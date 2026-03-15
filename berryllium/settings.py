@@ -149,3 +149,10 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
         'linenums': True,
     }
 }
+
+# Session configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # or 'cache' for Redis
+SESSION_COOKIE_AGE = 86400 * 7  # 7 days
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SECURE = True  # In production with HTTPS
