@@ -3,8 +3,9 @@ import uuid
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
+from django.forms import modelformset_factory
 
-from ..forms import FileUploadForm, MetadataForm
+from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
 from ..models import FileUpload
 
 # Navigation configuration for upload form
