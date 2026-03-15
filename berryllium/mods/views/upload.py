@@ -1,4 +1,5 @@
 import os
+import uuid
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
@@ -119,18 +120,12 @@ def upload_step2(request):
                 uf.file.name = temp_path  # point FileField at saved path
                 uf.save()
 
-                # Store ids for convenience (optional, but useful)
-                uploaded_ids = request.session.get('uploaded_file_ids', [])
-                uploaded_ids.append(uf.id)
-                request.session['uploaded_file_ids'] = uploaded_ids
-
                 # Store metadata in session for Step 2 preview list + removal
                 file_info = {
                     'temp_path': temp_path,
                     'original_name': basename,
                     'size': uploaded_file.size,
-                    'content_type': getattr(uploaded_file, "content_type", ""),
-                    'uploaded_file_id': uf.id,
+                    'content_type': getattr(uploaded_file, "content_type", "")
                 }
                 context['existing_files'].append(file_info)
                 request.session['temp_uploaded_files'] = context['existing_files']
