@@ -1,0 +1,113 @@
+{% load static %}
+{% load zfilters %}
+<div class="px-6 pt-6">
+    <span class="font-semibold text-white">Step 3 of 4: Organize Files</span>
+    <div class="bg-pine-600/50 h-12 rounded-full mt-4 items-center flex overflow-hidden pl-4 pr-4">
+        <div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full"></div>
+        <div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full"></div>
+        <div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full"></div>
+        <div class="bg-pine/10 h-2.5 rounded-full w-full"></div>
+    </div>
+</div>
+<form hx-post="{% url 'create_mods_step3' %}"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
+      x-data="fileOrganizer({ groups: JSON.parse(document.getElementById('groups-init').textContent), files: JSON.parse(document.getElementById('files-init').textContent), })">
+    {% csrf_token %}
+    {{ groups_init|json_script:"groups-init" }}
+    {{ files_init|json_script:"files-init" }}
+    <!-- groups management -->
+    <input type="hidden" name="groups-TOTAL_FORMS" :value="groups.length">
+    <input type="hidden" name="groups-INITIAL_FORMS" value="0">
+    <input type="hidden" name="groups-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="groups-MAX_NUM_FORMS" value="1000">
+    <!-- files management (model formset; INITIAL_FORMS must equal queryset size) -->
+    <input type="hidden" name="files-TOTAL_FORMS" :value="files.length">
+    <input type="hidden" name="files-INITIAL_FORMS" :value="files.length">
+    <input type="hidden" name="files-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="files-MAX_NUM_FORMS" value="1000">
+    <!-- File Groups -->
+    <div class="mt-6 px-6">
+        <div class="flex items-center justify-between mb-3">
+            <h3 class="text-white font-semibold">File Groups</h3>
+            <button type="button"
+                    @click="addGroup()"
+                    class="px-3 py-1.5 bg-gold-400/20 hover:bg-gold-400/30 text-gold-400 rounded-full text-sm transition cursor-pointer border border-gold-400/40 hover:border-gold-400 items-center flex gap-1">
+                <ion-icon name="add-outline" class="text-lg"></ion-icon> Add Group
+            </button>
+        </div>
+        <div class="space-y-4">
+            <template x-for="(g, groupIndex) in groups" :key="groupIndex">
+                <div class="bg-pine-600/15 border border-white/5 rounded-xl overflow-hidden">
+                    <!-- Group Header -->
+                    <div class="bg-pine-600/50 px-4 py-3 flex items-center justify-between border-b border-white/5">
+                        <input type="text"
+                               class="bg-pine-600/5 text-white font-medium flex-1 focus:outline-none"
+                               placeholder="Group name (e.g., Main Files)"
+                               x-model="g.name"
+                               :name="`groups-${groupIndex}-name`"
+                               required>
+                        <input type="hidden"
+                               :name="`groups-${groupIndex}-order`"
+                               :value="groupIndex">
+                        <button type="button"
+                                @click="removeGroup(groupIndex)"
+                                x-show="groups.length > 1 && groupIndex === groups.length - 1"
+                                class="text-red-400 hover:text-red-300 p-1 ml-2 cursor-pointer">
+                            <ion-icon name="trash-bin-outline" class="text-lg"></ion-icon>
+                        </button>
+                    </div>
+                    <div class="px-4 py-2 border-b border-white/5">
+                        <input type="text"
+                               class="bg-transparent text-white/70 text-sm w-full focus:outline-none"
+                               placeholder="Group description (optional)"
+                               x-model="g.description"
+                               :name="`groups-${groupIndex}-description`">
+                    </div>
+                    <!-- Drop zone -->
+                    <div class="p-4"
+                         @drop.prevent="handleDrop($event, groupIndex)"
+                         @dragover.prevent
+                         @dragenter.prevent="dragOverZone = groupIndex"
+                         :class="dragOverZone === groupIndex ? 'bg-gold-400/10' : ''">
+                        <div class="space-y-2">
+                            <template x-for="(f, i) in filesInGroup(groupIndex)" :key="f.id">
+                                <div draggable="true"
+                                     @dragstart="handleDragStart($event, f.id)"
+                                     @dragend="draggedFileId = null; dragOverZone = null"
+                                     class="bg-pine-600/30 border border-white/5 rounded-xl p-3 cursor-move hover:bg-pine-600/50 transition">
+                                    <!-- formset required hidden id field -->
+                                    <input type="hidden" :name="`files-${indexOfFile(f.id)}-id`" :value="f.id">
+                                    <!-- Keep server in sync -->
+                                    <input type="hidden"
+                                           :name="`files-${indexOfFile(f.id)}-group_index`"
+                                           :value="f.group_index">
+                                    <input type="hidden"
+                                           :name="`files-${indexOfFile(f.id)}-file_order`"
+                                           :value="f.file_order">
+                                    <span class="w-100 h-4 mb-2 text-white/50 cursor-move flex items-center gap-1">
+                                        <ion-icon name="reorder-three-outline" class="align-middle"></ion-icon>
+                                    </span>
+                                    <div class="flex items-center gap-3 mb-2 border-b border-white/5 pb-2">
+                                        <input type="text"
+                                               class="bg-transparent text-white font-medium focus:outline-none flex-1"
+                                               placeholder="Title"
+                                               x-model="f.title"
+                                               :name="`files-${indexOfFile(f.id)}-title`">
+                                        <span class="text-white/50 text-xs ml-auto" x-text="f.filename"></span>
+                                    </div>
+                                    <textarea class="bg-transparent text-white/70 text-sm w-full focus:outline-none"
+                                              rows="2"
+                                              placeholder="Description"
+                                              x-model="f.description"
+                                              :name="`files-${indexOfFile(f.id)}-description`"></textarea>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
+    </div>
+    {% include "upload/mods/actions.html" %}
+</form>

@@ -1,0 +1,31 @@
+<div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
+    <button type="button"
+            class="zb-controls flex-1 items-center justify-center"
+            hx-post="{% url 'cancel_mod_upload' %}"
+            hx-trigger="click"
+            hx-swap="none">Cancel</button>
+    {% if current_nav_index > 0 %}
+        <button type="submit"
+                class="zb-controls text-gray-400 flex-1 items-center justify-center hover:text-white transition-colors"
+                value="previous"
+                name="action">
+            <span><ion-icon name="arrow-back" class="align-middle"></ion-icon>
+            Previous</span>
+        </button>
+    {% endif %}
+    {% if remainder_range|length >= 0 %}
+        <button type="submit"
+                class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
+                value="next"
+                name="action">
+            <span>Next <ion-icon name="arrow-forward" class="align-middle"></ion-icon></span>
+        </button>
+    {% else %}
+        <button type="submit"
+                class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
+                value="next"
+                name="action">
+            <span>Finish <ion-icon name="checkmark" class="align-middle"></ion-icon></span>
+        </button>
+    {% endif %}
+</div>
