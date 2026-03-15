@@ -1,7 +1,9 @@
 <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
     <button type="button"
             class="zb-controls flex-1 items-center justify-center"
-            {% comment %} hx-post="{% url 'cancel_mod_upload' %}" {% endcomment %}
+            {% comment %}
+            hx-post="{% url 'cancel_mod_upload' %}"
+            {% endcomment %}
             hx-trigger="click"
             hx-swap="none">Cancel</button>
     {% if current_nav_index > 0 %}
