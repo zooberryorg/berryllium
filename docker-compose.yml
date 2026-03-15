@@ -1,0 +1,9 @@
+name: berrylium
+services:
+  app:
+    image: berrylium
+    container_name: berrylium.alpha.0.1.0
+    ports:
+      - "8001:8000"
+    volumes:
+      - .:/berrylium
