@@ -1,6 +1,6 @@
 <!-- progress bar -->
 <div class="px-6 pt-6">
-    {% include "upload/mods/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+    {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <div x-data="fileUploader()">
     <form hx-post="{% url 'create_mods_step2' %}"
