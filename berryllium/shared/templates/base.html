@@ -3,10 +3,10 @@
 <!DOCTYPE html>
 <html lang="en">
     <head>
-        {% include 'core/meta.html' %}
+        {% include 'shared/meta.html' %}
     </head>
     <body class="bg-pine-800 text-gray-900 font-manrope-400 text-storm-fg">
-        {% include 'core/navigation/navigation.html' %}
+        {% include 'shared/navigation/navigation.html' %}
         <main class="page-transition">
             <div class="container mx-auto">
             {% block content %}
@@ -14,7 +14,7 @@
             </div>
         </main>
         <footer class="bg-pine-900/50 mt-16 h-fit">
-            {% include 'core/footer.html' %}
+            {% include 'shared/footer.html' %}
         </footer>
     </body>
 </html>
