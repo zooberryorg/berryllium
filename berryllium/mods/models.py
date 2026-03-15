@@ -78,6 +78,9 @@ class Dependency(models.Model):
 
 
 class FileUpload(models.Model):
+    """
+    File uploads attached to mod pages.
+    """
     file = models.FileField(upload_to='uploads/')
     date = models.DateTimeField(auto_now_add=True)
     size = models.FloatField()
