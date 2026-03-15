@@ -1,44 +1,41 @@
 <!-- scrollable form -->
-  <!-- progress bar -->
+<!-- progress bar -->
 <div class="px-6 pt-6">
-  {% include "upload/mods/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+    {% include "upload/mods/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <form hx-post="{% url 'create_mods_step1' %}"
       hx-target="#upload-frame"
       hx-swap="innerHTML"
-      hx-encoding="multipart/form-data"
->
-    
-  {% csrf_token %}
-    
-  <div class="space-y-4 p-6">
-    <div>
-      <label class="block text-sm font-medium mb-1 text-white">
-        Title <span class="text-red-400">*</span>
-      </label>
-      {{ form.title }}
-      {% include "components/field_errors.html" with field=form.title %}
-      <label class="block text-sm font-medium mb-1 mt-4 text-white">
-        Summary (Max 200 characters) <span class="text-red-400">*</span>
-      </label>
-      {{ form.summary }}
-      {% include "components/field_errors.html" with field=form.summary %}
-      <label class="block text-sm font-medium mb-1 mt-4 text-white">
-        Category <span class="text-red-400">*</span>
-      </label>
-      {{ form.category }}
-      {% include "components/field_errors.html" with field=form.category %}
-      <label class="block text-sm font-medium mb-1 mt-4 text-white">
-        Game <span class="text-red-400">*</span>
-      </label>
-      {{ form.game }}
-      {% include "components/field_errors.html" with field=form.game %}
-      <label class="block text-sm font-medium mb-1 mt-4 text-white">
-        Expansions <span class="text-red-400">*</span>
-      </label>
-      {{ form.expansions }}
-      {% include "components/field_errors.html" with field=form.expansions %}
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    <div class="space-y-4 p-6">
+        <div>
+            <label class="block text-sm font-medium mb-1 text-white">
+                Title <span class="text-red-400">*</span>
+            </label>
+            {{ form.title }}
+            {% include "components/field_errors.html" with field=form.title %}
+            <label class="block text-sm font-medium mb-1 mt-4 text-white">
+                Summary (Max 200 characters) <span class="text-red-400">*</span>
+            </label>
+            {{ form.summary }}
+            {% include "components/field_errors.html" with field=form.summary %}
+            <label class="block text-sm font-medium mb-1 mt-4 text-white">
+                Category <span class="text-red-400">*</span>
+            </label>
+            {{ form.category }}
+            {% include "components/field_errors.html" with field=form.category %}
+            <label class="block text-sm font-medium mb-1 mt-4 text-white">
+                Game <span class="text-red-400">*</span>
+            </label>
+            {{ form.game }}
+            {% include "components/field_errors.html" with field=form.game %}
+            <label class="block text-sm font-medium mb-1 mt-4 text-white">
+                Expansions <span class="text-red-400">*</span>
+            </label>
+            {{ form.expansions }}
+            {% include "components/field_errors.html" with field=form.expansions %}
+        </div>
     </div>
-  </div>
-  {% include "upload/mods/actions.html" %}
+    {% include "upload/mods/actions.html" %}
 </form>
