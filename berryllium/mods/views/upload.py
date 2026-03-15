@@ -1,4 +1,8 @@
+import os
+
 from django.shortcuts import render, redirect
+from django.core.files.storage import default_storage
+
 from ..forms import FileUploadForm, MetadataForm
 from ..models import FileUpload
 
