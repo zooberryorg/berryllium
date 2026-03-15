@@ -1,49 +1,45 @@
-<div class="relative" 
-     x-data="{ open: false }" 
-     @mouseenter="open = true" 
+<div class="relative"
+     x-data="{ open: false }"
+     @mouseenter="open = true"
      @mouseleave="open = false">
-  
-  <a @click.prevent="open = !open" 
-     class="flex items-center space-x-2 bg-gradient-to-r from-gold-500 to-gold-300 text-pine-500 pl-4 pr-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-pine-900/50 transition-all duration-300 cursor-pointer font-medium">
-    <ion-icon name="add-outline" class="text-lg"></ion-icon>
-    <span>New</span>
-  </a>
-  
-  <div x-show="open" 
-       @click.outside="open = false"
-       x-transition
-       class="absolute pt-2 z-50 right-0">
-    <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[280px]">
-      
-      <a href="#"
-         class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item cursor-pointer">
-        <div class="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center mr-3 group-hover/item:bg-amber-600/20 transition-colors">
-          <i class="bi bi-upload text-amber-400"></i>
+    <a @click.prevent="open = !open"
+       class="flex items-center space-x-2 bg-gradient-to-r from-gold-500 to-gold-300 text-pine-500 pl-4 pr-5 py-2.5 rounded-full hover:shadow-lg hover:shadow-pine-900/50 transition-all duration-300 cursor-pointer font-medium">
+        <ion-icon name="add-outline" class="text-lg"></ion-icon>
+        <span>New</span>
+    </a>
+    <div x-show="open"
+         @click.outside="open = false"
+         x-transition
+         class="absolute pt-2 z-50 right-0">
+        <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[280px]">
+            <a href="#"
+               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item cursor-pointer">
+                <div class="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center mr-3 group-hover/item:bg-amber-600/20 transition-colors">
+                    <i class="bi bi-upload text-amber-400"></i>
+                </div>
+                <span class="text-white font-medium group-hover/item:text-amber-400 transition-colors">Upload a File</span>
+            </a>
+            <a href="#"
+               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+                <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center mr-3 group-hover/item:bg-blue-600/20 transition-colors">
+                    <i class="bi bi-journal-text text-blue-400"></i>
+                </div>
+                <span class="text-white font-medium group-hover/item:text-blue-400 transition-colors">New Dev Diary</span>
+            </a>
+            <a href="#"
+               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+                <div class="w-10 h-10 rounded-lg bg-cyan-600/10 flex items-center justify-center mr-3 group-hover/item:bg-cyan-600/20 transition-colors">
+                    <i class="bi bi-newspaper text-cyan-400"></i>
+                </div>
+                <span class="text-white font-medium group-hover/item:text-cyan-400 transition-colors">Write a Tutorial</span>
+            </a>
+            <a href="#"
+               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+                <div class="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center mr-3 group-hover/item:bg-green-600/20 transition-colors">
+                    <i class="bi bi-people-fill text-green-400"></i>
+                </div>
+                <span class="text-white font-medium group-hover/item:text-green-400 transition-colors">Start Design Team</span>
+            </a>
         </div>
-        <span class="text-white font-medium group-hover/item:text-amber-400 transition-colors">Upload a File</span>
-      </a>
-      
-      <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-        <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center mr-3 group-hover/item:bg-blue-600/20 transition-colors">
-          <i class="bi bi-journal-text text-blue-400"></i>
-        </div>
-        <span class="text-white font-medium group-hover/item:text-blue-400 transition-colors">New Dev Diary</span>
-      </a>
-      
-      <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-        <div class="w-10 h-10 rounded-lg bg-cyan-600/10 flex items-center justify-center mr-3 group-hover/item:bg-cyan-600/20 transition-colors">
-          <i class="bi bi-newspaper text-cyan-400"></i>
-        </div>
-        <span class="text-white font-medium group-hover/item:text-cyan-400 transition-colors">Write a Tutorial</span>
-      </a>
-      
-      <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-        <div class="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center mr-3 group-hover/item:bg-green-600/20 transition-colors">
-          <i class="bi bi-people-fill text-green-400"></i>
-        </div>
-        <span class="text-white font-medium group-hover/item:text-green-400 transition-colors">Start Design Team</span>
-      </a>
-      
     </div>
-  </div>
 </div>
