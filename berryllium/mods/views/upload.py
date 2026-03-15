@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from ..forms import FileUploadForm, MetadataForm
+from ..models import FileUpload
 
 # Navigation configuration for upload form
 #     name: Current location title
@@ -98,7 +99,7 @@ def upload_step2(request):
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
                 # Create DB row so Step 3 can actually query files
-                uf = UploadedFile(
+                uf = FileUpload(
                     size=uploaded_file.size,
                     filename=basename,
                     upload_session=session_id,
