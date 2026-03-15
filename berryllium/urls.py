@@ -19,5 +19,6 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('shared/', include('berryllium.shared.urls'))
+    path('shared/', include('berryllium.shared.urls')),
+    path('', include('berryllium.landings.urls'))
 ]

@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'berryllium.shared'
+    'berryllium.shared',
+    'berryllium.landings'
 ]
 
 MIDDLEWARE = [
