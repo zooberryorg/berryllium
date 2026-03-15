@@ -1,40 +1,36 @@
 {# Navigation #}
 <nav class="backdrop-blur-xl sticky top-0 z-50">
-  <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-    <a href="{% url 'home' %}" class="flex items-center space-x-3 rtl:space-x-reverse group">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-400 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
-          <span class="text-pine-500 font-bold text-xl">Z</span>
-        </div>
-        <span class="self-center text-2xl font-bold whitespace-nowrap text-white group-hover:text-amber-400 transition-colors">ZooBerry</span>
-    </a>
-    
-    {# Navigation links #}
-    <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1" id="navbar-search">
-      <div class="flex flex-col p-4 md:p-0 mt-4 md:space-x-2 rtl:space-x-reverse md:flex-row md:mt-0">
-        
-        {# Explore Dropdown #}
-        {% include 'shared/navigation/explore_menu.html' %}
-      </div>
-    </div>
-    
-    {# Right side actions #}
-    <div class="flex md:order-2 items-center space-x-3">
-      {% comment %} {% if user.is_authenticated %} {% endcomment %}
-        
-        {# Create new content dropdown #}
-        {% include 'shared/navigation/create_menu.html' %}
-        
-        {# User Profile Dropdown #}
-        {% include 'shared/navigation/user_menu.html' %}          
-      {% comment %} {% else %} {% endcomment %}
-        
-        {# Login Button #}
-        <a href="#" class="flex items-center space-x-2 text-white bg-[#4a5a4b]/50 hover:bg-[#5a6a5b]/50 pl-4 pr-5 py-2.5 rounded-full font-medium transition-all duration-200 border border-[#5a6a5b]/50 hover:border-[#6a7a6b]/50">
-          <ion-icon name="log-in-outline" class="text-lg"></ion-icon>
-          <span>Login</span>
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+        <a href="{% url 'home' %}"
+           class="flex items-center space-x-3 rtl:space-x-reverse group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-gold-500 to-gold-400 flex items-center justify-center transform group-hover:scale-110 transition-transform duration-300">
+                <span class="text-pine-500 font-bold text-xl">Z</span>
+            </div>
+            <span class="self-center text-2xl font-bold whitespace-nowrap text-white group-hover:text-amber-400 transition-colors">ZooBerry</span>
         </a>
-        
-      {% comment %} {% endif %} {% endcomment %}
+        {# Navigation links #}
+        <div class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+             id="navbar-search">
+            <div class="flex flex-col p-4 md:p-0 mt-4 md:space-x-2 rtl:space-x-reverse md:flex-row md:mt-0">
+                {# Explore Dropdown #}
+                {% include 'shared/navigation/explore_menu.html' %}
+            </div>
+        </div>
+        {# Right side actions #}
+        <div class="flex md:order-2 items-center space-x-3">
+            {% comment %} {% if user.is_authenticated %} {% endcomment %}
+            {# Create new content dropdown #}
+            {% include 'shared/navigation/create_menu.html' %}
+            {# User Profile Dropdown #}
+            {% include 'shared/navigation/user_menu.html' %}
+            {% comment %} {% else %} {% endcomment %}
+            {# Login Button #}
+            <a href="#"
+               class="flex items-center space-x-2 text-white bg-[#4a5a4b]/50 hover:bg-[#5a6a5b]/50 pl-4 pr-5 py-2.5 rounded-full font-medium transition-all duration-200 border border-[#5a6a5b]/50 hover:border-[#6a7a6b]/50">
+                <ion-icon name="log-in-outline" class="text-lg"></ion-icon>
+                <span>Login</span>
+            </a>
+            {% comment %} {% endif %} {% endcomment %}
+        </div>
     </div>
-  </div>
 </nav>

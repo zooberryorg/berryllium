@@ -1,61 +1,59 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block content %}
-
-<div class="relative grid mb-12 w-full rounded-3xl overflow-hidden mt-6">
-
-    <div class="col-start-1 row-start-1 max-w-screen-xl mx-auto p-8 md:p-12 z-20 w-full mt-2">
-        <div class="flex flex-col lg:flex-row justify-between items-center lg:items-start text-center lg:text-left gap-8">
-            
-            {# content #}
-            <div class="flex flex-col flex-1 animate-fade-in items-center">
-                <h1 class="text-5xl md:text-5xl font-bold mb-6 gradient-text">
-                    ZooBerry 3.0 is Here
-                </h1>
-                <p class="mb-8 text-sm text-gray-300 max-w-2xl leading-relaxed p-6 bg-pine-700 rounded-2xl">
-                    It's been a long-time coming, but ZooBerry is now officially in its third major version! Explore the sleek new interface, interactive features, and a whole slew of new archived content for both Zoo Tycoon 1 and Zoo Tycoon 2.
-                </p>
-
-                {# Pseudo searchbar that leads to explore (button) #}
-                <div class="relative mb-10">
-                    <a href="#" class="zb-input pl-12">
-                        <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-                        <span class="text-gray-400 group-hover:text-white transition-colors duration-300">Search mods, zoos, tutorials...</span>
-                    </a>
-                </div>
-                
-                {# cta buttons (cta = call to action) #}
-                <div class="flex flex-wrap gap-4 mb-12">
-                    <button class="border-2 border-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-600/20 transition-all duration-300 hover:shadow-lg hover:shadow-pine-800/30 flex items-center cursor-pointer">
-                        <span>Learn More</span>
-                    </button>
-                    <a href="#" class="btn-gradient text-pine-400 px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-pine-800/50 transition-all duration-300 cursor-pointer flex items-center">
-                        <i class="bi bi-upload mr-2 group-hover:text-pine-400 transition-colors duration-300"></i>
-                        <span>Upload Mod</span>
-                    </a>
-                </div>
-                
-                {# game selection #}
-                <div class="mt-4">
-                    <h3 class="text-2xl font-bold mb-6 text-white">Start Exploring</h3>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#" class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                            <img src="{% static 'shared/images/zt1.png' %}" alt="Zoo Tycoon 1" class="w-48 rounded-2xl transform group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-pine-800/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-end justify-center pb-4">
-                                <span class="text-white font-bold text-lg">Zoo Tycoon 1</span>
-                            </div>
+    <div class="relative grid mb-12 w-full rounded-3xl overflow-hidden mt-6">
+        <div class="col-start-1 row-start-1 max-w-screen-xl mx-auto p-8 md:p-12 z-20 w-full mt-2">
+            <div class="flex flex-col lg:flex-row justify-between items-center lg:items-start text-center lg:text-left gap-8">
+                {# content #}
+                <div class="flex flex-col flex-1 animate-fade-in items-center">
+                    <h1 class="text-5xl md:text-5xl font-bold mb-6 gradient-text">ZooBerry 3.0 is Here</h1>
+                    <p class="mb-8 text-sm text-gray-300 max-w-2xl leading-relaxed p-6 bg-pine-700 rounded-2xl">
+                        It's been a long-time coming, but ZooBerry is now officially in its third major version! Explore the sleek new interface, interactive features, and a whole slew of new archived content for both Zoo Tycoon 1 and Zoo Tycoon 2.
+                    </p>
+                    {# Pseudo searchbar that leads to explore (button) #}
+                    <div class="relative mb-10">
+                        <a href="#" class="zb-input pl-12">
+                            <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                            <span class="text-gray-400 group-hover:text-white transition-colors duration-300">Search mods, zoos, tutorials...</span>
                         </a>
-                        <a href="#" class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
-                            <img src="{% static 'shared/images/zt2.png' %}" alt="Zoo Tycoon 2" class="w-48 rounded-2xl transform group-hover:scale-110 transition-transform duration-500">
-                            <div class="absolute inset-0 bg-gradient-to-t from-pine-800/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-end justify-center pb-4">
-                                <span class="text-white font-bold text-lg">Zoo Tycoon 2</span>
-                            </div>
+                    </div>
+                    {# cta buttons (cta = call to action) #}
+                    <div class="flex flex-wrap gap-4 mb-12">
+                        <button class="border-2 border-gold-600 text-white px-6 py-3 rounded-xl font-semibold hover:bg-gold-600/20 transition-all duration-300 hover:shadow-lg hover:shadow-pine-800/30 flex items-center cursor-pointer">
+                            <span>Learn More</span>
+                        </button>
+                        <a href="#"
+                           class="btn-gradient text-pine-400 px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-pine-800/50 transition-all duration-300 cursor-pointer flex items-center">
+                            <i class="bi bi-upload mr-2 group-hover:text-pine-400 transition-colors duration-300"></i>
+                            <span>Upload Mod</span>
                         </a>
+                    </div>
+                    {# game selection #}
+                    <div class="mt-4">
+                        <h3 class="text-2xl font-bold mb-6 text-white">Start Exploring</h3>
+                        <div class="flex flex-wrap gap-4">
+                            <a href="#"
+                               class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                                <img src="{% static 'shared/images/zt1.png' %}"
+                                     alt="Zoo Tycoon 1"
+                                     class="w-48 rounded-2xl transform group-hover:scale-110 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-pine-800/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-end justify-center pb-4">
+                                    <span class="text-white font-bold text-lg">Zoo Tycoon 1</span>
+                                </div>
+                            </a>
+                            <a href="#"
+                               class="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
+                                <img src="{% static 'shared/images/zt2.png' %}"
+                                     alt="Zoo Tycoon 2"
+                                     class="w-48 rounded-2xl transform group-hover:scale-110 transition-transform duration-500">
+                                <div class="absolute inset-0 bg-gradient-to-t from-pine-800/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl flex items-end justify-center pb-4">
+                                    <span class="text-white font-bold text-lg">Zoo Tycoon 2</span>
+                                </div>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-
 {% endblock %}
