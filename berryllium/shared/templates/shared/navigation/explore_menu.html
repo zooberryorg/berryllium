@@ -1,0 +1,83 @@
+    <div class="relative group">
+        <a href="{% url 'explore' %}" class="flex items-center space-x-2 px-5 py-2.5 rounded-full text-white font-medium bg-pine-300 hover:bg-[#4a5a4b]/50 transition-all duration-200 cursor-pointer">
+        <span>Explore</span>
+        <i class="bi bi-caret-down-fill text-xs group-hover:rotate-180 transition-transform duration-200"></i>
+        </a>
+        
+        {# Dropdown Menu #}
+        <div class="absolute hidden group-hover:block pt-2 z-50 left-0">
+        <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[340px] opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+            
+            <a href="{% url 'browse_mods' %}" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center mr-3 group-hover/item:bg-amber-600/20 transition-colors">
+                <i class="bi bi-puzzle-fill text-amber-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-amber-400 transition-colors">Mods</div>
+                <div class="text-xs text-gray-400">Browse all modifications</div>
+            </div>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center mr-3 group-hover/item:bg-blue-600/20 transition-colors">
+                <i class="bi bi-grid-3x3-gap-fill text-blue-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-blue-400 transition-colors">Zoos and Save Files</div>
+                <div class="text-xs text-gray-400">Share your creations</div>
+            </div>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-cyan-600/10 flex items-center justify-center mr-3 group-hover/item:bg-cyan-600/20 transition-colors">
+                <i class="bi bi-tools text-cyan-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-cyan-400 transition-colors">Modding Tutorials</div>
+                <div class="text-xs text-gray-400">Learn to mod</div>
+            </div>
+            </a>
+            
+            <div class="h-px bg-[#4a5a4b]/50 my-2"></div>
+            
+            <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center mr-3 group-hover/item:bg-green-600/20 transition-colors">
+                <i class="bi bi-newspaper text-green-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-green-400 transition-colors">News</div>
+                <div class="text-xs text-gray-400">Latest updates</div>
+            </div>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-yellow-600/10 flex items-center justify-center mr-3 group-hover/item:bg-yellow-600/20 transition-colors">
+                <i class="bi bi-people-fill text-yellow-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-yellow-400 transition-colors">Modders</div>
+                <div class="text-xs text-gray-400">Community creators</div>
+            </div>
+            </a>
+            
+            <a href="#" class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
+            <div class="w-10 h-10 rounded-lg bg-orange-600/10 flex items-center justify-center mr-3 group-hover/item:bg-orange-600/20 transition-colors">
+                <i class="bi bi-archive text-orange-400 text-lg"></i>
+            </div>
+            <div class="flex-1">
+                <div class="font-medium text-white group-hover/item:text-orange-400 transition-colors">Archived Websites</div>
+                <div class="text-xs text-gray-400">Historical archives</div>
+            </div>
+            </a>
+            
+        </div>
+        </div>
+    </div>
+    
+    {# Other nav links #}
+    <div>
+        <a href="#" class="block px-5 py-2.5 rounded-full text-gray-300 hover:text-white hover:bg-pine-300 font-medium transition-all duration-200">About</a>
+    </div>
+    <div>
+        <a href="#" class="block px-5 py-2.5 rounded-full text-gray-300 hover:text-white hover:bg-pine-300 font-medium transition-all duration-200">Discord</a>
+    </div>
