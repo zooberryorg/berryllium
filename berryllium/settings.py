@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'berryllium.shared',
-    'berryllium.landings'
+    'berryllium.landings',
+    'berryllium.mods'
 ]
 
 MIDDLEWARE = [
