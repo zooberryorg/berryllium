@@ -18,6 +18,7 @@ NAVIGATION = [
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
 
+
 def _get_upload_session_id(request):
     """
     Ensure a session key exists (needed to tie UploadedFile rows to a user’s draft upload).
@@ -90,25 +91,29 @@ def upload_step2(request):
     remainder_range = range(current_index, len(NAVIGATION))
     nav_item_count = len(NAVIGATION)
     context = {
-        'form': FileUploadForm(),
-        'filename': request.session.get('upload_original_name'),
-        'nav_item_count': nav_item_count,
-        'current_nav_index': current_index - 1,
-        'progress_range': progress_range,
-        'remainder_range': remainder_range,
-        'existing_files': request.session.get('temp_uploaded_files', []),
+        "form": FileUploadForm(),
+        "filename": request.session.get("upload_original_name"),
+        "nav_item_count": nav_item_count,
+        "current_nav_index": current_index - 1,
+        "progress_range": progress_range,
+        "remainder_range": remainder_range,
+        "existing_files": request.session.get("temp_uploaded_files", []),
     }
 
-    if request.method == 'POST':
-        form = FileUploadForm(request.POST, request.FILES, existing_files=context['existing_files'])
+    if request.method == "POST":
+        form = FileUploadForm(
+            request.POST, request.FILES, existing_files=context["existing_files"]
+        )
 
         if form.is_valid():
-            uploaded_file = form.cleaned_data['file']
+            uploaded_file = form.cleaned_data["file"]
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
-                temp_filename = f"temp_uploads/{session_id}/{uuid.uuid4().hex}_{basename}"
+                temp_filename = (
+                    f"temp_uploads/{session_id}/{uuid.uuid4().hex}_{basename}"
+                )
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
                 # Create DB row so Step 3 can actually query files
@@ -122,30 +127,34 @@ def upload_step2(request):
 
                 # Store metadata in session for Step 2 preview list + removal
                 file_info = {
-                    'temp_path': temp_path,
-                    'original_name': basename,
-                    'size': uploaded_file.size,
-                    'content_type': getattr(uploaded_file, "content_type", "")
+                    "temp_path": temp_path,
+                    "original_name": basename,
+                    "size": uploaded_file.size,
+                    "content_type": getattr(uploaded_file, "content_type", ""),
                 }
-                context['existing_files'].append(file_info)
-                request.session['temp_uploaded_files'] = context['existing_files']
+                context["existing_files"].append(file_info)
+                request.session["temp_uploaded_files"] = context["existing_files"]
                 request.session.modified = True
 
-            if request.POST.get('action') == 'next':
-                if not request.session.get('temp_uploaded_files'):
-                    form.add_error('file', 'Please upload at least one file before continuing.')
-                    context['form'] = form
-                    context['existing_files'] = request.session.get('temp_uploaded_files', [])
-                    return render(request, 'mods/upload/step/2.html', context)
-                return redirect('create_mods_step3')
-            elif request.POST.get('action') == 'previous':
+            if request.POST.get("action") == "next":
+                if not request.session.get("temp_uploaded_files"):
+                    form.add_error(
+                        "file", "Please upload at least one file before continuing."
+                    )
+                    context["form"] = form
+                    context["existing_files"] = request.session.get(
+                        "temp_uploaded_files", []
+                    )
+                    return render(request, "mods/upload/step/2.html", context)
+                return redirect("create_mods_step3")
+            elif request.POST.get("action") == "previous":
                 print("Going back to step 1 from step 2")
-                return redirect('upload_step1')
+                return redirect("upload_step1")
             else:
-                return render(request, 'mods/upload/step/2.html', context)
+                return render(request, "mods/upload/step/2.html", context)
 
-        context['form'] = form  # return form with errors if invalid
-        return render(request, 'mods/upload/step/2.html', context)
+        context["form"] = form  # return form with errors if invalid
+        return render(request, "mods/upload/step/2.html", context)
 
     # GET
-    return render(request, 'mods/upload/step/2.html', context)
+    return render(request, "mods/upload/step/2.html", context)
