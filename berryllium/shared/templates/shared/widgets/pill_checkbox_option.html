@@ -1,0 +1,17 @@
+{# templates/core/widgets/pill_checkbox_option.html #}
+<div class="relative">
+    <input type="checkbox"
+           name="{{ widget.name }}"
+           value="{{ widget.value|stringformat:'s' }}"
+           {% include "django/forms/widgets/attrs.html" %}
+           {% if widget.selected %}checked{% endif %}
+           class="peer sr-only" />
+    <span class="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 rounded-full border border-white/25 peer-checked:hidden pointer-events-none bg-pine-600/25"></span>
+    <span class="absolute left-4 top-1/2 -translate-y-1/2 hidden peer-checked:inline-flex h-5 w-5 items-center justify-center rounded-full border border-gold-400/40 bg-gold-400 pointer-events-none">
+        <ion-icon name="checkmark" class="text-pine-600 text-lg"></ion-icon>
+    </span>
+    <label for="{{ widget.attrs.id }}"
+           class=" flex items-center justify-between gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 pl-12 cursor-pointer transition hover:bg-white/10 peer-checked:border-gold-400/50 peer-checked:bg-gold-400/10 ">
+        <span class="text-white/90">{{ widget.label }}</span>
+    </label>
+</div>
