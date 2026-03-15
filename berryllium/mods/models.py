@@ -76,6 +76,9 @@ class FileGroup(models.Model):
         ordering = ['order']
 
 class FileGroupMembership(models.Model):
+    """
+    Through model that offers file metadata in a FileGroup, specifically file reference and order in the group.
+    """
     file_group = models.ForeignKey(FileGroup, on_delete=models.CASCADE)
     uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
     order = models.IntegerField(default=0)
