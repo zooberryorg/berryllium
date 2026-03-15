@@ -47,7 +47,7 @@ def upload_step1(request):
             request.session['upload_metadata'] = form.cleaned_data
             
             # Return NEXT state (step 2) on success
-            return redirect('create_mods_step2')
+            return redirect('upload_step2')
         
         # Invalid: return SAME state with errors
         context['form'] = form
