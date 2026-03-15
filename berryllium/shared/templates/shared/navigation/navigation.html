@@ -19,14 +19,14 @@
     
     {# Right side actions #}
     <div class="flex md:order-2 items-center space-x-3">
-      {% if user.is_authenticated %}
+      {% comment %} {% if user.is_authenticated %} {% endcomment %}
         
         {# Create new content dropdown #}
         {% include 'shared/navigation/create_menu.html' %}
         
         {# User Profile Dropdown #}
         {% include 'shared/navigation/user_menu.html' %}          
-      {% else %}
+      {% comment %} {% else %} {% endcomment %}
         
         {# Login Button #}
         <a href="#" class="flex items-center space-x-2 text-white bg-[#4a5a4b]/50 hover:bg-[#5a6a5b]/50 pl-4 pr-5 py-2.5 rounded-full font-medium transition-all duration-200 border border-[#5a6a5b]/50 hover:border-[#6a7a6b]/50">
@@ -34,7 +34,7 @@
           <span>Login</span>
         </a>
         
-      {% endif %}
+      {% comment %} {% endif %} {% endcomment %}
     </div>
   </div>
 </nav>
