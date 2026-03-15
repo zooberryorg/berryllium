@@ -1,0 +1,174 @@
+@import "tailwindcss";
+
+@theme {
+  /* Breakpoint overrides */
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
+  
+  /* Pine color scale */
+  --color-pine-50: #f1f5ef;
+  --color-pine-100: #d9e3d3;
+  --color-pine-200: #3a5231;
+  --color-pine-300: #2e4226;
+  --color-pine-400: #263721;
+  --color-pine-500: #22311c;
+  --color-pine-600: #1e2b1a;
+  --color-pine-700: #263621;
+  --color-pine-800: #171f14;
+  --color-pine-900: #0b0e09;
+
+  /* Gold color scale */
+  --color-gold-50: #fef9ed;
+  --color-gold-100: #fdf0d1;
+  --color-gold-200: #f9e2a3;
+  --color-gold-300: #e5cd7b;
+  --color-gold-400: #d6b15d;
+  --color-gold-500: #d4a435;
+  --color-gold-600: #b68a2a;
+  --color-gold-700: #8f6b1f;
+  --color-gold-800: #6b4f16;
+  --color-gold-900: #4a360f;
+}
+.test {
+  color: #263621;
+}
+/* Layers */
+@layer components {
+  /* Input */
+  :is(.zb-input) {
+    @apply w-full rounded-full border border-pine-300 px-4 py-3 text-white transition-all duration-200;
+    @apply bg-pine-600 backdrop-blur-md;
+    @apply placeholder:text-gray-400;
+    @apply focus:outline-none;
+    @apply focus:border-[#c9a961];
+    @apply focus:bg-pine-600/60;
+    @apply hover:border-[#c9a961];
+    @apply hover:bg-pine-600/50;
+  }
+
+  :is(.zb-textarea) {
+    @apply w-full rounded-xl border border-pine-300 px-4 py-3 text-white transition-all duration-200;
+    @apply bg-pine-600 backdrop-blur-md;
+    @apply placeholder:text-gray-400;
+    @apply focus:outline-none;
+    @apply focus:border-[#c9a961];
+    @apply focus:bg-pine-600/60;
+    @apply hover:border-[#c9a961];
+    @apply hover:bg-pine-600/50;
+
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  :is(.zb-controls) {
+    @apply px-6 py-3 rounded-full flex items-center cursor-pointer;
+    @apply bg-[#4a5a4b]/50;
+    @apply hover:bg-[#5a6a5b]/50;
+    @apply hover:text-white ;
+    @apply text-gray-400 font-medium;
+    @apply border border-[#5a6a5b]/50;
+    @apply transition-all duration-200;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+  }
+
+  /* Card lift */
+  .card-lift {
+    @apply transition-[transform,box-shadow] duration-300 ease-out;
+  }
+  .card-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+
+  /* Button gradient hover (with overlay) */
+  .btn-gradient {
+    background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+  .btn-gradient::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #c9a961 0%, #d4af37 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  .btn-gradient:hover::before {
+    opacity: 1;
+  }
+  .btn-gradient span {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Glassmorphism card */
+  .glass {
+    background: #2e4226;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(75, 85, 99, 0.5);
+  }
+
+  /* Accent border glow */
+  .border-glow {
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  .border-glow:hover {
+    border-color: rgba(212, 175, 55, 0.6);
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Skeleton */
+  .skeleton {
+    background: linear-gradient(90deg, #4a5a4b 25%, #5a6a5b 50%, #4a5a4b 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s ease-in-out infinite;
+  }
+
+  /* Page transition */
+  .page-transition {
+    animation: fadeIn 0.4s ease-in;
+  }
+
+  /* Animation utility class */
+  .animate-fade-in-up {
+    animation: fadeInUp 0.5s ease-out;
+  }
+}
+
+/* Keyframes */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loading {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@layer base {
+  /* Scrollbar (global) */
+  ::-webkit-scrollbar { width: 12px; }
+  ::-webkit-scrollbar-track { background: #3a4a3b; }
+  ::-webkit-scrollbar-thumb { background: #5a6a5b; border-radius: 6px; }
+  ::-webkit-scrollbar-thumb:hover { background: #6b7280; }
+}
