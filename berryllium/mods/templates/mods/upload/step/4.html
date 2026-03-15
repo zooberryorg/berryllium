@@ -1,0 +1,52 @@
+<div class="px-6 pt-6">
+    <span class="font-semibold text-white">Step 4 of 4: Review & Publish</span>
+</div>
+<div class="p-6 space-y-6">
+    <!-- Metadata summary -->
+    <div class="bg-white/5 border border-white/10 rounded-lg p-4">
+        <h3 class="text-white font-semibold mb-2">Basic Info</h3>
+        <div class="text-white/70 text-sm space-y-1">
+            <div>
+                <span class="text-white/50">Title:</span> {{ metadata.title }}
+            </div>
+            <div>
+                <span class="text-white/50">Category:</span> {{ metadata.category }}
+            </div>
+            <div>
+                <span class="text-white/50">Game:</span> {{ metadata.game|join:", " }}
+            </div>
+            <div>
+                <span class="text-white/50">Expansions:</span> {{ metadata.expansions|join:", " }}
+            </div>
+            <div class="pt-2">
+                <span class="text-white/50">Summary:</span> {{ metadata.summary }}
+            </div>
+        </div>
+    </div>
+    <!-- Groups & files -->
+    <div class="space-y-4">
+        <h3 class="text-white font-semibold">File Organization</h3>
+        {% for g in groups %}
+            <div class="bg-white/5 border border-white/10 rounded-lg overflow-hidden">
+                <div class="px-4 py-3 border-b border-white/10 flex items-center justify-between">
+                    <div class="text-white font-medium">{{ g.name }}</div>
+                    <div class="text-white/50 text-xs">Group {{ forloop.counter0 }}</div>
+                </div>
+                <div class="p-4 space-y-2">
+                    {% for f in files %}
+                        {% if f.group_index == forloop.parentloop.counter0 %}
+                            <div class="bg-white/10 border border-white/15 rounded-md p-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-white text-sm font-medium">{{ f.title|default:f.filename }}</div>
+                                    <div class="text-white/50 text-xs">{{ f.filename }}</div>
+                                </div>
+                                {% if f.description %}<div class="text-white/60 text-xs mt-1">{{ f.description }}</div>{% endif %}
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% include "upload/mods/actions.html" %}
