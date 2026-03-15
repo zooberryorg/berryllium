@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from ..forms import FileUploadForm
+from ..forms import FileUploadForm, MetadataForm
 
 # Navigation configuration for upload form
 #     name: Current location title
