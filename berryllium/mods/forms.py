@@ -14,6 +14,9 @@ MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 
 
 class FileUploadForm(forms.Form):
+    """
+    File upload form for mods.
+    """
     file = forms.FileField(
         widget=forms.FileInput(attrs={"class": "hidden", "accept": ".z2f,.ztd,.zip"}),
         required=False,
@@ -31,6 +34,9 @@ class FileUploadForm(forms.Form):
         return True
 
     def clean_file(self):
+        """
+        Form validation and cleanup.
+        """
         if self.existing_files:
             return None  # If there are existing files, no need to validate this field
 
