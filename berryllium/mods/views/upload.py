@@ -13,7 +13,7 @@ from ..models import FileUpload
 #     icon: Icon name. See: https://icons.getbootstrap.com/
 NAVIGATION = [
     {"name": "Basic Information", "url": "upload_step1", "icon": "info-circle"},
-    # {'name': 'Upload Files', 'url': 'create_mods_step2', 'icon': 'upload'},
+    {'name': 'Upload Files', 'url': 'upload_step2', 'icon': 'upload'},
     # {'name': 'Organize Files', 'url': 'create_mods_step3', 'icon': 'folder'},
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
