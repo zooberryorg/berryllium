@@ -2,7 +2,7 @@ name: berryllium
 services:
   app:
     image: berryllium
-    container_name: berryllium.alpha.0.14.0
+    container_name: berryllium.alpha.0.16.0
     ports:
       - "8001:8000"
     volumes:

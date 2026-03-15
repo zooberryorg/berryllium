@@ -4,4 +4,5 @@ from .views import upload
 urlpatterns = [
     path("mods/upload/", upload.upload_mod, name="upload_mod"),
     path("mods/upload/s1", upload.upload_step1, name="upload_step1"),
+    path("mods/upload/s2", upload.upload_step2, name="upload_step2"),
 ]
