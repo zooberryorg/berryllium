@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-4 py-8 animate-fade-in">
+        {# tab nav #}
+        <div class="mb-8 overflow-x-auto">
+            <div class="inline-flex rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300 min-w-max">
+                <button class="px-6 py-3 mr-1 text-sm font-semibold rounded-xl transition-all duration-200 bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 shadow-lg whitespace-nowrap flex items-center">
+                    <i class="bi bi-puzzle-fill mr-2"></i>
+                    Mods
+                </button>
+                <button class="px-6 py-3 mr-1 text-sm font-medium rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-[#4a5a4b]/50 whitespace-nowrap flex items-center">
+                    <i class="bi bi-grid-3x3-gap-fill mr-2"></i>
+                    Zoos & Saves
+                </button>
+                <button class="px-6 py-3 mr-1 text-sm font-medium rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-[#4a5a4b]/50 whitespace-nowrap flex items-center">
+                    <i class="bi bi-tools mr-2"></i>
+                    Tutorials
+                </button>
+                <button class="px-6 py-3 mr-1 text-sm font-medium rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-[#4a5a4b]/50 whitespace-nowrap flex items-center">
+                    <i class="bi bi-newspaper mr-2"></i>
+                    News
+                </button>
+                <button class="px-6 py-3 mr-1 text-sm font-medium rounded-xl transition-all duration-200 text-gray-400 hover:text-white hover:bg-[#4a5a4b]/50 whitespace-nowrap flex items-center">
+                    <i class="bi bi-people-fill mr-2"></i>
+                    Modders
+                </button>
+            </div>
+        </div>
+        {% block explore_content %}{% endblock %}
+    </div>
+    <script>
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tabs = document.querySelectorAll('.inline-flex button');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            // Remove active styles from all tabs
+            tabs.forEach(t => {
+                t.classList.remove('bg-gradient-to-r', 'from-gold-500', 'to-gold-400', 'text-white', 'shadow-lg');
+                t.classList.add('text-gray-400', 'hover:bg-[#4a5a4b]/50');
+            });
+            
+            // Add active styles to clicked tab
+            this.classList.add('bg-gradient-to-r', 'from-gold-500', 'to-gold-400', 'text-pine-500', 'shadow-lg');
+            this.classList.remove('text-gray-400', 'hover:bg-[#4a5a4b]/50');
+        });
+    });
+});
+    </script>
+{% endblock %}
