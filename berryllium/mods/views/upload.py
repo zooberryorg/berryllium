@@ -60,3 +60,9 @@ def upload_step1(request):
         
     # GET: show fresh form
     return render(request, 'mods/upload/step/1.html', context=context)
+
+def upload_step2(request):
+    """
+    Step 2 of the upload form.
+    """
+    return render(request, "mods/upload/step/1.html")
