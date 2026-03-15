@@ -41,3 +41,17 @@ npx @tailwindcss/cli -i ./.tw/input.css -o ./berryllium/shared/static/shared/css
 ```
 
 For more information, see the [Tailwind CLI documentation](https://tailwindcss.com/docs/installation/tailwind-cli).
+
+To run linters and formatters, you can use the following commands:
+
+To lint: 
+
+```bash
+djlint .
+```
+
+To format:
+
+```bash
+djlint . --reformat
+```
