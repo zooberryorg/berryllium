@@ -4,11 +4,13 @@ from django.db import models
 # from tags.models import Tag
 # from uploads.models import UploadedFile, UploadedImage
 
+
 # Create your models here.
 class Mod(models.Model):
     """
     Typical mod uploaded to the app
     """
+
     # basic info
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
@@ -17,7 +19,7 @@ class Mod(models.Model):
     # game info
     game = models.CharField(max_length=100)
     expansions = models.CharField(max_length=200, blank=True)
-    
+
     # user relations
     # owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_mods')
     # contributors = models.ManyToManyField(User, through='users.Contributor', related_name='contributed_mods', blank=True)
@@ -34,8 +36,14 @@ class Mod(models.Model):
     last_updated = models.DateField(auto_now=True)
     # files
     # images = models.ManyToManyField(UploadedImage, blank=True)
-    files_groups = models.ManyToManyField('FileGroup', blank=True)
-    dependencies = models.ManyToManyField('self', through='Dependency', symmetrical=False, related_name='dependent_mods_set', blank=True)
+    files_groups = models.ManyToManyField("FileGroup", blank=True)
+    dependencies = models.ManyToManyField(
+        "self",
+        through="Dependency",
+        symmetrical=False,
+        related_name="dependent_mods_set",
+        blank=True,
+    )
     contents = models.TextField(blank=True)
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
@@ -50,42 +58,55 @@ class Mod(models.Model):
     # permissions
     allow_fan_images = models.BooleanField(default=False)
 
+
 class Dependency(models.Model):
     """
     Dependencies are files that a mod relies on; can be external link or internal reference
     """
-    from_mod = models.ForeignKey(Mod, related_name='dependency_relationships', on_delete=models.CASCADE)
-    dependency_mod = models.ForeignKey(Mod, related_name='dependent_mods', on_delete=models.CASCADE)
+
+    from_mod = models.ForeignKey(
+        Mod, related_name="dependency_relationships", on_delete=models.CASCADE
+    )
+    dependency_mod = models.ForeignKey(
+        Mod, related_name="dependent_mods", on_delete=models.CASCADE
+    )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
     version = models.CharField(max_length=100, blank=True)
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
 
+
 class FileGroup(models.Model):
     """
     By default mods have FileGroup support for the cases where multiple files need to be listed on the page. Each file needs its own metadata.
     """
-    mod_id = models.ForeignKey('mods.Mod', on_delete=models.CASCADE, related_name='file_groups')
+
+    mod_id = models.ForeignKey(
+        "mods.Mod", on_delete=models.CASCADE, related_name="file_groups"
+    )
     name = models.CharField(max_length=255)
     # files = models.ManyToManyField(UploadedFile, through='FileGroupMembership', related_name='file_groups')
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
     class Meta:
-        ordering = ['order']
+        ordering = ["order"]
+
 
 class FileGroupMembership(models.Model):
     """
     Through model that offers file metadata in a FileGroup, specifically file reference and order in the group.
     """
+
     file_group = models.ForeignKey(FileGroup, on_delete=models.CASCADE)
     # uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
     order = models.IntegerField(default=0)
-    
+
     class Meta:
         """
         File ordering and unique relationships
         """
-        ordering = ['order']
+
+        ordering = ["order"]
         # unique_together = ['file_group', 'uploaded_file']
