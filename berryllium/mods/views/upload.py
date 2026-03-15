@@ -13,7 +13,7 @@ from ..models import FileUpload
 #     icon: Icon name. See: https://icons.getbootstrap.com/
 NAVIGATION = [
     {"name": "Basic Information", "url": "upload_step1", "icon": "info-circle"},
-    {'name': 'Upload Files', 'url': 'upload_step2', 'icon': 'upload'},
+    {"name": "Upload Files", "url": "upload_step2", "icon": "upload"},
     # {'name': 'Organize Files', 'url': 'create_mods_step3', 'icon': 'folder'},
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
@@ -159,58 +159,62 @@ def upload_step2(request):
     # GET
     return render(request, "mods/upload/step/2.html", context)
 
+
 # TODO: Move validation and cleanup to form
 def update_step3_state(request, uploaded_files, template_obj):
     """
     Updates step3 state and some validation.
     """
-    group_formset = FileGroupFormSet(request.POST, prefix='groups')
+    group_formset = FileGroupFormSet(request.POST, prefix="groups")
 
-    FileDetailsFormSet = modelformset_factory(
-        FileUpload,
-        form=FileDetailsForm,
-        extra=0
-    )
+    FileDetailsFormSet = modelformset_factory(FileUpload, form=FileDetailsForm, extra=0)
     file_formset = FileDetailsFormSet(
-        request.POST,
-        queryset=uploaded_files,
-        prefix='files'
+        request.POST, queryset=uploaded_files, prefix="files"
     )
 
     if group_formset.is_valid() and file_formset.is_valid():
         groups_data = []
         for form in group_formset:
-            if form.cleaned_data and not form.cleaned_data.get('DELETE'):
-                groups_data.append({
-                    'name': form.cleaned_data['name'],
-                    'description': form.cleaned_data.get('description', ''),
-                    'order': form.cleaned_data.get('order', 0),
-                })
+            if form.cleaned_data and not form.cleaned_data.get("DELETE"):
+                groups_data.append(
+                    {
+                        "name": form.cleaned_data["name"],
+                        "description": form.cleaned_data.get("description", ""),
+                        "order": form.cleaned_data.get("order", 0),
+                    }
+                )
 
         files_data = []
         # Structure data into json serializable format
         for form in file_formset:
             if form.cleaned_data:
-                files_data.append({
-                    'id': form.instance.id,
-                    'title': form.cleaned_data.get('title', ''),
-                    'description': form.cleaned_data.get('description', ''),
-                    'group_index': form.cleaned_data['group_index'],
-                    'file_order': form.cleaned_data['file_order'],
-                })
+                files_data.append(
+                    {
+                        "id": form.instance.id,
+                        "title": form.cleaned_data.get("title", ""),
+                        "description": form.cleaned_data.get("description", ""),
+                        "group_index": form.cleaned_data["group_index"],
+                        "file_order": form.cleaned_data["file_order"],
+                    }
+                )
 
-        request.session['file_groups'] = groups_data
-        request.session['file_details'] = files_data
+        request.session["file_groups"] = groups_data
+        request.session["file_details"] = files_data
         request.session.modified = True
 
-        return group_formset, file_formset, uploaded_files 
-    
+        return group_formset, file_formset, uploaded_files
+
     # else return to step 3 with errors
-    return render(request, template_obj, {
-        'group_formset': group_formset,
-        'file_formset': file_formset,
-        'uploaded_files': uploaded_files,
-    })
+    return render(
+        request,
+        template_obj,
+        {
+            "group_formset": group_formset,
+            "file_formset": file_formset,
+            "uploaded_files": uploaded_files,
+        },
+    )
+
 
 def create_mods_step3(request):
     """
@@ -222,62 +226,74 @@ def create_mods_step3(request):
     remainder_range = range(current_index, len(NAVIGATION))
     nav_item_count = len(NAVIGATION)
     context = {
-        'form': FileUploadForm(),
-        'filename': request.session.get('upload_original_name'),
-        'nav_item_count': nav_item_count,
-        'current_nav_index': current_index - 1,
-        'progress_range': progress_range,
-        'remainder_range': remainder_range,
-        'existing_files': request.session.get('temp_uploaded_files', []),
+        "form": FileUploadForm(),
+        "filename": request.session.get("upload_original_name"),
+        "nav_item_count": nav_item_count,
+        "current_nav_index": current_index - 1,
+        "progress_range": progress_range,
+        "remainder_range": remainder_range,
+        "existing_files": request.session.get("temp_uploaded_files", []),
     }
 
     # TODO: rework to use context instead of passing uploaded_files separately
 
-    uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by('date', 'id')
+    uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by(
+        "date", "id"
+    )
     if not uploaded_files.exists():
-        return render(request, 'upload/mods/step2.html', {
-            'form': FileUploadForm(),
-            'existing_files': request.session.get('temp_uploaded_files', []),
-            'error': 'Upload at least one file before organizing.',
-        })
+        return render(
+            request,
+            "upload/mods/step2.html",
+            {
+                "form": FileUploadForm(),
+                "existing_files": request.session.get("temp_uploaded_files", []),
+                "error": "Upload at least one file before organizing.",
+            },
+        )
 
     # ---------------- POST (Back/Next) uses formset validation
-    if request.method == 'POST':
-        action = request.POST.get('action')
+    if request.method == "POST":
+        action = request.POST.get("action")
 
-        if action in ('next', 'previous'):
-            res = update_step3_state(request, uploaded_files, 'upload/mods/step3.html')
+        if action in ("next", "previous"):
+            res = update_step3_state(request, uploaded_files, "upload/mods/step3.html")
             # if invalid, res will be None -> fall through and re-render with errors
             if res is not None:
                 return res
-            if action == 'previous':
-                return redirect('create_mods_step2')
-            if action == 'next':
+            if action == "previous":
+                return redirect("create_mods_step2")
+            if action == "next":
                 # IMPORTANT: go to step 4 (don’t re-render step3)
-                return redirect('create_mods_step4')
+                return redirect("create_mods_step4")
 
     # ---------------- GET (rehydrate Alpine)
-    groups_init = request.session.get('file_groups', [])
+    groups_init = request.session.get("file_groups", [])
     if not groups_init:
-        groups_init = [{'name': 'Files', 'description': '', 'order': 0}]
+        groups_init = [{"name": "Files", "description": "", "order": 0}]
 
-    existing_file_details = request.session.get('file_details', [])
-    by_id = {fd.get('id'): fd for fd in existing_file_details if fd.get('id')}
+    existing_file_details = request.session.get("file_details", [])
+    by_id = {fd.get("id"): fd for fd in existing_file_details if fd.get("id")}
 
     files_init = []
     for i, uf in enumerate(uploaded_files):
         fd = by_id.get(uf.id, {})
-        files_init.append({
-            "id": uf.id,
-            "filename": uf.filename,
-            "title": fd.get("title", ""),
-            "description": fd.get("description", ""),
-            "group_index": int(fd.get("group_index", 0)),
-            "file_order": int(fd.get("file_order", i)),
-        })
+        files_init.append(
+            {
+                "id": uf.id,
+                "filename": uf.filename,
+                "title": fd.get("title", ""),
+                "description": fd.get("description", ""),
+                "group_index": int(fd.get("group_index", 0)),
+                "file_order": int(fd.get("file_order", i)),
+            }
+        )
 
-    return render(request, 'upload/mods/step3.html', {
-        "uploaded_files": uploaded_files,
-        "groups_init": groups_init,
-        "files_init": files_init,
-    })
+    return render(
+        request,
+        "upload/mods/step3.html",
+        {
+            "uploaded_files": uploaded_files,
+            "groups_init": groups_init,
+            "files_init": files_init,
+        },
+    )
