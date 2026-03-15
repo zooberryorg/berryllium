@@ -33,3 +33,11 @@ docker-compose build
 ```bash
 docker-compose up
 ```
+
+To setup UX/UI development, make sure you have Node.js and npm installed. In a separate terminal, run Tailwind CLI to watch for changes in the templates and update the project's CSS file:
+
+```bash
+npx @tailwindcss/cli -i ./.tw/input.css -o ./berryllium/shared/static/css/be.css --watch
+```
+
+For more information, see the [Tailwind CLI documentation](https://tailwindcss.com/docs/installation/tailwind-cli).
