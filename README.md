@@ -28,6 +28,8 @@ pip install -r requirements.txt
 docker-compose build
 ```
 
+Local server instance will be accessible at `http://localhost:8001`
+
 6. Run the containers
 
 ```bash
@@ -48,7 +50,7 @@ For more information, see the [Tailwind CLI documentation](https://tailwindcss.c
 
 ### Linters and Formatters
 
-To run linters and formatters, you can use the following commands:
+For Django templates, we use [djlint](https://djlint.com/). It can be used as both a linter and a formatter.
 
 To lint: 
 
@@ -60,4 +62,18 @@ To format:
 
 ```bash
 djlint . --reformat
+```
+
+For Python code linting and formatting, we use [Ruff](https://docs.astral.sh/ruff/).
+
+To lint:
+
+```bash
+ruff check
+```
+
+To format:
+
+```bash
+ruff format
 ```
