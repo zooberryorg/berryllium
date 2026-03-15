@@ -13,7 +13,7 @@
       <div class="flex flex-col p-4 md:p-0 mt-4 md:space-x-2 rtl:space-x-reverse md:flex-row md:mt-0">
         
         {# Explore Dropdown #}
-        {% include 'core/navigation/explore_menu.html' %}
+        {% include 'shared/navigation/explore_menu.html' %}
       </div>
     </div>
     
@@ -22,10 +22,10 @@
       {% if user.is_authenticated %}
         
         {# Create new content dropdown #}
-        {% include 'core/navigation/create_menu.html' %}
+        {% include 'shared/navigation/create_menu.html' %}
         
         {# User Profile Dropdown #}
-        {% include 'core/navigation/user_menu.html' %}          
+        {% include 'shared/navigation/user_menu.html' %}          
       {% else %}
         
         {# Login Button #}
