@@ -1,7 +1,7 @@
 import os
 from django import forms
 # from django.core.exceptions import ValidationError
-# from core.widgets import PillCheckboxSelectMultiple
+from shared.widgets import PillCheckboxSelectMultiple
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
