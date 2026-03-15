@@ -160,6 +160,9 @@ def upload_step2(request):
     return render(request, "mods/upload/step/2.html", context)
 
 def create_mods_step3(request):
+    """
+    Step 3 of upload form.
+    """
     session_id = _get_upload_session_id(request)
     current_index = 3
     progress_range = range(current_index)
@@ -177,7 +180,7 @@ def create_mods_step3(request):
 
     # TODO: rework to use context instead of passing uploaded_files separately
 
-    uploaded_files = UploadedFile.objects.filter(upload_session=session_id).order_by('date', 'id')
+    uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by('date', 'id')
     if not uploaded_files.exists():
         return render(request, 'upload/mods/step2.html', {
             'form': FileUploadForm(),
