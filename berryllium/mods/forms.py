@@ -4,6 +4,7 @@ from django.forms import formset_factory
 
 # from django.core.exceptions import ValidationError
 from ..shared.widgets import PillCheckboxSelectMultiple
+from .models import FileUpload
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
@@ -168,7 +169,7 @@ class FileDetailsForm(forms.ModelForm):
     file_order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
     
     class Meta:
-        model = UploadedFile
+        model = FileUpload
         fields = ['title', 'description']
         widgets = {
             'title': forms.TextInput(attrs={
