@@ -1,5 +1,6 @@
 import os
 from django import forms
+from django.forms import formset_factory
 
 # from django.core.exceptions import ValidationError
 from ..shared.widgets import PillCheckboxSelectMultiple
@@ -144,3 +145,41 @@ class MetadataForm(forms.Form):
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
         return summary
+
+class FileGroupForm(forms.Form):
+    name = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Group name (e.g., Main Files)',
+            'class': 'bg-transparent text-white font-medium w-full focus:outline-none'
+        })
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Group description (optional)',
+            'class': 'zb-textarea'
+        })
+    )
+    order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
+
+class FileDetailsForm(forms.ModelForm):
+    group_index = forms.IntegerField(widget=forms.HiddenInput())
+    file_order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
+    
+    class Meta:
+        model = UploadedFile
+        fields = ['title', 'description']
+        widgets = {
+            'title': forms.TextInput(attrs={
+                'placeholder': 'File title',
+                'class': 'bg-transparent text-white text-sm w-full focus:outline-none'
+            }),
+            'description': forms.Textarea(attrs={
+                'placeholder': 'File description (optional)',
+                'rows': 2,
+                'class': 'zb-textarea'
+            })
+        }
+
+FileGroupFormSet = formset_factory(FileGroupForm, extra=0, can_delete=True)
