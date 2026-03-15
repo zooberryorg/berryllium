@@ -1,6 +1,6 @@
 from django.apps import AppConfig
 
 
-class SharedConfig(AppConfig):
+class LandingsConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'berryllium.shared'
+    name = 'berryllium.landings'
