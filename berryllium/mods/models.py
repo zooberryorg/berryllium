@@ -2,7 +2,6 @@ from django.db import models
 # from users.models import User
 # from markdownx.models import MarkdownxField
 # from tags.models import Tag
-# from uploads.models import UploadedFile, UploadedImage
 
 
 # Create your models here.
@@ -102,11 +101,17 @@ class FileGroup(models.Model):
         "mods.Mod", on_delete=models.CASCADE, related_name="file_groups"
     )
     name = models.CharField(max_length=255)
-    # files = models.ManyToManyField(UploadedFile, through='FileGroupMembership', related_name='file_groups')
+    files = models.ManyToManyField(
+        FileUpload, through="FileGroupMembership", related_name="file_groups"
+    )
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
     class Meta:
+        """
+        File ordering
+        """
+
         ordering = ["order"]
 
 
@@ -116,7 +121,7 @@ class FileGroupMembership(models.Model):
     """
 
     file_group = models.ForeignKey(FileGroup, on_delete=models.CASCADE)
-    # uploaded_file = models.ForeignKey(UploadedFile, on_delete=models.CASCADE)
+    uploaded_file = models.ForeignKey(FileUpload, on_delete=models.CASCADE)
     order = models.IntegerField(default=0)
 
     class Meta:
@@ -125,4 +130,4 @@ class FileGroupMembership(models.Model):
         """
 
         ordering = ["order"]
-        # unique_together = ['file_group', 'uploaded_file']
+        unique_together = ['file_group', 'uploaded_file']
