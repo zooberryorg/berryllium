@@ -130,4 +130,4 @@ class FileGroupMembership(models.Model):
         """
 
         ordering = ["order"]
-        unique_together = ['file_group', 'uploaded_file']
+        unique_together = ["file_group", "uploaded_file"]
