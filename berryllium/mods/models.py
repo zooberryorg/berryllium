@@ -6,6 +6,9 @@ from uploads.models import UploadedFile, UploadedImage
 
 # Create your models here.
 class Mod(models.Model):
+    """
+    Typical mod uploaded to the app
+    """
     # basic info
     id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200)
@@ -48,6 +51,9 @@ class Mod(models.Model):
     allow_fan_images = models.BooleanField(default=False)
 
 class Dependency(models.Model):
+    """
+    Dependencies are files that a mod relies on; can be external link or internal reference
+    """
     from_mod = models.ForeignKey(Mod, related_name='dependency_relationships', on_delete=models.CASCADE)
     dependency_mod = models.ForeignKey(Mod, related_name='dependent_mods', on_delete=models.CASCADE)
     notes = models.TextField(blank=True)
@@ -57,6 +63,9 @@ class Dependency(models.Model):
     external_url = models.URLField(blank=True)
 
 class FileGroup(models.Model):
+    """
+    By default mods have FileGroup support for the cases where multiple files need to be listed on the page. Each file needs its own metadata.
+    """
     mod_id = models.ForeignKey('mods.Mod', on_delete=models.CASCADE, related_name='file_groups')
     name = models.CharField(max_length=255)
     files = models.ManyToManyField(UploadedFile, through='FileGroupMembership', related_name='file_groups')
