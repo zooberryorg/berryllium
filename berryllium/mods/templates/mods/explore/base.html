@@ -1,0 +1,130 @@
+{% extends 'shared/explore/base.html' %}
+{% block explore_content %}
+    <div class="flex flex-row sm:flex-col lg:flex-row lg:items-start gap-6">
+        {# Sidebar #}
+        <aside class="lg:w-76 space-y-6 flex-shrink-0 self-start">
+            {# Categories card #}
+            {% include 'sidebar/explore_mod_categories.html' %}
+            {% comment %} {# Tags card #}
+                    <div class="rounded-2xl px-4">
+                        <div class="flex items-center gap-3 mb-6">
+                        <h3 class="text-lg font-bold text-white">Tags</h3>
+                </div>
+            
+                {# Tag search #}
+                {% url 'search' as search_url %}
+                <div class="relative mb-6">
+                    <input type="text"
+                           name="tag_search"
+                           placeholder="Search tags..."
+                           class="zb-input pl-12"
+                           hx-post="{{ search_url }}"
+                           hx-trigger="keyup changed delay:500ms"
+                           hx-target="#tag-results"
+                           hx-include="this">
+                <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+            </div>
+            
+            {# Tags display #}
+            <div id="tag-results">
+                {% include 'tags.html' with tags=all_tags %}
+            </div>
+</div> {% endcomment %}
+</aside>
+{# Main content area #}
+<main class="flex-1 min-w-0 space-y-6">
+    {# Search bar #}
+    <div class="rounded-2xl">
+        <div class="relative">
+            <input type="text"
+                   name="mod_search"
+                   placeholder="Search mods by name, author, or description..."
+                   class="zb-input pl-12 pr-12 text-sm"
+                   hx-post="{% url 'search_mods' %}"
+                   hx-trigger="keyup changed delay:500ms"
+                   hx-target="#mod-results"
+                   hx-include="this">
+            <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
+            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
+                <i class="bi bi-x-lg text-xl"></i>
+            </button>
+        </div>
+    </div>
+    {# Filters Bar #}
+    {% include 'actionbar/explore_mod_filters.html' %}
+    {# Results count and view toggle #}
+    <div class="flex items-center justify-between">
+        <div class="text-gray-400">
+            <span class="text-white font-semibold">1,247</span> mods found
+        </div>
+        <div class="flex items-center gap-2">
+            <button class="w-10 h-10 rounded-lg bg-pine-700 text-white flex items-center justify-center transition-all duration-200 hover:bg-pine-800">
+                <i class="bi bi-grid-3x3-gap-fill"></i>
+            </button>
+            <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 flex items-center justify-center transition-all duration-200 hover:bg-[#5a6a5b]/50 hover:text-white cursor-pointer">
+                <i class="bi bi-list-ul"></i>
+            </button>
+        </div>
+    </div>
+    {# Search results #}
+    <div id="mod-results">{% include 'search_results/mod_results.html' %}</div>
+    {# Pagination (hardcoded for now) #}
+    <div>
+        <div class="flex items-center justify-between">
+            <button class="px-6 py-3 rounded-full bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-medium transition-all duration-200 border border-[#5a6a5b]/50 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled>
+                <i class="bi bi-chevron-left mr-2"></i>
+                Previous
+            </button>
+            <div class="flex items-center gap-2">
+                <button class="w-10 h-10 rounded-lg bg-pine-700 text-white font-semibold transition-all duration-200">1</button>
+                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
+                    2
+                </button>
+                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
+                    3
+                </button>
+                <span class="text-gray-500 px-2">...</span>
+                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
+                    25
+                </button>
+            </div>
+            <button class="px-6 py-3 rounded-full bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-medium transition-all duration-200 border border-[#5a6a5b]/50 flex items-center cursor-pointer">
+                Next
+                <i class="bi bi-chevron-right ml-2"></i>
+            </button>
+        </div>
+    </div>
+</main>
+</div>
+<script>
+// View toggle functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const gridView = document.querySelector('.bi-grid-3x3-gap-fill').closest('button');
+    const listView = document.querySelector('.bi-list-ul').closest('button');
+    const resultsContainer = document.getElementById('mod-results');
+    
+    gridView?.addEventListener('click', function() {
+        // Switch to grid view
+        gridView.classList.add('bg-amber-600', 'text-white');
+        gridView.classList.remove('bg-[#4a5a4b]/50', 'text-gray-400');
+        listView.classList.add('bg-[#4a5a4b]/50', 'text-gray-400');
+        listView.classList.remove('bg-amber-600', 'text-white');
+        
+        resultsContainer?.classList.add('grid-view');
+        resultsContainer?.classList.remove('list-view');
+    });
+    
+    listView?.addEventListener('click', function() {
+        // Switch to list view
+        listView.classList.add('bg-amber-600', 'text-white');
+        listView.classList.remove('bg-[#4a5a4b]/50', 'text-gray-400');
+        gridView.classList.add('bg-[#4a5a4b]/50', 'text-gray-400');
+        gridView.classList.remove('bg-amber-600', 'text-white');
+        
+        resultsContainer?.classList.add('list-view');
+        resultsContainer?.classList.remove('grid-view');
+    });
+});
+</script>
+{% endblock %}
