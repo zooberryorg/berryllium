@@ -1,0 +1,8 @@
+{# templates/widgets/pill_checkbox_select.html #}
+<div class="grid grid-cols-2 gap-2 appearance-none">
+  {% for group, options, index in widget.optgroups %}
+    {% for option in options %}
+      {% include option.template_name with widget=option %}
+    {% endfor %}
+  {% endfor %}
+</div>
