@@ -122,6 +122,7 @@ class FileUpload(models.Model):
     filegroup = models.ForeignKey(
         FileGroup, on_delete=models.CASCADE, related_name="filegroup_files"
     )
+    order = models.PositiveIntegerField(default=0)
 
     # files
     staged_file = models.FileField(upload_to="uploads/")  # temp file for processing
@@ -134,6 +135,13 @@ class FileUpload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     published_at = models.DateTimeField(blank=True, null=True)
     size = models.BigIntegerField()  # size in bytes
-    filename = models.CharField(max_length=255)
+    filename = models.CharField(max_length=255) # name of the file as uploaded
     description = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True) # optional title for the file that replaces the filename in listings
+
+    class Meta:
+        """
+        File ordering
+        """
+
+        ordering = ["order", "id"]
