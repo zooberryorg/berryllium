@@ -57,7 +57,7 @@ class Dependency(models.Model):
     """
 
     mod = models.ForeignKey(
-        Mod, related_name="mod_dependencies", on_delete=models.CASCADE
+        Mod, related_name="dependencies", on_delete=models.CASCADE
     )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
@@ -123,7 +123,7 @@ class FileUpload(models.Model):
 
     # filegroup
     filegroup = models.ForeignKey(
-        FileGroup, on_delete=models.CASCADE, related_name="filegroup_files"
+        FileGroup, on_delete=models.CASCADE, related_name="files"
     )
     order = models.PositiveIntegerField(default=0)
 
