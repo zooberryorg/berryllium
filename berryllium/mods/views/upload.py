@@ -315,7 +315,8 @@ def remove_temp_file(request, file_index):
         if 0 <= file_index < len(temp_files):
             file_info = temp_files[file_index]
 
-            # Delete UploadedFile row if present (also deletes its storage file if you want)
+            # Delete UploadedFile row if present
+            # TODO: restore file ID functionality
             uploaded_file_id = file_info.get("uploaded_file_id")
             if uploaded_file_id:
                 try:
@@ -336,11 +337,4 @@ def remove_temp_file(request, file_index):
             request.session.modified = True
 
         print("Updated temp files:", temp_files)
-        return render(
-            request,
-            "mods/upload/step/2.html",
-            {
-                "form": FileUploadForm(),
-                "existing_files": temp_files,
-            },
-        )
+        return redirect('upload_step2')
