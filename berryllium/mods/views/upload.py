@@ -263,7 +263,7 @@ def upload_step3(request):
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
-            res = update_step3_state(request, uploaded_files, "upload/mods/step3.html")
+            res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
             # if invalid, res will be None -> fall through and re-render with errors
             if res is not None:
                 return res
@@ -297,7 +297,7 @@ def upload_step3(request):
 
     return render(
         request,
-        "upload/mods/step3.html",
+        "mods/upload/step/3.html",
         {
             "uploaded_files": uploaded_files,
             "groups_init": groups_init,
