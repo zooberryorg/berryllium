@@ -88,7 +88,12 @@ class FileUpload(models.Model):
     """
 
     filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
-    file = models.FileField(upload_to="uploads/")
+
+    # files
+    staged_file = models.FileField(upload_to="uploads/") # temp file for processing
+    cdn_url = models.URLField(blank=True) # url after processing
+
+    # metadata
     date = models.DateTimeField(auto_now_add=True)
     size = models.BigIntegerField() # size in bytes
     filename = models.CharField(max_length=255)
