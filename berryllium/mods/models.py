@@ -36,13 +36,6 @@ class Mod(models.Model):
     # files
     # images = models.ManyToManyField(UploadedImage, blank=True)
     files_groups = models.ManyToManyField("FileGroup", blank=True)
-    dependencies = models.ManyToManyField(
-        "self",
-        through="Dependency",
-        symmetrical=False,
-        related_name="dependent_mods_set",
-        blank=True,
-    )
     contents = models.TextField(blank=True)
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
