@@ -1,3 +1,4 @@
+{% load static %}
 <!-- progress bar -->
 <div class="px-6 pt-6">
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
@@ -87,5 +88,4 @@
         {% include "mods/upload/actions.html" %}
     </form>
 </div>
-<script src="{% static 'static/mods/js/upload_widget.js' %}"></script>
 <style>[x-cloak] { display: none !important; }</style>
