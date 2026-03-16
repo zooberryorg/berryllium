@@ -75,6 +75,19 @@ class Dependency(models.Model):
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
 
+class FileUpload(models.Model):
+    """
+    File uploads attached to mod pages.
+    """
+    
+    filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
+    file = models.FileField(upload_to="uploads/")
+    date = models.DateTimeField(auto_now_add=True)
+    size = models.FloatField()
+    filename = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+
 class FileGroup(models.Model):
     """
     By default mods have FileGroup support for the cases where multiple files need to be listed on the page. Each file needs its own metadata.
@@ -96,18 +109,6 @@ class FileGroup(models.Model):
         """
 
         ordering = ["order"]
-
-class FileUpload(models.Model):
-    """
-    File uploads attached to mod pages.
-    """
-
-    file = models.FileField(upload_to="uploads/")
-    date = models.DateTimeField(auto_now_add=True)
-    size = models.FloatField()
-    filename = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
 
 class FileGroupMembership(models.Model):
     """
