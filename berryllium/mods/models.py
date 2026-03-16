@@ -15,7 +15,7 @@ class Mod(models.Model):
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=100, blank=True)
     summary = models.CharField(max_length=500, blank=True)
-    
+
     # game info
     game = models.CharField(max_length=100)
     expansions = models.CharField(max_length=200, blank=True)
@@ -118,3 +118,6 @@ class FileUpload(models.Model):
     filename = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.PENDING
+    )
