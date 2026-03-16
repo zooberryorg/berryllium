@@ -151,3 +151,6 @@ class FileUpload(models.Model):
 
     def __str__(self):
         return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f"File #{self.pk}"} - {self.filegroup.name}"
+    
+    def staged_path(self, instance, filename):
+        return f"uploads/staged/{instance.filegroup.mod.id}/{filename}"
