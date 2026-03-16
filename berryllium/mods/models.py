@@ -95,13 +95,13 @@ class FileUpload(models.Model):
         Definitions:
         - PENDING: File uploaded but not yet processed
         - PROCESSING: File has been opened and is being processed
-        - PUBLISHED: File has been approved and is live on the site
+        - APPROVED: File has been approved and is live on the site
         - FAILED: File failed processing
         """
 
         PENDING = "pending", "Pending"
         PROCESSING = "processing", "Processing"
-        PUBLISHED = "published", "Published"
+        APPROVED = "approved", "Approved"
         FAILED = "failed", "Failed"
 
     filegroup = models.ForeignKey(
