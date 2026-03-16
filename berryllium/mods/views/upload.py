@@ -107,13 +107,10 @@ def upload_step2(request):
             request.POST, request.FILES, existing_files=context["existing_files"]
         )
 
-        print("Checking if file upload request is valid...")
         if form.is_valid():
-            print("Request is valid. Cleaning file...")
             uploaded_file = form.cleaned_data["file"]
 
             if uploaded_file:
-                print("File is clean. Let's save it.")
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
                 temp_filename = (
@@ -140,8 +137,6 @@ def upload_step2(request):
                 context["existing_files"].append(file_info)
                 request.session["temp_uploaded_files"] = context["existing_files"]
                 request.session.modified = True
-            else:
-                print("File was not clean.")
 
             if request.POST.get("action") == "next":
                 if not request.session.get("temp_uploaded_files"):
@@ -155,7 +150,6 @@ def upload_step2(request):
                     return render(request, "mods/upload/step/2.html", context)
                 return redirect("upload_step3")
             elif request.POST.get("action") == "previous":
-                print("Going back to step 1 from step 2")
                 return redirect("upload_step1")
             else:
                 return render(request, "mods/upload/step/2.html", context)
@@ -263,7 +257,7 @@ def upload_step3(request):
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
-            res = update_step3_state(request, uploaded_files, "upload/mods/step3.html")
+            res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
             # if invalid, res will be None -> fall through and re-render with errors
             if res is not None:
                 return res
@@ -297,7 +291,7 @@ def upload_step3(request):
 
     return render(
         request,
-        "upload/mods/step3.html",
+        "mods/upload/step/3.html",
         {
             "uploaded_files": uploaded_files,
             "groups_init": groups_init,
@@ -313,10 +307,8 @@ def remove_temp_file(request, file_index):
     Delete a file from current session.
     """
     if request.method == "POST":
-        print("Removing temp file at index:", file_index)
         temp_files = request.session.get("temp_uploaded_files", [])
 
-        print("Current temp files:", temp_files)
         if 0 <= file_index < len(temp_files):
             file_info = temp_files[file_index]
 
@@ -328,7 +320,6 @@ def remove_temp_file(request, file_index):
                     uploaded_file = FileUpload.objects.get(id=uploaded_file_id)
                 except FileUpload.DoesNotExist:
                     uploaded_file = None
-                    print("UploadedFile row missing for id:", uploaded_file_id)
                 if uploaded_file:
                     uploaded_file.delete()
 
@@ -341,5 +332,4 @@ def remove_temp_file(request, file_index):
             request.session["temp_uploaded_files"] = temp_files
             request.session.modified = True
 
-        print("Updated temp files:", temp_files)
         return redirect("upload_step2")
