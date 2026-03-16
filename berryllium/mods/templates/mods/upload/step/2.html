@@ -14,7 +14,7 @@
         <div class="space-y-4 mt-6 mb-6">
             <div class="px-6">
                 <!-- Drag and Drop Zone -->
-                 {% include "mods/upload/step/partials/dropzone.html" %}
+                {% include "mods/upload/step/partials/dropzone.html" %}
                 <!-- Hidden submit button for htmx -->
                 <button type="submit"
                         x-ref="submitBtn"
@@ -31,8 +31,7 @@
             </div>
         </div>
         <!-- Previously Uploaded Files (from session) -->
-         {% include "mods/upload/step/partials/previous_files.html" %}
-
+        {% include "mods/upload/step/partials/previous_files.html" %}
         <!-- Action Buttons -->
         {% include "mods/upload/actions.html" %}
     </form>
