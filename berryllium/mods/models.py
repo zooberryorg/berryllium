@@ -63,8 +63,8 @@ class Dependency(models.Model):
     Dependencies are files that a mod relies on; can be external link or internal reference
     """
 
-    from_mod = models.ForeignKey(
-        Mod, related_name="dependency_relationships", on_delete=models.CASCADE
+    mod = models.ForeignKey(
+        Mod, related_name="mod_dependencies", on_delete=models.CASCADE
     )
     dependency_mod = models.ForeignKey(
         Mod, related_name="dependent_mods", on_delete=models.CASCADE
@@ -74,19 +74,6 @@ class Dependency(models.Model):
     version = models.CharField(max_length=100, blank=True)
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
-
-class FileUpload(models.Model):
-    """
-    File uploads attached to mod pages.
-    """
-
-    filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
-    file = models.FileField(upload_to="uploads/")
-    date = models.DateTimeField(auto_now_add=True)
-    size = models.FloatField()
-    filename = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
 
 class FileGroup(models.Model):
     """
@@ -106,3 +93,17 @@ class FileGroup(models.Model):
         """
 
         ordering = ["order"]
+
+class FileUpload(models.Model):
+    """
+    File uploads attached to mod pages.
+    """
+
+    filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
+    file = models.FileField(upload_to="uploads/")
+    date = models.DateTimeField(auto_now_add=True)
+    size = models.FloatField()
+    filename = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    title = models.CharField(max_length=255, blank=True, null=True)
+
