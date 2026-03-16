@@ -56,9 +56,7 @@ class Dependency(models.Model):
     Dependencies are files that a mod relies on; can be external link or internal reference
     """
 
-    mod = models.ForeignKey(
-        Mod, related_name="dependencies", on_delete=models.CASCADE
-    )
+    mod = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
     version = models.CharField(max_length=100, blank=True)
@@ -128,7 +126,7 @@ class FileUpload(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     # files
-    staged_file = models.FileField(upload_to="uploads/")  # temp file for processing
+    staged_file = models.FileField(upload_to="uploads/", null=True)  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
 
     # preliminary metadata; possible use for directory listings vs proper file uploads
@@ -138,9 +136,11 @@ class FileUpload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     published_at = models.DateTimeField(blank=True, null=True)
     size = models.BigIntegerField()  # size in bytes
-    filename = models.CharField(max_length=255) # name of the file as uploaded
-    description = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255, blank=True, null=True) # optional title for the file that replaces the filename in listings
+    filename = models.CharField(max_length=255)  # name of the file as uploaded
+    description = models.TextField(blank=True)
+    title = models.CharField(
+        max_length=255, blank=True, null=True
+    )  # optional title for the file that replaces the filename in listings
 
     class Meta:
         """
@@ -150,4 +150,4 @@ class FileUpload(models.Model):
         ordering = ["order", "id"]
 
     def __str__(self):
-        return f"{self.title or self.filename or self.staged_file.name} - {self.filegroup.name}"
+        return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f"File #{self.pk}"} - {self.filegroup.name}"
