@@ -15,6 +15,7 @@ class Mod(models.Model):
     title = models.CharField(max_length=200)
     category = models.CharField(max_length=100, blank=True)
     summary = models.CharField(max_length=500, blank=True)
+
     # game info
     game = models.CharField(max_length=100)
     expansions = models.CharField(max_length=200, blank=True)
@@ -33,22 +34,14 @@ class Mod(models.Model):
     original_release_date = models.DateField(null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     last_updated = models.DateField(auto_now=True)
-    # files
+
     # images = models.ManyToManyField(UploadedImage, blank=True)
-    files_groups = models.ManyToManyField("FileGroup", blank=True)
-    dependencies = models.ManyToManyField(
-        "self",
-        through="Dependency",
-        symmetrical=False,
-        related_name="dependent_mods_set",
-        blank=True,
-    )
     contents = models.TextField(blank=True)
+
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
     archived_file = models.BooleanField(default=False)
-    # misc
-    permissions = models.CharField(max_length=200, blank=True)
+
     # stats
     download_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
@@ -63,12 +56,7 @@ class Dependency(models.Model):
     Dependencies are files that a mod relies on; can be external link or internal reference
     """
 
-    from_mod = models.ForeignKey(
-        Mod, related_name="dependency_relationships", on_delete=models.CASCADE
-    )
-    dependency_mod = models.ForeignKey(
-        Mod, related_name="dependent_mods", on_delete=models.CASCADE
-    )
+    mod = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
     version = models.CharField(max_length=100, blank=True)
@@ -76,34 +64,13 @@ class Dependency(models.Model):
     external_url = models.URLField(blank=True)
 
 
-class FileUpload(models.Model):
-    """
-    File uploads attached to mod pages.
-    """
-
-    file = models.FileField(upload_to="uploads/")
-    date = models.DateTimeField(auto_now_add=True)
-    size = models.FloatField()
-    filename = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
-    title = models.CharField(max_length=255, blank=True, null=True)
-
-    # for orphaned uploads tracking
-    upload_session = models.CharField(max_length=255, blank=True, null=True)
-
-
 class FileGroup(models.Model):
     """
     By default mods have FileGroup support for the cases where multiple files need to be listed on the page. Each file needs its own metadata.
     """
 
-    mod_id = models.ForeignKey(
-        "mods.Mod", on_delete=models.CASCADE, related_name="file_groups"
-    )
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="file_groups")
     name = models.CharField(max_length=255)
-    files = models.ManyToManyField(
-        FileUpload, through="FileGroupMembership", related_name="file_groups"
-    )
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
@@ -114,20 +81,78 @@ class FileGroup(models.Model):
 
         ordering = ["order"]
 
+    def __str__(self):
+        return f"{self.mod.title} - {self.name}"
 
-class FileGroupMembership(models.Model):
+
+class FileUpload(models.Model):
     """
-    Through model that offers file metadata in a FileGroup, specifically file reference and order in the group.
+    File uploads attached to mod pages.
     """
 
-    file_group = models.ForeignKey(FileGroup, on_delete=models.CASCADE)
-    uploaded_file = models.ForeignKey(FileUpload, on_delete=models.CASCADE)
-    order = models.IntegerField(default=0)
+    # moderation
+    class Status(models.TextChoices):
+        """
+        Status of file processing. Reasons: AV scan, bug check, etc.
+        Definitions:
+        - PENDING: File uploaded but not yet processed
+        - PROCESSING: File has been opened and is being processed
+        - APPROVED: File has been approved and is live on the site
+        - FAILED: File failed processing
+        """
+
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        APPROVED = "approved", "Approved"
+        FAILED = "failed", "Failed"
+
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True
+    )
+    moderated_at = models.DateTimeField(blank=True, null=True)
+    moderation_notes = models.TextField(blank=True)
+    # approved_by = models.ForeignKey(
+    #     User,
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    #     related_name="approved_files",
+    # )
+
+    # filegroup
+    filegroup = models.ForeignKey(
+        FileGroup, on_delete=models.CASCADE, related_name="files"
+    )
+    order = models.PositiveIntegerField(default=0)
+
+    # files
+    staged_file = models.FileField(
+        upload_to="uploads/staged/", null=True
+    )  # temp file for processing, null after processing
+    url = models.URLField(blank=True)  # url after processing
+
+    # preliminary metadata; possible use for directory listings vs proper file uploads
+    is_external = models.BooleanField(default=False)
+
+    # metadata
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    published_at = models.DateTimeField(blank=True, null=True)
+    size = models.BigIntegerField()  # size in bytes
+    filename = models.CharField(max_length=255)  # name of the file as uploaded
+    description = models.TextField(blank=True)
+    title = models.CharField(
+        max_length=255, blank=True, null=True
+    )  # optional title for the file that replaces the filename in listings
 
     class Meta:
         """
-        File ordering and unique relationships
+        File ordering
         """
 
-        ordering = ["order"]
-        unique_together = ["file_group", "uploaded_file"]
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f'File #{self.pk}'} - {self.filegroup.name}"
+
+    def staged_path(self, instance, filename):
+        return f"uploads/staged/{instance.filegroup.mod.id}/{filename}"
