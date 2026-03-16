@@ -12,13 +12,17 @@ class Mod(models.Model):
 
     # basic info
     id = models.AutoField(primary_key=True)
-    title = models.CharField(max_length=200)
-    category = models.CharField(max_length=100, blank=True)
+    title = models.CharField(max_length=200, db_index=True)
+    category = models.CharField(max_length=100, blank=True, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
 
+    # is mod a directory link instead of a file upload?
+    is_external = models.BooleanField(default=False, db_index=True)
+    external_url = models.URLField(blank=True)
+
     # game info
-    game = models.CharField(max_length=100)
-    expansions = models.CharField(max_length=200, blank=True)
+    game = models.CharField(max_length=100, db_index=True)
+    expansions = models.CharField(max_length=200, blank=True, db_index=True)
 
     # user relations
     # owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_mods')
@@ -31,7 +35,6 @@ class Mod(models.Model):
     # description = MarkdownxField(blank=True)
 
     # dates
-    original_release_date = models.DateField(null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     last_updated = models.DateField(auto_now=True)
 
@@ -40,7 +43,8 @@ class Mod(models.Model):
 
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
-    archived_file = models.BooleanField(default=False)
+    is_archived_file = models.BooleanField(default=False)
+    original_release_date = models.DateField(null=True, blank=True)
 
     # stats
     download_count = models.IntegerField(default=0)
@@ -84,6 +88,8 @@ class FileGroup(models.Model):
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
 
+def staged_path(self, instance, filename):
+    return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
 class FileUpload(models.Model):
     """
@@ -127,12 +133,9 @@ class FileUpload(models.Model):
 
     # files
     staged_file = models.FileField(
-        upload_to="uploads/staged/", null=True
+        upload_to=staged_path, null=True
     )  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
-
-    # preliminary metadata; possible use for directory listings vs proper file uploads
-    is_external = models.BooleanField(default=False)
 
     # metadata
     uploaded_at = models.DateTimeField(auto_now_add=True)
@@ -153,6 +156,3 @@ class FileUpload(models.Model):
 
     def __str__(self):
         return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f'File #{self.pk}'} - {self.filegroup.name}"
-
-    def staged_path(self, instance, filename):
-        return f"uploads/staged/{instance.filegroup.mod.id}/{filename}"
