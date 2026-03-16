@@ -9,7 +9,7 @@
         <div class="bg-pine/10 h-2.5 rounded-full w-full"></div>
     </div>
 </div>
-<form hx-post="{% url 'create_mods_step3' %}"
+<form hx-post="{% url 'upload_step3' %}"
       hx-target="#modal-content"
       hx-swap="innerHTML"
       x-data="fileOrganizer({ groups: JSON.parse(document.getElementById('groups-init').textContent), files: JSON.parse(document.getElementById('files-init').textContent), })">

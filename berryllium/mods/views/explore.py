@@ -1,5 +1,6 @@
 from django.shortcuts import render
 
+
 def mods(request):
     """
     Query list of available mods.
