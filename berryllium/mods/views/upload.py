@@ -4,6 +4,7 @@ import uuid
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory
+from django.views.decorators.http import require_http_methods
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
 from ..models import FileUpload
@@ -298,3 +299,44 @@ def upload_step3(request):
             "files_init": files_init,
         },
     )
+
+# TODO: Fix latency issues with HX requests (takes forever between initial upload and response)
+@require_http_methods(["POST"])
+def remove_temp_file(request, file_index):
+    """
+    Delete a file from current session.
+    """
+    if request.method == 'POST':
+        print("Removing temp file at index:", file_index)
+        temp_files = request.session.get('temp_uploaded_files', [])
+
+        print("Current temp files:", temp_files)
+        if 0 <= file_index < len(temp_files):
+            file_info = temp_files[file_index]
+
+            # Delete UploadedFile row if present (also deletes its storage file if you want)
+            uploaded_file_id = file_info.get('uploaded_file_id')
+            if uploaded_file_id:
+                try:
+                    uploaded_file = FileUpload.objects.get(id=uploaded_file_id)
+                except FileUpload.DoesNotExist:
+                    uploaded_file = None
+                    print("UploadedFile row missing for id:", uploaded_file_id)
+                if uploaded_file:
+                    uploaded_file.delete()
+
+            # Delete from storage (in case row was missing)
+            temp_path = file_info.get('temp_path')
+            if temp_path and default_storage.exists(temp_path):
+                default_storage.delete(temp_path)
+
+            temp_files.pop(file_index)
+            request.session['temp_uploaded_files'] = temp_files
+            request.session.modified = True
+
+        print("Updated temp files:", temp_files)
+        return render(request, 'upload/mods/step2.html', {
+            'form': FileUploadForm(),
+            'existing_files': temp_files,
+        })
+
