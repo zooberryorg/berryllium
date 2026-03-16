@@ -15,7 +15,7 @@ from ..models import FileUpload
 NAVIGATION = [
     {"name": "Basic Information", "url": "upload_step1", "icon": "info-circle"},
     {"name": "Upload Files", "url": "upload_step2", "icon": "upload"},
-    # {'name': 'Organize Files', 'url': 'create_mods_step3', 'icon': 'folder'},
+    {'name': 'Organize Files', 'url': 'upload_step3', 'icon': 'folder'},
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
 
@@ -147,7 +147,7 @@ def upload_step2(request):
                         "temp_uploaded_files", []
                     )
                     return render(request, "mods/upload/step/2.html", context)
-                return redirect("create_mods_step3")
+                return redirect("upload_step3")
             elif request.POST.get("action") == "previous":
                 print("Going back to step 1 from step 2")
                 return redirect("upload_step1")
@@ -217,7 +217,7 @@ def update_step3_state(request, uploaded_files, template_obj):
     )
 
 
-def create_mods_step3(request):
+def upload_step3(request):
     """
     Step 3 of upload form.
     """
