@@ -79,7 +79,7 @@ class FileUpload(models.Model):
     """
     File uploads attached to mod pages.
     """
-    
+
     filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
     file = models.FileField(upload_to="uploads/")
     date = models.DateTimeField(auto_now_add=True)
@@ -109,20 +109,3 @@ class FileGroup(models.Model):
         """
 
         ordering = ["order"]
-
-class FileGroupMembership(models.Model):
-    """
-    Through model that offers file metadata in a FileGroup, specifically file reference and order in the group.
-    """
-
-    file_group = models.ForeignKey(FileGroup, on_delete=models.CASCADE)
-    uploaded_file = models.ForeignKey(FileUpload, on_delete=models.CASCADE)
-    order = models.IntegerField(default=0)
-
-    class Meta:
-        """
-        File ordering and unique relationships
-        """
-
-        ordering = ["order"]
-        unique_together = ["file_group", "uploaded_file"]
