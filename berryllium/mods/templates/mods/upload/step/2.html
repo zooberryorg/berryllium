@@ -10,7 +10,7 @@
           hx-encoding="multipart/form-data"
           x-ref="uploadForm">
         {% csrf_token %}
-        <div class="space-y-4 mt-6">
+        <div class="space-y-4 mt-6 mb-6">
             <div class="px-6">
                 <!-- Drag and Drop Zone -->
                 <div @dragenter.prevent="isDragging = true"
@@ -58,7 +58,7 @@
         </div>
         <!-- Previously Uploaded Files (from session) -->
         {% if existing_files %}
-            <div class="px-6 mt-6 mb-6">
+            <div class="px-6 mb-6">
                 <p class="text-sm font-medium text-white/70 mb-2">Uploaded Files:</p>
                 <div class="space-y-2">
                     {% for file in existing_files %}
