@@ -35,7 +35,6 @@ class Mod(models.Model):
     last_updated = models.DateField(auto_now=True)
     # files
     # images = models.ManyToManyField(UploadedImage, blank=True)
-    files_groups = models.ManyToManyField("FileGroup", blank=True)
     contents = models.TextField(blank=True)
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
