@@ -86,6 +86,19 @@ class FileUpload(models.Model):
     """
     File uploads attached to mod pages.
     """
+    class Status(models.TextChoices):
+        """
+        Status of file processing. Reasons: AV scan, bug check, etc.
+        Definitions:
+        - PENDING: File uploaded but not yet processed
+        - PROCESSING: File has been opened and is being processed
+        - PUBLISHED: File has been approved and is live on the site
+        - FAILED: File failed processing
+        """
+        PENDING = "pending", "Pending"
+        PROCESSING = "processing", "Processing"
+        PUBLISHED = "published", "Published"
+        FAILED = "failed", "Failed"
 
     filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
 
