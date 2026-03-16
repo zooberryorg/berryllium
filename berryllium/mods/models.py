@@ -89,6 +89,7 @@ class FileUpload(models.Model):
     File uploads attached to mod pages.
     """
 
+    # moderation
     class Status(models.TextChoices):
         """
         Status of file processing. Reasons: AV scan, bug check, etc.
@@ -104,6 +105,20 @@ class FileUpload(models.Model):
         APPROVED = "approved", "Approved"
         FAILED = "failed", "Failed"
 
+    status = models.CharField(
+        max_length=20, choices=Status.choices, default=Status.PENDING
+    )
+    moderated_at = models.DateTimeField(blank=True, null=True)
+    moderation_notes = models.TextField(blank=True)
+    # approved_by = models.ForeignKey(
+    #     User,
+    #     on_delete=models.SET_NULL,
+    #     blank=True,
+    #     null=True,
+    #     related_name="approved_files",
+    # )
+
+    # filegroup
     filegroup = models.ForeignKey(
         FileGroup, on_delete=models.CASCADE, related_name="filegroup_files"
     )
@@ -118,6 +133,3 @@ class FileUpload(models.Model):
     filename = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
-    status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
-    )
