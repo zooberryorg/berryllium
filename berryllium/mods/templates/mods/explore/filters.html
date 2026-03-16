@@ -1,0 +1,244 @@
+{# Filters Bar #}
+<div>
+    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 text-sm">
+        {# Filters #}
+        <div class="flex flex-wrap gap-3 flex-1">
+            {# Sort Order Dropdown #}
+            <div class="relative group">
+                <select class="zb-input pr-12 cursor-pointer min-w-[220px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/50">
+                    <option value="recently_updated">Recently Updated</option>
+                    <option value="most_recent">Most Recent</option>
+                    <option value="most_downloaded">Most Downloaded</option>
+                    <option value="highest_rated">Highest Rated</option>
+                    <option value="most_liked">Most Liked</option>
+                    <option value="alphabetical">Alphabetical (A-Z)</option>
+                </select>
+                <div class="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors">
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+            {# Game Filter Dropdown #}
+            <div class="relative group">
+                <select class="zb-input pr-12 cursor-pointer min-w-[220px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/50">
+                    <option value="">Any Game</option>
+                    <option value="zt1">Zoo Tycoon 1</option>
+                    <option value="zt2">Zoo Tycoon 2</option>
+                </select>
+                <div class="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors">
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+            {# Time Period Filter #}
+            <div class="relative group">
+                <select class="zb-input pr-12 cursor-pointer min-w-[220px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/50">
+                    <option value="">All Time</option>
+                    <option value="today">Today</option>
+                    <option value="week">This Week</option>
+                    <option value="month">This Month</option>
+                    <option value="year">This Year</option>
+                </select>
+                <div class="pointer-events-none absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors">
+                    <i class="bi bi-chevron-down"></i>
+                </div>
+            </div>
+            {# More Filters Button #}
+            <button class="px-5 py-3 rounded-full bg-pine-700 hover:bg-pine-700/50 text-gray-400 hover:text-white font-medium transition-all duration-200 flex items-center whitespace-nowrap cursor-pointer">
+                <i class="bi bi-sliders"></i>
+            </button>
+        </div>
+        {# Clear Filters Button #}
+        {% comment %} <button class="px-5 py-3 rounded-xl bg-red-600/10 hover:bg-red-600/20 text-red-400 hover:text-red-300 font-medium transition-all duration-200 border border-red-600/30 hover:border-red-600/50 flex items-center whitespace-nowrap">
+            <i class="bi bi-x-circle mr-2"></i>
+            Clear All
+        </button> {% endcomment %}
+    </div>
+    {# Active Filters Display #}
+    <div id="active-filters"
+         class="mt-4 pt-4 border-t border-[#4a5a4b]/50 hidden">
+        <div class="flex items-center gap-2 flex-wrap">
+            <span class="text-sm text-gray-400">Active filters:</span>
+            {# Example active filter pills #}
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-600/20 text-amber-400 border border-amber-600/30 text-sm">
+                <span>Animals</span>
+                <button class="hover:text-amber-300 transition-colors">
+                    <i class="bi bi-x"></i>
+                </button>
+            </span>
+            <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-600/20 text-blue-400 border border-blue-600/30 text-sm">
+                <span>Zoo Tycoon 2</span>
+                <button class="hover:text-blue-300 transition-colors">
+                    <i class="bi bi-x"></i>
+                </button>
+            </span>
+        </div>
+    </div>
+</div>
+{# filters modal (hidden by default) #}
+<div id="advanced-filters-modal"
+     class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glass rounded-2xl border border-[#4a5a4b]/50 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <div class="p-6 border-b border-[#4a5a4b]/50 flex items-center justify-between sticky top-0 bg-pine-600/90 backdrop-blur-xl">
+            <h3 class="text-xl font-bold text-white flex items-center">
+                <i class="bi bi-sliders mr-3 text-amber-400"></i>
+                Advanced Filters
+            </h3>
+            <button onclick="closeAdvancedFilters()"
+                    class="w-10 h-10 rounded-xl bg-[#4a5a4b]/50 hover:bg-[#5a6a5b]/50 text-gray-400 hover:text-white transition-all duration-200 flex items-center justify-center">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-6">
+            {# Expansion Packs #}
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-3">Expansion Packs</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-amber-600 focus:ring-amber-600 focus:ring-offset-0">
+                        <span class="text-white">Dinosaur Digs</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-amber-600 focus:ring-amber-600 focus:ring-offset-0">
+                        <span class="text-white">Marine Mania</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-amber-600 focus:ring-amber-600 focus:ring-offset-0">
+                        <span class="text-white">Endangered Species</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-amber-600 focus:ring-amber-600 focus:ring-offset-0">
+                        <span class="text-white">African Adventure</span>
+                    </label>
+                </div>
+            </div>
+            {# Download Range #}
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-3">Minimum Downloads</label>
+                <div class="flex items-center gap-4">
+                    <input type="range"
+                           min="0"
+                           max="10000"
+                           value="0"
+                           class="flex-1 h-2 bg-[#4a5a4b] rounded-lg appearance-none cursor-pointer">
+                    <span class="text-white font-semibold min-w-[80px] text-right">0+</span>
+                </div>
+            </div>
+            {# File Size #}
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-3">File Size</label>
+                <div class="flex gap-3">
+                    <select class="zb-input flex-1 cursor-pointer">
+                        <option value="">Any Size</option>
+                        <option value="small">Under 1MB</option>
+                        <option value="medium">1MB - 10MB</option>
+                        <option value="large">10MB - 100MB</option>
+                        <option value="xlarge">Over 100MB</option>
+                    </select>
+                </div>
+            </div>
+            {# Status #}
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-3">Mod Status</label>
+                <div class="flex gap-3">
+                    <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200 has-[:checked]:bg-green-600/20 has-[:checked]:border-green-600/30 border border-transparent">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-green-600 focus:ring-green-600 focus:ring-offset-0">
+                        <span class="text-white">Active</span>
+                    </label>
+                    <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200 has-[:checked]:bg-yellow-600/20 has-[:checked]:border-yellow-600/30 border border-transparent">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-yellow-600 focus:ring-yellow-600 focus:ring-offset-0">
+                        <span class="text-white">Beta</span>
+                    </label>
+                    <label class="flex-1 flex items-center justify-center gap-2 p-3 rounded-xl bg-pine-300/30 hover:bg-pine-300 cursor-pointer transition-all duration-200 has-[:checked]:bg-red-600/20 has-[:checked]:border-red-600/30 border border-transparent">
+                        <input type="checkbox"
+                               class="w-5 h-5 rounded border-[#5a6a5b] text-red-600 focus:ring-red-600 focus:ring-offset-0">
+                        <span class="text-white">Archived</span>
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
+            <button onclick="closeAdvancedFilters()"
+                    class="flex-1 px-6 py-3 rounded-xl bg-[#4a5a4b]/50 hover:bg-[#5a6a5b]/50 text-gray-300 font-semibold transition-all duration-200">
+                Cancel
+            </button>
+            <button class="flex-1 btn-gradient text-white px-6 py-3 rounded-xl font-semibold hover:shadow-lg hover:shadow-amber-600/50 transition-all duration-300">
+                <span>Apply Filters</span>
+            </button>
+        </div>
+    </div>
+</div>
+<script>
+// More Filters button handler
+document.querySelector('.bi-sliders')?.closest('button').addEventListener('click', function() {
+    document.getElementById('advanced-filters-modal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+});
+
+// Close advanced filters
+function closeAdvancedFilters() {
+    document.getElementById('advanced-filters-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+
+// Close on backdrop click
+document.getElementById('advanced-filters-modal')?.addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeAdvancedFilters();
+    }
+});
+
+// Clear all filters
+document.querySelector('.bi-x-circle')?.closest('button').addEventListener('click', function() {
+    // Reset all selects
+    document.querySelectorAll('select').forEach(select => {
+        select.selectedIndex = 0;
+    });
+    
+    // Hide active filters
+    document.getElementById('active-filters')?.classList.add('hidden');
+    
+    // Show notification
+    showFilterNotification('All filters cleared', 'info');
+});
+
+// Filter notification
+function showFilterNotification(message, type = 'info') {
+    const colors = {
+        success: 'bg-green-600',
+        info: 'bg-blue-600',
+        warning: 'bg-yellow-600'
+    };
+    
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 ${colors[type]} text-white px-6 py-3 rounded-xl shadow-lg z-50 transform transition-all duration-300`;
+    notification.style.opacity = '0';
+    notification.innerHTML = `
+        <div class="flex items-center gap-2">
+            <i class="bi bi-funnel"></i>
+            <span>${message}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => notification.style.opacity = '1', 10);
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Show active filters when filters are applied
+document.querySelectorAll('select').forEach(select => {
+    select.addEventListener('change', function() {
+        if (this.value) {
+            document.getElementById('active-filters')?.classList.remove('hidden');
+        }
+    });
+});
+</script>
