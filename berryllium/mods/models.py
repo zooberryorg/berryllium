@@ -66,9 +66,6 @@ class Dependency(models.Model):
     mod = models.ForeignKey(
         Mod, related_name="mod_dependencies", on_delete=models.CASCADE
     )
-    dependency_mod = models.ForeignKey(
-        Mod, related_name="dependent_mods", on_delete=models.CASCADE
-    )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
     version = models.CharField(max_length=100, blank=True)
