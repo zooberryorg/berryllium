@@ -107,7 +107,7 @@ class FileUpload(models.Model):
         FAILED = "failed", "Failed"
 
     status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
+        max_length=20, choices=Status.choices, default=Status.PENDING, db_index=True
     )
     moderated_at = models.DateTimeField(blank=True, null=True)
     moderation_notes = models.TextField(blank=True)
@@ -126,7 +126,9 @@ class FileUpload(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     # files
-    staged_file = models.FileField(upload_to="uploads/staged/", null=True)  # temp file for processing, null after processing
+    staged_file = models.FileField(
+        upload_to="uploads/staged/", null=True
+    )  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
 
     # preliminary metadata; possible use for directory listings vs proper file uploads
@@ -150,7 +152,7 @@ class FileUpload(models.Model):
         ordering = ["order", "id"]
 
     def __str__(self):
-        return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f"File #{self.pk}"} - {self.filegroup.name}"
-    
+        return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f'File #{self.pk}'} - {self.filegroup.name}"
+
     def staged_path(self, instance, filename):
         return f"uploads/staged/{instance.filegroup.mod.id}/{filename}"
