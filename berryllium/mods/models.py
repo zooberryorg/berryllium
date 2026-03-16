@@ -83,6 +83,9 @@ class FileGroup(models.Model):
 
         ordering = ["order"]
 
+    def __str__(self):
+        return f"{self.mod.title} - {self.name}"
+
 
 class FileUpload(models.Model):
     """
@@ -147,4 +150,4 @@ class FileUpload(models.Model):
         ordering = ["order", "id"]
 
     def __str__(self):
-        return self.title or self.filename or self.staged_file.name
+        return f"{self.title or self.filename or self.staged_file.name} - {self.filegroup.name}"
