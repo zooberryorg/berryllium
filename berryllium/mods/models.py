@@ -125,10 +125,14 @@ class FileUpload(models.Model):
 
     # files
     staged_file = models.FileField(upload_to="uploads/")  # temp file for processing
-    cdn_url = models.URLField(blank=True)  # url after processing
+    url = models.URLField(blank=True)  # url after processing
+
+    # preliminary metadata; possible use for directory listings vs proper file uploads
+    is_external = models.BooleanField(default=False)
 
     # metadata
-    date = models.DateTimeField(auto_now_add=True)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+    published_at = models.DateTimeField(blank=True, null=True)
     size = models.BigIntegerField()  # size in bytes
     filename = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
