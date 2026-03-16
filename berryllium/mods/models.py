@@ -33,7 +33,6 @@ class Mod(models.Model):
     original_release_date = models.DateField(null=True, blank=True)
     date = models.DateField(auto_now_add=True)
     last_updated = models.DateField(auto_now=True)
-    # files
     # images = models.ManyToManyField(UploadedImage, blank=True)
     contents = models.TextField(blank=True)
     # archival info
@@ -91,7 +90,7 @@ class FileUpload(models.Model):
     filegroup = models.ForeignKey(FileGroup, on_delete=models.CASCADE, related_name="filegroup_files")
     file = models.FileField(upload_to="uploads/")
     date = models.DateTimeField(auto_now_add=True)
-    size = models.FloatField()
+    size = models.BigIntegerField() # size in bytes
     filename = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     title = models.CharField(max_length=255, blank=True, null=True)
