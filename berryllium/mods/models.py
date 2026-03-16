@@ -126,7 +126,7 @@ class FileUpload(models.Model):
     order = models.PositiveIntegerField(default=0)
 
     # files
-    staged_file = models.FileField(upload_to="uploads/", null=True)  # temp file for processing, null after processing
+    staged_file = models.FileField(upload_to="uploads/staged/", null=True)  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
 
     # preliminary metadata; possible use for directory listings vs proper file uploads
