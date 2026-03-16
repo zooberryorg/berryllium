@@ -245,7 +245,7 @@ def upload_step3(request):
     if not uploaded_files.exists():
         return render(
             request,
-            "upload/mods/step2.html",
+            "mods/upload/step/2.html",
             {
                 "form": FileUploadForm(),
                 "existing_files": request.session.get("temp_uploaded_files", []),
@@ -338,7 +338,7 @@ def remove_temp_file(request, file_index):
         print("Updated temp files:", temp_files)
         return render(
             request,
-            "upload/mods/step2.html",
+            "mods/upload/step/2.html",
             {
                 "form": FileUploadForm(),
                 "existing_files": temp_files,
