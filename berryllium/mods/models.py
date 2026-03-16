@@ -98,7 +98,7 @@ class FileGroup(models.Model):
     """
 
     mod_id = models.ForeignKey(
-        "mods.Mod", on_delete=models.CASCADE, related_name="file_groups"
+        Mod, on_delete=models.CASCADE, related_name="file_groups"
     )
     name = models.CharField(max_length=255)
     files = models.ManyToManyField(
