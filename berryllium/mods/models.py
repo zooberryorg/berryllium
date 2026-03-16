@@ -97,9 +97,6 @@ class FileGroup(models.Model):
         Mod, on_delete=models.CASCADE, related_name="file_groups"
     )
     name = models.CharField(max_length=255)
-    files = models.ManyToManyField(
-        FileUpload, through="FileGroupMembership", related_name="file_groups"
-    )
     order = models.IntegerField(default=0)
     description = models.TextField(blank=True)
 
