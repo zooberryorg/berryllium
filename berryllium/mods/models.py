@@ -38,8 +38,6 @@ class Mod(models.Model):
     # archival info
     former_hosts = models.CharField(max_length=200, blank=True)
     archived_file = models.BooleanField(default=False)
-    # misc
-    permissions = models.CharField(max_length=200, blank=True)
     # stats
     download_count = models.IntegerField(default=0)
     like_count = models.IntegerField(default=0)
