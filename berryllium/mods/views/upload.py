@@ -107,10 +107,13 @@ def upload_step2(request):
             request.POST, request.FILES, existing_files=context["existing_files"]
         )
 
+        print("Checking if file upload request is valid...")
         if form.is_valid():
+            print("Request is valid. Cleaning file...")
             uploaded_file = form.cleaned_data["file"]
 
             if uploaded_file:
+                print("File is clean. Let's save it.")
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
                 temp_filename = (
@@ -137,6 +140,8 @@ def upload_step2(request):
                 context["existing_files"].append(file_info)
                 request.session["temp_uploaded_files"] = context["existing_files"]
                 request.session.modified = True
+            else:
+                print("File was not clean.")
 
             if request.POST.get("action") == "next":
                 if not request.session.get("temp_uploaded_files"):
@@ -337,4 +342,4 @@ def remove_temp_file(request, file_index):
             request.session.modified = True
 
         print("Updated temp files:", temp_files)
-        return redirect('upload_step2')
+        return redirect("upload_step2")

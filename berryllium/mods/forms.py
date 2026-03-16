@@ -41,9 +41,6 @@ class FileUploadForm(forms.Form):
         """
         Form validation and cleanup.
         """
-        if self.existing_files:
-            return None  # If there are existing files, no need to validate this field
-
         uploaded_file = self.cleaned_data.get("file")
 
         if not uploaded_file:
