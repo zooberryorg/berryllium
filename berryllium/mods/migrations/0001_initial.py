@@ -5,106 +5,177 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Dependency',
+            name="Dependency",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notes', models.TextField(blank=True)),
-                ('required', models.BooleanField(default=True)),
-                ('version', models.CharField(blank=True, max_length=100)),
-                ('is_external', models.BooleanField(default=False)),
-                ('external_url', models.URLField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("notes", models.TextField(blank=True)),
+                ("required", models.BooleanField(default=True)),
+                ("version", models.CharField(blank=True, max_length=100)),
+                ("is_external", models.BooleanField(default=False)),
+                ("external_url", models.URLField(blank=True)),
             ],
         ),
         migrations.CreateModel(
-            name='FileGroup',
+            name="FileGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=255)),
-                ('order', models.IntegerField(default=0)),
-                ('description', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=255)),
+                ("order", models.IntegerField(default=0)),
+                ("description", models.TextField(blank=True)),
             ],
             options={
-                'ordering': ['order'],
+                "ordering": ["order"],
             },
         ),
         migrations.CreateModel(
-            name='FileUpload',
+            name="FileUpload",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('file', models.FileField(upload_to='uploads/')),
-                ('date', models.DateTimeField(auto_now_add=True)),
-                ('size', models.FloatField()),
-                ('filename', models.CharField(max_length=255)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('title', models.CharField(blank=True, max_length=255, null=True)),
-                ('upload_session', models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("file", models.FileField(upload_to="uploads/")),
+                ("date", models.DateTimeField(auto_now_add=True)),
+                ("size", models.FloatField()),
+                ("filename", models.CharField(max_length=255)),
+                ("description", models.TextField(blank=True, null=True)),
+                ("title", models.CharField(blank=True, max_length=255, null=True)),
+                (
+                    "upload_session",
+                    models.CharField(blank=True, max_length=255, null=True),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='FileGroupMembership',
+            name="FileGroupMembership",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('order', models.IntegerField(default=0)),
-                ('file_group', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mods.filegroup')),
-                ('uploaded_file', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='mods.fileupload')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("order", models.IntegerField(default=0)),
+                (
+                    "file_group",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="mods.filegroup"
+                    ),
+                ),
+                (
+                    "uploaded_file",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="mods.fileupload",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order'],
-                'unique_together': {('file_group', 'uploaded_file')},
+                "ordering": ["order"],
+                "unique_together": {("file_group", "uploaded_file")},
             },
         ),
         migrations.AddField(
-            model_name='filegroup',
-            name='files',
-            field=models.ManyToManyField(related_name='file_groups', through='mods.FileGroupMembership', to='mods.fileupload'),
+            model_name="filegroup",
+            name="files",
+            field=models.ManyToManyField(
+                related_name="file_groups",
+                through="mods.FileGroupMembership",
+                to="mods.fileupload",
+            ),
         ),
         migrations.CreateModel(
-            name='Mod',
+            name="Mod",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('title', models.CharField(max_length=200)),
-                ('category', models.CharField(blank=True, max_length=100)),
-                ('summary', models.CharField(blank=True, max_length=500)),
-                ('game', models.CharField(max_length=100)),
-                ('expansions', models.CharField(blank=True, max_length=200)),
-                ('uploaded_by', models.CharField(max_length=100)),
-                ('draft', models.BooleanField(default=True)),
-                ('version', models.CharField(max_length=100)),
-                ('original_release_date', models.DateField(blank=True, null=True)),
-                ('date', models.DateField(auto_now_add=True)),
-                ('last_updated', models.DateField(auto_now=True)),
-                ('contents', models.TextField(blank=True)),
-                ('former_hosts', models.CharField(blank=True, max_length=200)),
-                ('archived_file', models.BooleanField(default=False)),
-                ('permissions', models.CharField(blank=True, max_length=200)),
-                ('download_count', models.IntegerField(default=0)),
-                ('like_count', models.IntegerField(default=0)),
-                ('allow_fan_images', models.BooleanField(default=False)),
-                ('dependencies', models.ManyToManyField(blank=True, related_name='dependent_mods_set', through='mods.Dependency', to='mods.mod')),
-                ('files_groups', models.ManyToManyField(blank=True, to='mods.filegroup')),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("title", models.CharField(max_length=200)),
+                ("category", models.CharField(blank=True, max_length=100)),
+                ("summary", models.CharField(blank=True, max_length=500)),
+                ("game", models.CharField(max_length=100)),
+                ("expansions", models.CharField(blank=True, max_length=200)),
+                ("uploaded_by", models.CharField(max_length=100)),
+                ("draft", models.BooleanField(default=True)),
+                ("version", models.CharField(max_length=100)),
+                ("original_release_date", models.DateField(blank=True, null=True)),
+                ("date", models.DateField(auto_now_add=True)),
+                ("last_updated", models.DateField(auto_now=True)),
+                ("contents", models.TextField(blank=True)),
+                ("former_hosts", models.CharField(blank=True, max_length=200)),
+                ("archived_file", models.BooleanField(default=False)),
+                ("permissions", models.CharField(blank=True, max_length=200)),
+                ("download_count", models.IntegerField(default=0)),
+                ("like_count", models.IntegerField(default=0)),
+                ("allow_fan_images", models.BooleanField(default=False)),
+                (
+                    "dependencies",
+                    models.ManyToManyField(
+                        blank=True,
+                        related_name="dependent_mods_set",
+                        through="mods.Dependency",
+                        to="mods.mod",
+                    ),
+                ),
+                (
+                    "files_groups",
+                    models.ManyToManyField(blank=True, to="mods.filegroup"),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='filegroup',
-            name='mod_id',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='file_groups', to='mods.mod'),
+            model_name="filegroup",
+            name="mod_id",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="file_groups",
+                to="mods.mod",
+            ),
         ),
         migrations.AddField(
-            model_name='dependency',
-            name='dependency_mod',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dependent_mods', to='mods.mod'),
+            model_name="dependency",
+            name="dependency_mod",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="dependent_mods",
+                to="mods.mod",
+            ),
         ),
         migrations.AddField(
-            model_name='dependency',
-            name='from_mod',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dependency_relationships', to='mods.mod'),
+            model_name="dependency",
+            name="from_mod",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="dependency_relationships",
+                to="mods.mod",
+            ),
         ),
     ]
