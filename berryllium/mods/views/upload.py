@@ -107,18 +107,14 @@ def generate_progress_bar(current_index, total_steps):
     """
 
     title = f"Step {current_index + 1} of {total_steps}: {NAVIGATION[current_index]['name']}"
-    completed_step_html = '<div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full w-1/4"></div>'
-    remaining_step_html = (
-        '<div class="bg-white/10 h-2.5 rounded-full w-full mr-2 w-1/4"></div>'
-    )
 
-    completed_list = completed_step_html * (current_index + 1)
-    remaining_list = remaining_step_html * (total_steps - current_index - 1)
+    completed_range = list(range(current_index + 1))
+    remaining_range = list(range(current_index + 1, total_steps))
 
     return {
         "title": title,
-        "completed": completed_list,
-        "remaining": remaining_list,
+        "completed": completed_range,
+        "remaining": remaining_range,
         "total_steps": total_steps,
     }
 
