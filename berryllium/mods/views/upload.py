@@ -88,7 +88,13 @@ def upload_file(uploaded_file, mod_id=None):
 
     # see if hash already exists in mod files
     existing_file = FileUpload.objects.filter(file_hash=file_hash, filegroup__mod_id=mod_id).first()
-    if not fg and not existing_file:
+
+    # if file exists, delete newly uploaded file from storage
+    if existing_file:
+        if default_storage.exists(temp_path):
+            default_storage.delete(temp_path)
+        return {}
+    elif not fg:
         fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
     # Create DB row so Step 3 can actually query files
@@ -213,10 +219,10 @@ def upload_step2(request):
 
             if clean_file:
                 file = upload_file(clean_file, mod_id=mod_id)
-
-                # update existing_files for re-rendering form with new file
-                existing_files.append(file)
-                context["existing_files"] = existing_files
+                if file:
+                    # update existing_files for re-rendering form with new file
+                    existing_files.append(file)
+                    context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
