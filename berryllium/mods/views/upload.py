@@ -85,12 +85,18 @@ def upload_step1(request):
     """
     context = init_context(current_index=0)
     session_exists = request.session.get("session_id") is not None
-    
+
     if request.method == "POST":
         form = MetadataForm(request.POST)
         if form.is_valid():
             # Save data in db
-            mod = form.save(commit=False)
+            mod = Mod(
+                title=form.cleaned_data["title"],
+                category=form.cleaned_data.get("category", ""),
+                summary=form.cleaned_data.get("summary", ""),
+                game=form.cleaned_data["game"],
+                expansions=form.cleaned_data.get("expansions", ""),
+            )
             mod.save()
 
             # create a session id tied to the mod to make sure

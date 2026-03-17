@@ -15,5 +15,5 @@ urlpatterns = [
     # Explore mods
     path("explore/mods/", explore.mods, name="explore_mods"),
     # File Drafts
-    path("mods/drafts/<int:mod_id>/", explore.open_mod_draft, name="open_mod_draft"),
+    path("mods/drafts/<int:mod_id>/", upload.open_mod_draft, name="open_mod_draft"),
 ]
