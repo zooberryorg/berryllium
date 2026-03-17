@@ -157,7 +157,7 @@ class FileUpload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     published_at = models.DateTimeField(blank=True, null=True)
     size = models.BigIntegerField(null=True, blank=True)  # size in bytes
-    filename = models.CharField(max_length=255)  # name of the file as uploaded
+    filename = models.CharField(max_length=255, blank=True)  # name of the file as uploaded
     description = models.TextField(blank=True)
     title = models.CharField(
         max_length=255, blank=True, null=True
