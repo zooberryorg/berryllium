@@ -146,7 +146,8 @@ def upload_step2(request):
         # get existing uploaded files saved in draft
         mod = Mod.objects.get(id=request.session["session_id"])
         files = mod.files.all()
-        existing_files = [f for f in files.values("filename", "size", "id")]
+        if files.exists():
+            existing_files = [f for f in files.values("filename", "size", "id")]
 
     if request.method == "POST":
         form = FileUploadForm(
@@ -155,6 +156,7 @@ def upload_step2(request):
 
         if form.is_valid():
             uploaded_file = form.cleaned_data["file"]
+            session_id = request.session["session_id"]
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
