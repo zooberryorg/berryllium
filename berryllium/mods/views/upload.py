@@ -214,17 +214,14 @@ def upload_step2(request):
     existing_files = []
     file_url = ""
 
-    # rehydrate data
+    # rehydrate file data (file url only if GET)
     if mod_id:
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
-        file_url = mod.external_url if mod.is_external else ""
 
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
             context["existing_files"] = existing_files
-        if file_url:
-            context["file_url"] = file_url
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
@@ -279,6 +276,13 @@ def upload_step2(request):
         return render(request, "mods/upload/step/2.html", context)
 
     # ---------------------- GET
+    if request.method == "GET":
+        mod = Mod.objects.get(id=mod_id)
+        files = mod.files.all()
+        file_url = mod.external_url if mod.is_external else ""
+        if mod_id and file_url:
+            context["file_url"] = file_url
+
     return render(request, "mods/upload/step/2.html", context)
 
 

@@ -1,6 +1,8 @@
 import os
 from django import forms
 from django.forms import formset_factory
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
 from ..shared.widgets import PillCheckboxSelectMultiple
@@ -8,12 +10,9 @@ from .models import FileUpload
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
+URL_REGEX = r'/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/'
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 MAX_SUMMARY_LENGTH = 200
-
-ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
-ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 
 
 class MetadataForm(forms.Form):
@@ -123,6 +122,16 @@ class FileUploadForm(forms.Form):
         if ext not in allowed_extensions:
             return False
         return True
+    
+    def valid_url(self, url):
+        """Basic URL validation"""
+        # validate url against regex
+        validate = URLValidator(schemes=["http", "https"])
+        try:
+            validate(url)
+            return True
+        except ValidationError:
+            return False
 
     def clean_file(self):
         """
@@ -150,6 +159,19 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
+    
+    def clean_file_url(self):
+        """
+        Validate file URL if provided.
+        """
+        file_url = self.cleaned_data.get("file_url")
+
+        if file_url:
+            # make sure valid url
+            if not self.valid_url(file_url):
+                raise forms.ValidationError("Please enter a valid URL.")
+
+        return file_url
 
     # cross-field validation to ensure either file or file_url is provided
     def clean(self):
