@@ -58,9 +58,20 @@ class Mod(models.Model):
 class Dependency(models.Model):
     """
     Dependencies are files that a mod relies on; can be external link or internal reference
+    Definitions:
+    - parent: the mod that has the dependency
+    - ref: the mod that is being depended on (can be null if external)
+    - notes: any notes about the dependency
+    - required: whether the dependency is required or optional
+    - version: optional version info for the dependency
+    - is_external: whether the dependency is an external link or an internal reference
+    - external_url: if is_external is true, the url of the dependency
     """
 
-    mod = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
+    parent = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
+    ref = models.ForeignKey(
+        Mod, related_name="referenced_by", on_delete=models.CASCADE
+    )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
     version = models.CharField(max_length=100, blank=True)
@@ -133,7 +144,7 @@ class FileUpload(models.Model):
 
     # files
     staged_file = models.FileField(
-        upload_to=staged_path, null=True
+        upload_to=staged_path, null=True, blank=True
     )  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
 
