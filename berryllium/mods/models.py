@@ -25,9 +25,10 @@ class Mod(models.Model):
     expansions = models.CharField(max_length=200, blank=True, db_index=True)
 
     # user relations
-    # owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_mods')
     # contributors = models.ManyToManyField(User, through='users.Contributor', related_name='contributed_mods', blank=True)
-    uploaded_by = models.CharField(max_length=100)
+    # uploaded_by = models.ForeignKey(
+    #     User, on_delete=models.SET_NULL, blank=True, null=True, related_name="uploaded_mods"
+    # )
 
     draft = models.BooleanField(default=True)
     # tags = models.ManyToManyField(Tag, blank=True)
