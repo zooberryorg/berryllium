@@ -157,14 +157,13 @@ class FileUploadForm(forms.Form):
         cleaned_file = cleaned_data.get("file")
         file_url = cleaned_data.get("file_url")
 
-        if not cleaned_file and not file_url:
-            raise forms.ValidationError("Please upload a file or provide a file URL.")
+        # only one of file or file_url can be provided, not both
+        if cleaned_file and file_url:
+            raise forms.ValidationError("Please provide either a file or a file URL, not both.")
         
-        # Validate file size
-        if cleaned_file.size > MAX_FILE_SIZE:
-            raise forms.ValidationError(
-                f"File size exceeds the limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
-            )
+        # in case absolutely nothing has been input
+        if not cleaned_file and not file_url and not self.existing_files:
+            raise forms.ValidationError("Please upload a file or provide a file URL.")
         
         return cleaned_data
 
