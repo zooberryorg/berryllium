@@ -11,7 +11,6 @@ class Mod(models.Model):
     """
 
     # basic info
-    id = models.AutoField(primary_key=True)
     title = models.CharField(max_length=200, db_index=True)
     category = models.CharField(max_length=100, blank=True, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
