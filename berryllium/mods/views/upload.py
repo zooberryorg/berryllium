@@ -110,7 +110,6 @@ def generate_progress_bar(current_index, total_steps):
 
     completed_range = list(range(current_index + 1))
     remaining_range = list(range(current_index + 1, total_steps))
-    print(f"Progress bar - Completed: {completed_range}, Remaining: {remaining_range}")
 
     return {
         "title": title,
@@ -209,19 +208,24 @@ def upload_step2(request):
     """
     Step 2 of the upload form.
     """
+    print(f"Entering upload_step2 view. Request method: {request.method}")
     context = init_context(current_index=1, form=FileUploadForm())
-    print(context)
     mod_id = request.session.get("session_id")
     existing_files = []
+    file_url = ""
+
+    # rehydrate file data (file url only if GET)
     if mod_id:
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
+
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
             context["existing_files"] = existing_files
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
+        print(f"POST data: {request.POST}, FILES count: {len(existing_files)}")
         # get existing uploaded files saved in draft
 
         form = FileUploadForm(
@@ -229,9 +233,12 @@ def upload_step2(request):
         )
 
         if form.is_valid():
+            print("File upload form is valid.")
             clean_file = form.cleaned_data["file"]
+            clean_url = form.cleaned_data["file_url"]
 
             if clean_file:
+                print("File is valid. Adding to file list.")
                 file = upload_file(clean_file, mod_id=mod_id)
                 if file:
                     # update existing_files for re-rendering form with new file
@@ -240,29 +247,42 @@ def upload_step2(request):
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
-                if not existing_files:
-                    form.add_error(
-                        "file", "Please upload at least one file before continuing."
-                    )
-                    context["form"] = form
-                    context["existing_files"] = []
-                    return render(request, "mods/upload/step/2.html", context)
+                print("Next button clicked.")
+                if clean_url and not existing_files:
+                    print("No file uploaded, but URL provided. Saving URL to mod.")
+                    mod = Mod.objects.filter(id=mod_id).first()
+                    # TODO: Cleanup temp files and rework filegroups with url-based mods
+                    if mod:
+                        mod.is_external = True
+                        mod.external_url = clean_url
+                        mod.save()
 
+                print("Attempting to redirect to step 3.")
                 return redirect("upload_step3")
 
             # ----------------- Handle previous navigation
             elif request.POST.get("action") == "previous":
+                print("Previous button clicked. Returning to step 1.")
                 return redirect("upload_step1")
 
             # ----------------- Simple file upload without navigation (stay on step 2)
             else:
+                print("File uploaded without navigation. Staying on step 2.")
                 return render(request, "mods/upload/step/2.html", context)
 
         # ---------------------- Invalid form: return SAME state with errors
         context["form"] = form
+        print("File upload form is invalid. Returning to step 2 with errors.")
         return render(request, "mods/upload/step/2.html", context)
 
     # ---------------------- GET
+    if request.method == "GET":
+        mod = Mod.objects.get(id=mod_id)
+        files = mod.files.all()
+        file_url = mod.external_url if mod.is_external else ""
+        if mod_id and file_url:
+            context["file_url"] = file_url
+
     return render(request, "mods/upload/step/2.html", context)
 
 
@@ -271,19 +291,17 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
-    print(context)
+    print("Entering upload_step3 view. Request method:", request.method)
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
     uploaded_files = mod.files.all() if mod else []
     context["uploaded_files"] = uploaded_files
 
-    if not uploaded_files.exists():
-        return render(request, "mods/upload/step/2.html", context)
-
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         action = request.POST.get("action")
+        print("POST action received in step 3:", action)
 
         if action in ("next", "previous"):
             # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
@@ -319,10 +337,7 @@ def upload_step3(request):
             }
         )
 
-    return render(
-        request,
-        "mods/upload/step/3.html",context
-    )
+    return render(request, "mods/upload/step/3.html", context)
 
 
 # TODO: Fix latency issues with HX requests (takes forever between initial upload and response)

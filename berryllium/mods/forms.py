@@ -1,6 +1,8 @@
 import os
 from django import forms
 from django.forms import formset_factory
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
 from ..shared.widgets import PillCheckboxSelectMultiple
@@ -10,10 +12,6 @@ ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 MAX_SUMMARY_LENGTH = 200
-
-ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
-ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 
 
 class MetadataForm(forms.Form):
@@ -103,6 +101,16 @@ class FileUploadForm(forms.Form):
         required=False,
     )
 
+    file_url = forms.URLField(
+        widget=forms.URLInput(
+            attrs={
+                "class": "zb-input text-sm",
+                "placeholder": "https://example.com/modfile/",
+            }
+        ),
+        required=False,
+    )
+
     def __init__(self, *args, existing_files=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.existing_files = existing_files or []
@@ -113,38 +121,74 @@ class FileUploadForm(forms.Form):
         if ext not in allowed_extensions:
             return False
         return True
+    
+    def valid_url(self, url):
+        """Basic URL validation"""
+        # validate url against regex
+        validate = URLValidator(schemes=["http", "https"])
+        try:
+            validate(url)
+            return True
+        except ValidationError:
+            return False
 
     def clean_file(self):
         """
         Form validation and cleanup.
         """
-        uploaded_file = self.cleaned_data.get("file")
+        cleaned_file = self.cleaned_data.get("file")
 
-        if not uploaded_file:
-            return None
-
-        # Validate file size
-        if uploaded_file.size > MAX_FILE_SIZE:
-            raise forms.ValidationError(
-                f"File size exceeds the limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
-            )
+        # if no file uploaded, check if file URL is provided, if not raise error
+        if not cleaned_file:
+            return cleaned_file
 
         # Validate file extension
-        if not self.valid_file_extension(uploaded_file.name, ALLOWED_EXTENSIONS):
+        if not self.valid_file_extension(cleaned_file.name, ALLOWED_EXTENSIONS):
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
             )
 
         # Check for illegal characters in filename
-        if any(char in uploaded_file.name for char in ILLEGAL_CHARACTERS):
+        if any(char in cleaned_file.name for char in ILLEGAL_CHARACTERS):
             raise forms.ValidationError(
                 f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
 
-        if uploaded_file.size == 0:
+        if cleaned_file.size == 0:
             raise forms.ValidationError("The uploaded file is empty.")
 
-        return uploaded_file
+        return cleaned_file
+    
+    def clean_file_url(self):
+        """
+        Validate file URL if provided.
+        """
+        file_url = self.cleaned_data.get("file_url")
+
+        if file_url:
+            # make sure valid url
+            if not self.valid_url(file_url):
+                raise forms.ValidationError("Please enter a valid URL.")
+
+        return file_url
+
+    # cross-field validation to ensure either file or file_url is provided
+    def clean(self):
+        cleaned_data = super().clean()
+        cleaned_file = cleaned_data.get("file")
+        file_url = cleaned_data.get("file_url")
+
+        # only one of file or file_url can be provided, not both
+        if cleaned_file and file_url:
+            raise forms.ValidationError(
+                "Please provide either a file or a file URL, not both."
+            )
+
+        # in case absolutely nothing has been input
+        if not cleaned_file and not file_url and not self.existing_files:
+            raise forms.ValidationError("Please upload a file or provide a file URL.")
+
+        return cleaned_data
 
 
 class FileGroupForm(forms.Form):

@@ -188,7 +188,7 @@ class FileUpload(models.Model):
     staged_file = models.FileField(
         upload_to=staged_path, null=True, blank=True
     )  # temp file for processing, null after processing
-    url = models.URLField(blank=True)  # url after processing
+    url = models.URLField(blank=True, null=True)  # url after processing
     file_hash = models.CharField(
         max_length=64, blank=True
     )  # file hash for integrity check
