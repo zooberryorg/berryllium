@@ -229,7 +229,6 @@ def upload_step2(request):
                 if file:
                     # update existing_files for re-rendering form with new file
                     existing_files.append(file)
-                    context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
@@ -249,6 +248,7 @@ def upload_step2(request):
 
             # ----------------- Simple file upload without navigation (stay on step 2)
             else:
+                context["existing_files"] = existing_files
                 return render(request, "mods/upload/step/2.html", context)
 
         # ---------------------- Invalid form: return SAME state with errors
