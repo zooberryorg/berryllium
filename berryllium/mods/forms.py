@@ -110,6 +110,7 @@ class FileUploadForm(forms.Form):
                 "placeholder": "https://example.com/modfile/",
             }
         ),
+        required=False,
     )
 
     def __init__(self, *args, existing_files=None, **kwargs):
