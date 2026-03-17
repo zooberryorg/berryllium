@@ -24,16 +24,6 @@ NAVIGATION = [
 
 # ----------------------- Helper functions ----------------------
 
-
-def _get_upload_session_id(request):
-    """
-    Ensure a session key exists (needed to tie UploadedFile rows to a user’s draft upload).
-    """
-    if not request.session.session_key:
-        request.session.save()
-    return request.session.session_key
-
-
 def upload_mod(request):
     """
     Landing page for mod upload requests.
