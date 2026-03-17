@@ -24,6 +24,7 @@ NAVIGATION = [
 
 # ----------------------- Helper functions ----------------------
 
+
 def _get_upload_session_id(request):
     """
     Ensure a session key exists (needed to tie UploadedFile rows to a user’s draft upload).
@@ -62,6 +63,7 @@ def init_context(current_index, form):
         "remainder_range": range(current_index + 1, nav_length),
     }
 
+
 def calculate_file_hash(file):
     """
     Calculates a hash for the given file.
@@ -71,6 +73,7 @@ def calculate_file_hash(file):
     for chunk in file.chunks():
         hasher.update(chunk)
     return hasher.hexdigest()
+
 
 def upload_file(uploaded_file, mod_id=None):
     """
@@ -87,7 +90,9 @@ def upload_file(uploaded_file, mod_id=None):
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
 
     # see if hash already exists in mod files
-    existing_file = FileUpload.objects.filter(file_hash=file_hash, filegroup__mod_id=mod_id).first()
+    existing_file = FileUpload.objects.filter(
+        file_hash=file_hash, filegroup__mod_id=mod_id
+    ).first()
 
     # if file exists, delete newly uploaded file from storage
     if existing_file:
@@ -109,7 +114,9 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
+
 # ----------------------- Views ----------------------
+
 
 def open_mod_draft(request, mod_id):
     """

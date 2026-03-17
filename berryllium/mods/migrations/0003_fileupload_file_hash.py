@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mods', '0002_fileupload_version'),
+        ("mods", "0002_fileupload_version"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='fileupload',
-            name='file_hash',
+            model_name="fileupload",
+            name="file_hash",
             field=models.CharField(blank=True, max_length=64),
         ),
     ]
