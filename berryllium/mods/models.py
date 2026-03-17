@@ -117,7 +117,6 @@ class FileGroup(models.Model):
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
 
-
 class FileUpload(models.Model):
     """
     File uploads attached to mod pages.

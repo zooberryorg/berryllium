@@ -7,7 +7,7 @@ from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
-from ..models import FileUpload, Mod
+from ..models import FileUpload, Mod, FileGroup
 
 # Navigation configuration for upload form
 #     name: Current location title
@@ -99,7 +99,7 @@ def upload_step1(request):
                 "expansions": ",".join(form.cleaned_data.get("expansions", [])),
             }
 
-            mod_id = session_exists 
+            mod_id = session_exists
 
             # If session exists, update draft mod
             if mod_id:
@@ -147,65 +147,63 @@ def upload_step2(request):
     Step 2 of the upload form.
     """
     context = init_context(current_index=1, form=FileUploadForm())
-    session_exists = request.session.get("session_id") is not None
+    mod_id = request.session.get("session_id")
     existing_files = []
-
-    if session_exists:
-        # get existing uploaded files saved in draft
-        mod = Mod.objects.get(id=request.session["session_id"])
-        files = mod.files.all()
-        if files.exists():
-            existing_files = [f for f in files.values("filename", "size", "id")]
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
+
+        # get existing uploaded files saved in draft
+        if mod_id:
+            mod = Mod.objects.get(id=mod_id)
+            files = mod.files.all()
+            if files.exists():
+                existing_files = [f for f in files.values("filename", "size", "id")]
+
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
         )
 
         if form.is_valid():
             uploaded_file = form.cleaned_data["file"]
-            session_id = request.session["session_id"]
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
+                # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
                 temp_filename = (
-                    f"temp_uploads/{session_id}/{uuid.uuid4().hex}_{basename}"
+                    f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
                 )
                 temp_path = default_storage.save(temp_filename, uploaded_file)
+
+                # if no existing files, create FileGroup to store file
+                fg = FileGroup.objects.filter(mod_id=mod_id).first()
+                if not fg:
+                    fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
                 # Create DB row so Step 3 can actually query files
                 uf = FileUpload(
                     size=uploaded_file.size,
                     filename=basename,
-                    upload_session=session_id,
+                    staged_file=temp_path,
+                    filegroup=fg
                 )
-                uf.file.name = temp_path  # point FileField at saved path
                 uf.save()
 
-                # Store metadata in session for Step 2 preview list + removal
-                file_info = {
-                    "temp_path": temp_path,
-                    "original_name": basename,
-                    "size": uploaded_file.size,
-                    "content_type": getattr(uploaded_file, "content_type", ""),
-                }
-                context["existing_files"].append(file_info)
-                request.session["temp_uploaded_files"] = context["existing_files"]
-                request.session.modified = True
+                # update existing_files for re-rendering form with new file
+                existing_files.append({"filename": basename, "size": uploaded_file.size, "id": uf.id})
+                context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
-                if not request.session.get("temp_uploaded_files"):
+                if not existing_files:
                     form.add_error(
                         "file", "Please upload at least one file before continuing."
                     )
                     context["form"] = form
-                    context["existing_files"] = request.session.get(
-                        "temp_uploaded_files", []
-                    )
+                    context["existing_files"] = []
                     return render(request, "mods/upload/step/2.html", context)
+                
                 return redirect("upload_step3")
 
             # ----------------- Handle previous navigation
