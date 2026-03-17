@@ -147,15 +147,15 @@ def upload_step2(request):
     Step 2 of the upload form.
     """
     context = init_context(current_index=1, form=FileUploadForm())
-    session_exists = request.session.get("session_id") is not None
+    mod_id = request.session.get("session_id")
     existing_files = []
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
 
         # get existing uploaded files saved in draft
-        if session_exists:
-            mod = Mod.objects.get(id=request.session["session_id"])
+        if mod_id:
+            mod = Mod.objects.get(id=mod_id)
             files = mod.files.all()
             if files.exists():
                 existing_files = [f for f in files.values("filename", "size", "id")]
@@ -166,7 +166,6 @@ def upload_step2(request):
 
         if form.is_valid():
             uploaded_file = form.cleaned_data["file"]
-            mod_id = session_exists
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
@@ -185,17 +184,19 @@ def upload_step2(request):
                 )
                 uf.save()
 
+                # update existing_files for re-rendering form with new file
+                existing_files.append({"filename": basename, "size": uploaded_file.size, "id": uf.id})
+
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
-                if not request.session.get("temp_uploaded_files"):
+                if not existing_files:
                     form.add_error(
                         "file", "Please upload at least one file before continuing."
                     )
                     context["form"] = form
-                    context["existing_files"] = request.session.get(
-                        "temp_uploaded_files", []
-                    )
+                    context["existing_files"] = []
                     return render(request, "mods/upload/step/2.html", context)
+                
                 return redirect("upload_step3")
 
             # ----------------- Handle previous navigation
