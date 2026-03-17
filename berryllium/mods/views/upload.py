@@ -166,13 +166,14 @@ def upload_step2(request):
 
         if form.is_valid():
             uploaded_file = form.cleaned_data["file"]
-            session_id = request.session["session_id"]
+            mod_id = session_exists
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
+                # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
                 temp_filename = (
-                    f"temp_uploads/{session_id}/{uuid.uuid4().hex}_{basename}"
+                    f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
                 )
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
@@ -180,9 +181,8 @@ def upload_step2(request):
                 uf = FileUpload(
                     size=uploaded_file.size,
                     filename=basename,
-                    upload_session=session_id,
+                    staged_file=temp_path
                 )
-                uf.file.name = temp_path  # point FileField at saved path
                 uf.save()
 
             # ------------------ Handle next navigation
