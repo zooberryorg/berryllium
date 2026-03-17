@@ -73,9 +73,15 @@ class Dependency(models.Model):
     - ModB.required_by.all() -> all mods that require ModB
     """
 
-    parent = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
+    parent = models.ForeignKey(
+        Mod, related_name="dependencies", on_delete=models.CASCADE
+    )
     ref = models.ForeignKey(
-        Mod, related_name="required_by", on_delete=models.SET_NULL, null=True, blank=True
+        Mod,
+        related_name="required_by",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
     )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
@@ -104,8 +110,10 @@ class FileGroup(models.Model):
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
 
+
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
+
 
 class FileUpload(models.Model):
     """
@@ -157,7 +165,9 @@ class FileUpload(models.Model):
     uploaded_at = models.DateTimeField(auto_now_add=True)
     published_at = models.DateTimeField(blank=True, null=True)
     size = models.BigIntegerField(null=True, blank=True)  # size in bytes
-    filename = models.CharField(max_length=255, blank=True)  # name of the file as uploaded
+    filename = models.CharField(
+        max_length=255, blank=True
+    )  # name of the file as uploaded
     description = models.TextField(blank=True)
     title = models.CharField(
         max_length=255, blank=True, null=True
