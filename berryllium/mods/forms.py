@@ -10,7 +10,6 @@ from .models import FileUpload
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-URL_REGEX = r'/^https?:\/\/(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b(?:[-a-zA-Z0-9()@:%_\+.~#?&\/=]*)$/'
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 MAX_SUMMARY_LENGTH = 200
 
