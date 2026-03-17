@@ -14,9 +14,19 @@
         <div class="p-6 mt-4 mb-4">
             <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
                 <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
-                <span class="text-white/70">Enter a URL below for external files. You can either provide a link or upload a file, but not both.</span>
+                <span class="text-white/70">Enter a URL below for external files. You can either provide a link or upload files, but not both.</span>
             </div>
         </div>
+        <div class="space-y-4 px-6">
+            <div>
+                <label class="block text-sm font-medium mb-1 text-white">
+                    External File URL
+                </label>
+                {{ form.file_url }}
+                {% include "mods/upload/field_errors.html" with field=form.file_url %}
+            </div>
+        </div>
+
         <div class="space-y-4 mt-6 mb-6">
             <div class="px-6">
                 <!-- Drag and Drop Zone -->

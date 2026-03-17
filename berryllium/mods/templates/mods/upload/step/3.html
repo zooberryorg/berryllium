@@ -7,10 +7,6 @@
       hx-target="#modal-content"
       hx-swap="innerHTML"
       {% csrf_token %}
-      --
-      groups
-      management
-      -->
     <input type="hidden" name="groups-TOTAL_FORMS" :value="groups.length">
     <input type="hidden" name="groups-INITIAL_FORMS" value="0">
     <input type="hidden" name="groups-MIN_NUM_FORMS" value="0">
