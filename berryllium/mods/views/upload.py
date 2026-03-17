@@ -43,6 +43,7 @@ def upload_mod(request):
         },
     )
 
+
 def init_context(current_index):
     """
     Initializes the multi-step form context with navigation information and progress.
@@ -58,13 +59,16 @@ def init_context(current_index):
         "remainder_range": range(current_index + 1, nav_length),
     }
 
+
 def open_mod_draft(request, mod_id):
     """
     View to open an existing mod draft for editing.
     """
     try:
         mod = Mod.objects.get(id=mod_id, draft=True)
-        request.session["session_id"] = mod.id  # Set session to load draft in upload steps
+        request.session["session_id"] = (
+            mod.id
+        )  # Set session to load draft in upload steps
         return redirect("upload_step1")  # Redirect to step 1 to load draft data
     except Mod.DoesNotExist:
         print(f"Draft mod with ID {mod_id} does not exist.")
@@ -73,6 +77,7 @@ def open_mod_draft(request, mod_id):
     # TODO: Add error handling for non-existent or non-draft mods
     # except Mod.DoesNotExist:
     #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
+
 
 def upload_step1(request):
     """
