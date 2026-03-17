@@ -230,6 +230,7 @@ def upload_step2(request):
 
         if form.is_valid():
             clean_file = form.cleaned_data["file"]
+            clean_url = form.cleaned_data["file_url"]
 
             if clean_file:
                 file = upload_file(clean_file, mod_id=mod_id)
@@ -237,6 +238,8 @@ def upload_step2(request):
                     # update existing_files for re-rendering form with new file
                     existing_files.append(file)
                     context["existing_files"] = existing_files
+            elif clean_url: # TODO: handle URL uploads
+                pass
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
