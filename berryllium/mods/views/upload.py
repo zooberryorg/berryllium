@@ -177,16 +177,16 @@ def upload_step2(request):
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
                 # if no existing files, create FileGroup to store file
-                if not existing_files:
-                    fg = FileGroup(mod_id=mod_id, name="Files", description="")
-                    fg.save()
+                fg = FileGroup.objects.filter(mod_id=mod_id).first()
+                if not fg:
+                    fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
                 # Create DB row so Step 3 can actually query files
                 uf = FileUpload(
                     size=uploaded_file.size,
                     filename=basename,
                     staged_file=temp_path,
-                    filegroup=fg if not existing_files else FileGroup.objects.get(mod_id=mod_id),
+                    filegroup=fg
                 )
                 uf.save()
 
