@@ -6,10 +6,9 @@
 <form hx-post="{% url 'upload_step3' %}"
       hx-target="#modal-content"
       hx-swap="innerHTML"
-      x-data="fileOrganizer({ groups: JSON.parse(document.getElementById('groups-init').textContent), files: JSON.parse(document.getElementById('files-init').textContent), })">
+      
     {% csrf_token %}
-    {{ groups_init|json_script:"groups-init" }}
-    {{ files_init|json_script:"files-init" }}
+
     <!-- groups management -->
     <input type="hidden" name="groups-TOTAL_FORMS" :value="groups.length">
     <input type="hidden" name="groups-INITIAL_FORMS" value="0">

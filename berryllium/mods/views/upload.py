@@ -259,21 +259,20 @@ def upload_step2(request):
     # ---------------------- GET
     return render(request, "mods/upload/step/2.html", context)
 
+
 def upload_step3(request):
     """
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupFormSet())
+
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
     uploaded_files = mod.files.all() if mod else []
+    context["uploaded_files"] = uploaded_files
 
     if not uploaded_files.exists():
-        return render(
-            request,
-            "mods/upload/step/2.html",
-            context
-        )
+        return render(request, "mods/upload/step/2.html", context)
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
