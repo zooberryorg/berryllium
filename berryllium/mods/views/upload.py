@@ -140,14 +140,17 @@ def upload_step2(request):
     """
     context = init_context(current_index=1, form=FileUploadForm())
     session_exists = request.session.get("session_id") is not None
+    existing_files = []
 
-    context = {
-        "existing_files": request.session.get("temp_uploaded_files", []),
-    }
+    if session_exists:
+        # get existing uploaded files saved in draft
+        mod = Mod.objects.get(id=request.session["session_id"])
+        files = mod.files.all()
+        existing_files = [f for f in files.values("filename", "size", "id")]
 
     if request.method == "POST":
         form = FileUploadForm(
-            request.POST, request.FILES, existing_files=context["existing_files"]
+            request.POST, request.FILES, existing_files=existing_files
         )
 
         if form.is_valid():

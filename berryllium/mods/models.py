@@ -57,6 +57,10 @@ class Mod(models.Model):
     # permissions
     allow_fan_images = models.BooleanField(default=False)
 
+    @property
+    def files(self):
+        return FileUpload.objects.filter(filegroup__mod=self)
+
 
 class Dependency(models.Model):
     """
