@@ -9,7 +9,7 @@ urlpatterns = [
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
     # File management
     path(
-        "mods/remove/<int:file_index>/",
+        "mods/remove/<int:file_id>/",
         upload.remove_temp_file,
         name="remove_temp_file",
     ),

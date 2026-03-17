@@ -207,15 +207,16 @@ def upload_step2(request):
     context = init_context(current_index=1, form=FileUploadForm())
     mod_id = request.session.get("session_id")
     existing_files = []
+    if mod_id:
+        mod = Mod.objects.get(id=mod_id)
+        files = mod.files.all()
+        if files.exists():
+            existing_files = [f for f in files.values("filename", "size", "id")]
+            context["existing_files"] = existing_files
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
         # get existing uploaded files saved in draft
-        if mod_id:
-            mod = Mod.objects.get(id=mod_id)
-            files = mod.files.all()
-            if files.exists():
-                existing_files = [f for f in files.values("filename", "size", "id")]
 
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
@@ -229,6 +230,7 @@ def upload_step2(request):
                 if file:
                     # update existing_files for re-rendering form with new file
                     existing_files.append(file)
+                    context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
@@ -248,7 +250,6 @@ def upload_step2(request):
 
             # ----------------- Simple file upload without navigation (stay on step 2)
             else:
-                context["existing_files"] = existing_files
                 return render(request, "mods/upload/step/2.html", context)
 
         # ---------------------- Invalid form: return SAME state with errors
@@ -400,35 +401,25 @@ def upload_step3(request):
 
 # TODO: Fix latency issues with HX requests (takes forever between initial upload and response)
 @require_http_methods(["POST"])
-def remove_temp_file(request, file_index):
+def remove_temp_file(request, file_id):
     """
     Delete a file from current session.
     """
+    mod_id = request.session.get("session_id")
     if request.method == "POST":
-        temp_files = request.session.get("temp_uploaded_files", [])
+        mod = Mod.objects.filter(id=mod_id).first()
+        temp_files = mod.files.all() if mod else []
 
-        if 0 <= file_index < len(temp_files):
-            file_info = temp_files[file_index]
+        # find file by id in temp_files
+        file = temp_files.filter(id=file_id).first()
+        temp_path = []
+        if file:
+            file.delete()
+            temp_path = file.staged_file.path
 
-            # Delete UploadedFile row if present
-            # TODO: restore file ID functionality
-            uploaded_file_id = file_info.get("uploaded_file_id")
-            if uploaded_file_id:
-                try:
-                    uploaded_file = FileUpload.objects.get(id=uploaded_file_id)
-                except FileUpload.DoesNotExist:
-                    uploaded_file = None
-                if uploaded_file:
-                    uploaded_file.delete()
-
-            # Delete from storage (in case row was missing)
-            temp_path = file_info.get("temp_path")
-            if temp_path and default_storage.exists(temp_path):
-                default_storage.delete(temp_path)
-
-            temp_files.pop(file_index)
-            request.session["temp_uploaded_files"] = temp_files
-            request.session.modified = True
+        # Delete from storage (in case row was missing)
+        if temp_path and default_storage.exists(temp_path):
+            default_storage.delete(temp_path)
 
         return redirect("upload_step2")
 
