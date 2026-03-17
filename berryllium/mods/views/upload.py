@@ -4,11 +4,10 @@ import hashlib
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
-from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 
-from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
+from ..forms import FileUploadForm, MetadataForm, FileDetailsForm, FileGroupForm
 from ..models import FileUpload, Mod, FileGroup
 
 # Navigation configuration for upload form
@@ -23,15 +22,6 @@ NAVIGATION = [
 ]
 
 # ----------------------- Helper functions ----------------------
-
-
-def _get_upload_session_id(request):
-    """
-    Ensure a session key exists (needed to tie UploadedFile rows to a user’s draft upload).
-    """
-    if not request.session.session_key:
-        request.session.save()
-    return request.session.session_key
 
 
 def upload_mod(request):
@@ -52,16 +42,12 @@ def init_context(current_index, form):
     """
     Initializes the multi-step form context with navigation information and progress.
     """
-
-    nav_length = len(NAVIGATION)
-
-    return {
+    context = {
         "form": form,
-        "nav_item_count": nav_length,
-        "current_nav_index": current_index,
-        "progress_range": range(current_index + 1),
-        "remainder_range": range(current_index + 1, nav_length),
     }
+    progress_bar = generate_progress_bar(current_index, total_steps=len(NAVIGATION))
+
+    return context | progress_bar
 
 
 def calculate_file_hash(file):
@@ -113,6 +99,25 @@ def upload_file(uploaded_file, mod_id=None):
     uf.save()
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+
+
+def generate_progress_bar(current_index, total_steps):
+    """
+    Generates progress bar data for the upload steps.
+    """
+
+    title = f"Step {current_index + 1} of {total_steps}: {NAVIGATION[current_index]['name']}"
+
+    completed_range = list(range(current_index + 1))
+    remaining_range = list(range(current_index + 1, total_steps))
+    print(f"Progress bar - Completed: {completed_range}, Remaining: {remaining_range}")
+
+    return {
+        "title": title,
+        "completed": completed_range,
+        "remaining": remaining_range,
+        "total_steps": total_steps,
+    }
 
 
 # ----------------------- Views ----------------------
@@ -205,6 +210,7 @@ def upload_step2(request):
     Step 2 of the upload form.
     """
     context = init_context(current_index=1, form=FileUploadForm())
+    print(context)
     mod_id = request.session.get("session_id")
     existing_files = []
     if mod_id:
@@ -260,111 +266,36 @@ def upload_step2(request):
     return render(request, "mods/upload/step/2.html", context)
 
 
-# TODO: Move validation and cleanup to form
-def update_step3_state(request, uploaded_files, template_obj):
-    """
-    Updates step3 state and some validation.
-    """
-    group_formset = FileGroupFormSet(request.POST, prefix="groups")
-
-    FileDetailsFormSet = modelformset_factory(FileUpload, form=FileDetailsForm, extra=0)
-    file_formset = FileDetailsFormSet(
-        request.POST, queryset=uploaded_files, prefix="files"
-    )
-
-    if group_formset.is_valid() and file_formset.is_valid():
-        groups_data = []
-        for form in group_formset:
-            if form.cleaned_data and not form.cleaned_data.get("DELETE"):
-                groups_data.append(
-                    {
-                        "name": form.cleaned_data["name"],
-                        "description": form.cleaned_data.get("description", ""),
-                        "order": form.cleaned_data.get("order", 0),
-                    }
-                )
-
-        files_data = []
-        # Structure data into json serializable format
-        for form in file_formset:
-            if form.cleaned_data:
-                files_data.append(
-                    {
-                        "id": form.instance.id,
-                        "title": form.cleaned_data.get("title", ""),
-                        "description": form.cleaned_data.get("description", ""),
-                        "group_index": form.cleaned_data["group_index"],
-                        "file_order": form.cleaned_data["file_order"],
-                    }
-                )
-
-        request.session["file_groups"] = groups_data
-        request.session["file_details"] = files_data
-        request.session.modified = True
-
-        return group_formset, file_formset, uploaded_files
-
-    # else return to step 3 with errors
-    return render(
-        request,
-        template_obj,
-        {
-            "group_formset": group_formset,
-            "file_formset": file_formset,
-            "uploaded_files": uploaded_files,
-        },
-    )
-
-
 def upload_step3(request):
     """
     Step 3 of upload form.
     """
-    session_id = _get_upload_session_id(request)
-    current_index = 3
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
-    nav_item_count = len(NAVIGATION)
-    context = {
-        "form": FileUploadForm(),
-        "filename": request.session.get("upload_original_name"),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": current_index - 1,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
-        "existing_files": request.session.get("temp_uploaded_files", []),
-    }
+    context = init_context(current_index=2, form=FileGroupForm())
+    print(context)
 
-    # TODO: rework to use context instead of passing uploaded_files separately
+    mod_id = request.session.get("session_id")
+    mod = Mod.objects.filter(id=mod_id).first()
+    uploaded_files = mod.files.all() if mod else []
+    context["uploaded_files"] = uploaded_files
 
-    uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by(
-        "date", "id"
-    )
     if not uploaded_files.exists():
-        return render(
-            request,
-            "mods/upload/step/2.html",
-            {
-                "form": FileUploadForm(),
-                "existing_files": request.session.get("temp_uploaded_files", []),
-                "error": "Upload at least one file before organizing.",
-            },
-        )
+        return render(request, "mods/upload/step/2.html", context)
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
-            res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
+            # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
             # if invalid, res will be None -> fall through and re-render with errors
-            if res is not None:
-                return res
+            # if res is not None:
+            #     return res
             if action == "previous":
-                return redirect("create_mods_step2")
+                print("GOING BACK TO STEP 2")
+                return render(request, "mods/upload/step/2.html", context)
             if action == "next":
                 # IMPORTANT: go to step 4 (don’t re-render step3)
-                return redirect("create_mods_step4")
+                return render(request, "mods/upload/step/4.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     groups_init = request.session.get("file_groups", [])
@@ -390,12 +321,7 @@ def upload_step3(request):
 
     return render(
         request,
-        "mods/upload/step/3.html",
-        {
-            "uploaded_files": uploaded_files,
-            "groups_init": groups_init,
-            "files_init": files_init,
-        },
+        "mods/upload/step/3.html",context
     )
 
 
