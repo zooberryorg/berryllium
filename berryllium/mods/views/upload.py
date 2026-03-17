@@ -404,8 +404,10 @@ def remove_temp_file(request, file_index):
     """
     Delete a file from current session.
     """
+    mod_id = request.session.get("session_id")
     if request.method == "POST":
-        temp_files = request.session.get("temp_uploaded_files", [])
+        mod = Mod.objects.filter(id=mod_id).first()
+        temp_files = mod.files.all() if mod else []
 
         if 0 <= file_index < len(temp_files):
             file_info = temp_files[file_index]

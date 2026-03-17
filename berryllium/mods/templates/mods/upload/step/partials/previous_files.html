@@ -12,7 +12,7 @@
                         </div>
                     </div>
                     <button type="button"
-                            hx-post="{% url 'remove_temp_file' forloop.counter0 %}"
+                            hx-post="{% url 'remove_temp_file' file.id %}"
                             hx-swap="innerHTML"
                             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                             class="text-red-400 hover:text-red-300 p-1 cursor-pointer">
