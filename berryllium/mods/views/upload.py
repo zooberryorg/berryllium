@@ -7,7 +7,7 @@ from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
-from ..models import FileUpload
+from ..models import FileUpload, Mod
 
 # Navigation configuration for upload form
 #     name: Current location title
@@ -54,7 +54,6 @@ def upload_step1(request):
     nav_item_count = len(NAVIGATION)
     context = {
         "form": MetadataForm(),
-        "filename": request.session.get("upload_original_name"),
         "nav_item_count": nav_item_count,
         "current_nav_index": 0,
         "progress_range": progress_range,
@@ -78,9 +77,18 @@ def upload_step1(request):
         # Invalid: return SAME state with errors
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
-    elif request.method == "GET" and request.session.get("upload_metadata"):
-        # Send existing files for review at form initialization TODO: simply send a boolean
-        form = MetadataForm(initial=request.session["upload_metadata"])
+    
+    elif request.method == "GET" and request.session.get("session_id"):
+        # Send draft data if it exists
+        mod_id = request.session["session_id"]
+        try:
+            mod = Mod.objects.get(id=mod_id)
+            form = MetadataForm(instance=mod)
+        except Mod.DoesNotExist:
+            form = MetadataForm()
+            
+        form = MetadataForm()
+
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
 
