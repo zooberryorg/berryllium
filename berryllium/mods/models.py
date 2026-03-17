@@ -71,7 +71,7 @@ class Dependency(models.Model):
 
     parent = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
     ref = models.ForeignKey(
-        Mod, related_name="mod", on_delete=models.CASCADE, null=True, blank=True
+        Mod, related_name="mod", on_delete=models.SET_NULL, null=True, blank=True
     )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
