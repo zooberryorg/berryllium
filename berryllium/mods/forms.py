@@ -103,7 +103,14 @@ class FileUploadForm(forms.Form):
         required=False,
     )
 
-    
+    file_url = forms.URLField(
+        widget=forms.URLInput(
+            attrs={
+                "class": "zb-input text-sm",
+                "placeholder": "https://example.com/modfile/",
+            }
+        ),
+    )
 
     def __init__(self, *args, existing_files=None, **kwargs):
         super().__init__(*args, **kwargs)
