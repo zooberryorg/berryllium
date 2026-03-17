@@ -53,13 +53,15 @@ def init_context(current_index, form):
     """
 
     nav_length = len(NAVIGATION)
-
+    print(f"Initializing context for step {current_index + 1} of {form.__class__.__name__}")
+    print(f"Current index: {current_index}, Navigation length: {nav_length}")
+    print(f"Progress range: {[range(current_index + 1)]}, Remainder range: {[range(current_index + 1, nav_length)]}")
     return {
         "form": form,
         "nav_item_count": nav_length,
         "current_nav_index": current_index,
-        "progress_range": range(current_index + 1),
-        "remainder_range": range(current_index + 1, nav_length),
+        "progress_range": list(range(current_index + 1)),
+        "remainder_range": list(range(current_index + 1, nav_length)),
     }
 
 
@@ -112,6 +114,25 @@ def upload_file(uploaded_file, mod_id=None):
     uf.save()
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+
+def generate_progress_bar(current_index, total_steps):
+    """
+    Generates progress bar data for the upload steps.
+    """
+
+    title = f"Step {current_index + 1} of {total_steps}: {NAVIGATION[current_index]['name']}"
+    completed_step_html = '<div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full w-1/4"></div>'
+    remaining_step_html = '<div class="bg-white/10 h-2.5 rounded-full w-full mr-2 w-1/4"></div>'
+
+    completed_list = completed_step_html * (current_index + 1)
+    remaining_list = remaining_step_html * (total_steps - current_index - 1)
+
+    return {
+        "title": title,
+        "completed": completed_list,
+        "remaining": remaining_list,
+        "total_steps": total_steps,
+    }
 
 
 # ----------------------- Views ----------------------
@@ -278,15 +299,16 @@ def upload_step3(request):
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
-            res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
+            # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
             # if invalid, res will be None -> fall through and re-render with errors
-            if res is not None:
-                return res
+            # if res is not None:
+            #     return res
             if action == "previous":
-                return redirect("create_mods_step2")
+                print("GOING BACK TO STEP 2")
+                return render(request, "mods/upload/step/2.html", context)
             if action == "next":
                 # IMPORTANT: go to step 4 (don’t re-render step3)
-                return redirect("create_mods_step4")
+                return render(request, "mods/upload/step/4.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     groups_init = request.session.get("file_groups", [])
