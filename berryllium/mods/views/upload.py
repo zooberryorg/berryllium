@@ -72,6 +72,32 @@ def calculate_file_hash(file):
         hasher.update(chunk)
     return hasher.hexdigest()
 
+def upload_file(uploaded_file, mod_id=None):
+    """
+    Handles file upload and validation.
+    """
+    # Save to storage (temp namespace by session)
+    basename = os.path.basename(uploaded_file.name)
+    # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
+    temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
+    temp_path = default_storage.save(temp_filename, uploaded_file)
+
+    # if no existing files, create FileGroup to store file
+    fg = FileGroup.objects.filter(mod_id=mod_id).first()
+    if not fg:
+        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+
+    # Create DB row so Step 3 can actually query files
+    uf = FileUpload(
+        size=uploaded_file.size,
+        filename=basename,
+        staged_file=temp_path,
+        filegroup=fg,
+    )
+    uf.save()
+
+    return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+
 
 def open_mod_draft(request, mod_id):
     """
@@ -177,33 +203,13 @@ def upload_step2(request):
         )
 
         if form.is_valid():
-            uploaded_file = form.cleaned_data["file"]
+            clean_file = form.cleaned_data["file"]
 
-            if uploaded_file:
-                # Save to storage (temp namespace by session)
-                basename = os.path.basename(uploaded_file.name)
-                # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
-                temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
-                temp_path = default_storage.save(temp_filename, uploaded_file)
-
-                # if no existing files, create FileGroup to store file
-                fg = FileGroup.objects.filter(mod_id=mod_id).first()
-                if not fg:
-                    fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
-
-                # Create DB row so Step 3 can actually query files
-                uf = FileUpload(
-                    size=uploaded_file.size,
-                    filename=basename,
-                    staged_file=temp_path,
-                    filegroup=fg,
-                )
-                uf.save()
+            if clean_file:
+                file = upload_file(clean_file, mod_id=mod_id)
 
                 # update existing_files for re-rendering form with new file
-                existing_files.append(
-                    {"filename": basename, "size": uploaded_file.size, "id": uf.id}
-                )
+                existing_files.append(file)
                 context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
