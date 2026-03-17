@@ -115,7 +115,13 @@ def upload_step1(request):
         mod_id = request.session["session_id"]
         try:
             mod = Mod.objects.get(id=mod_id)
-            form = MetadataForm(instance=mod)
+            form = MetadataForm(initial={
+                "title": mod.title,
+                "category": mod.category,
+                "summary": mod.summary,
+                "game": mod.game,
+                "expansions": mod.expansions,
+            })
         except Mod.DoesNotExist:
             form = MetadataForm()
 
