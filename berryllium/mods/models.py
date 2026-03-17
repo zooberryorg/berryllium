@@ -35,8 +35,8 @@ class Mod(models.Model):
     # description = MarkdownxField(blank=True)
 
     # dates
-    date = models.DateField(auto_now_add=True)
-    last_updated = models.DateField(auto_now=True)
+    submission_date = models.DateTimeField(auto_now_add=True)
+    last_updated = models.DateTimeField(auto_now=True)
 
     # images = models.ManyToManyField(UploadedImage, blank=True)
     contents = models.TextField(blank=True)
@@ -70,7 +70,7 @@ class Dependency(models.Model):
 
     parent = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
     ref = models.ForeignKey(
-        Mod, related_name="referenced_by", on_delete=models.CASCADE
+        Mod, related_name="mod", on_delete=models.CASCADE, null=True, blank=True
     )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
