@@ -44,7 +44,7 @@ def upload_mod(request):
     )
 
 
-def init_context(current_index):
+def init_context(current_index, form):
     """
     Initializes the multi-step form context with navigation information and progress.
     """
@@ -52,7 +52,7 @@ def init_context(current_index):
     nav_length = len(NAVIGATION)
 
     return {
-        "form": MetadataForm(),
+        "form": form,
         "nav_item_count": nav_length,
         "current_nav_index": current_index,
         "progress_range": range(current_index + 1),
@@ -83,7 +83,7 @@ def upload_step1(request):
     """
     Step 1 of the upload form.
     """
-    context = init_context(current_index=0)
+    context = init_context(current_index=0, form=MetadataForm())
     session_exists = request.session.get("session_id") is not None
 
     if request.method == "POST":
@@ -138,18 +138,10 @@ def upload_step2(request):
     """
     Step 2 of the upload form.
     """
-    session_id = _get_upload_session_id(request)
-    current_index = 2
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
-    nav_item_count = len(NAVIGATION)
+    context = init_context(current_index=1, form=FileUploadForm())
+    session_exists = request.session.get("session_id") is not None
+
     context = {
-        "form": FileUploadForm(),
-        "filename": request.session.get("upload_original_name"),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": current_index - 1,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
         "existing_files": request.session.get("temp_uploaded_files", []),
     }
 
