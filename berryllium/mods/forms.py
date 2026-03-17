@@ -150,7 +150,7 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-    
+
     # cross-field validation to ensure either file or file_url is provided
     def clean(self):
         cleaned_data = super().clean()
@@ -159,12 +159,14 @@ class FileUploadForm(forms.Form):
 
         # only one of file or file_url can be provided, not both
         if cleaned_file and file_url:
-            raise forms.ValidationError("Please provide either a file or a file URL, not both.")
-        
+            raise forms.ValidationError(
+                "Please provide either a file or a file URL, not both."
+            )
+
         # in case absolutely nothing has been input
         if not cleaned_file and not file_url and not self.existing_files:
             raise forms.ValidationError("Please upload a file or provide a file URL.")
-        
+
         return cleaned_data
 
 

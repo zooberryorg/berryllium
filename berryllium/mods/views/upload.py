@@ -255,7 +255,7 @@ def upload_step2(request):
                     print("No file uploaded, but URL provided. Saving URL to mod.")
                     mod = Mod.objects.filter(id=mod_id).first()
                     # TODO: Cleanup temp files and rework filegroups with url-based mods
-                    if mod: 
+                    if mod:
                         mod.is_external = True
                         mod.external_url = clean_url
                         mod.save()
