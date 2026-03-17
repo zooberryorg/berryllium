@@ -263,20 +263,16 @@ def upload_step3(request):
     """
     Step 3 of upload form.
     """
+    context = init_context(current_index=2, form=FileGroupFormSet())
     mod_id = request.session.get("session_id")
+    mod = Mod.objects.filter(id=mod_id).first()
+    uploaded_files = mod.files.all() if mod else []
 
-    uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by(
-        "date", "id"
-    )
     if not uploaded_files.exists():
         return render(
             request,
             "mods/upload/step/2.html",
-            {
-                "form": FileUploadForm(),
-                "existing_files": request.session.get("temp_uploaded_files", []),
-                "error": "Upload at least one file before organizing.",
-            },
+            context
         )
 
     # ---------------- POST (Back/Next) uses formset validation
