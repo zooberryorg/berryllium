@@ -85,7 +85,10 @@ def upload_file(uploaded_file, mod_id=None):
 
     # if no existing files, create FileGroup to store file
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
-    if not fg:
+
+    # see if hash already exists in mod files
+    existing_file = FileUpload.objects.filter(file_hash=file_hash, filegroup__mod_id=mod_id).first()
+    if not fg and not existing_file:
         fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
     # Create DB row so Step 3 can actually query files
