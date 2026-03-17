@@ -93,7 +93,8 @@ class Dependency(models.Model):
 
 class FileGroup(models.Model):
     """
-    By default mods have FileGroup support for the cases where multiple files need to be listed on the page. Each file needs its own metadata.
+    By default mods have FileGroup support for the cases where multiple files 
+    need to be listed on the page. Each file needs its own metadata.
     """
 
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="file_groups")
