@@ -7,8 +7,9 @@ urlpatterns = [
     path("mods/upload/s1", upload.upload_step1, name="upload_step1"),
     path("mods/upload/s2", upload.upload_step2, name="upload_step2"),
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
+    # File management
     path(
-        "upload/mods/remove/<int:file_index>/",
+        "mods/remove/<int:file_index>/",
         upload.remove_temp_file,
         name="remove_temp_file",
     ),
@@ -16,4 +17,6 @@ urlpatterns = [
     path("explore/mods/", explore.mods, name="explore_mods"),
     # File Drafts
     path("mods/drafts/<int:mod_id>/", upload.open_mod_draft, name="open_mod_draft"),
+    # Session management
+    path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
 ]

@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
 from ..models import FileUpload, Mod, FileGroup
@@ -152,7 +153,6 @@ def upload_step2(request):
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
-
         # get existing uploaded files saved in draft
         if mod_id:
             mod = Mod.objects.get(id=mod_id)
@@ -171,9 +171,7 @@ def upload_step2(request):
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
                 # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
-                temp_filename = (
-                    f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
-                )
+                temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
                 # if no existing files, create FileGroup to store file
@@ -186,12 +184,14 @@ def upload_step2(request):
                     size=uploaded_file.size,
                     filename=basename,
                     staged_file=temp_path,
-                    filegroup=fg
+                    filegroup=fg,
                 )
                 uf.save()
 
                 # update existing_files for re-rendering form with new file
-                existing_files.append({"filename": basename, "size": uploaded_file.size, "id": uf.id})
+                existing_files.append(
+                    {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+                )
                 context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
@@ -203,7 +203,7 @@ def upload_step2(request):
                     context["form"] = form
                     context["existing_files"] = []
                     return render(request, "mods/upload/step/2.html", context)
-                
+
                 return redirect("upload_step3")
 
             # ----------------- Handle previous navigation
@@ -394,3 +394,38 @@ def remove_temp_file(request, file_index):
             request.session.modified = True
 
         return redirect("upload_step2")
+
+
+@require_http_methods(["POST"])
+def cancel_mod_upload(request):
+    """
+    Cancel and delete the current mod upload session.
+    Note: live version will only delete session data. Live version
+    will keep draft and temp files until a cleanup task runs,
+    the mod is processed into a full mod, or the user manually deletes the draft.
+    """
+    mod_id = request.session.get("session_id")
+    if mod_id:
+        # Get all files with this session
+        mod = Mod.objects.filter(id=mod_id).first()
+        if mod:
+            files = mod.files.all()
+            for f in files:
+                # Delete file from storage
+                if f.staged_file and default_storage.exists(f.staged_file.name):
+                    default_storage.delete(f.staged_file.name)
+            # Delete session directory if it exists
+            session_dir = f"temp_uploads/{mod_id}/"
+            if default_storage.exists(session_dir):
+                default_storage.delete(session_dir)
+            # Delete draft mod
+            mod.delete()
+
+        # Clear session data related to the upload
+        request.session.pop("session_id", None)
+        request.session.modified = True
+
+    # force htmx to redirect instead of trying to re-render
+    response = HttpResponse()
+    response["HX-Redirect"] = redirect("home").url
+    return response

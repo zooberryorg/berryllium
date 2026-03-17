@@ -117,6 +117,7 @@ class FileGroup(models.Model):
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
 
+
 class FileUpload(models.Model):
     """
     File uploads attached to mod pages.
@@ -174,6 +175,7 @@ class FileUpload(models.Model):
     title = models.CharField(
         max_length=255, blank=True, null=True
     )  # optional title for the file that replaces the filename in listings
+    version = models.CharField(max_length=100, blank=True)
 
     class Meta:
         """
