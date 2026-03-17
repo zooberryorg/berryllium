@@ -1,5 +1,6 @@
 import os
 import uuid
+import hashlib
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
@@ -21,6 +22,7 @@ NAVIGATION = [
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
 
+# ----------------------- Helper functions ----------------------
 
 def _get_upload_session_id(request):
     """
@@ -59,6 +61,16 @@ def init_context(current_index, form):
         "progress_range": range(current_index + 1),
         "remainder_range": range(current_index + 1, nav_length),
     }
+
+def calculate_file_hash(file):
+    """
+    Calculates a hash for the given file.
+    """
+
+    hasher = hashlib.sha256()
+    for chunk in file.chunks():
+        hasher.update(chunk)
+    return hasher.hexdigest()
 
 
 def open_mod_draft(request, mod_id):
