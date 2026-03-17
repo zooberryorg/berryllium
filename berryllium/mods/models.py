@@ -174,6 +174,7 @@ class FileUpload(models.Model):
     title = models.CharField(
         max_length=255, blank=True, null=True
     )  # optional title for the file that replaces the filename in listings
+    version = models.CharField(max_length=100, blank=True)
 
     class Meta:
         """

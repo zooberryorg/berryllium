@@ -394,3 +394,32 @@ def remove_temp_file(request, file_index):
             request.session.modified = True
 
         return redirect("upload_step2")
+
+@require_http_methods(["POST"])
+def cancel_mod_upload(request):
+    """
+    Cancel and delete the current mod upload session.
+    Note: live version will only delete session data. Live version
+    will keep draft and temp files until a cleanup task runs,
+    the mod is processed into a full mod, or the user manually deletes the draft.
+    """
+    mod_id = request.session.get("session_id")
+    if mod_id:
+        # Get all files with this session
+        mod = Mod.objects.filter(id=mod_id).first()
+        if mod:
+            files = mod.files.all()
+            for f in files:
+                # Delete file from storage
+                if f.staged_file and default_storage.exists(f.staged_file.name):
+                    default_storage.delete(f.staged_file.name)
+                # Delete DB row
+                f.delete()
+            # Delete draft mod
+            mod.delete()
+
+        # Clear session data related to the upload
+        request.session.pop("session_id", None)
+        request.session.modified = True
+
+        return redirect("home")
