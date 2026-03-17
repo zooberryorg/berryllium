@@ -84,7 +84,8 @@ def upload_step1(request):
     Step 1 of the upload form.
     """
     context = init_context(current_index=0)
-
+    session_exists = request.session.get("session_id") is not None
+    
     if request.method == "POST":
         form = MetadataForm(request.POST)
         if form.is_valid():
@@ -103,7 +104,7 @@ def upload_step1(request):
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
 
-    elif request.method == "GET" and request.session.get("session_id"):
+    elif request.method == "GET" and session_exists:
         # Send draft data if it exists
         mod_id = request.session["session_id"]
         try:
