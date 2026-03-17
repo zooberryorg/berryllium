@@ -121,7 +121,7 @@ class FileUploadForm(forms.Form):
         if ext not in allowed_extensions:
             return False
         return True
-    
+
     def valid_url(self, url):
         """Basic URL validation"""
         # validate url against regex
@@ -158,7 +158,7 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-    
+
     def clean_file_url(self):
         """
         Validate file URL if provided.

@@ -310,7 +310,7 @@ def upload_step3(request):
             #     return res
             if action == "previous":
                 print("GOING BACK TO STEP 2")
-                return render(request, "mods/upload/step/2.html", context)
+                return redirect("upload_step2")
             if action == "next":
                 # IMPORTANT: go to step 4 (don’t re-render step3)
                 return render(request, "mods/upload/step/4.html", context)
