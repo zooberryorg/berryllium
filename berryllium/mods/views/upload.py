@@ -4,11 +4,10 @@ import hashlib
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
-from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 
-from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
+from ..forms import FileUploadForm, MetadataForm, FileDetailsForm, FileGroupForm
 from ..models import FileUpload, Mod, FileGroup
 
 # Navigation configuration for upload form
@@ -264,7 +263,7 @@ def upload_step3(request):
     """
     Step 3 of upload form.
     """
-    context = init_context(current_index=2, form=FileGroupFormSet())
+    context = init_context(current_index=2, form=FileGroupForm())
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
