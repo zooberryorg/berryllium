@@ -103,6 +103,7 @@
     --color-pine-700: #263621;
     --color-pine-800: #171f14;
     --color-pine-900: #0b0e09;
+    --color-gold-200: #f9e2a3;
     --color-gold-300: #e5cd7b;
     --color-gold-400: #d6b15d;
     --color-gold-500: #d4a435;
@@ -1276,6 +1277,9 @@
   }
   .text-cyan-400 {
     color: var(--color-cyan-400);
+  }
+  .text-gold-200 {
+    color: var(--color-gold-200);
   }
   .text-gold-400 {
     color: var(--color-gold-400);
