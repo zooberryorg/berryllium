@@ -1319,6 +1319,9 @@
   .text-pine-200 {
     color: var(--color-pine-200);
   }
+  .text-pine-300 {
+    color: var(--color-pine-300);
+  }
   .text-pine-400 {
     color: var(--color-pine-400);
   }
