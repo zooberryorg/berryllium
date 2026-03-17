@@ -1,5 +1,6 @@
 import os
 import uuid
+import hashlib
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
@@ -20,6 +21,8 @@ NAVIGATION = [
     {"name": "Organize Files", "url": "upload_step3", "icon": "folder"},
     # {'name': 'Review & Submit', 'url': 'create_mods_step4', 'icon': 'check-circle'},
 ]
+
+# ----------------------- Helper functions ----------------------
 
 
 def _get_upload_session_id(request):
@@ -59,6 +62,60 @@ def init_context(current_index, form):
         "progress_range": range(current_index + 1),
         "remainder_range": range(current_index + 1, nav_length),
     }
+
+
+def calculate_file_hash(file):
+    """
+    Calculates a hash for the given file.
+    """
+
+    hasher = hashlib.md5()
+    for chunk in file.chunks():
+        hasher.update(chunk)
+    return hasher.hexdigest()
+
+
+def upload_file(uploaded_file, mod_id=None):
+    """
+    Handles file upload and validation.
+    """
+    # Save to storage (temp namespace by session)
+    basename = os.path.basename(uploaded_file.name)
+    # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
+    temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
+    temp_path = default_storage.save(temp_filename, uploaded_file)
+    file_hash = calculate_file_hash(uploaded_file)
+
+    # if no existing files, create FileGroup to store file
+    fg = FileGroup.objects.filter(mod_id=mod_id).first()
+
+    # see if hash already exists in mod files
+    existing_file = FileUpload.objects.filter(
+        file_hash=file_hash, filegroup__mod_id=mod_id
+    ).first()
+
+    # if file exists, delete newly uploaded file from storage
+    if existing_file:
+        if default_storage.exists(temp_path):
+            default_storage.delete(temp_path)
+        return {}
+    elif not fg:
+        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+
+    # Create DB row so Step 3 can actually query files
+    uf = FileUpload(
+        size=uploaded_file.size,
+        filename=basename,
+        staged_file=temp_path,
+        filegroup=fg,
+        file_hash=file_hash,
+    )
+    uf.save()
+
+    return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+
+
+# ----------------------- Views ----------------------
 
 
 def open_mod_draft(request, mod_id):
@@ -165,34 +222,14 @@ def upload_step2(request):
         )
 
         if form.is_valid():
-            uploaded_file = form.cleaned_data["file"]
+            clean_file = form.cleaned_data["file"]
 
-            if uploaded_file:
-                # Save to storage (temp namespace by session)
-                basename = os.path.basename(uploaded_file.name)
-                # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
-                temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
-                temp_path = default_storage.save(temp_filename, uploaded_file)
-
-                # if no existing files, create FileGroup to store file
-                fg = FileGroup.objects.filter(mod_id=mod_id).first()
-                if not fg:
-                    fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
-
-                # Create DB row so Step 3 can actually query files
-                uf = FileUpload(
-                    size=uploaded_file.size,
-                    filename=basename,
-                    staged_file=temp_path,
-                    filegroup=fg,
-                )
-                uf.save()
-
-                # update existing_files for re-rendering form with new file
-                existing_files.append(
-                    {"filename": basename, "size": uploaded_file.size, "id": uf.id}
-                )
-                context["existing_files"] = existing_files
+            if clean_file:
+                file = upload_file(clean_file, mod_id=mod_id)
+                if file:
+                    # update existing_files for re-rendering form with new file
+                    existing_files.append(file)
+                    context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":

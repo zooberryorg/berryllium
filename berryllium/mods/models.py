@@ -11,6 +11,32 @@ def staged_path(instance, filename):
 class Mod(models.Model):
     """
     Typical mod uploaded to the app
+
+    Definitions:
+    - title: the name of the mod
+    - category: mod category (e.g. animals, buildings, etc.)
+    - summary: short summary of the mod
+    - is_external: whether the mod is an external link instead of a file upload
+    - external_url: if is_external is true, the url of the mod
+    - game: the game the mod is for (zt1 or zt2 for now)
+    - expansions: exp compatibility
+    - draft: is the listing published or not
+    - version: optional version info for the mod
+    - description: detailed description of the mod, supports markdown
+    - submission_date: date the mod was submitted
+    - last_updated: date the mod was last updated
+    - contents: itemized list of mod contents, used for search indexing
+    - former_hosts: any former hosting sites for archival mods
+    - is_archived_file: whether the mod is an archived file (e.g. from a dead hosting site)
+    - original_release_date: original release date of the mod, used for archival mods
+    - download_count: number of times the mod has been downloaded
+    - like_count: number of likes the mod has received
+    - allow_fan_images: whether to allow fan images to be attached to the mod page
+
+    Examples:
+    - Mod.objects.filter(game='zt2', category='animals') -> all animal mods for Zoo Tycoon 2
+    - Mod.files -> all files attached to the mod through FileGroups
+
     """
 
     # basic info
@@ -163,6 +189,9 @@ class FileUpload(models.Model):
         upload_to=staged_path, null=True, blank=True
     )  # temp file for processing, null after processing
     url = models.URLField(blank=True)  # url after processing
+    file_hash = models.CharField(
+        max_length=64, blank=True
+    )  # file hash for integrity check
 
     # metadata
     uploaded_at = models.DateTimeField(auto_now_add=True)
