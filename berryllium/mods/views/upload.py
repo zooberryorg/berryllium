@@ -151,6 +151,7 @@ def upload_step2(request):
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
 
+    # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
@@ -188,6 +189,7 @@ def upload_step2(request):
                 request.session["temp_uploaded_files"] = context["existing_files"]
                 request.session.modified = True
 
+            # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 if not request.session.get("temp_uploaded_files"):
                     form.add_error(
@@ -199,15 +201,20 @@ def upload_step2(request):
                     )
                     return render(request, "mods/upload/step/2.html", context)
                 return redirect("upload_step3")
+
+            # ----------------- Handle previous navigation
             elif request.POST.get("action") == "previous":
                 return redirect("upload_step1")
+
+            # ----------------- Simple file upload without navigation (stay on step 2)
             else:
                 return render(request, "mods/upload/step/2.html", context)
 
-        context["form"] = form  # return form with errors if invalid
+        # ---------------------- Invalid form: return SAME state with errors
+        context["form"] = form
         return render(request, "mods/upload/step/2.html", context)
 
-    # GET
+    # ---------------------- GET
     return render(request, "mods/upload/step/2.html", context)
 
 
