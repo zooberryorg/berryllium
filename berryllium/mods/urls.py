@@ -17,4 +17,6 @@ urlpatterns = [
     path("explore/mods/", explore.mods, name="explore_mods"),
     # File Drafts
     path("mods/drafts/<int:mod_id>/", upload.open_mod_draft, name="open_mod_draft"),
+    # Session management
+    path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
 ]
