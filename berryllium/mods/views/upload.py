@@ -1,3 +1,4 @@
+from multiprocessing import context
 import os
 import uuid
 import hashlib
@@ -52,17 +53,11 @@ def init_context(current_index, form):
     Initializes the multi-step form context with navigation information and progress.
     """
 
-    nav_length = len(NAVIGATION)
-    print(f"Initializing context for step {current_index + 1} of {form.__class__.__name__}")
-    print(f"Current index: {current_index}, Navigation length: {nav_length}")
-    print(f"Progress range: {[range(current_index + 1)]}, Remainder range: {[range(current_index + 1, nav_length)]}")
+    progress_bar = generate_progress_bar(current_index, total_steps=len(NAVIGATION))
+
     return {
         "form": form,
-        "nav_item_count": nav_length,
-        "current_nav_index": current_index,
-        "progress_range": list(range(current_index + 1)),
-        "remainder_range": list(range(current_index + 1, nav_length)),
-    }
+    }.update(progress_bar)
 
 
 def calculate_file_hash(file):
@@ -225,6 +220,7 @@ def upload_step2(request):
     Step 2 of the upload form.
     """
     context = init_context(current_index=1, form=FileUploadForm())
+    print(context)
     mod_id = request.session.get("session_id")
     existing_files = []
     if mod_id:
@@ -285,6 +281,9 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    progress_bar = generate_progress_bar(current_index=2, total_steps=len(NAVIGATION))
+    context.update(progress_bar)
+    print(context)
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
