@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
 from ..models import FileUpload, Mod, FileGroup
@@ -405,31 +406,26 @@ def cancel_mod_upload(request):
     """
     mod_id = request.session.get("session_id")
     if mod_id:
-        print(f"STEP 1: Cancelling mod upload session {mod_id} and deleting associated data.")
         # Get all files with this session
         mod = Mod.objects.filter(id=mod_id).first()
         if mod:
-            print(f"STEP 2: Found draft mod with ID {mod_id}. Deleting draft and associated files.")
             files = mod.files.all()
             for f in files:
                 # Delete file from storage
                 if f.staged_file and default_storage.exists(f.staged_file.name):
                     default_storage.delete(f.staged_file.name)
-                # Delete DB row
-                f.delete()
             # Delete session directory if it exists
             session_dir = f"temp_uploads/{mod_id}/"
             if default_storage.exists(session_dir):
                 default_storage.delete(session_dir)
             # Delete draft mod
             mod.delete()
-            print(f"STEP 3: Deleted draft mod with ID {mod_id} and all associated files.")
 
         # Clear session data related to the upload
         request.session.pop("session_id", None)
         request.session.modified = True
-        print(f"STEP 4: Mod upload session {mod_id} cancelled and data deleted.")
-    else:
-        print("No active mod upload session found to cancel.")
 
-    return redirect("home")
+    # force htmx to redirect instead of trying to re-render
+    response = HttpResponse()
+    response["HX-Redirect"] = redirect("home").url
+    return response
