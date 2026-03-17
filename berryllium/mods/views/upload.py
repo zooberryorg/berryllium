@@ -91,18 +91,24 @@ def upload_step1(request):
         form = MetadataForm(request.POST)
         if form.is_valid():
             # Save data in db
-            mod = Mod(
-                title=form.cleaned_data["title"],
-                category=",".join(form.cleaned_data.get("category", [])),
-                summary=form.cleaned_data["summary"],
-                game=",".join(form.cleaned_data.get("game", [])),
-                expansions=",".join(form.cleaned_data.get("expansions", [])),
-            )
-            mod.save()
+            data = {
+                "title": form.cleaned_data["title"],
+                "category": ",".join(form.cleaned_data.get("category", [])),
+                "summary": form.cleaned_data["summary"],
+                "game": ",".join(form.cleaned_data.get("game", [])),
+                "expansions": ",".join(form.cleaned_data.get("expansions", [])),
+            }
 
-            # create a session id tied to the mod to make sure
-            # every step saves to correct mod instance
-            request.session["session_id"] = mod.id
+            mod_id = session_exists 
+
+            # If session exists, update draft mod
+            if mod_id:
+                Mod.objects.filter(id=mod_id, draft=True).update(**data)
+
+            # If no session, create new draft mod
+            else:
+                mod = Mod.objects.create(**data)
+                request.session["session_id"] = mod.id
 
             # Return NEXT state (step 2) on success
             return redirect("upload_step2")
