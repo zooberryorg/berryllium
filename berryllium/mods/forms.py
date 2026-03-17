@@ -91,6 +91,7 @@ class MetadataForm(forms.Form):
             )
         return summary
 
+
 class FileUploadForm(forms.Form):
     """
     This is Step 2 of the file upload form, which handles

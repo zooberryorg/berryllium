@@ -92,10 +92,10 @@ def upload_step1(request):
             # Save data in db
             mod = Mod(
                 title=form.cleaned_data["title"],
-                category=form.cleaned_data.get("category", ""),
-                summary=form.cleaned_data.get("summary", ""),
-                game=form.cleaned_data["game"],
-                expansions=form.cleaned_data.get("expansions", ""),
+                category=",".join(form.cleaned_data.get("category", [])),
+                summary=form.cleaned_data["summary"],
+                game=",".join(form.cleaned_data.get("game", [])),
+                expansions=",".join(form.cleaned_data.get("expansions", [])),
             )
             mod.save()
 
@@ -115,13 +115,15 @@ def upload_step1(request):
         mod_id = request.session["session_id"]
         try:
             mod = Mod.objects.get(id=mod_id)
-            form = MetadataForm(initial={
-                "title": mod.title,
-                "category": mod.category,
-                "summary": mod.summary,
-                "game": mod.game,
-                "expansions": mod.expansions,
-            })
+            form = MetadataForm(
+                initial={
+                    "title": mod.title,
+                    "category": mod.category.split(",") if mod.category else [],
+                    "summary": mod.summary,
+                    "game": mod.game.split(",") if mod.game else [],
+                    "expansions": mod.expansions.split(",") if mod.expansions else [],
+                }
+            )
         except Mod.DoesNotExist:
             form = MetadataForm()
 
