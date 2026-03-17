@@ -125,8 +125,6 @@ def upload_step1(request):
         except Mod.DoesNotExist:
             form = MetadataForm()
 
-        form = MetadataForm()
-
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
 
