@@ -129,9 +129,6 @@ class FileUploadForm(forms.Form):
         Form validation and cleanup.
         """
         cleaned_file = self.cleaned_data.get("file")
-        file_url = self.cleaned_data.get("file_url")
-        print(f"Uploaded file: {cleaned_file}, File URL: {file_url}")
-        print(f"File URL provided: {bool(file_url)}, File uploaded: {bool(cleaned_file)}")
 
         # if no file uploaded, check if file URL is provided, if not raise error
         if not cleaned_file:

@@ -221,7 +221,7 @@ def upload_step2(request):
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
-        print(f"POST data: {request.POST}, FILES data: {request.FILES}")
+        print(f"POST data: {request.POST}, FILES count: {len(existing_files)}")
         # get existing uploaded files saved in draft
 
         form = FileUploadForm(
