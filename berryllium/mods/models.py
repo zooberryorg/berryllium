@@ -67,11 +67,15 @@ class Dependency(models.Model):
     - version: optional version info for the dependency
     - is_external: whether the dependency is an external link or an internal reference
     - external_url: if is_external is true, the url of the dependency
+
+    Examples:
+    - ModA.dependencies.all() -> all dependencies for ModA
+    - ModB.required_by.all() -> all mods that require ModB
     """
 
     parent = models.ForeignKey(Mod, related_name="dependencies", on_delete=models.CASCADE)
     ref = models.ForeignKey(
-        Mod, related_name="mod", on_delete=models.SET_NULL, null=True, blank=True
+        Mod, related_name="required_by", on_delete=models.SET_NULL, null=True, blank=True
     )
     notes = models.TextField(blank=True)
     required = models.BooleanField(default=True)
