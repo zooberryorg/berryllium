@@ -43,20 +43,26 @@ def upload_mod(request):
         },
     )
 
+def init_context(current_index):
+    """
+    Initializes the multi-step form context with navigation information and progress.
+    """
+
+    nav_length = len(NAVIGATION)
+
+    return {
+        "form": MetadataForm(),
+        "nav_item_count": nav_length,
+        "current_nav_index": current_index,
+        "progress_range": range(current_index + 1),
+        "remainder_range": range(current_index + 1, nav_length),
+    }
 
 def upload_step1(request):
     """
     Step 1 of the upload form.
     """
-    current_index = 1
-    nav_item_count = len(NAVIGATION)
-    context = {
-        "form": MetadataForm(),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": 0,
-        "progress_range": range(current_index),
-        "remainder_range": range(current_index, len(NAVIGATION)),
-    }
+    context = init_context(current_index=0)
 
     if request.method == "POST":
         form = MetadataForm(request.POST)
