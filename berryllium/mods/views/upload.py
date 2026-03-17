@@ -77,7 +77,7 @@ def upload_step1(request):
         # Invalid: return SAME state with errors
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
-    
+
     elif request.method == "GET" and request.session.get("session_id"):
         # Send draft data if it exists
         mod_id = request.session["session_id"]
@@ -86,13 +86,13 @@ def upload_step1(request):
             form = MetadataForm(instance=mod)
         except Mod.DoesNotExist:
             form = MetadataForm()
-            
+
         form = MetadataForm()
 
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
 
-    # GET: show fresh form
+    # show fresh form
     return render(request, "mods/upload/step/1.html", context=context)
 
 

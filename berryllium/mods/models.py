@@ -7,6 +7,7 @@ from django.db import models
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
+
 class Mod(models.Model):
     """
     Typical mod uploaded to the app
@@ -93,7 +94,7 @@ class Dependency(models.Model):
 
 class FileGroup(models.Model):
     """
-    By default mods have FileGroup support for the cases where multiple files 
+    By default mods have FileGroup support for the cases where multiple files
     need to be listed on the page. Each file needs its own metadata.
     """
 
@@ -111,6 +112,7 @@ class FileGroup(models.Model):
 
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
+
 
 class FileUpload(models.Model):
     """

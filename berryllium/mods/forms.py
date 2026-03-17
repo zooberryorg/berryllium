@@ -15,6 +15,7 @@ ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 
+
 class MetadataForm(forms.Form):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -90,9 +91,10 @@ class MetadataForm(forms.Form):
             )
         return summary
 
+
 class FileUploadForm(forms.Form):
     """
-    This is Step 2 of the file upload form, which handles 
+    This is Step 2 of the file upload form, which handles
     the actual file upload and validation.
     """
 
@@ -144,11 +146,13 @@ class FileUploadForm(forms.Form):
 
         return uploaded_file
 
+
 class FileGroupForm(forms.Form):
     """
-    Step 3 of the file upload form, which handles the file organization 
+    Step 3 of the file upload form, which handles the file organization
     into groups.
     """
+
     name = forms.CharField(
         max_length=255,
         widget=forms.TextInput(
@@ -168,6 +172,7 @@ class FileGroupForm(forms.Form):
         ),
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
+
 
 class FileDetailsForm(forms.ModelForm):
     group_index = forms.IntegerField(widget=forms.HiddenInput())
@@ -191,5 +196,6 @@ class FileDetailsForm(forms.ModelForm):
                 }
             ),
         }
+
 
 FileGroupFormSet = formset_factory(FileGroupForm, extra=0, can_delete=True)
