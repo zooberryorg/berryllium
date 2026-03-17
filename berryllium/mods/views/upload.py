@@ -110,6 +110,7 @@ def generate_progress_bar(current_index, total_steps):
 
     completed_range = list(range(current_index + 1))
     remaining_range = list(range(current_index + 1, total_steps))
+    print(f"Progress bar - Completed: {completed_range}, Remaining: {remaining_range}")
 
     return {
         "title": title,
@@ -270,8 +271,6 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
-    progress_bar = generate_progress_bar(current_index=2, total_steps=len(NAVIGATION))
-    context.update(progress_bar)
     print(context)
 
     mod_id = request.session.get("session_id")
@@ -322,12 +321,7 @@ def upload_step3(request):
 
     return render(
         request,
-        "mods/upload/step/3.html",
-        {
-            "uploaded_files": uploaded_files,
-            "groups_init": groups_init,
-            "files_init": files_init,
-        },
+        "mods/upload/step/3.html",context
     )
 
 
