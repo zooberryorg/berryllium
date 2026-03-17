@@ -244,9 +244,6 @@ def upload_step2(request):
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 if not existing_files:
-                    form.add_error(
-                        "file", "Please upload at least one file before continuing."
-                    )
                     context["form"] = form
                     context["existing_files"] = []
                     return render(request, "mods/upload/step/2.html", context)

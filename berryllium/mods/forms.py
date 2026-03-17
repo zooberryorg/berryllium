@@ -130,21 +130,12 @@ class FileUploadForm(forms.Form):
         """
         uploaded_file = self.cleaned_data.get("file")
         file_url = self.cleaned_data.get("file_url")
+        print(f"Uploaded file: {uploaded_file}, File URL: {file_url}")
+        print(f"File URL provided: {bool(file_url)}, File uploaded: {bool(uploaded_file)}")
 
+        # if no file uploaded, check if file URL is provided, if not raise error
         if not uploaded_file:
-            return None
-
-        if uploaded_file and file_url:
-            raise forms.ValidationError("Please provide either a file or a URL, not both.")
-
-        if not uploaded_file and not file_url:
-            raise forms.ValidationError("Please upload a file or provide a file URL.")
-        
-        # Validate file size
-        if uploaded_file.size > MAX_FILE_SIZE:
-            raise forms.ValidationError(
-                f"File size exceeds the limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
-            )
+            return uploaded_file
 
         # Validate file extension
         if not self.valid_file_extension(uploaded_file.name, ALLOWED_EXTENSIONS):
@@ -162,6 +153,21 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return uploaded_file
+    
+    # cross-field validation to ensure either file or file_url is provided
+    def clean(self):
+        cleaned_data = super().clean()
+        uploaded_file = cleaned_data.get("file")
+        file_url = cleaned_data.get("file_url")
+
+        if not uploaded_file and not file_url:
+            raise forms.ValidationError("Please upload a file or provide a file URL.")
+        
+        # Validate file size
+        if uploaded_file.size > MAX_FILE_SIZE:
+            raise forms.ValidationError(
+                f"File size exceeds the limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
+            )
 
 
 class FileGroupForm(forms.Form):
