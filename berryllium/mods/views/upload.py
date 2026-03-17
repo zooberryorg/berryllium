@@ -152,7 +152,6 @@ def upload_step2(request):
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
-
         # get existing uploaded files saved in draft
         if mod_id:
             mod = Mod.objects.get(id=mod_id)
@@ -171,9 +170,7 @@ def upload_step2(request):
                 # Save to storage (temp namespace by session)
                 basename = os.path.basename(uploaded_file.name)
                 # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
-                temp_filename = (
-                    f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
-                )
+                temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
                 temp_path = default_storage.save(temp_filename, uploaded_file)
 
                 # if no existing files, create FileGroup to store file
@@ -186,12 +183,14 @@ def upload_step2(request):
                     size=uploaded_file.size,
                     filename=basename,
                     staged_file=temp_path,
-                    filegroup=fg
+                    filegroup=fg,
                 )
                 uf.save()
 
                 # update existing_files for re-rendering form with new file
-                existing_files.append({"filename": basename, "size": uploaded_file.size, "id": uf.id})
+                existing_files.append(
+                    {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+                )
                 context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
@@ -203,7 +202,7 @@ def upload_step2(request):
                     context["form"] = form
                     context["existing_files"] = []
                     return render(request, "mods/upload/step/2.html", context)
-                
+
                 return redirect("upload_step3")
 
             # ----------------- Handle previous navigation
@@ -394,6 +393,7 @@ def remove_temp_file(request, file_index):
             request.session.modified = True
 
         return redirect("upload_step2")
+
 
 @require_http_methods(["POST"])
 def cancel_mod_upload(request):
