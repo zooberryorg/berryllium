@@ -291,7 +291,7 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
-    print(context)
+    print("Entering upload_step3 view. Request method:", request.method)
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
@@ -301,6 +301,7 @@ def upload_step3(request):
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         action = request.POST.get("action")
+        print("POST action received in step 3:", action)
 
         if action in ("next", "previous"):
             # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
