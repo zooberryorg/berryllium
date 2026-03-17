@@ -99,7 +99,7 @@ def upload_step1(request):
                 "expansions": ",".join(form.cleaned_data.get("expansions", [])),
             }
 
-            mod_id = session_exists 
+            mod_id = session_exists
 
             # If session exists, update draft mod
             if mod_id:
@@ -150,15 +150,16 @@ def upload_step2(request):
     session_exists = request.session.get("session_id") is not None
     existing_files = []
 
-    if session_exists:
-        # get existing uploaded files saved in draft
-        mod = Mod.objects.get(id=request.session["session_id"])
-        files = mod.files.all()
-        if files.exists():
-            existing_files = [f for f in files.values("filename", "size", "id")]
-
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
+
+        # get existing uploaded files saved in draft
+        if session_exists:
+            mod = Mod.objects.get(id=request.session["session_id"])
+            files = mod.files.all()
+            if files.exists():
+                existing_files = [f for f in files.values("filename", "size", "id")]
+
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
         )
@@ -183,17 +184,6 @@ def upload_step2(request):
                 )
                 uf.file.name = temp_path  # point FileField at saved path
                 uf.save()
-
-                # Store metadata in session for Step 2 preview list + removal
-                file_info = {
-                    "temp_path": temp_path,
-                    "original_name": basename,
-                    "size": uploaded_file.size,
-                    "content_type": getattr(uploaded_file, "content_type", ""),
-                }
-                context["existing_files"].append(file_info)
-                request.session["temp_uploaded_files"] = context["existing_files"]
-                request.session.modified = True
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
