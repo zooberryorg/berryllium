@@ -259,63 +259,6 @@ def upload_step2(request):
     # ---------------------- GET
     return render(request, "mods/upload/step/2.html", context)
 
-
-# TODO: Move validation and cleanup to form
-def update_step3_state(request, uploaded_files, template_obj):
-    """
-    Updates step3 state and some validation.
-    """
-    group_formset = FileGroupFormSet(request.POST, prefix="groups")
-
-    FileDetailsFormSet = modelformset_factory(FileUpload, form=FileDetailsForm, extra=0)
-    file_formset = FileDetailsFormSet(
-        request.POST, queryset=uploaded_files, prefix="files"
-    )
-
-    if group_formset.is_valid() and file_formset.is_valid():
-        groups_data = []
-        for form in group_formset:
-            if form.cleaned_data and not form.cleaned_data.get("DELETE"):
-                groups_data.append(
-                    {
-                        "name": form.cleaned_data["name"],
-                        "description": form.cleaned_data.get("description", ""),
-                        "order": form.cleaned_data.get("order", 0),
-                    }
-                )
-
-        files_data = []
-        # Structure data into json serializable format
-        for form in file_formset:
-            if form.cleaned_data:
-                files_data.append(
-                    {
-                        "id": form.instance.id,
-                        "title": form.cleaned_data.get("title", ""),
-                        "description": form.cleaned_data.get("description", ""),
-                        "group_index": form.cleaned_data["group_index"],
-                        "file_order": form.cleaned_data["file_order"],
-                    }
-                )
-
-        request.session["file_groups"] = groups_data
-        request.session["file_details"] = files_data
-        request.session.modified = True
-
-        return group_formset, file_formset, uploaded_files
-
-    # else return to step 3 with errors
-    return render(
-        request,
-        template_obj,
-        {
-            "group_formset": group_formset,
-            "file_formset": file_formset,
-            "uploaded_files": uploaded_files,
-        },
-    )
-
-
 def upload_step3(request):
     """
     Step 3 of upload form.
