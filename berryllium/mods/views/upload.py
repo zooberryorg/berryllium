@@ -212,12 +212,19 @@ def upload_step2(request):
     context = init_context(current_index=1, form=FileUploadForm())
     mod_id = request.session.get("session_id")
     existing_files = []
+    file_url = ""
+
+    # rehydrate data
     if mod_id:
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
+        file_url = mod.external_url if mod.is_external else ""
+
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
             context["existing_files"] = existing_files
+        if file_url:
+            context["file_url"] = file_url
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":

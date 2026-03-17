@@ -22,7 +22,11 @@
                 <label class="block text-sm font-medium mb-1 text-white">
                     External File URL
                 </label>
-                {{ form.file_url }}
+                <input type="url"
+                       name="file_url"
+                       value="{{ file_url }}"
+                       placeholder="https://example.com/file.zip"
+                       class="zb-input text-sm">
                 {% include "mods/upload/field_errors.html" with field=form.file_url %}
             </div>
         </div>
