@@ -192,6 +192,7 @@ def upload_step2(request):
 
                 # update existing_files for re-rendering form with new file
                 existing_files.append({"filename": basename, "size": uploaded_file.size, "id": uf.id})
+                context["existing_files"] = existing_files
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
