@@ -7,7 +7,7 @@ from django.forms import modelformset_factory
 from django.views.decorators.http import require_http_methods
 
 from ..forms import FileUploadForm, MetadataForm, FileGroupFormSet, FileDetailsForm
-from ..models import FileUpload
+from ..models import FileUpload, Mod
 
 # Navigation configuration for upload form
 #     name: Current location title
@@ -44,28 +44,71 @@ def upload_mod(request):
     )
 
 
+def init_context(current_index, form):
+    """
+    Initializes the multi-step form context with navigation information and progress.
+    """
+
+    nav_length = len(NAVIGATION)
+
+    return {
+        "form": form,
+        "nav_item_count": nav_length,
+        "current_nav_index": current_index,
+        "progress_range": range(current_index + 1),
+        "remainder_range": range(current_index + 1, nav_length),
+    }
+
+
+def open_mod_draft(request, mod_id):
+    """
+    View to open an existing mod draft for editing.
+    """
+    try:
+        mod = Mod.objects.get(id=mod_id, draft=True)
+        request.session["session_id"] = (
+            mod.id
+        )  # Set session to load draft in upload steps
+        return redirect("upload_step1")  # Redirect to step 1 to load draft data
+    except Mod.DoesNotExist:
+        print(f"Draft mod with ID {mod_id} does not exist.")
+        # redirect to home
+        return redirect("home")
+    # TODO: Add error handling for non-existent or non-draft mods
+    # except Mod.DoesNotExist:
+    #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
+
+
 def upload_step1(request):
     """
     Step 1 of the upload form.
     """
-    current_index = 1
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
-    nav_item_count = len(NAVIGATION)
-    context = {
-        "form": MetadataForm(),
-        "filename": request.session.get("upload_original_name"),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": 0,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
-    }
+    context = init_context(current_index=0, form=MetadataForm())
+    session_exists = request.session.get("session_id") is not None
 
+    # --------------------- POST
     if request.method == "POST":
         form = MetadataForm(request.POST)
         if form.is_valid():
-            # Store metadata in session
-            request.session["upload_metadata"] = form.cleaned_data
+            # Save data in db
+            data = {
+                "title": form.cleaned_data["title"],
+                "category": ",".join(form.cleaned_data.get("category", [])),
+                "summary": form.cleaned_data["summary"],
+                "game": ",".join(form.cleaned_data.get("game", [])),
+                "expansions": ",".join(form.cleaned_data.get("expansions", [])),
+            }
+
+            mod_id = session_exists 
+
+            # If session exists, update draft mod
+            if mod_id:
+                Mod.objects.filter(id=mod_id, draft=True).update(**data)
+
+            # If no session, create new draft mod
+            else:
+                mod = Mod.objects.create(**data)
+                request.session["session_id"] = mod.id
 
             # Return NEXT state (step 2) on success
             return redirect("upload_step2")
@@ -73,13 +116,29 @@ def upload_step1(request):
         # Invalid: return SAME state with errors
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
-    elif request.method == "GET" and request.session.get("upload_metadata"):
-        # Send existing files for review at form initialization TODO: simply send a boolean
-        form = MetadataForm(initial=request.session["upload_metadata"])
+
+    # --------------------- GET with existing session
+    elif request.method == "GET" and session_exists:
+        # Send draft data if it exists
+        mod_id = request.session["session_id"]
+        try:
+            mod = Mod.objects.get(id=mod_id)
+            form = MetadataForm(
+                initial={
+                    "title": mod.title,
+                    "category": mod.category.split(",") if mod.category else [],
+                    "summary": mod.summary,
+                    "game": mod.game.split(",") if mod.game else [],
+                    "expansions": mod.expansions.split(",") if mod.expansions else [],
+                }
+            )
+        except Mod.DoesNotExist:
+            form = MetadataForm()
+
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)
 
-    # GET: show fresh form
+    # --------------------- GET without session (new upload)
     return render(request, "mods/upload/step/1.html", context=context)
 
 
@@ -87,28 +146,26 @@ def upload_step2(request):
     """
     Step 2 of the upload form.
     """
-    session_id = _get_upload_session_id(request)
-    current_index = 2
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
-    nav_item_count = len(NAVIGATION)
-    context = {
-        "form": FileUploadForm(),
-        "filename": request.session.get("upload_original_name"),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": current_index - 1,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
-        "existing_files": request.session.get("temp_uploaded_files", []),
-    }
+    context = init_context(current_index=1, form=FileUploadForm())
+    session_exists = request.session.get("session_id") is not None
+    existing_files = []
 
+    if session_exists:
+        # get existing uploaded files saved in draft
+        mod = Mod.objects.get(id=request.session["session_id"])
+        files = mod.files.all()
+        if files.exists():
+            existing_files = [f for f in files.values("filename", "size", "id")]
+
+    # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
         form = FileUploadForm(
-            request.POST, request.FILES, existing_files=context["existing_files"]
+            request.POST, request.FILES, existing_files=existing_files
         )
 
         if form.is_valid():
             uploaded_file = form.cleaned_data["file"]
+            session_id = request.session["session_id"]
 
             if uploaded_file:
                 # Save to storage (temp namespace by session)
@@ -138,6 +195,7 @@ def upload_step2(request):
                 request.session["temp_uploaded_files"] = context["existing_files"]
                 request.session.modified = True
 
+            # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 if not request.session.get("temp_uploaded_files"):
                     form.add_error(
@@ -149,15 +207,20 @@ def upload_step2(request):
                     )
                     return render(request, "mods/upload/step/2.html", context)
                 return redirect("upload_step3")
+
+            # ----------------- Handle previous navigation
             elif request.POST.get("action") == "previous":
                 return redirect("upload_step1")
+
+            # ----------------- Simple file upload without navigation (stay on step 2)
             else:
                 return render(request, "mods/upload/step/2.html", context)
 
-        context["form"] = form  # return form with errors if invalid
+        # ---------------------- Invalid form: return SAME state with errors
+        context["form"] = form
         return render(request, "mods/upload/step/2.html", context)
 
-    # GET
+    # ---------------------- GET
     return render(request, "mods/upload/step/2.html", context)
 
 
