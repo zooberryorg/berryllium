@@ -243,7 +243,7 @@ def upload_step2(request):
 
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
-                print("Next button clicked. Saving file URL if provided and moving to step 3.")
+                print("Next button clicked.")
                 if clean_url and not existing_files:
                     print("No file uploaded, but URL provided. Saving URL to mod.")
                     mod = Mod.objects.filter(id=mod_id).first()
@@ -286,9 +286,6 @@ def upload_step3(request):
     mod = Mod.objects.filter(id=mod_id).first()
     uploaded_files = mod.files.all() if mod else []
     context["uploaded_files"] = uploaded_files
-
-    if not uploaded_files.exists():
-        return render(request, "mods/upload/step/2.html", context)
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
