@@ -1,4 +1,3 @@
-from multiprocessing import context
 import os
 import uuid
 import hashlib
@@ -24,6 +23,7 @@ NAVIGATION = [
 
 # ----------------------- Helper functions ----------------------
 
+
 def upload_mod(request):
     """
     Landing page for mod upload requests.
@@ -42,12 +42,12 @@ def init_context(current_index, form):
     """
     Initializes the multi-step form context with navigation information and progress.
     """
-
+    context = {
+        "form": form,
+    }
     progress_bar = generate_progress_bar(current_index, total_steps=len(NAVIGATION))
 
-    return {
-        "form": form,
-    }.update(progress_bar)
+    return context | progress_bar
 
 
 def calculate_file_hash(file):
@@ -100,6 +100,7 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
+
 def generate_progress_bar(current_index, total_steps):
     """
     Generates progress bar data for the upload steps.
@@ -107,7 +108,9 @@ def generate_progress_bar(current_index, total_steps):
 
     title = f"Step {current_index + 1} of {total_steps}: {NAVIGATION[current_index]['name']}"
     completed_step_html = '<div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full w-1/4"></div>'
-    remaining_step_html = '<div class="bg-white/10 h-2.5 rounded-full w-full mr-2 w-1/4"></div>'
+    remaining_step_html = (
+        '<div class="bg-white/10 h-2.5 rounded-full w-full mr-2 w-1/4"></div>'
+    )
 
     completed_list = completed_step_html * (current_index + 1)
     remaining_list = remaining_step_html * (total_steps - current_index - 1)
