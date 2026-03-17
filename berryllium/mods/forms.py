@@ -124,12 +124,19 @@ class FileUploadForm(forms.Form):
             return False
         return True
 
-    def clean_file(self):
+    def clean(self):
         """
         Form validation and cleanup.
         """
         uploaded_file = self.cleaned_data.get("file")
+        file_url = self.cleaned_data.get("file_url")
+        
+        if uploaded_file and file_url:
+            raise forms.ValidationError("Please provide either a file or a URL, not both.")
 
+        if not uploaded_file and not file_url:
+            raise forms.ValidationError("Please upload a file or provide a file URL.")
+        
         if not uploaded_file:
             return None
 
