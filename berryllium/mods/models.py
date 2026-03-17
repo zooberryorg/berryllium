@@ -87,7 +87,7 @@ class FileGroup(models.Model):
 
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="file_groups")
     name = models.CharField(max_length=255)
-    order = models.IntegerField(default=0)
+    order = models.PositiveIntegerField(default=0)
     description = models.TextField(blank=True)
 
     class Meta:
