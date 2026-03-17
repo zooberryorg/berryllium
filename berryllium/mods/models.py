@@ -4,7 +4,9 @@ from django.db import models
 # from tags.models import Tag
 
 
-# Create your models here.
+def staged_path(instance, filename):
+    return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
+
 class Mod(models.Model):
     """
     Typical mod uploaded to the app
@@ -108,11 +110,6 @@ class FileGroup(models.Model):
 
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
-
-
-def staged_path(instance, filename):
-    return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
-
 
 class FileUpload(models.Model):
     """
