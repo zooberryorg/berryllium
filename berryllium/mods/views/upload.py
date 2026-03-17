@@ -263,22 +263,7 @@ def upload_step3(request):
     """
     Step 3 of upload form.
     """
-    session_id = _get_upload_session_id(request)
-    current_index = 3
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
-    nav_item_count = len(NAVIGATION)
-    context = {
-        "form": FileUploadForm(),
-        "filename": request.session.get("upload_original_name"),
-        "nav_item_count": nav_item_count,
-        "current_nav_index": current_index - 1,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
-        "existing_files": request.session.get("temp_uploaded_files", []),
-    }
-
-    # TODO: rework to use context instead of passing uploaded_files separately
+    mod_id = request.session.get("session_id")
 
     uploaded_files = FileUpload.objects.filter(upload_session=session_id).order_by(
         "date", "id"
