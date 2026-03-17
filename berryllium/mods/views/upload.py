@@ -49,15 +49,13 @@ def upload_step1(request):
     Step 1 of the upload form.
     """
     current_index = 1
-    progress_range = range(current_index)
-    remainder_range = range(current_index, len(NAVIGATION))
     nav_item_count = len(NAVIGATION)
     context = {
         "form": MetadataForm(),
         "nav_item_count": nav_item_count,
         "current_nav_index": 0,
-        "progress_range": progress_range,
-        "remainder_range": remainder_range,
+        "progress_range": range(current_index),
+        "remainder_range": range(current_index, len(NAVIGATION)),
     }
 
     if request.method == "POST":
