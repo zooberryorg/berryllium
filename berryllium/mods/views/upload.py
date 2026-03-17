@@ -81,6 +81,7 @@ def upload_file(uploaded_file, mod_id=None):
     # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
     temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
     temp_path = default_storage.save(temp_filename, uploaded_file)
+    file_hash = calculate_file_hash(uploaded_file)
 
     # if no existing files, create FileGroup to store file
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
@@ -93,6 +94,7 @@ def upload_file(uploaded_file, mod_id=None):
         filename=basename,
         staged_file=temp_path,
         filegroup=fg,
+        file_hash=file_hash,
     )
     uf.save()
 
