@@ -4,12 +4,12 @@
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <form hx-post="{% url 'upload_step3' %}"
-          hx-target="#upload-frame"
-          hx-swap="innerHTML"
-          enctype="multipart/form-data"
-          hx-encoding="multipart/form-data"
-          x-ref="uploadForm">
-      {% csrf_token %}
+      hx-target="#upload-frame"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      hx-encoding="multipart/form-data"
+      x-ref="uploadForm">
+    {% csrf_token %}
     <input type="hidden" name="groups-TOTAL_FORMS" :value="groups.length">
     <input type="hidden" name="groups-INITIAL_FORMS" value="0">
     <input type="hidden" name="groups-MIN_NUM_FORMS" value="0">
