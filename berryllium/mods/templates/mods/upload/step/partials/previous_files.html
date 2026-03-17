@@ -11,6 +11,7 @@
                             <p class="text-white/50 text-xs">{{ file.size|filesizeformat }}</p>
                         </div>
                     </div>
+                    
                     <button type="button"
                             hx-post="{% url 'remove_temp_file' file.id %}"
                             hx-swap="innerHTML"
