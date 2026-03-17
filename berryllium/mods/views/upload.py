@@ -64,8 +64,13 @@ def upload_step1(request):
     if request.method == "POST":
         form = MetadataForm(request.POST)
         if form.is_valid():
-            # Store metadata in session
-            request.session["upload_metadata"] = form.cleaned_data
+            # Save data in db
+            mod = form.save(commit=False)
+            mod.save()
+
+            # create a session id tied to the mod to make sure
+            # every step saves to correct mod instance
+            request.session["session_id"] = mod.id
 
             # Return NEXT state (step 2) on success
             return redirect("upload_step2")
