@@ -98,6 +98,7 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
+# ----------------------- Views ----------------------
 
 def open_mod_draft(request, mod_id):
     """
