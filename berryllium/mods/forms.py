@@ -147,6 +147,12 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
             )
+        
+        # Validate file size
+        if cleaned_file.size > MAX_FILE_SIZE:
+            raise forms.ValidationError(
+                f"File size exceeds the maximum limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
+            )
 
         # Check for illegal characters in filename
         if any(char in cleaned_file.name for char in ILLEGAL_CHARACTERS):
