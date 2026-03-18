@@ -5,6 +5,7 @@ from django.views.decorators.http import require_POST
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
+
 @require_POST
 def process_url_field(request):
     """HTMX endpoint to validate file URL field."""
@@ -25,9 +26,13 @@ def process_url_field(request):
     try:
         URLValidator(schemes=["http", "https"])(file_url)
     except ValidationError:
-        error_message = "Please enter a valid URL. Protocol (http:// or https://) is required."
+        error_message = (
+            "Please enter a valid URL. Protocol (http:// or https://) is required."
+        )
         return render(
-            request, "mods/upload/step/partials/hx_errors.html", {"error_message": error_message}
+            request,
+            "mods/upload/step/partials/hx_errors.html",
+            {"error_message": error_message},
         )
 
     # if valid, return empty response

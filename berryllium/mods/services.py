@@ -48,7 +48,7 @@ def upload_file(uploaded_file, mod_id=None):
     temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
 
     # note: calc hash first because default_storage will end up
-    # moving binary pointer to the end of the file which will 
+    # moving binary pointer to the end of the file which will
     # result in stale hash if we try to calculate after saving to storage
     # alternatively, reset pointer with uploaded_file.seek(0) to reset
     file_hash = calculate_file_hash(uploaded_file)
