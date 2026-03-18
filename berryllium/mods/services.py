@@ -1,5 +1,3 @@
-
-
 import os
 import uuid
 
@@ -8,6 +6,7 @@ from berryllium.mods.utils import calculate_file_hash
 from berryllium.mods.models import FileGroup, FileUpload
 
 from django.core.files.storage import default_storage
+
 
 def init_context(current_index, form):
     """
@@ -19,6 +18,7 @@ def init_context(current_index, form):
     progress_bar = generate_progress_bar(current_index, total_steps=len(NAVIGATION))
 
     return context | progress_bar
+
 
 def generate_progress_bar(current_index, total_steps):
     """
@@ -36,6 +36,7 @@ def generate_progress_bar(current_index, total_steps):
         "remaining": remaining_range,
         "total_steps": total_steps,
     }
+
 
 def upload_file(uploaded_file, mod_id=None):
     """
@@ -75,4 +76,3 @@ def upload_file(uploaded_file, mod_id=None):
     uf.save()
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
-

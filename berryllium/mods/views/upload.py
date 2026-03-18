@@ -5,8 +5,8 @@ from django.http import HttpResponse
 
 from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm
 from berryllium.mods.models import Mod
-
-# ----------------------- Helper functions ----------------------
+from berryllium.mods.services import init_context, upload_file
+from berryllium.mods.settings import NAVIGATION
 
 
 def upload_mod(request):
@@ -22,11 +22,6 @@ def upload_mod(request):
             "mod_navigation": NAVIGATION,
         },
     )
-
-
-
-
-# ----------------------- Views ----------------------
 
 
 def open_mod_draft(request, mod_id):
@@ -126,7 +121,7 @@ def upload_step2(request):
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
         file_url = mod.external_url if mod.is_external else ""
-        
+
         if mod_id and file_url:
             context["file_url"] = file_url
 
