@@ -62,11 +62,11 @@ def upload_file(uploaded_file, mod_id=None):
         file_hash=file_hash, filegroup__mod_id=mod_id
     ).first()
 
-    # if file exists, delete newly uploaded file from storage
+    # if file duplicate, delete newly uploaded file from storage
     if existing_file:
         if default_storage.exists(temp_path):
             default_storage.delete(temp_path)
-        return {}
+        return None
     elif not fg:
         fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
