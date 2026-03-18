@@ -21,5 +21,5 @@ urlpatterns = [
     # Session management
     path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
     # HTMX endpoints
-    path("mods/validate-url/", process_url_field, name="process_url_field")
+    path("mods/validate-url/", process_url_field, name="process_url_field"),
 ]

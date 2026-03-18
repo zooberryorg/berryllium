@@ -35,10 +35,15 @@
                        placeholder="https://example.com/file.zip"
                        class="zb-input text-sm"
                        hx-post="{% url 'process_url_field' %}"
-                       hx-trigger="change delay:500ms"
+                       hx-trigger="change delay:100ms"
                        hx-target="#file-url-error"
                        hx-swap="innerHTML">
-                {% include "mods/upload/field_errors.html" with field=form.file_url %}
+                <div class="px-6 pb-6" id="file-url-error">
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
+                        <ion-icon name="alert-circle" class="text-red-400 text-xl"></ion-icon>
+                        {% include "mods/upload/field_errors.html" with field=form.file_url %}
+                    </div>
+                </div>
             </div>
         </div>
         <!-- divider -->
