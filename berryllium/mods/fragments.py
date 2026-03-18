@@ -5,7 +5,7 @@ from django.views.decorators.http import require_POST
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
-
+@require_POST
 def process_url_field(request):
     """HTMX endpoint to validate file URL field."""
     file_url = request.POST.get("file_url", "")
