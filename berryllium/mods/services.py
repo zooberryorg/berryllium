@@ -54,7 +54,7 @@ def upload_file(uploaded_file, mod_id=None):
     file_hash = calculate_file_hash(uploaded_file)
     temp_path = default_storage.save(temp_filename, uploaded_file)
 
-    # if no existing files, create FileGroup to store file
+    # find file group that this file belongs to (if it exists)
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
 
     # see if hash already exists in mod files
