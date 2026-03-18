@@ -26,44 +26,6 @@ def upload_mod(request):
         },
     )
 
-def upload_file(uploaded_file, mod_id=None):
-    """
-    Handles file upload and validation.
-    """
-    # Save to storage (temp namespace by session)
-    basename = os.path.basename(uploaded_file.name)
-    # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
-    temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
-    temp_path = default_storage.save(temp_filename, uploaded_file)
-    file_hash = calculate_file_hash(uploaded_file)
-
-    # if no existing files, create FileGroup to store file
-    fg = FileGroup.objects.filter(mod_id=mod_id).first()
-
-    # see if hash already exists in mod files
-    existing_file = FileUpload.objects.filter(
-        file_hash=file_hash, filegroup__mod_id=mod_id
-    ).first()
-
-    # if file exists, delete newly uploaded file from storage
-    if existing_file:
-        if default_storage.exists(temp_path):
-            default_storage.delete(temp_path)
-        return {}
-    elif not fg:
-        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
-
-    # Create DB row so Step 3 can actually query files
-    uf = FileUpload(
-        size=uploaded_file.size,
-        filename=basename,
-        staged_file=temp_path,
-        filegroup=fg,
-        file_hash=file_hash,
-    )
-    uf.save()
-
-    return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
 
 
