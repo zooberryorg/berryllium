@@ -17,7 +17,7 @@
                 <span class="text-white/70">Enter a URL below for external files. You can either provide a link or upload files, but not both.</span>
             </div>
         </div>
-        <!-- all form errors -->
+        <!-- non-field errors -->
         {% if form.errors %}
             <div class="px-6 pb-6">
                 <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
@@ -33,7 +33,11 @@
                        name="file_url"
                        value="{{ file_url }}"
                        placeholder="https://example.com/file.zip"
-                       class="zb-input text-sm">
+                       class="zb-input text-sm"
+                       hx-post="{% url 'validate_file_url' %}"
+                       hx-trigger="change delay:500ms"
+                       hx-target="#file-url-error"
+                       hx-swap="innerHTML">
                 {% include "mods/upload/field_errors.html" with field=form.file_url %}
             </div>
         </div>
