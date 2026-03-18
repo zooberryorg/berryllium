@@ -183,13 +183,6 @@ def upload_step2(request):
         return render(request, "mods/upload/step/2.html", context)
 
     # ---------------------- GET
-    if request.method == "GET":
-        mod = Mod.objects.get(id=mod_id)
-        files = mod.files.all()
-        file_url = mod.external_url if mod.is_external else ""
-        if mod_id and file_url:
-            context["file_url"] = file_url
-
     return render(request, "mods/upload/step/2.html", context)
 
 
