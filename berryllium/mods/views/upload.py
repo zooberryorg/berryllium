@@ -87,6 +87,7 @@ def upload_step1(request):
         mod_id = request.session["session_id"]
         try:
             mod = Mod.objects.get(id=mod_id)
+            # Rehydrate form with draft data
             form = MetadataForm(
                 initial={
                     "title": mod.title,
