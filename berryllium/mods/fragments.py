@@ -25,7 +25,7 @@ def process_url_field(request):
     try:
         URLValidator(schemes=["http", "https"])(file_url)
     except ValidationError:
-        error_message = "Please enter a valid URL."
+        error_message = "Please enter a valid URL. Protocol (http:// or https://) is required."
         return render(
             request, "mods/upload/step/partials/hx_errors.html", {"error_message": error_message}
         )
