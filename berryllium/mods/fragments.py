@@ -17,7 +17,7 @@ def process_url_field(request):
                 mod.external_url = ""
                 mod.is_external = False
                 mod.save()
-                return 
+                return HttpResponse()
             
     # handle dynamic validation
     form = FileUploadForm(data={"file_url": file_url})
@@ -25,3 +25,5 @@ def process_url_field(request):
     if form.errors.get("file_url"):
         error_message = form.errors["file_url"][0]
         return render(request, "mods/fragments/file_url_error.html", {"error_message": error_message})
+    
+    return HttpResponse()
