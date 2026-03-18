@@ -48,13 +48,13 @@ def upload_file(uploaded_file, mod_id=None):
     temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
 
     # note: calc hash first because default_storage will end up
-    # moving binary pointer to the end of the file which will 
+    # moving binary pointer to the end of the file which will
     # result in stale hash if we try to calculate after saving to storage
     # alternatively, reset pointer with uploaded_file.seek(0) to reset
     file_hash = calculate_file_hash(uploaded_file)
     temp_path = default_storage.save(temp_filename, uploaded_file)
 
-    # if no existing files, create FileGroup to store file
+    # find file group that this file belongs to (if it exists)
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
 
     # see if hash already exists in mod files
