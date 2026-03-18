@@ -137,7 +137,7 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
             )
-        
+
         # Validate file size
         if cleaned_file.size > MAX_FILE_SIZE:
             raise forms.ValidationError(
