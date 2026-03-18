@@ -160,7 +160,7 @@ def upload_step2(request):
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 print("Next button clicked.")
-                if clean_url and not existing_files:
+                if clean_url:
                     print("No file uploaded, but URL provided. Saving URL to mod.")
                     mod = Mod.objects.filter(id=mod_id).first()
                     # TODO: Cleanup temp files and rework filegroups with url-based mods
