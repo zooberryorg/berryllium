@@ -160,7 +160,7 @@ def upload_step2(request):
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 print("Next button clicked.")
-                if clean_url and not existing_files:
+                if clean_url:
                     print("No file uploaded, but URL provided. Saving URL to mod.")
                     mod = Mod.objects.filter(id=mod_id).first()
                     # TODO: Cleanup temp files and rework filegroups with url-based mods
@@ -183,13 +183,6 @@ def upload_step2(request):
         return render(request, "mods/upload/step/2.html", context)
 
     # ---------------------- GET
-    if request.method == "GET":
-        mod = Mod.objects.get(id=mod_id)
-        files = mod.files.all()
-        file_url = mod.external_url if mod.is_external else ""
-        if mod_id and file_url:
-            context["file_url"] = file_url
-
     return render(request, "mods/upload/step/2.html", context)
 
 

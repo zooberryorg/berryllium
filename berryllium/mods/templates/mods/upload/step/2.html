@@ -34,11 +34,14 @@
                        value="{{ file_url }}"
                        placeholder="https://example.com/file.zip"
                        class="zb-input text-sm"
-                       hx-post="{% url 'validate_file_url' %}"
-                       hx-trigger="change delay:500ms"
+                       autocomplete="off"
+                       hx-post="{% url 'process_url_field' %}"
+                       hx-trigger="input delay:100ms"
                        hx-target="#file-url-error"
                        hx-swap="innerHTML">
-                {% include "mods/upload/field_errors.html" with field=form.file_url %}
+                <div class="pb-6" id="file-url-error">
+                    {% include "mods/upload/field_errors.html" with field=form.file_url %}
+                </div>
             </div>
         </div>
         <!-- divider -->
