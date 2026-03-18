@@ -3,8 +3,8 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 
-from ..forms import FileUploadForm, MetadataForm, FileDetailsForm, FileGroupForm
-from ..models import FileUpload, Mod, FileGroup
+from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm
+from berryllium.mods.models import Mod
 
 # ----------------------- Helper functions ----------------------
 
