@@ -1,7 +1,9 @@
-from berryllium.mods.forms import FileUploadForm
 from berryllium.mods.models import Mod
+
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
+from django.core.validators import URLValidator
+from django.core.exceptions import ValidationError
 
 @require_POST
 def process_url_field(request):
@@ -9,7 +11,7 @@ def process_url_field(request):
     file_url = request.POST.get("file_url", "")
 
     # save url field when cleared
-    if file_url == "":
+    if not file_url:
         mod_id = request.session.get("mod_id")
         if mod_id:
             mod = Mod.objects.filter(id=mod_id).first()
@@ -17,13 +19,15 @@ def process_url_field(request):
                 mod.external_url = ""
                 mod.is_external = False
                 mod.save()
+                # return empty response to clear any existing errors
                 return HttpResponse()
             
     # handle dynamic validation
-    form = FileUploadForm(data={"file_url": file_url})
-    form.is_valid()
-    if form.errors.get("file_url"):
-        error_message = form.errors["file_url"][0]
+    try: 
+        URLValidator(schemes=["http", "https"])(file_url)
+    except ValidationError:
+        error_message = "Please enter a valid URL."
         return render(request, "mods/partials/hx_errors.html", {"error_message": error_message})
     
+    # if valid, return empty response
     return HttpResponse()
