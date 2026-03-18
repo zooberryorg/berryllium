@@ -1,1 +1,4 @@
-{{ error_message |default:"" }}
+<div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
+    <ion-icon name="alert-circle" class="text-red-400 text-xl"></ion-icon>
+    {{ error_message |default:"" }}
+</div>

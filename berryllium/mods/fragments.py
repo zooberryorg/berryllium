@@ -28,7 +28,7 @@ def process_url_field(request):
     except ValidationError:
         error_message = "Please enter a valid URL."
         return render(
-            request, "mods/partials/hx_errors.html", {"error_message": error_message}
+            request, "mods/upload/step/partials/hx_errors.html", {"error_message": error_message}
         )
 
     # if valid, return empty response
