@@ -27,6 +27,7 @@ NAVIGATION = [
 def upload_mod(request):
     """
     Landing page for mod upload requests.
+    # TODO: Clear session to start fresh.
     """
     return render(
         request,
@@ -218,6 +219,10 @@ def upload_step2(request):
     if mod_id:
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
+        file_url = mod.external_url if mod.is_external else ""
+        
+        if mod_id and file_url:
+            context["file_url"] = file_url
 
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
@@ -227,6 +232,12 @@ def upload_step2(request):
     if request.method == "POST":
         print(f"POST data: {request.POST}, FILES count: {len(existing_files)}")
         # get existing uploaded files saved in draft
+
+        # ----------------- Handle previous navigation
+        # validation not needed for back navigation
+        if request.POST.get("action") == "previous":
+            print("Previous button clicked. Returning to step 1.")
+            return redirect("upload_step1")
 
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
@@ -259,11 +270,6 @@ def upload_step2(request):
 
                 print("Attempting to redirect to step 3.")
                 return redirect("upload_step3")
-
-            # ----------------- Handle previous navigation
-            elif request.POST.get("action") == "previous":
-                print("Previous button clicked. Returning to step 1.")
-                return redirect("upload_step1")
 
             # ----------------- Simple file upload without navigation (stay on step 2)
             else:
