@@ -122,7 +122,7 @@ def upload_step2(request):
         files = mod.files.all()
         file_url = mod.external_url if mod.is_external else ""
 
-        if mod_id and file_url:
+        if file_url:
             context["file_url"] = file_url
 
         if files.exists():
