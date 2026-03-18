@@ -122,16 +122,6 @@ class FileUploadForm(forms.Form):
             return False
         return True
 
-    def valid_url(self, url):
-        """Basic URL validation"""
-        # validate url against regex
-        validate = URLValidator(schemes=["http", "https"])
-        try:
-            validate(url)
-            return True
-        except ValidationError:
-            return False
-
     def clean_file(self):
         """
         Form validation and cleanup.
@@ -164,19 +154,6 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-
-    def clean_file_url(self):
-        """
-        Validate file URL if provided.
-        """
-        file_url = self.cleaned_data.get("file_url")
-
-        if file_url:
-            # make sure valid url
-            if not self.valid_url(file_url):
-                raise forms.ValidationError("Please enter a valid URL.")
-
-        return file_url
 
     # cross-field validation to ensure either file or file_url is provided
     def clean(self):
