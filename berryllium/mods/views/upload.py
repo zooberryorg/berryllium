@@ -1,6 +1,5 @@
 import os
 import uuid
-import hashlib
 
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
@@ -37,20 +36,6 @@ def upload_mod(request):
             "mod_navigation": NAVIGATION,
         },
     )
-
-
-
-
-def calculate_file_hash(file):
-    """
-    Calculates a hash for the given file.
-    """
-
-    hasher = hashlib.md5()
-    for chunk in file.chunks():
-        hasher.update(chunk)
-    return hasher.hexdigest()
-
 
 def upload_file(uploaded_file, mod_id=None):
     """
