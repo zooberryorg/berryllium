@@ -181,7 +181,7 @@ class FileUploadForm(forms.Form):
         # only one of file or file_url can be provided, not both
         if cleaned_file and file_url:
             raise forms.ValidationError(
-                "Please provide either a file or a file URL, not both."
+                "Only one of file upload or file URL can be provided. Please choose one."
             )
 
         # in case absolutely nothing has been input
