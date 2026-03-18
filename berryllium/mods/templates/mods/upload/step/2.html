@@ -34,6 +34,7 @@
                        value="{{ file_url }}"
                        placeholder="https://example.com/file.zip"
                        class="zb-input text-sm"
+                       autocomplete="off"
                        hx-post="{% url 'process_url_field' %}"
                        hx-trigger="input delay:100ms"
                        hx-target="#file-url-error"
