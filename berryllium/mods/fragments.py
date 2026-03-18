@@ -9,10 +9,9 @@ from django.core.exceptions import ValidationError
 def process_url_field(request):
     """HTMX endpoint to validate file URL field."""
     file_url = request.POST.get("file_url", "")
-    print(f"Received URL for validation: {file_url}")
     # save url field when cleared
     if not file_url:
-        mod_id = request.session.get("mod_id")
+        mod_id = request.session.get("session_id")
         if mod_id:
             mod = Mod.objects.filter(id=mod_id).first()
             if mod:
