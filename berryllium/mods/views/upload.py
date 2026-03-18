@@ -1,6 +1,3 @@
-import os
-import uuid
-
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
