@@ -24,6 +24,6 @@ def process_url_field(request):
     form.is_valid()
     if form.errors.get("file_url"):
         error_message = form.errors["file_url"][0]
-        return render(request, "mods/fragments/file_url_error.html", {"error_message": error_message})
+        return render(request, "mods/partials/hx_errors.html", {"error_message": error_message})
     
     return HttpResponse()
