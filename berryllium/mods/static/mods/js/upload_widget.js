@@ -11,6 +11,13 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
 
     // guarantee form state on page load
     init() {
+      // event listener for file input changes to guarantee state is updated
+      this.$el.addEventListener('htmx:afterRequest', () => {
+        console.log('htmx request completed, checking file queue length...');
+        this.hasExistingFiles = this.getFileQueueLength() > 0;
+        console.log('Updated hasExistingFiles:', this.hasExistingFiles);
+      });
+
       console.log('Initializing file input processor with existing files:', this.hasExistingFiles, 'and existing URL:', this.hasExistingUrl);
       if (this.hasExistingFiles) {
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
@@ -23,7 +30,6 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     // preset help messages for help text component
     get helpMessage() {
       // when files exist and url field disabled
-      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
       if (this.hasExistingFiles) {
         return `Files currently added to queue. If you wish to add an external URL instead, remove all files from the queue first.`;
       }
@@ -33,6 +39,12 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       }
       return '';
     },
+
+    get showHelp() {
+      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
+      console.log('Current showHelp:', !!(this.hasExistingFiles || this.hasExistingUrl));
+      return !!(this.hasExistingFiles || this.hasExistingUrl);
+    },  
 
     onUrlFieldInput() {
       console.log(this.getUrlFieldLength());
@@ -52,8 +64,8 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     },
 
     getFileQueueLength() {
-      if (!this.$refs.fileInput) return 0;
-      return this.$refs.fileInput.files.length;
+      const fileQueue = this.$el.querySelectorAll('[data-file]');
+      return fileQueue ? fileQueue.length : 0;
     },
 
     enableInput(ref, flag) {
@@ -66,10 +78,6 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       this[flag] = false;
       ref.classList.add('pointer-events-none', `opacity-20`);
     },
-
-    get showHelp() {
-      return !!(this.hasExistingFiles || this.hasExistingUrl);
-    },  
     
     handleFileSelect(event) {
       const file = event.target.files[0];
