@@ -24,11 +24,13 @@
                        value="{{ group.name }}"
                        class="bg-pine-700/50 rounded px-2 py-1 text-sm text-white/80 focus:outline-none w-full"
                        placeholder="Group Name">
+                {% if file_groups|length > 1 %}
                 <button type="button"
                         class="text-pine-300 hover:text-red-400/50 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90"
                         onclick="removeGroup({{ forloop.counter0 }})">
                     <ion-icon name="trash"></ion-icon>
                 </button>
+                {% endif %}
             </div>
             <div class="flex gap-4 flex-wrap">
             </div>
