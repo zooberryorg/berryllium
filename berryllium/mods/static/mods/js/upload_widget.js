@@ -4,10 +4,16 @@ function fileInputProcessor() {
   return {
     isDragging: false,
     isUploading: false,
+    fileCount: 0,
 
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
       return this.$refs.urlInput.value.length;
+    },
+
+    getFileQueueLength(ref) {
+      if (!this.$refs.fileInput) return 0;
+      return this.$refs.fileInput.files.length;
     },
 
     enableInput(ref) {
