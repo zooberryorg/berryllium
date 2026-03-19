@@ -42,8 +42,12 @@ def upload_file(uploaded_file, mod_id=None):
     """
     Handles file upload and validation.
     """
+    if mod_id is None:
+        return None
+
     # Save to storage (temp namespace by session)
     basename = os.path.basename(uploaded_file.name)
+
     # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
     temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
 
@@ -52,10 +56,6 @@ def upload_file(uploaded_file, mod_id=None):
     # result in stale hash if we try to calculate after saving to storage
     # alternatively, reset pointer with uploaded_file.seek(0) to reset
     file_hash = calculate_file_hash(uploaded_file)
-    temp_path = default_storage.save(temp_filename, uploaded_file)
-
-    # find file group that this file belongs to (if it exists)
-    fg = FileGroup.objects.filter(mod_id=mod_id).first()
 
     # see if hash already exists in mod files
     existing_file = FileUpload.objects.filter(
@@ -64,20 +64,21 @@ def upload_file(uploaded_file, mod_id=None):
 
     # if file duplicate, delete newly uploaded file from storage
     if existing_file:
-        if default_storage.exists(temp_path):
-            default_storage.delete(temp_path)
         return None
-    elif not fg:
-        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+
+    # find file group that this file belongs to (if it exists)
+    fg, _ = FileGroup.objects.get_or_create(mod_id=mod_id, defaults={"name": "Files"})
+
+    # once all clear, save file to storage
+    temp_path = default_storage.save(temp_filename, uploaded_file)
 
     # Create DB row so Step 3 can actually query files
-    uf = FileUpload(
+    uf = FileUpload.objects.create(
         size=uploaded_file.size,
         filename=basename,
         staged_file=temp_path,
         filegroup=fg,
         file_hash=file_hash,
     )
-    uf.save()
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
