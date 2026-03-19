@@ -49,7 +49,7 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
         return this.hasFiles || this.hasExistingUrl;
     },
 
-    get fileCountState() {
+    get hasFiles() {
       return this.fileCount > 0;
     },
 
