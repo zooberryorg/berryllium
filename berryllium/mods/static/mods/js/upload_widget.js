@@ -14,6 +14,10 @@ function fileInputProcessor() {
     enableInput(ref) {
       ref.classList.remove('pointer-events-none', `opacity-${this.disableOpacityLevel}`);
     },
+
+    disableInput(ref) {
+      ref.classList.add('pointer-events-none', `opacity-${this.disableOpacityLevel}`);
+    }
     
     handleFileSelect(event) {
       const file = event.target.files[0];
