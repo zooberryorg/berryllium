@@ -1,4 +1,4 @@
-function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
+function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} = {}) {
   // note: implicit global vars go here; attach to window object
 
   return {
@@ -12,7 +12,7 @@ function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
     get helpMessage() {
       // when files exist and url field disabled
       if (this.hasExistingFiles && !this.urlFieldEnabled) {
-        return `Files currently added to queue. If you wish to add a URL instead, remove all files from the queue first.`;
+        return `Files currently added to queue. If you wish to add an external URL instead, remove all files from the queue first.`;
       }
       // when url exists and file dropzone disabled
       if (this.hasExistingUrl && !this.fileDropzoneEnabled) {
