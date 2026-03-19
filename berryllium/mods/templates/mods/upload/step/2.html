@@ -27,7 +27,7 @@
             </div>
         {% endif %}
         <div class="space-y-4 px-6">
-            <div x-ref="url-block">
+            <div x-ref="urlBlock">
                 <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
                 <input type="url"
                        name="file_url"
@@ -38,7 +38,8 @@
                        hx-post="{% url 'process_url_field' %}"
                        hx-trigger="input delay:100ms"
                        hx-target="#file-url-error"
-                       hx-swap="innerHTML">
+                       hx-swap="innerHTML"
+                       x-ref="urlInput">
                 <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
             </div>
         </div>
