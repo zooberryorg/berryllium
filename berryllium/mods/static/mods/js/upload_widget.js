@@ -1,4 +1,4 @@
-function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} = {}) {
+function fileInputProcessor({hasExistingUrl = false} = {}) {
   // note: implicit global vars go here; attach to window object
 
   return {
@@ -6,16 +6,11 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     isUploading: false,
     urlFieldEnabled: true,
     fileDropzoneEnabled: true,
-    hasExistingFiles: hasExistingFiles,
+    fileQueueLength: 0,
     hasExistingUrl: hasExistingUrl,
 
     // guarantee form state on page load
     init() {
-      // event listener for file input changes to guarantee state is updated
-      this.$el.addEventListener('htmx:afterSwap', () => {
-          this.hasExistingFiles = this.getFileQueueLength() > 0;
-      });
-
       if (this.hasExistingFiles) {
         console.log('files found in queue on init, disabling url field and enabling help');
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
@@ -65,6 +60,17 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
       return this.$refs.urlInput.value.length;
+    },
+
+    updateQueueState() {
+      queueLen = this.getFileQueueLength();
+      this.hasExistingFiles = queueLen > 0;
+      if (!this.hasExistingFiles) {
+        this.$refs.fileQueue.remove();
+      }
+      console.log('CURRENT TIME:', new Date().toLocaleTimeString());
+      console.log('queue length:', queueLen);
+      console.log('updated queue state, hasExistingFiles:', this.hasExistingFiles);
     },
 
     getFileQueueLength() {
