@@ -1975,6 +1975,26 @@
       }
     }
   }
+  .hover\:text-gold-400\/50 {
+    &:hover {
+      @media (hover: hover) {
+        color: color-mix(in srgb, #d6b15d 50%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          color: color-mix(in oklab, var(--color-gold-400) 50%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:text-gold-400\/70 {
+    &:hover {
+      @media (hover: hover) {
+        color: color-mix(in srgb, #d6b15d 70%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          color: color-mix(in oklab, var(--color-gold-400) 70%, transparent);
+        }
+      }
+    }
+  }
   .hover\:text-pine-200 {
     &:hover {
       @media (hover: hover) {
