@@ -3,7 +3,7 @@
 <div class="px-6 pt-6">
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
-<div x-data="fileInputProcessor({{ existing_files|length }})">
+<div x-data="fileInputProcessor({{ existing_files|length }}, {{ file_url|length }})">
     <form hx-post="{% url 'upload_step2' %}"
           hx-target="#upload-frame"
           hx-swap="innerHTML"

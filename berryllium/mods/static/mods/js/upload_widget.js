@@ -1,17 +1,20 @@
-function fileInputProcessor(hasExistingFiles = false) {
+function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
   // note: implicit global vars go here; attach to window object
 
   return {
     isDragging: false,
     isUploading: false,
-    fileCount: 0,
     urlFieldEnabled: true,
     fileDropzoneEnabled: true,
     hasExistingFiles: hasExistingFiles,
+    hasExistingUrl: hasExistingUrl,
 
     init() {
       if (this.hasExistingFiles) {
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
+      }
+      if (this.hasExistingUrl) {
+        this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
       }
     },
 
