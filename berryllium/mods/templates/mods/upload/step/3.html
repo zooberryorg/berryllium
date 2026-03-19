@@ -18,32 +18,29 @@
     </div>
     {% for group in file_groups %}
         <div class="px-6 mb-4">
-            <div class="flex items center gap-2 mb-2 w-full bg-pine-700/50 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
+            <div class="flex items center gap-2 mb-2 w-full bg-pine-800/40 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
                 <input type="text"
                        name="group_name_{{ forloop.counter0 }}"
                        value="{{ group.name }}"
-                       class="bg-pine-700/50 rounded px-2 py-1 text-sm text-white/80 focus:outline-none w-full"
+                       class="rounded px-2 py-1 text-sm text-white/80 focus:outline-none w-full"
                        placeholder="Group Name">
                 <button type="button"
-                        class="text-pine-300 hover:text-gold-400/70 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90"
-                        >
+                        class="text-pine-300 hover:text-gold-400/70 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90">
                     <ion-icon name="arrow-up"></ion-icon>
                 </button>
                 <button type="button"
-                        class="text-pine-300 hover:text-gold-400/70 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90"
-                        >
+                        class="text-pine-300 hover:text-gold-400/70 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90">
                     <ion-icon name="arrow-down"></ion-icon>
                 </button>
                 {% if file_groups|length > 1 %}
-                <button type="button"
-                        class="text-pine-300 hover:text-red-400/50 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90"
-                        onclick="removeGroup({{ forloop.counter0 }})">
-                    <ion-icon name="trash"></ion-icon>
-                </button>
+                    <button type="button"
+                            class="text-pine-300 hover:text-red-400/50 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90"
+                            onclick="removeGroup({{ forloop.counter0 }})">
+                        <ion-icon name="trash"></ion-icon>
+                    </button>
                 {% endif %}
             </div>
-            <div class="flex gap-4 flex-wrap">
-            </div>
+            <div class="flex gap-4 flex-wrap"></div>
         </div>
     {% endfor %}
 </div>

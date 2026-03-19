@@ -991,6 +991,36 @@
   .bg-pine-800 {
     background-color: var(--color-pine-800);
   }
+  .bg-pine-800\/20 {
+    background-color: color-mix(in srgb, #171f14 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-pine-800) 20%, transparent);
+    }
+  }
+  .bg-pine-800\/30 {
+    background-color: color-mix(in srgb, #171f14 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-pine-800) 30%, transparent);
+    }
+  }
+  .bg-pine-800\/40 {
+    background-color: color-mix(in srgb, #171f14 40%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-pine-800) 40%, transparent);
+    }
+  }
+  .bg-pine-800\/50 {
+    background-color: color-mix(in srgb, #171f14 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-pine-800) 50%, transparent);
+    }
+  }
+  .bg-pine-800\/70 {
+    background-color: color-mix(in srgb, #171f14 70%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-pine-800) 70%, transparent);
+    }
+  }
   .bg-pine-900 {
     background-color: var(--color-pine-900);
   }
