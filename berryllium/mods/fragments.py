@@ -34,6 +34,15 @@ def process_url_field(request):
             "mods/upload/step/partials/hx_errors.html",
             {"error_message": error_message},
         )
+    
+    # if valid, save to mod draft
+    mod_id = request.session.get("session_id")
+    if mod_id:
+        mod = Mod.objects.filter(id=mod_id).first()
+        if mod:
+            mod.external_url = file_url
+            mod.is_external = True
+            mod.save()
 
     # if valid, return empty response
     return HttpResponse()
