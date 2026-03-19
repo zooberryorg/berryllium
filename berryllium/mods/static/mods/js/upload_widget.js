@@ -6,12 +6,15 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
     isUploading: false,
     urlFieldEnabled: true,
     fileDropzoneEnabled: true,
-    fileQueueLength: 0,
+    fileCount: 0,
     hasExistingUrl: hasExistingUrl,
 
     // guarantee form state on page load
     init() {
-      if (this.hasExistingFiles) {
+      // get initial file queue length 
+      this.fileCount = this.getFileQueueLength();
+
+      if (this.hasFiles) {
         console.log('files found in queue on init, disabling url field and enabling help');
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
       }
@@ -23,7 +26,7 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
     // preset help messages for help text component
     get helpMessage() {
       // when files exist and url field disabled
-      if (this.hasExistingFiles) {
+      if (this.hasFiles) {
         return `Files currently added to queue. If you wish to add an external URL instead, remove all files from the queue first.`;
       }
       // when url exists and file dropzone disabled
@@ -34,16 +37,20 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
     },
 
     get showHelp() {
-        console.log('checking showHelp condition with hasExistingFiles:', this.hasExistingFiles, 'hasExistingUrl:', this.hasExistingUrl);
+        console.log('checking showHelp condition with fileCount:', this.fileCount, 'hasExistingUrl:', this.hasExistingUrl);
         
-        if (this.hasExistingFiles || this.hasExistingUrl) {
+        if (this.hasFiles || this.hasExistingUrl) {
           console.log('showHelp condition met, showing help text');
           this.$refs.helpText.classList.remove('hidden');
         } else {
           console.log('showHelp condition not met, hiding help text');
           this.$refs.helpText.classList.add('hidden');
         }
-        return this.hasExistingFiles || this.hasExistingUrl;
+        return this.hasFiles || this.hasExistingUrl;
+    },
+
+    get fileCountState() {
+      return this.fileCount > 0;
     },
 
     onUrlFieldInput() {
@@ -63,14 +70,12 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
     },
 
     updateQueueState() {
-      queueLen = this.getFileQueueLength();
-      this.hasExistingFiles = queueLen > 0;
-      if (!this.hasExistingFiles) {
+      this.fileCount--;
+      if (this.hasFiles) {
         this.$refs.fileQueue.remove();
       }
       console.log('CURRENT TIME:', new Date().toLocaleTimeString());
-      console.log('queue length:', queueLen);
-      console.log('updated queue state, hasExistingFiles:', this.hasExistingFiles);
+      console.log('updated queue state, fileCount:', this.fileCount);
     },
 
     getFileQueueLength() {
