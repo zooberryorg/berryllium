@@ -115,7 +115,8 @@ class FileUploadForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.existing_files = existing_files or []
 
-    def valid_file_extension(self, filename, allowed_extensions):
+    @staticmethod
+    def valid_file_extension(filename, allowed_extensions):
         """Validate file extension"""
         ext = os.path.splitext(filename)[1].lower()
         if ext not in allowed_extensions:
@@ -155,6 +156,26 @@ class FileUploadForm(forms.Form):
 
         return cleaned_file
 
+    def clean_file_url(self):
+        """
+        Validate the file URL field.
+        """
+        file_url = self.cleaned_data.get("file_url")
+
+        # if no url provided, skip validation (file upload will be validated in clean_file)
+        if not file_url:
+            return file_url
+
+        # Validate URL format
+        try:
+            URLValidator(schemes=["http", "https"])(file_url)
+        except ValidationError:
+            raise forms.ValidationError(
+                "Please enter a valid URL. Protocol (http:// or https://) is required."
+            )
+
+        return file_url
+
     # cross-field validation to ensure either file or file_url is provided
     def clean(self):
         cleaned_data = super().clean()
@@ -162,7 +183,7 @@ class FileUploadForm(forms.Form):
         file_url = cleaned_data.get("file_url")
 
         # only one of file or file_url can be provided, not both
-        if cleaned_file and file_url:
+        if (cleaned_file or self.existing_files) and file_url:
             raise forms.ValidationError(
                 "Only one of file upload or file URL can be provided. Please choose one."
             )
