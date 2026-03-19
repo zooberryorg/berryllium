@@ -19,12 +19,12 @@ function fileInputProcessor() {
     },
 
     enableInput(ref, flag) {
-      flag = !flag;
+      this[flag] = true;
       ref.classList.remove('pointer-events-none', `opacity-20`);
     },
 
     disableInput(ref, flag) {
-      flag = !flag;
+      this[flag] = false;
       ref.classList.add('pointer-events-none', `opacity-20`);
     },
     
