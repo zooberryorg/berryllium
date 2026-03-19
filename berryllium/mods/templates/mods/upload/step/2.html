@@ -30,11 +30,7 @@
             <div class="px-6 mb-4">
                 <div class="flex gap-4 bg-blue-500/15 border border-blue-500/30 rounded-xl p-4 items-center">
                     <ion-icon name="information-circle" class="text-blue-400 text-4xl"></ion-icon>
-                    {% if existing_files|length > 0 %}
-                        <span class="text-blue-400">You have uploaded {{ existing_files|length }} file{{ existing_files|length|pluralize }}. Please remove them to upload a new file or provide a URL.</span>
-                    {% elif file_url %}
-                        <span class="text-blue-400">You have entered a URL. Please clear it to upload files or enter a new URL.</span>
-                    {% endif %}
+                    <span x-text="helpMessage"></span>
                 </div>
             </div>
         </div>

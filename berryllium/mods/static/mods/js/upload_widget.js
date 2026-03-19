@@ -12,9 +12,11 @@ function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
     init() {
       if (this.hasExistingFiles) {
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
+        this.showComponent(this.$refs.helpText);
       }
       if (this.hasExistingUrl) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
+        this.showComponent(this.$refs.helpText);
       }
     },
 
