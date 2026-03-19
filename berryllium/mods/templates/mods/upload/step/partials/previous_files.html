@@ -1,7 +1,7 @@
 <!-- This partial depends on the fileInputProcessor existing in the x-data root located
  in mods/upload/step/2.html -->
 {% if existing_files %}
-    <div x-init="disableInput($refs.urlBlock, 'urlFieldEnabled')" class="px-6 mb-6">
+    <div class="px-6 mb-6">
         <p class="text-sm font-medium text-white/70 mb-2">Uploaded Files:</p>
         <div class="space-y-2">
             {% for file in existing_files %}
@@ -24,6 +24,4 @@
             {% endfor %}
         </div>
     </div>
-{% else %}
-    <div x-init="enableInput($refs.urlBlock, 'urlFieldEnabled')"></div>
 {% endif %}

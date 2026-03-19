@@ -1,4 +1,4 @@
-function fileInputProcessor() {
+function fileInputProcessor(hasExistingFiles = false) {
   // note: implicit global vars go here; attach to window object
 
   return {
@@ -7,6 +7,13 @@ function fileInputProcessor() {
     fileCount: 0,
     urlFieldEnabled: true,
     fileDropzoneEnabled: true,
+    hasExistingFiles: hasExistingFiles,
+
+    init() {
+      if (this.hasExistingFiles) {
+        this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
+      }
+    },
 
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
