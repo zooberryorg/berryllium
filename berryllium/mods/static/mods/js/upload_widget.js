@@ -71,8 +71,9 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
 
     updateQueueState() {
       this.fileCount--;
-      if (this.hasFiles) {
+      if (!this.hasFiles) {
         this.$refs.fileQueue.remove();
+        this.enableInput(this.$refs.urlBlock, 'urlFieldEnabled');
       }
       console.log('CURRENT TIME:', new Date().toLocaleTimeString());
       console.log('updated queue state, fileCount:', this.fileCount);
