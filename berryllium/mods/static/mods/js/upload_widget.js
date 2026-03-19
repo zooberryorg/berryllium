@@ -25,6 +25,8 @@ function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
 
     getFileQueueLength() {
       if (!this.$refs.fileInput) return 0;
+      inputLength = this.$refs.fileInput.files.length;
+      if inputLength > 0 ? 
       return this.$refs.fileInput.files.length;
     },
 
@@ -36,6 +38,14 @@ function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
     disableInput(ref, flag) {
       this[flag] = false;
       ref.classList.add('pointer-events-none', `opacity-20`);
+    },
+
+    showComponent() {
+      this.$refs.component.classList.remove('hidden');
+    },
+
+    hideComponent() {
+      this.$refs.component.classList.add('hidden');
     },
     
     handleFileSelect(event) {
