@@ -18,11 +18,13 @@ function fileInputProcessor() {
       return this.$refs.fileInput.files.length;
     },
 
-    enableInput(ref) {
+    enableInput(ref, flag) {
+      flag = !flag;
       ref.classList.remove('pointer-events-none', `opacity-20`);
     },
 
-    disableInput(ref) {
+    disableInput(ref, flag) {
+      flag = !flag;
       ref.classList.add('pointer-events-none', `opacity-20`);
     },
     
