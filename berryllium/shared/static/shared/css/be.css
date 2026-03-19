@@ -757,6 +757,15 @@
       border-color: color-mix(in oklab, var(--color-gold-400) 40%, transparent);
     }
   }
+  .border-gold-500 {
+    border-color: var(--color-gold-500);
+  }
+  .border-gold-500\/30 {
+    border-color: color-mix(in srgb, #d4a435 30%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-gold-500) 30%, transparent);
+    }
+  }
   .border-gold-600 {
     border-color: var(--color-gold-600);
   }
@@ -917,6 +926,15 @@
     background-color: color-mix(in srgb, #d6b15d 20%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-gold-400) 20%, transparent);
+    }
+  }
+  .bg-gold-500 {
+    background-color: var(--color-gold-500);
+  }
+  .bg-gold-500\/15 {
+    background-color: color-mix(in srgb, #d4a435 15%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-gold-500) 15%, transparent);
     }
   }
   .bg-green-600 {
