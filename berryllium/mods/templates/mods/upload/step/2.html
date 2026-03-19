@@ -17,6 +17,14 @@
                 <span class="text-white/70">Enter a URL below for external files. You can either provide a link or upload files, but not both.</span>
             </div>
         </div>
+        <template id="help-text" x-ref="helpText" class="hidden" x-if="showHelp">
+            <div class="px-6 mb-4">
+                <div class="flex gap-4 bg-gold-500/15 border border-gold-500/30 rounded-xl p-4 items-center">
+                    <ion-icon name="information-circle" class="text-gold-400 text-4xl"></ion-icon>
+                    <span x-text="helpMessage" class="text-gold-400 text-sm"></span>
+                </div>
+            </div>
+        </template>
         <!-- non-field errors -->
         {% if form.errors %}
             <div class="px-6 pb-6">
@@ -26,14 +34,6 @@
                 </div>
             </div>
         {% endif %}
-        <div id="help-text" x-ref="helpText" x-show="showHelp">
-            <div class="px-6 mb-4">
-                <div class="flex gap-4 bg-gold-500/15 border border-gold-500/30 rounded-xl p-4 items-center">
-                    <ion-icon name="information-circle" class="text-gold-400 text-4xl"></ion-icon>
-                    <span x-text="helpMessage" class="text-gold-400 text-sm"></span>
-                </div>
-            </div>
-        </div>
         <div class="space-y-4 px-6">
             <div x-ref="urlBlock">
                 <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
