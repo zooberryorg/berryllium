@@ -5,6 +5,8 @@ function fileInputProcessor() {
     isDragging: false,
     isUploading: false,
     fileCount: 0,
+    urlFieldEnabled: true,
+    fileDropzoneEnabled: true,
 
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
