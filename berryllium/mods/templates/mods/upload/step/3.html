@@ -22,7 +22,7 @@
     <div class="p-6 mt-4 mb-4">
         <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
             <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
-            <span class="text-white/70">Drag and drop your uploaded files into groups. You can create multiple groups to categorize your files (e.g., Main Files, Optional Files, etc.).</span>
+            <span class="text-white/70">Drag and drop your uploaded files into groups. You can create multiple groups to categorize your files (e.group., Main Files, Optional Files, etc.).</span>
         </div>
     </div>
     <!-- File Groups -->
@@ -36,14 +36,14 @@
             </button>
         </div>
         <div class="space-y-4">
-            <template x-for="(g, groupIndex) in groups" :key="groupIndex">
+            <template x-for="(group, groupIndex) in groups" :key="groupIndex">
                 <div class="bg-pine-600/15 border border-white/5 rounded-xl overflow-hidden">
                     <!-- Group Header -->
                     <div class="bg-pine-600/50 px-4 py-3 flex items-center justify-between border-b border-white/5">
                         <input type="text"
                                class="bg-pine-600/5 text-white font-medium flex-1 focus:outline-none"
-                               placeholder="Group name (e.g., Main Files)"
-                               x-model="g.name"
+                               placeholder="Group name (e.group., Main Files)"
+                               x-model="group.name"
                                :name="`groups-${groupIndex}-name`"
                                required>
                         <input type="hidden"
@@ -60,7 +60,7 @@
                         <input type="text"
                                class="bg-transparent text-white/70 text-sm w-full focus:outline-none"
                                placeholder="Group description (optional)"
-                               x-model="g.description"
+                               x-model="group.description"
                                :name="`groups-${groupIndex}-description`">
                     </div>
                     <!-- Drop zone -->
@@ -70,20 +70,20 @@
                          @dragenter.prevent="dragOverZone = groupIndex"
                          :class="dragOverZone === groupIndex ? 'bg-gold-400/10' : ''">
                         <div class="space-y-2">
-                            <template x-for="(f, i) in filesInGroup(groupIndex)" :key="f.id">
+                            <template x-for="(file, i) in filesInGroup(groupIndex)" :key="file.id">
                                 <div draggable="true"
-                                     @dragstart="handleDragStart($event, f.id)"
+                                     @dragstart="handleDragStart($event, file.id)"
                                      @dragend="draggedFileId = null; dragOverZone = null"
                                      class="bg-pine-600/30 border border-white/5 rounded-xl p-3 cursor-move hover:bg-pine-600/50 transition">
                                     <!-- formset required hidden id field -->
-                                    <input type="hidden" :name="`files-${indexOfFile(f.id)}-id`" :value="f.id">
+                                    <input type="hidden" :name="`files-${indexOfFile(file.id)}-id`" :value="file.id">
                                     <!-- Keep server in sync -->
                                     <input type="hidden"
-                                           :name="`files-${indexOfFile(f.id)}-group_index`"
-                                           :value="f.group_index">
+                                           :name="`files-${indexOfFile(file.id)}-group_index`"
+                                           :value="file.group_index">
                                     <input type="hidden"
-                                           :name="`files-${indexOfFile(f.id)}-file_order`"
-                                           :value="f.file_order">
+                                           :name="`files-${indexOfFile(file.id)}-file_order`"
+                                           :value="file.file_order">
                                     <span class="w-100 h-4 mb-2 text-white/50 cursor-move flex items-center gap-1">
                                         <ion-icon name="reorder-three-outline" class="align-middle"></ion-icon>
                                     </span>
@@ -91,15 +91,15 @@
                                         <input type="text"
                                                class="bg-transparent text-white font-medium focus:outline-none flex-1"
                                                placeholder="Title"
-                                               x-model="f.title"
-                                               :name="`files-${indexOfFile(f.id)}-title`">
-                                        <span class="text-white/50 text-xs ml-auto" x-text="f.filename"></span>
+                                               x-model="file.title"
+                                               :name="`files-${indexOfFile(file.id)}-title`">
+                                        <span class="text-white/50 text-xs ml-auto" x-text="file.filename"></span>
                                     </div>
                                     <textarea class="bg-transparent text-white/70 text-sm w-full focus:outline-none"
                                               rows="2"
                                               placeholder="Description"
-                                              x-model="f.description"
-                                              :name="`files-${indexOfFile(f.id)}-description`"></textarea>
+                                              x-model="file.description"
+                                              :name="`files-${indexOfFile(file.id)}-description`"></textarea>
                                 </div>
                             </template>
                         </div>
