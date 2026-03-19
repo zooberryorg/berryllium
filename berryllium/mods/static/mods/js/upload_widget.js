@@ -37,12 +37,7 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
 
     // show help text if either url exists or files exist
     get showHelp() {
-        if (this.hasFiles || this.hasExistingUrl) {
-          this.$refs.helpText.classList.remove('hidden');
-        } else {
-          this.$refs.helpText.classList.add('hidden');
-        }
-        return this.hasFiles || this.hasExistingUrl;
+      return this.hasFiles || this.hasExistingUrl;
     },
 
     // check if files are in the queue
