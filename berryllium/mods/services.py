@@ -42,8 +42,12 @@ def upload_file(uploaded_file, mod_id=None):
     """
     Handles file upload and validation.
     """
+    if mod_id is None:
+        return None
+
     # Save to storage (temp namespace by session)
     basename = os.path.basename(uploaded_file.name)
+
     # TODO: Make sure this path is consistent with other temp paths and is cleaned up properly
     temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
 
