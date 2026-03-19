@@ -62,6 +62,7 @@ class Mod(models.Model):
     # tags = models.ManyToManyField(Tag, blank=True)
     version = models.CharField(max_length=100)
     # description = MarkdownxField(blank=True)
+    prlicense = models.CharField(max_length=100, blank=True)
 
     # dates
     submission_date = models.DateTimeField(auto_now_add=True)

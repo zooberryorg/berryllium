@@ -111,7 +111,6 @@ def upload_step2(request):
     """
     Step 2 of the upload form.
     """
-    print(f"Entering upload_step2 view. Request method: {request.method}")
     context = init_context(current_index=1, form=FileUploadForm())
     mod_id = request.session.get("session_id")
     existing_files = []
@@ -132,13 +131,11 @@ def upload_step2(request):
 
     # ---------------------- POST (Handle file uploads and navigation)
     if request.method == "POST":
-        print(f"POST data: {request.POST}, FILES count: {len(existing_files)}")
         # get existing uploaded files saved in draft
 
         # ----------------- Handle previous navigation
         # validation not needed for back navigation
         if request.POST.get("action") == "previous":
-            print("Previous button clicked. Returning to step 1.")
             return redirect("upload_step1")
 
         form = FileUploadForm(
@@ -146,12 +143,10 @@ def upload_step2(request):
         )
 
         if form.is_valid():
-            print("File upload form is valid.")
             clean_file = form.cleaned_data["file"]
             clean_url = form.cleaned_data["file_url"]
 
             if clean_file:
-                print("File is valid. Adding to file list.")
                 file = upload_file(clean_file, mod_id=mod_id)
                 if file:
                     # update existing_files for re-rendering form with new file
@@ -162,7 +157,6 @@ def upload_step2(request):
             if request.POST.get("action") == "next":
                 print("Next button clicked.")
                 if clean_url:
-                    print("No file uploaded, but URL provided. Saving URL to mod.")
                     mod = Mod.objects.filter(id=mod_id).first()
                     # TODO: Cleanup temp files and rework filegroups with url-based mods
                     if mod:
@@ -170,17 +164,14 @@ def upload_step2(request):
                         mod.external_url = clean_url
                         mod.save()
 
-                print("Attempting to redirect to step 3.")
                 return redirect("upload_step3")
 
             # ----------------- Simple file upload without navigation (stay on step 2)
             else:
-                print("File uploaded without navigation. Staying on step 2.")
                 return render(request, "mods/upload/step/2.html", context)
 
         # ---------------------- Invalid form: return SAME state with errors
         context["form"] = form
-        print("File upload form is invalid. Returning to step 2 with errors.")
         return render(request, "mods/upload/step/2.html", context)
 
     # ---------------------- GET
@@ -192,7 +183,6 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
-    print("Entering upload_step3 view. Request method:", request.method)
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
@@ -202,19 +192,12 @@ def upload_step3(request):
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         action = request.POST.get("action")
-        print("POST action received in step 3:", action)
 
         if action in ("next", "previous"):
-            # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
-            # if invalid, res will be None -> fall through and re-render with errors
-            # if res is not None:
-            #     return res
             if action == "previous":
-                print("GOING BACK TO STEP 2")
                 return redirect("upload_step2")
             if action == "next":
-                # IMPORTANT: go to step 4 (don’t re-render step3)
-                return render(request, "mods/upload/step/4.html", context)
+                return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
     groups_init = request.session.get("file_groups", [])
@@ -239,6 +222,9 @@ def upload_step3(request):
         )
 
     return render(request, "mods/upload/step/3.html", context)
+
+def upload_step4(request):
+    return render(request, "mods/upload/step/4.html", context=init_context(current_index=3))
 
 
 # TODO: Fix latency issues with HX requests (takes forever between initial upload and response)
