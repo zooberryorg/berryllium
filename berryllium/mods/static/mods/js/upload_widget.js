@@ -15,7 +15,6 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
       this.fileCount = this.getFileQueueLength();
 
       if (this.hasFiles) {
-        console.log('files found in queue on init, disabling url field and enabling help');
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
       }
       if (this.hasExistingUrl) {
@@ -36,29 +35,27 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
       return '';
     },
 
+    // show help text if either url exists or files exist
     get showHelp() {
-        console.log('checking showHelp condition with fileCount:', this.fileCount, 'hasExistingUrl:', this.hasExistingUrl);
-        
         if (this.hasFiles || this.hasExistingUrl) {
-          console.log('showHelp condition met, showing help text');
           this.$refs.helpText.classList.remove('hidden');
         } else {
-          console.log('showHelp condition not met, hiding help text');
           this.$refs.helpText.classList.add('hidden');
         }
         return this.hasFiles || this.hasExistingUrl;
     },
 
+    // check if files are in the queue
     get hasFiles() {
       return this.fileCount > 0;
     },
 
+    // event handlers
     onUrlFieldInput() {
       if (this.getUrlFieldLength() > 0) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
         this.hasExistingUrl = true;
       } else {
-        console.log('url field cleared, enabling dropzone and hiding help');
         this.enableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
         this.hasExistingUrl = false;
       }
@@ -69,14 +66,15 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
       return this.$refs.urlInput.value.length;
     },
 
+    // fires when a file is removed from queue
     updateQueueState() {
       this.fileCount--;
       if (!this.hasFiles) {
-        this.$refs.fileQueue.remove();
+        this.$nextTick(() => {
+          this.$refs.fileQueue.remove();
+        });
         this.enableInput(this.$refs.urlBlock, 'urlFieldEnabled');
       }
-      console.log('CURRENT TIME:', new Date().toLocaleTimeString());
-      console.log('updated queue state, fileCount:', this.fileCount);
     },
 
     getFileQueueLength() {
