@@ -10,33 +10,41 @@
       hx-encoding="multipart/form-data"
       x-ref="uploadForm">
     {% csrf_token %}
-        <div class="p-6 mt-4 mb-4">
-            <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
-                <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
-                <span class="text-white/70">Organize your uploaded files into groups. You can create new groups, rename them, and drag files between groups. Or you can skip this step and leave it up to us. Up to you! Enable file organization below to get started.</span>
+    <div class="p-6 mt-4 mb-4">
+        <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
+            <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
+            <span class="text-white/70">Organize your uploaded files into groups. You can create new groups, rename them, and drag files between groups. Or you can skip this step and leave it up to us. Up to you! Enable file organization below to get started.</span>
+        </div>
+    </div>
+    {% for group in file_groups %}
+        <div class="mb-4">
+            <div class="flex items center gap-2 mb-2">
+                <input type="text"
+                       name="group_name_{{ forloop.counter0 }}"
+                       value="{{ group.name }}"
+                       class="bg-pine-700/50 border border-white/10 rounded px-2 py-1 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-pine-500 focus:border-transparent"
+                       placeholder="Group Name">
+                <button type="button"
+                        class="text-red-500 hover:text-red-400"
+                        onclick="removeGroup({{ forloop.counter0 }})">
+                    <ion-icon name="trash"></ion-icon>
+                </button>
+            </div>
+            <div class="flex gap-4 flex-wrap">
+                {% for file in group.files %}
+                    <div class="bg-pine-700/50 border border-white/10 rounded p-2 w-32 text-center relative">
+                        <div class="text-sm text-white/80 mb-1">{{ file.name|truncatechars:15 }}</div>
+                        <div class="text-xs text-white/60">{{ file.size|filesizeformat }}</div>
+                        <button type="button"
+                                class="absolute top-1 right-1 text-red-500 hover:text-red-400"
+                                onclick="removeFile({{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})">
+                            <ion-icon name="close"></ion-icon>
+                        </button>
+                    </div>
+                {% endfor %}
             </div>
         </div>
-        {% for group in file_groups %}
-            <div class="mb-4">
-                <div class="flex items center gap-2 mb-2">
-                    <input type="text" name="group_name_{{ forloop.counter0 }}" value="{{ group.name }}" class="bg-pine-700/50 border border-white/10 rounded px-2 py-1 text-sm text-white/80 focus:outline-none focus:ring-2 focus:ring-pine-500 focus:border-transparent" placeholder="Group Name">
-                    <button type="button" class="text-red-500 hover:text-red-400" onclick="removeGroup({{ forloop.counter0 }})">
-                        <ion-icon name="trash"></ion-icon>
-                    </button>
-                    </div>
-                <div class="flex gap-4 flex-wrap">
-                    {% for file in group.files %}
-                        <div class="bg-pine-700/50 border border-white/10 rounded p-2 w-32 text-center relative">
-                            <div class="text-sm text-white/80 mb-1">{{ file.name|truncatechars:15 }}</div>
-                            <div class="text-xs text-white/60">{{ file.size|filesizeformat }}</div>
-                            <button type="button" class="absolute top-1 right-1 text-red-500 hover:text-red-400" onclick="removeFile({{ forloop.parentloop.counter0 }}, {{ forloop.counter0 }})">
-                                <ion-icon name="close"></ion-icon>
-                            </button>
-                        </div>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
-    </div>
-    {% include "mods/upload/actions.html" %}
+    {% endfor %}
+</div>
+{% include "mods/upload/actions.html" %}
 </form>
