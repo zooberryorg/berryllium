@@ -1,9 +1,12 @@
+<!-- This partial depends on the fileInputProcessor existing in the x-data root located
+ in mods/upload/step/2.html -->
 {% if existing_files %}
-    <div x-init="disableInput($refs.urlBlock)" class="px-6 mb-6">
+    <div class="px-6 mb-6" x-ref="fileQueue">
         <p class="text-sm font-medium text-white/70 mb-2">Uploaded Files:</p>
         <div class="space-y-2">
             {% for file in existing_files %}
-                <div class="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
+                <div data-file="{{ file.id }}"
+                     class="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
                     <div class="flex items-center gap-3">
                         <ion-icon name="document" class="text-xl text-pine-100"></ion-icon>
                         <div>
@@ -13,7 +16,9 @@
                     </div>
                     <button type="button"
                             hx-post="{% url 'remove_temp_file' file.id %}"
-                            hx-swap="innerHTML"
+                            hx-target="[data-file='{{ file.id }}']"
+                            hx-swap="outerHTML"
+                            @click="updateQueueState()"
                             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                             class="text-red-400/40 hover:text-red-400 p-1 cursor-pointer p-1 rounded-md border border-red-400/40 hover:border-red-400 transition items-center flex gap-1">
                         <ion-icon name="trash" class="text-xl align-middle"></ion-icon>
@@ -22,6 +27,4 @@
             {% endfor %}
         </div>
     </div>
-{% else %}
-    <div x-init="enableInput($refs.urlBlock)"></div>
 {% endif %}

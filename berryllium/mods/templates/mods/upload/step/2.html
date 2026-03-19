@@ -3,7 +3,7 @@
 <div class="px-6 pt-6">
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
-<div x-data="fileInputProcessor()">
+<div x-data="fileInputProcessor({ hasExistingUrl: {{ file_url|length }} })">
     <form hx-post="{% url 'upload_step2' %}"
           hx-target="#upload-frame"
           hx-swap="innerHTML"
@@ -26,6 +26,14 @@
                 </div>
             </div>
         {% endif %}
+        <div id="help-text" x-ref="helpText" x-show="showHelp">
+            <div class="px-6 mb-4">
+                <div class="flex gap-4 bg-gold-500/15 border border-gold-500/30 rounded-xl p-4 items-center">
+                    <ion-icon name="information-circle" class="text-gold-400 text-4xl"></ion-icon>
+                    <span x-text="helpMessage" class="text-gold-400 text-sm"></span>
+                </div>
+            </div>
+        </div>
         <div class="space-y-4 px-6">
             <div x-ref="urlBlock">
                 <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
@@ -36,11 +44,11 @@
                        class="zb-input text-sm"
                        autocomplete="off"
                        hx-post="{% url 'process_url_field' %}"
-                       hx-trigger="input delay:100ms"
+                       hx-trigger="input delay:500ms"
                        hx-target="#file-url-error"
                        hx-swap="innerHTML"
                        x-ref="urlInput"
-                       @input="getUrlFieldLength() > 0 ? disableInput($refs.dropzoneBlock) : enableInput($refs.dropzoneBlock)">
+                       @input="onUrlFieldInput()">
                 <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
             </div>
         </div>
