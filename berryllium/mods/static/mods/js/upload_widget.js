@@ -1,4 +1,7 @@
-function fileUploader() {
+function fileInputProcessor() {
+  // data variables
+  published = false;
+
   return {
     isDragging: false,
     isUploading: false,
