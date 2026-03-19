@@ -28,8 +28,6 @@
         {% endif %}
         <div class="space-y-4 px-6">
             <div x-ref="urlBlock"
-                
-                :class="getUrlFieldLength() > 0 ? disableInput($refs.dropzoneBlock) : enableInput($refs.dropzoneBlock)">
                 <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
                 <input type="url"
                        name="file_url"
@@ -42,7 +40,7 @@
                        hx-target="#file-url-error"
                        hx-swap="innerHTML"
                        x-ref="urlInput"
-                       @inputChanged="$dispatch('inputChanged')">
+                       @input="getUrlFieldLength() > 0 ? disableInput($refs.dropzoneBlock) : enableInput($refs.dropzoneBlock)">
                 <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
             </div>
         </div>
