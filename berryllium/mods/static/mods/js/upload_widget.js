@@ -1,7 +1,22 @@
-function fileUploader() {
+function fileInputProcessor() {
+  // note: implicit global vars go here; attach to window object
+
   return {
     isDragging: false,
     isUploading: false,
+
+    getUrlFieldLength() {
+      if (!this.$refs.urlInput) return 0;
+      return this.$refs.urlInput.value.length;
+    },
+
+    enableInput(ref) {
+      ref.classList.remove('pointer-events-none', `opacity-20`);
+    },
+
+    disableInput(ref) {
+      ref.classList.add('pointer-events-none', `opacity-20`);
+    },
     
     handleFileSelect(event) {
       const file = event.target.files[0];
