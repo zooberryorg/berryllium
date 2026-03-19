@@ -1,10 +1,15 @@
 function fileInputProcessor() {
-  // data variables
-  published = false;
+  // note: implicit global vars go here; attach to window object
 
   return {
     isDragging: false,
     isUploading: false,
+    urlFieldLength: 0,
+
+    getUrlFieldLength() {
+      if (!this.$refs.urlInput) return 0;
+      return this.$refs.urlInput.value.length;
+    },
     
     handleFileSelect(event) {
       const file = event.target.files[0];
