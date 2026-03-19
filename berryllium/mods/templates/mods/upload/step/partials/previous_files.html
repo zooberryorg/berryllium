@@ -22,4 +22,6 @@
             {% endfor %}
         </div>
     </div>
+{% else %}
+    <div x-init="enableInput($refs.urlBlock)"></div>
 {% endif %}
