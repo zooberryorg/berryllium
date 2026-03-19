@@ -228,6 +228,9 @@ def upload_step3(request):
 
     return render(request, "mods/upload/step/3.html", context)
 
+def upload_step4(request):
+    return render(request, "mods/upload/step/4.html", context=init_context(current_index=3))
+
 
 # TODO: Fix latency issues with HX requests (takes forever between initial upload and response)
 @require_http_methods(["POST"])
