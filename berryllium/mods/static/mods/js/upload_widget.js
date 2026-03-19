@@ -4,11 +4,15 @@ function fileInputProcessor() {
   return {
     isDragging: false,
     isUploading: false,
-    urlFieldLength: 0,
+    disableOpacityLevel: 20,
 
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
       return this.$refs.urlInput.value.length;
+    },
+
+    enableInput(ref) {
+      ref.classList.remove('pointer-events-none', `opacity-${this.disableOpacityLevel}`);
     },
     
     handleFileSelect(event) {
