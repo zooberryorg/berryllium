@@ -154,7 +154,7 @@ class FileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-    
+
     def clean_file_url(self):
         """
         Validate the file URL field.
