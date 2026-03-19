@@ -194,15 +194,10 @@ def upload_step3(request):
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
-            # res = update_step3_state(request, uploaded_files, "mods/upload/step/3.html")
-            # if invalid, res will be None -> fall through and re-render with errors
-            # if res is not None:
-            #     return res
             if action == "previous":
                 return redirect("upload_step2")
             if action == "next":
-                # IMPORTANT: go to step 4 (don’t re-render step3)
-                return render(request, "mods/upload/step/4.html", context)
+                return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
     groups_init = request.session.get("file_groups", [])
