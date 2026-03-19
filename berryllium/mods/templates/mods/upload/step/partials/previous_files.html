@@ -3,7 +3,7 @@
 {% if existing_files %}
     <div class="px-6 mb-6">
         <p class="text-sm font-medium text-white/70 mb-2">Uploaded Files:</p>
-        <div class="space-y-2">
+        <div class="space-y-2" x-ref="fileQueue">
             {% for file in existing_files %}
                 <div data-file
                      class="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
@@ -14,7 +14,10 @@
                             <p class="text-white/50 text-xs">{{ file.size|filesizeformat }}</p>
                         </div>
                     </div>
-                    <button type="button"
+                    <button type="button"                            
+                            {% if existing_files|length == 1%}
+                            @click="forceDisableHelp()"
+                            {% endif %}
                             hx-post="{% url 'remove_temp_file' file.id %}"
                             hx-swap="innerHTML"
                             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'

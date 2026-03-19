@@ -12,18 +12,20 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     // guarantee form state on page load
     init() {
       // event listener for file input changes to guarantee state is updated
-      this.$el.addEventListener('htmx:afterRequest', () => {
-        console.log('htmx request completed, checking file queue length...');
-        this.hasExistingFiles = this.getFileQueueLength() > 0;
-        console.log('Updated hasExistingFiles:', this.hasExistingFiles);
+      window.addEventListener('htmx:afterSwap', () => {
+        this.$nextTick(() => {
+          this.hasExistingFiles = this.getFileQueueLength() > 0;
+        });
       });
 
-      console.log('Initializing file input processor with existing files:', this.hasExistingFiles, 'and existing URL:', this.hasExistingUrl);
       if (this.hasExistingFiles) {
+        console.log('files found in queue on init, disabling url field and enabling help');
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
+        this.showHelp();
       }
       if (this.hasExistingUrl) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
+        this.showHelp();
       }
     },
 
@@ -40,22 +42,25 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       return '';
     },
 
-    get showHelp() {
-      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
-      console.log('Current showHelp:', !!(this.hasExistingFiles || this.hasExistingUrl));
-      return !!(this.hasExistingFiles || this.hasExistingUrl);
+    showHelp() {
+      this.$refs.helpText.classList.remove('hidden');
     },  
 
+    forceDisableHelp() {
+      this.$refs.helpText.classList.add('hidden');
+    },
+
     onUrlFieldInput() {
-      console.log(this.getUrlFieldLength());
       if (this.getUrlFieldLength() > 0) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
         this.hasExistingUrl = true;
-      } else if (this.getUrlFieldLength() === 0 && !this.hasExistingFiles) {
+        this.showHelp();
+      } else {
+        console.log('url field cleared, enabling dropzone and hiding help');
         this.enableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
         this.hasExistingUrl = false;
+        this.forceDisableHelp();
       }
-      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
     },
 
     getUrlFieldLength() {
@@ -65,12 +70,17 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
 
     getFileQueueLength() {
       const fileQueue = this.$el.querySelectorAll('[data-file]');
+      console.log('checking file queue length, found:', fileQueue.length);
+      if (fileQueue.length > 0) {
+        console.log('in getFileQueueLength, found file queue and enabling help');
+        this.showHelp();
+      }
+
       return fileQueue ? fileQueue.length : 0;
     },
 
     enableInput(ref, flag) {
       this[flag] = true;
-      console.log(`Enabling input for ${flag}`);
       ref.classList.remove('pointer-events-none', `opacity-20`);
     },
 
@@ -82,7 +92,6 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     handleFileSelect(event) {
       const file = event.target.files[0];
       if (file) {
-        console.log('File selected:', file.name, file.size);
         // Click the hidden submit button to trigger htmx
         this.$refs.submitBtn.click();
       }
@@ -92,7 +101,6 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       this.isDragging = false;
       const file = event.dataTransfer.files[0];
       if (file) {
-        console.log('File dropped:', file.name, file.size);
         // Set the file to the input
         const dt = new DataTransfer();
         dt.items.add(file);
