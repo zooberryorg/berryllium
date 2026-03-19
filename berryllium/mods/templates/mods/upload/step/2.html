@@ -26,9 +26,7 @@
                 </div>
             </div>
         {% endif %}
-        <div id="help-text"
-             x-show="urlFieldEnabled || fileDropzoneEnabled"
-             x-ref="helpText">
+        <div id="help-text" x-ref="helpText" class="hidden">
             <div class="px-6 mb-4">
                 <div class="flex gap-4 bg-blue-500/15 border border-blue-500/30 rounded-xl p-4 items-center">
                     <ion-icon name="information-circle" class="text-blue-400 text-4xl"></ion-icon>
@@ -54,7 +52,9 @@
                        hx-target="#file-url-error"
                        hx-swap="innerHTML"
                        x-ref="urlInput"
-                       @input="getUrlFieldLength() > 0 ? disableInput($refs.dropzoneBlock, 'fileDropzoneEnabled') : enableInput($refs.dropzoneBlock, 'fileDropzoneEnabled')">
+                       @input="getUrlFieldLength() > 0 ? 
+                       (disableInput($refs.dropzoneBlock, 'fileDropzoneEnabled'), showComponent($refs.helpText))  
+                       : (enableInput($refs.dropzoneBlock, 'fileDropzoneEnabled'), hideComponent($refs.helpText))">
                 <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
             </div>
         </div>
