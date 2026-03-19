@@ -27,7 +27,8 @@
             </div>
         {% endif %}
         <div class="space-y-4 px-6">
-            <div x-ref="urlBlock">
+            <div x-ref="urlBlock"
+                 :class="getUrlFieldLength() > 0 ? $refs.dropzoneBlock.classList.add('pointer-events-none', 'opacity-20') : $refs.dropzoneBlock.classList.remove('pointer-events-none', 'opacity-20')">
                 <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
                 <input type="url"
                        name="file_url"
@@ -50,7 +51,7 @@
             <div class="border-t border-white/10 my-6 w-full"></div>
         </div>
         <div class="space-y-4 mt-6 mb-6">
-            <div class="px-6">
+            <div class="px-6" x-ref="dropzoneBlock">
                 <!-- Drag and Drop Zone -->
                 {% include "mods/upload/step/partials/dropzone.html" %}
                 <!-- Hidden submit button for htmx -->
