@@ -9,6 +9,18 @@ function fileInputProcessor(hasExistingFiles = false, hasExistingUrl = false) {
     hasExistingFiles: hasExistingFiles,
     hasExistingUrl: hasExistingUrl,
 
+    get helpMessage() {
+      // when files exist and url field disabled
+      if (this.hasExistingFiles && !this.urlFieldEnabled) {
+        return `Files currently added to queue. If you wish to add a URL instead, remove all files from the queue first.`;
+      }
+      // when url exists and file dropzone disabled
+      if (this.hasExistingUrl && !this.fileDropzoneEnabled) {
+        return `URL field is currently populated. If you wish to add files instead, clear the URL field first.`;
+      }
+      return '';
+    },
+
     init() {
       if (this.hasExistingFiles) {
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
