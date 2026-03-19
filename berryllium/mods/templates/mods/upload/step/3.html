@@ -10,12 +10,25 @@
       hx-encoding="multipart/form-data"
       x-ref="uploadForm">
     {% csrf_token %}
-        <div class="p-6 mt-4 mb-4">
-            <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
-                <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
-                <span class="text-white/70">Organize your uploaded files into groups. You can create new groups, rename them, and drag files between groups. Or you can skip this step and leave it up to us. Up to you! Enable file organization below to get started.</span>
-            </div>
+    <div class="p-6 mt-4 mb-4">
+        <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
+            <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
+            <span class="text-white/70">Organize your uploaded files into groups. You can create new groups, rename them, and drag files between groups. Or you can skip this step and leave it up to us. Up to you! Enable file organization below to get started.</span>
         </div>
     </div>
-    {% include "mods/upload/actions.html" %}
+    {% for group in file_groups %}
+        <div class="px-6 mb-4">
+            <div class="flex flex-col items-center gap-2 mb-2 w-full bg-pine-800/40 rounded-lg px-2 pt-1 pb-2 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
+                <div class="flex items-center gap-2 w-full py-2">
+                    {% include "mods/upload/step/partials/group_header.html" %}
+                </div>
+                {% for file in group.files.all %}
+                    {% include "mods/upload/step/partials/group_files.html"%}
+                {% endfor %}
+            </div>
+            <div class="flex gap-4 flex-wrap"></div>
+        </div>
+    {% endfor %}
+</div>
+{% include "mods/upload/actions.html" %}
 </form>
