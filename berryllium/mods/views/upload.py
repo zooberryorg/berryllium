@@ -263,7 +263,7 @@ def remove_temp_file(request, file_id):
         if temp_path and default_storage.exists(temp_path):
             default_storage.delete(temp_path)
 
-        return redirect("upload_step2")
+        return HttpResponse()
 
 
 @require_http_methods(["POST"])
