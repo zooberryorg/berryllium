@@ -87,6 +87,10 @@ class Mod(models.Model):
     @property
     def files(self):
         return FileUpload.objects.filter(filegroup__mod=self)
+    
+    @property
+    def file_groups(self):
+        return FileGroup.objects.filter(mod=self)
 
 
 class Dependency(models.Model):
