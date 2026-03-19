@@ -18,12 +18,12 @@
     </div>
     {% for group in file_groups %}
         <div class="px-6 mb-4">
-            <div class="flex flex-col items-center gap-2 mb-2 w-full bg-pine-800/40 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
+            <div class="flex flex-col items-center gap-2 mb-2 w-full bg-pine-800/40 rounded-lg px-2 pt-1 pb-2 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
                 <div class="flex items-center gap-2 w-full py-2">
                     <input type="text"
                            name="group_name_{{ forloop.counter0 }}"
                            value="{{ group.name }}"
-                           class="rounded px-2 py-1 text-sm text-white/80 focus:outline-none w-full"
+                           class="px-2 py-1 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
                            placeholder="Group Name">
                     <button type="button"
                             class="text-pine-300 hover:text-gold-400/70 bg-pine-600/90 rounded px-2 py-1 cursor-pointer border border-600/90 hover:border-pine-200/90">
@@ -42,7 +42,7 @@
                     {% endif %}
                 </div>
                 {% for file in group.files.all %}
-                    <div class="flex items-center gap-2 w-full bg-pine-800/40 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 focus:border-transparent hover:bg-pine-800">
+                    <div class="flex items-center gap-2 w-full bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 focus:border-transparent hover:bg-pine-800">
                         <span class="text-pine-200 px-2 py-1 font-size-md">
                             <ion-icon name="document"></ion-icon>
                         </span>
