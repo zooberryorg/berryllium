@@ -13,7 +13,7 @@ function fileInputProcessor() {
       return this.$refs.urlInput.value.length;
     },
 
-    getFileQueueLength(ref) {
+    getFileQueueLength() {
       if (!this.$refs.fileInput) return 0;
       return this.$refs.fileInput.files.length;
     },
