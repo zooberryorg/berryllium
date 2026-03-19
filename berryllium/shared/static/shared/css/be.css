@@ -703,6 +703,10 @@
     --tw-border-style: dashed;
     border-style: dashed;
   }
+  .border-none {
+    --tw-border-style: none;
+    border-style: none;
+  }
   .border-\[\#4a5a4b\]\/50 {
     border-color: color-mix(in oklab, #4a5a4b 50%, transparent);
   }
@@ -1885,6 +1889,13 @@
       }
     }
   }
+  .hover\:bg-pine-700 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-pine-700);
+      }
+    }
+  }
   .hover\:bg-pine-700\/50 {
     &:hover {
       @media (hover: hover) {
@@ -1895,10 +1906,50 @@
       }
     }
   }
+  .hover\:bg-pine-700\/60 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #263621 60%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-pine-700) 60%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-pine-700\/80 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #263621 80%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-pine-700) 80%, transparent);
+        }
+      }
+    }
+  }
+  .hover\:bg-pine-700\/90 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #263621 90%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-pine-700) 90%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-pine-800 {
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-pine-800);
+      }
+    }
+  }
+  .hover\:bg-pine-800\/60 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #171f14 60%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-pine-800) 60%, transparent);
+        }
       }
     }
   }

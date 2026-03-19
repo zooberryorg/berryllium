@@ -42,11 +42,11 @@
                     {% endif %}
                 </div>
                 {% for file in group.files.all %}
-                    <div class="flex items-center gap-2 mb-2 w-full bg-pine-800/40 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
+                    <div class="flex items-center gap-2 w-full bg-pine-800/40 rounded-md px-2 py-1 text-sm text-white/80 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 focus:border-transparent hover:bg-pine-800 cursor-pointer">
                         <span class="text-pine-200 px-2 py-1 font-size-md">
                             <ion-icon name="document"></ion-icon>
                         </span>
-                        <span class="text-white/80">{{ file.filename }}</span>
+                        <input type="text" class="text-white/80 bg-transparent border-none focus:outline-none" value="{{ file.filename }}" readonly>
                     </div>
                 {% endfor %}
             </div>
