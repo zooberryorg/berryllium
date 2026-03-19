@@ -57,9 +57,6 @@ def upload_file(uploaded_file, mod_id=None):
     # alternatively, reset pointer with uploaded_file.seek(0) to reset
     file_hash = calculate_file_hash(uploaded_file)
 
-    # find file group that this file belongs to (if it exists)
-    fg = FileGroup.objects.filter(mod_id=mod_id).first()
-
     # see if hash already exists in mod files
     existing_file = FileUpload.objects.filter(
         file_hash=file_hash, filegroup__mod_id=mod_id
@@ -68,8 +65,9 @@ def upload_file(uploaded_file, mod_id=None):
     # if file duplicate, delete newly uploaded file from storage
     if existing_file:
         return None
-    elif not fg:
-        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+    
+    # find file group that this file belongs to (if it exists)
+    fg, _ = FileGroup.objects.get_or_create(mod_id=mod_id, defaults={"name": "Files"})
     
     # once all clear, save file to storage
     temp_path = default_storage.save(temp_filename, uploaded_file)
