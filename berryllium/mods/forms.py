@@ -115,7 +115,8 @@ class FileUploadForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.existing_files = existing_files or []
 
-    def valid_file_extension(self, filename, allowed_extensions):
+    @staticmethod
+    def valid_file_extension(filename, allowed_extensions):
         """Validate file extension"""
         ext = os.path.splitext(filename)[1].lower()
         if ext not in allowed_extensions:
