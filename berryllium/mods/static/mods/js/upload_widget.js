@@ -9,6 +9,19 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
     hasExistingFiles: hasExistingFiles,
     hasExistingUrl: hasExistingUrl,
 
+    // guarantee form state on page load
+    init() {
+      if (this.hasExistingFiles) {
+        this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
+        this.showComponent(this.$refs.helpText);
+      }
+      if (this.hasExistingUrl) {
+        this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
+        this.showComponent(this.$refs.helpText);
+      }
+    },
+
+    // preset help messages for help text component
     get helpMessage() {
       // when files exist and url field disabled
       if (this.hasExistingFiles && !this.urlFieldEnabled) {
@@ -21,14 +34,13 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       return '';
     },
 
-    init() {
-      if (this.hasExistingFiles) {
-        this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
-        this.showComponent(this.$refs.helpText);
-      }
-      if (this.hasExistingUrl) {
+    onUrlFieldInput() {
+      if (this.getUrlFieldLength() > 0) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
         this.showComponent(this.$refs.helpText);
+      } else {
+        this.enableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
+        this.hideComponent(this.$refs.helpText);
       }
     },
 

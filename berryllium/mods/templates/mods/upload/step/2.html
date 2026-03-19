@@ -48,9 +48,7 @@
                        hx-target="#file-url-error"
                        hx-swap="innerHTML"
                        x-ref="urlInput"
-                       @input="getUrlFieldLength() > 0 ? 
-                       (disableInput($refs.dropzoneBlock, 'fileDropzoneEnabled'), showComponent($refs.helpText))  
-                       : (enableInput($refs.dropzoneBlock, 'fileDropzoneEnabled'), hideComponent($refs.helpText))">
+                       @input="">
                 <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
             </div>
         </div>
