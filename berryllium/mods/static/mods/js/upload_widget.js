@@ -4,7 +4,6 @@ function fileInputProcessor() {
   return {
     isDragging: false,
     isUploading: false,
-    disableOpacityLevel: 20,
 
     getUrlFieldLength() {
       if (!this.$refs.urlInput) return 0;
@@ -12,12 +11,12 @@ function fileInputProcessor() {
     },
 
     enableInput(ref) {
-      ref.classList.remove('pointer-events-none', `opacity-${this.disableOpacityLevel}`);
+      ref.classList.remove('pointer-events-none', `opacity-20`);
     },
 
     disableInput(ref) {
-      ref.classList.add('pointer-events-none', `opacity-${this.disableOpacityLevel}`);
-    }
+      ref.classList.add('pointer-events-none', `opacity-20`);
+    },
     
     handleFileSelect(event) {
       const file = event.target.files[0];
