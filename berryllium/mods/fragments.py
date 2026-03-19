@@ -19,8 +19,8 @@ def process_url_field(request):
                 mod.external_url = ""
                 mod.is_external = False
                 mod.save()
-                # return empty response to clear any existing errors
-                return HttpResponse()
+        # return empty response to clear any existing errors
+        return HttpResponse()
 
     # handle dynamic validation
     try:
