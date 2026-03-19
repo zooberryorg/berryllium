@@ -52,7 +52,6 @@ def upload_file(uploaded_file, mod_id=None):
     # result in stale hash if we try to calculate after saving to storage
     # alternatively, reset pointer with uploaded_file.seek(0) to reset
     file_hash = calculate_file_hash(uploaded_file)
-    temp_path = default_storage.save(temp_filename, uploaded_file)
 
     # find file group that this file belongs to (if it exists)
     fg = FileGroup.objects.filter(mod_id=mod_id).first()
@@ -64,11 +63,12 @@ def upload_file(uploaded_file, mod_id=None):
 
     # if file duplicate, delete newly uploaded file from storage
     if existing_file:
-        if default_storage.exists(temp_path):
-            default_storage.delete(temp_path)
         return None
     elif not fg:
         fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+    
+    # once all clear, save file to storage
+    temp_path = default_storage.save(temp_filename, uploaded_file)
 
     # Create DB row so Step 3 can actually query files
     uf = FileUpload(
