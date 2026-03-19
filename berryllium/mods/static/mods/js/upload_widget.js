@@ -11,37 +11,39 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
 
     // guarantee form state on page load
     init() {
+      console.log('Initializing file input processor with existing files:', this.hasExistingFiles, 'and existing URL:', this.hasExistingUrl);
       if (this.hasExistingFiles) {
         this.disableInput(this.$refs.urlBlock, 'urlFieldEnabled');
-        this.showComponent(this.$refs.helpText);
       }
       if (this.hasExistingUrl) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
-        this.showComponent(this.$refs.helpText);
       }
     },
 
     // preset help messages for help text component
     get helpMessage() {
       // when files exist and url field disabled
-      if (this.hasExistingFiles && !this.urlFieldEnabled) {
+      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
+      if (this.hasExistingFiles) {
         return `Files currently added to queue. If you wish to add an external URL instead, remove all files from the queue first.`;
       }
       // when url exists and file dropzone disabled
-      if (this.hasExistingUrl && !this.fileDropzoneEnabled) {
+      if (this.hasExistingUrl) {
         return `URL field is currently populated. If you wish to add files instead, clear the URL field first.`;
       }
       return '';
     },
 
     onUrlFieldInput() {
+      console.log(this.getUrlFieldLength());
       if (this.getUrlFieldLength() > 0) {
         this.disableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
-        this.showComponent(this.$refs.helpText);
-      } else {
+        this.hasExistingUrl = true;
+      } else if (this.getUrlFieldLength() === 0 && !this.hasExistingFiles) {
         this.enableInput(this.$refs.dropzoneBlock, 'fileDropzoneEnabled');
-        this.hideComponent(this.$refs.helpText);
+        this.hasExistingUrl = false;
       }
+      console.log('Existing files:', this.hasExistingFiles, 'Existing URL:', this.hasExistingUrl);
     },
 
     getUrlFieldLength() {
@@ -56,6 +58,7 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
 
     enableInput(ref, flag) {
       this[flag] = true;
+      console.log(`Enabling input for ${flag}`);
       ref.classList.remove('pointer-events-none', `opacity-20`);
     },
 
@@ -64,13 +67,9 @@ function fileInputProcessor({hasExistingFiles = false, hasExistingUrl = false} =
       ref.classList.add('pointer-events-none', `opacity-20`);
     },
 
-    showComponent(ref) {
-      ref.classList.remove('hidden');
-    },
-
-    hideComponent(ref) {
-      ref.classList.add('hidden');
-    },
+    get showHelp() {
+      return !!(this.hasExistingFiles || this.hasExistingUrl);
+    },  
     
     handleFileSelect(event) {
       const file = event.target.files[0];
