@@ -201,7 +201,7 @@ class FileGroupForm(forms.Form):
     into groups.
     """
 
-    name = forms.CharField(
+    group_name = forms.CharField(
         max_length=255,
         widget=forms.TextInput(
             attrs={
