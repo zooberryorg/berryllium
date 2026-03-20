@@ -1,9 +1,6 @@
 {% load static %}
-<div class="font-semibold text-white"
-     x-data="navigationState()"
-     x-ref="navLink-{{ current_index }}"
-     data-current-index="{{ current_index }}"
-     x-init="updateNavigation({ currentIndex: Number($el.dataset.currentIndex) })">{{ title }}</div>
+<span class="font-semibold text-white"
+     >{{ title }}</span>
 <div class="bg-pine-600/50 h-12 rounded-full mt-4 items-center flex overflow-hidden pl-4 pr-4">
     {% for step in completed %}
         <div class="bg-gold-400 h-2.5 rounded-full transition-all duration-500 ease-in-out mr-2 w-full w-1/4"></div>
