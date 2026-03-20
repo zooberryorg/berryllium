@@ -1,6 +1,6 @@
 from django.urls import path
 from berryllium.mods.views import upload, explore
-from berryllium.mods.fragments import process_url_field
+from berryllium.mods.fragments import hx_process_url_field
 
 urlpatterns = [
     # Upload form
@@ -22,5 +22,5 @@ urlpatterns = [
     # Session management
     path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
     # HTMX endpoints
-    path("mods/validate-url/", process_url_field, name="process_url_field"),
+    path("mods/validate-url/", hx_process_url_field, name="hx_process_url_field"),
 ]
