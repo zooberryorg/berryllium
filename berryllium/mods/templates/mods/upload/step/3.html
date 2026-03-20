@@ -18,7 +18,7 @@
         </div>
     </div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
-    <div class="px-6" x-show="toggled" x-ref="fileGroups">
+    <div x-show="toggled" x-ref="fileGroups">
         {% for group in file_groups %}
             {% include "mods/upload/step/partials/group_base.html" with group=group group_index=group_index %}
         {% endfor %}
