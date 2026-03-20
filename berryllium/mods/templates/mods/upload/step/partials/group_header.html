@@ -6,7 +6,9 @@
     {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
         {{ group_form.name }}
-        {{ group_form.name.errors }}
+        {% if group_form.name.errors %}
+            <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>
+        {% endif %}
         {{ group_form.description }}
         {{ group_form.description.errors }}
         {% for file_form in file_forms %}

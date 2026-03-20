@@ -1419,6 +1419,9 @@
       color: color-mix(in oklab, var(--color-red-400) 40%, transparent);
     }
   }
+  .text-red-500 {
+    color: var(--color-red-500);
+  }
   .text-red-600 {
     color: var(--color-red-600);
   }

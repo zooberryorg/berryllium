@@ -207,6 +207,8 @@ def upload_step3(request):
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
+        if request.POST.get("action") == "previous":
+            return redirect("upload_step2")
         for group_form, file_formset in file_groups:
             group_form = FileGroupForm(request.POST, instance=group_form.instance)
             file_formset = SingleFileFormset(
@@ -220,17 +222,14 @@ def upload_step3(request):
                 context["group_formset"] = group_formset
                 context["file_groups"] = file_groups
                 return render(request, "mods/upload/step/3.html", context)
-        action = request.POST.get("action")
 
-        if action in ("next", "previous"):
-            if action == "previous":
-                return redirect("upload_step2")
-            if action == "next":
-                return redirect("upload_step4")
+        if request.POST.get("action") == "next":
+            return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_groups
     context["group_formset"] = group_formset
+    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     return render(request, "mods/upload/step/3.html", context)
 
 
