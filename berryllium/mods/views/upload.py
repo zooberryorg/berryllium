@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 
-from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm
+from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm, SingleFileForm
 from berryllium.mods.models import Mod, FileGroup
 from berryllium.mods.services import init_context, upload_file
 from berryllium.mods.settings import UPLOAD_NAVIGATION
@@ -189,8 +189,6 @@ def upload_step3(request):
     uploaded_files = mod.files.all() if mod else []
     context["uploaded_files"] = uploaded_files
     context["file_groups"] = [fg for fg in mod.file_groups.all()] if mod else []
-    print(f"Uploaded files for mod {mod_id}: {[f.filename for f in uploaded_files]}")
-    print(f"File groups for mod {mod_id}: {[fg.name for fg in context['file_groups']]}")
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
