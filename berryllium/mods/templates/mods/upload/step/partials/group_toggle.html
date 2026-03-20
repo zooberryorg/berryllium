@@ -1,9 +1,9 @@
 <label  
 x-init="$watch('toggled', value => {
     if (value) {
-        $refs.uploadForm.classList.add('disabled');
+        $refs.fileGroups.classList.add('disabled');
     } else {
-        $refs.uploadForm.classList.remove('disabled');
+        $refs.fileGroups.classList.remove('disabled');
     }
 })"
 class="w-80 inline-flex cursor-pointer p-4 bg-pine-600/15 border border-white/5 rounded-xl shadow-xs ml-6 mb-4 items-center hover:bg-gold-400/10">
