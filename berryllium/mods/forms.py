@@ -224,7 +224,7 @@ class FileGroupForm(forms.ModelForm):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Group description (optional)",
+                "placeholder": "Group description",
                 "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10",
             }
         ),
