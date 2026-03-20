@@ -52,5 +52,5 @@ def hx_process_url_field(request):
 @require_POST
 def hx_toggle_group_manager(request):
     """HTMX endpoint to toggle file group manager visibility."""
-    request.session["group_manager_toggled"] = not request.session.get("group_manager_toggled", False)
+    request.session["group_manager_toggled"] = request.POST
     return HttpResponse()
