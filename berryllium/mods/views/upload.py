@@ -189,11 +189,19 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    mod_id = request.session.get("session_id")
     # TODO: iterative through formsets to validate forms
     FileGroupFormset = formset_factory(FileGroupForm, fields=["group_name", "group_description"], extra=0)
     SingleFileFormset = inlineformset_factory(FileGroup, FileUpload, fields=["title", "description"], extra=0)
-    filegroupforms = FileGroupFormset(prefix="groups")
-    singlefileforms = SingleFileFormset(prefix="files")
+    
+    group_objects = FileGroup.objects.filter(mod_id=mod_id)
+    group_formset = FileGroupFormset(queryset=group_objects)
+
+    # pair each file group with its set of files
+    file_groups = [
+        (form, SingleFileFormset(instance=form.instance))
+        for form in group_formset.forms
+    ]
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
@@ -217,8 +225,8 @@ def upload_step3(request):
                 return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
-    context["filegroupforms"] = filegroupforms
-    context["singlefileforms"] = singlefileforms
+    context["file_groups"] = file_groups
+    context["group_formset"] = group_formset
     return render(request, "mods/upload/step/3.html", context)
 
 
