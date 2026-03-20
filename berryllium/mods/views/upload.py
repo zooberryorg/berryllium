@@ -184,8 +184,11 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
-    file_group_forms = formset_factory(FileGroupForm, extra=0)
-    single_file_forms = formset_factory(SingleFileForm, extra=0)
+    # TODO: iterative through formsets to validate forms
+    FileGroupFormset = formset_factory(FileGroupForm, extra=0)
+    SingleFileFormset = formset_factory(SingleFileForm, extra=0)
+    filegroupforms = FileGroupFormset(prefix="groups")
+    singlefileforms = SingleFileFormset(prefix="files")
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
@@ -209,26 +212,6 @@ def upload_step3(request):
                 return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
-    groups_init = request.session.get("file_groups", [])
-    if not groups_init:
-        groups_init = [{"name": "Files", "description": "", "order": 0}]
-
-    existing_file_details = request.session.get("file_details", [])
-    by_id = {fd.get("id"): fd for fd in existing_file_details if fd.get("id")}
-
-    files_init = []
-    for i, uf in enumerate(uploaded_files):
-        fd = by_id.get(uf.id, {})
-        files_init.append(
-            {
-                "id": uf.id,
-                "filename": uf.filename,
-                "title": fd.get("title", ""),
-                "description": fd.get("description", ""),
-                "group_index": int(fd.get("group_index", 0)),
-                "file_order": int(fd.get("file_order", i)),
-            }
-        )
 
     return render(request, "mods/upload/step/3.html", context)
 
