@@ -190,7 +190,6 @@ def upload_step3(request):
     """
     context = init_context(current_index=2, form=FileGroupForm())
     context["group_manager_toggled"] = request.session.get("group_manager_toggled")
-    print(f"Group manager toggled: {context['group_manager_toggled']}")
     mod_id = request.session.get("session_id")
 
     FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
