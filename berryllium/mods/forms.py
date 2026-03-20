@@ -223,7 +223,8 @@ class FileGroupForm(forms.ModelForm):
                 # if click away from field, collapse
                 "x-model.blur": "collapse()",
                 ":class": "focused ? 'h-32' : 'h-10'",
-                ":keydown.escape": "collapse()",
+                
+                "@keydown.escape": "collapse()",
                 "@keydown.enter.prevent": "if($event.shiftKey) { this.focus() } else { $event.preventDefault() }",
             }
         ),
