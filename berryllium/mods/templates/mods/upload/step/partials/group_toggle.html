@@ -14,10 +14,10 @@
            id="group_manager_toggle"
            name="group_manager_toggle"
            class="sr-only peer"
-           @click="toggled = !toggled"
            hx-post="{% url 'hx_toggle_group_manager' %}"
-           hx-trigger="changed"
-           hx-include="[name='group_manager_toggle']">
+           hx-trigger="change"
+           hx-include="[name='group_manager_toggle']"
+           hx-swap="none">
     <div class="shrink-0 relative w-9 h-5 bg-pine-soft/50 peer-focus:ring-4 peer-focus:ring-gold-400/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-pine-500 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-400">
     </div>
     <div class="ms-2.5 select-none text-white/80">
