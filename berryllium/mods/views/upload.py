@@ -191,7 +191,7 @@ def upload_step3(request):
     context = init_context(current_index=2, form=FileGroupForm())
     mod_id = request.session.get("session_id")
     # TODO: iterative through formsets to validate forms
-    FileGroupFormset = modelformset_factory(FileGroupForm, fields=["group_name", "group_description"], extra=0)
+    FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
     SingleFileFormset = inlineformset_factory(FileGroup, FileUpload, fields=["title", "description"], extra=0)
     
     group_objects = FileGroup.objects.filter(mod_id=mod_id)

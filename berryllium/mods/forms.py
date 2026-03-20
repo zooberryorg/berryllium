@@ -195,7 +195,7 @@ class FileUploadForm(forms.Form):
         return cleaned_data
 
 
-class FileGroupForm(forms.Form):
+class FileGroupForm(forms.ModelForm):
     """
     Step 3 of the file upload form, which handles the file organization
     into groups.
