@@ -1,8 +1,8 @@
-function fileGroups() {
+function fileGroups({ toggled = false }) {
     return {
-        toggled: false, // default state for group mgr toggle
+        toggled: toggled, // default state for group mgr toggle
 
-        
+
         
     }
 }
