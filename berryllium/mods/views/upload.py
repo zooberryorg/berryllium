@@ -205,20 +205,21 @@ def upload_step3(request):
         for form in group_formset.forms
     ]
 
-    # TODO: address likely duplication with block above
-    mod_id = request.session.get("session_id")
-    mod = Mod.objects.filter(id=mod_id).first()
-    uploaded_files = mod.files.all() if mod else []
-    context["uploaded_files"] = uploaded_files
-    context["file_groups"] = [fg for fg in mod.file_groups.all()] if mod else []
-
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
-        form = FileGroupForm(request.POST)
+        for group_form, file_formset in file_groups:
+            group_form = FileGroupForm(request.POST, instance=group_form.instance)
+            file_formset = SingleFileFormset(
+                request.POST, instance=group_form.instance
+            )
 
-        # if form isn't valid, return same page with errors
-        if not form.is_valid():
-            return render(request, "mods/upload/step/3.html", context)
+            if group_form.is_valid() and file_formset.is_valid():
+                group_form.save()
+                file_formset.save()
+            else:
+                context["group_formset"] = group_formset
+                context["file_groups"] = file_groups
+                return render(request, "mods/upload/step/3.html", context)
         action = request.POST.get("action")
 
         if action in ("next", "previous"):

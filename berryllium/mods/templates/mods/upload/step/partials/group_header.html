@@ -6,7 +6,9 @@
     {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
         {{ group_form.name }}
+        {{ group_form.name.errors }}
         {{ group_form.description }}
+        {{ group_form.description.errors }}
         {% for file_form in file_forms %}
             {% include "mods/upload/step/partials/group_files.html" with file_form=file_form.instance %}
         {% endfor %}
