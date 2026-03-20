@@ -74,6 +74,22 @@
     @apply transition-all duration-200;
   }
 
+  :is(.zb-action) {
+    @apply text-pine-100/50 bg-pine-800/90;
+    @apply hover:text-gold-400/70 hover:border-gold-400/20;
+    @apply border border-white/10 rounded;
+    @apply px-2 py-1;
+    @apply cursor-pointer;
+  }
+
+  :is(.zb-action-delete) {
+    @apply text-pine-100/50 bg-pine-800/90;
+    @apply hover:text-red-400/50 hover:border-gold-400/20;
+    @apply border border-white/10 rounded;
+    @apply px-2 py-1;
+    @apply cursor-pointer;
+  }
+
   /* Gradient text */
   .gradient-text {
     background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
