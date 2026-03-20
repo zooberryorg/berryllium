@@ -202,6 +202,7 @@ class FileGroupForm(forms.Form):
     """
 
     group_name = forms.CharField(
+        required=False,
         max_length=255,
         widget=forms.TextInput(
             attrs={
@@ -227,6 +228,7 @@ class SingleFileForm(forms.Form):
     """
 
     title = forms.CharField(
+        required=False,
         max_length=255,
         widget=forms.TextInput(
             attrs={
