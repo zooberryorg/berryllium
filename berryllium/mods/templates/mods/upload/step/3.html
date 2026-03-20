@@ -11,9 +11,7 @@
       x-data="{ toggled: false }"
       x-ref="uploadForm">
     {% csrf_token %}
-    <div class="p-6 mt-4">
-        {% include "mods/upload/step/partials/group_blurb.html" %}
-    </div>
+    <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
     <div x-show="toggled" x-ref="fileGroups">
         {% for group in file_groups %}
