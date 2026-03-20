@@ -10,20 +10,27 @@
       hx-encoding="multipart/form-data"
       x-ref="uploadForm">
     {% csrf_token %}
-    <div class="p-6 mt-4 mb-4">
+    <div class="p-6 mt-4">
         <div class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
             <ion-icon name="information-circle" class="text-4xl text-white/70"></ion-icon>
             <span class="text-white/70">Organize your uploaded files into groups. You can create new groups, rename them, and drag files between groups. Or you can skip this step and leave it up to us. Up to you! Enable file organization below to get started.</span>
         </div>
     </div>
+    <label class="w-80 inline-flex cursor-pointer p-4 bg-pine-600/15 border border-white/5 rounded-xl shadow-xs ml-6 mb-4 items-center">
+        <input type="checkbox" value="" class="sr-only peer">
+        <div class="shrink-0 relative w-9 h-5 bg-pine-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-soft dark:peer-focus:ring-brand-soft rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand">
+        </div>
+        <div class="ms-2.5 select-none text-white/80">
+            <p class="text-sm font-medium text-heading mb-1">Enable File Manager</p>
+            <p class="text-sm font-normal text-body">Disabling will save all files under a default group.</p>
+        </div>
+    </label>
     {% for group in file_groups %}
         <div class="px-6 mb-4">
             <div class="flex flex-col items-center gap-2 mb-2 w-full bg-pine-800/40 rounded-lg px-2 pt-1 pb-2 text-sm text-white/80 border border-pine-700/50 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
-                <div class="flex items-center gap-2 w-full py-2">
-                    {% include "mods/upload/step/partials/group_header.html" %}
-                </div>
+                <div class="flex items-center gap-2 w-full py-2">{% include "mods/upload/step/partials/group_header.html" %}</div>
                 {% for file in group.files.all %}
-                    {% include "mods/upload/step/partials/group_files.html"%}
+                    {% include "mods/upload/step/partials/group_files.html" %}
                 {% endfor %}
             </div>
             <div class="flex gap-4 flex-wrap"></div>
