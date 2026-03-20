@@ -192,6 +192,11 @@ def upload_step3(request):
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
+        form = FileGroupForm(request.POST)
+
+        # if form isn't valid, return same page with errors
+        if not form.is_valid():
+            return render(request, "mods/upload/step/3.html", context)
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
