@@ -1,7 +1,7 @@
 import os
 from django import forms
 from django.forms import formset_factory
-from django.core.validators import URLValidator, MaxLengthValidator, MinLengthValidator
+from django.core.validators import URLValidator, MaxLengthValidator, MinLengthValidator, FileExtensionValidator, ProhibitNullCharactersValidator
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
@@ -134,7 +134,9 @@ class FileUploadForm(forms.Form):
             return cleaned_file
 
         # Validate file extension
-        if not self.valid_file_extension(cleaned_file.name, ALLOWED_EXTENSIONS):
+        try:
+            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(cleaned_file.name)
+        except ValidationError:
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
             )
@@ -238,6 +240,10 @@ class FileGroupForm(forms.ModelForm):
             raise forms.ValidationError(e.message)
         try:
             MaxLengthValidator(60)(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+        try:
+            ProhibitNullCharactersValidator()(self.cleaned_data["name"])
         except ValidationError as e:
             raise forms.ValidationError(e.message)
 
