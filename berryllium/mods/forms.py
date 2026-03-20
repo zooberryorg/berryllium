@@ -5,8 +5,8 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
-from ..shared.widgets import PillCheckboxSelectMultiple
-from .models import FileUpload
+from berryllium.shared.widgets import PillCheckboxSelectMultiple
+from berryllium.mods.models import FileUpload, FileGroup
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
@@ -200,6 +200,14 @@ class FileGroupForm(forms.Form):
     Step 3 of the file upload form, which handles the file organization
     into groups.
     """
+
+    class Meta:
+        model = FileGroup
+        fields = ["group_name", "description"]
+        help_texts = {
+            "group_name": "Name of the file group (e.g., Main Files, etc.)",
+            "description": "Optional description for this file group.",
+        }
 
     group_name = forms.CharField(
         required=False,

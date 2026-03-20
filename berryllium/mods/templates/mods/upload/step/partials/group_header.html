@@ -3,6 +3,7 @@
         <div class="flex items-center gap-1">{% include "mods/upload/step/partials/group_actions.html" %}</div>
         <div class="h-full"></div>
     </div>
+    {{ group_formset.management_form }}
     <input type="text"
            name="group_name_{{ forloop.counter0 }}"
            value="{{ group.name }}"
