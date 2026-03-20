@@ -55,3 +55,7 @@ def hx_toggle_group_manager(request):
     isToggled = 'group_manager_toggle' in request.POST
     request.session["group_manager_toggled"] = isToggled
     return HttpResponse()
+
+@require_POST
+def hx_update_file_title(request, file_id):
+    pass
