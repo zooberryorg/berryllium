@@ -23,5 +23,14 @@ urlpatterns = [
     path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
     # HTMX endpoints
     path("mods/validate-url/", hx.hx_process_url_field, name="hx_process_url_field"),
-    path("mods/toggle-group-manager/", hx.hx_toggle_group_manager, name="hx_toggle_group_manager"),
+    path(
+        "mods/toggle-group-manager/",
+        hx.hx_toggle_group_manager,
+        name="hx_toggle_group_manager",
+    ),
+    path(
+        "mods/update-file-title/<int:file_id>/",
+        hx.hx_update_file_title,
+        name="hx_update_file_title",
+    ),
 ]

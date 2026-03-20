@@ -5,8 +5,8 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
-from ..shared.widgets import PillCheckboxSelectMultiple
-from .models import FileUpload
+from berryllium.shared.widgets import PillCheckboxSelectMultiple
+from berryllium.mods.models import FileUpload, FileGroup
 
 ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
@@ -195,18 +195,28 @@ class FileUploadForm(forms.Form):
         return cleaned_data
 
 
-class FileGroupForm(forms.Form):
+class FileGroupForm(forms.ModelForm):
     """
     Step 3 of the file upload form, which handles the file organization
     into groups.
     """
 
+    # note: fields here need to match the fields in the FileGroup model
+    class Meta:
+        model = FileGroup
+        fields = ["name", "description"]
+        help_texts = {
+            "name": "Name of the file group (e.g., Main Files, etc.)",
+            "description": "Optional description for this file group.",
+        }
+
     name = forms.CharField(
+        required=False,
         max_length=255,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
-                "class": "bg-transparent text-white font-medium w-full focus:outline-none",
+                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",
             }
         ),
     )
@@ -214,12 +224,39 @@ class FileGroupForm(forms.Form):
         required=False,
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Group description (optional)",
-                "class": "zb-textarea",
+                "placeholder": "Group description",
+                "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10",
             }
         ),
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
+
+
+class SingleFileForm(forms.Form):
+    """
+    This form is for editing single files within a FileGroup.
+    """
+
+    title = forms.CharField(
+        required=False,
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "File title",
+                "class": "bg-transparent text-white text-sm w-full focus:outline-none",
+            }
+        ),
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "placeholder": "File description (optional)",
+                "class": "zb-textarea",
+                "rows": 2,
+            }
+        ),
+    )
 
 
 class FileDetailsForm(forms.ModelForm):

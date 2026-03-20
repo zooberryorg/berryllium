@@ -2,11 +2,17 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 
-from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm
-from berryllium.mods.models import Mod, FileGroup
+from berryllium.mods.forms import (
+    FileUploadForm,
+    MetadataForm,
+    FileGroupForm,
+    SingleFileForm,
+)
+from berryllium.mods.models import Mod, FileGroup, FileUpload
 from berryllium.mods.services import init_context, upload_file
-from berryllium.mods.settings import NAVIGATION
+from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
 def upload_mod(request):
@@ -19,7 +25,7 @@ def upload_mod(request):
         "mods/upload/base.html",
         {
             "form": FileUploadForm(),
-            "mod_navigation": NAVIGATION,
+            "mod_navigation": UPLOAD_NAVIGATION,
         },
     )
 
@@ -183,17 +189,36 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    mod_id = request.session.get("session_id")
+    # TODO: iterative through formsets to validate forms
+    FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
+    SingleFileFormset = inlineformset_factory(
+        FileGroup, FileUpload, fields=["title", "description"], extra=0
+    )
 
+    group_objects = FileGroup.objects.filter(mod_id=mod_id)
+    group_formset = FileGroupFormset(queryset=group_objects)
+
+    # pair each file group with its set of files
+    file_groups = [
+        (form, SingleFileFormset(instance=form.instance))
+        for form in group_formset.forms
+    ]
+
+    # TODO: address likely duplication with block above
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
     uploaded_files = mod.files.all() if mod else []
     context["uploaded_files"] = uploaded_files
     context["file_groups"] = [fg for fg in mod.file_groups.all()] if mod else []
-    print(f"Uploaded files for mod {mod_id}: {[f.filename for f in uploaded_files]}")
-    print(f"File groups for mod {mod_id}: {[fg.name for fg in context['file_groups']]}")
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
+        form = FileGroupForm(request.POST)
+
+        # if form isn't valid, return same page with errors
+        if not form.is_valid():
+            return render(request, "mods/upload/step/3.html", context)
         action = request.POST.get("action")
 
         if action in ("next", "previous"):
@@ -203,27 +228,8 @@ def upload_step3(request):
                 return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
-    groups_init = request.session.get("file_groups", [])
-    if not groups_init:
-        groups_init = [{"name": "Files", "description": "", "order": 0}]
-
-    existing_file_details = request.session.get("file_details", [])
-    by_id = {fd.get("id"): fd for fd in existing_file_details if fd.get("id")}
-
-    files_init = []
-    for i, uf in enumerate(uploaded_files):
-        fd = by_id.get(uf.id, {})
-        files_init.append(
-            {
-                "id": uf.id,
-                "filename": uf.filename,
-                "title": fd.get("title", ""),
-                "description": fd.get("description", ""),
-                "group_index": int(fd.get("group_index", 0)),
-                "file_order": int(fd.get("file_order", i)),
-            }
-        )
-
+    context["file_groups"] = file_groups
+    context["group_formset"] = group_formset
     return render(request, "mods/upload/step/3.html", context)
 
 
