@@ -74,6 +74,14 @@
     @apply transition-all duration-200;
   }
 
+  :is(.zb-actions) {
+    @apply text-pine-300 bg-pine-600/90;
+    @apply hover:text-gold-400/70 hover:border-pine-200/90;
+    @apply border border-600/90 rounded;
+    @apply px-2 py-1;
+    @apply cursor-pointer;
+  }
+
   /* Gradient text */
   .gradient-text {
     background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
