@@ -12,39 +12,45 @@ function navigationState({currentIndex = 1} = {}) {
         iconInactiveClass: 'text-gray-400',
         linkActiveBgClass: 'bg-gold-400/20',
         linkInactiveBgClass: 'bg-transparent',
-        updateNavigation() {
 
-        const navLinks = document.querySelectorAll('[x-ref^="navLink-"]');
+        updateIcon(link, {oldBg, newBg, oldIcon, newIcon}) {
+            // update inner div icon bg
+            const innerDiv = link.querySelector('div');
+            if (innerDiv) {
+                innerDiv.classList.remove(oldBg);
+                innerDiv.classList.add(newBg);
+                // update icon color
+                const icon = innerDiv.querySelector('i');
+                if (icon) {
+                    icon.classList.add(newIcon);
+                    icon.classList.remove(oldIcon);
+                }
+            }
+        },
+
+        updateNavigation() {
+            const navLinks = document.querySelectorAll('[x-ref^="navLink-"]');
             navLinks.forEach((link, idx) => {
                 if (idx == this.currentIndex ) {
                     // update link bg and text color
                     link.classList.add(...this.linkClasses);
-                    // update inner div icon bg
-                    const innerDiv = link.querySelector('div');
-                    if (innerDiv) {
-                        innerDiv.classList.remove(this.linkInactiveBgClass);
-                        innerDiv.classList.add(this.linkActiveBgClass);
-                        // update icon color
-                        const icon = innerDiv.querySelector('i');
-                        if (icon) {
-                            icon.classList.remove(this.iconInactiveClass);
-                            icon.classList.add(this.iconActiveClass);
-                        }
-                    }
+                    this.updateIcon(link, {
+                        oldBg: this.linkInactiveBgClass,
+                        newBg: this.linkActiveBgClass,
+                        oldIcon: this.iconInactiveClass,
+                        newIcon: this.iconActiveClass
+                    });
                 } else {
                     link.classList.remove(...this.linkClasses);
+                    this.updateIcon(link, {
+                        oldBg: this.linkActiveBgClass,
+                        newBg: this.linkInactiveBgClass,
+                        oldIcon: this.iconActiveClass,
+                        newIcon: this.iconInactiveClass
+                    });
 
-                    const innerDiv = link.querySelector('div');
-                    if (innerDiv) {
-                        innerDiv.classList.remove(this.linkActiveBgClass);
-                        const icon = innerDiv.querySelector('i');
-                        if (icon) {
-                            icon.classList.add(this.iconInactiveClass);
-                            icon.classList.remove(this.iconActiveClass);
-                        }
-                    }
                 }
-        });
+            });
         }
     }
 }
