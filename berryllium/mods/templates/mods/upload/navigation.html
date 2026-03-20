@@ -1,10 +1,7 @@
 <div class="space-y-1 text-sm">
     {% for link in mod_navigation %}
         <a href="{% url link.url %}"
-           x-ref="navLink-{{ forloop.counter }}"
-     x-data="navigationState({ currentIndex: Number($el.dataset.currentIndex) })"
-     data-current-index="{{ current_index }}"
-x-init="updateNavigation()"
+            x-ref="navLink-{{ forloop.counter0 }}"
            class="group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-gold-500/50 hover:to-gold-300/50 transition-all duration-200 border border-transparent hover:border-gold-300/30"
            hx-get="{% url link.url %}"
            hx-target="#upload-frame"

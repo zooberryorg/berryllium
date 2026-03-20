@@ -4,14 +4,13 @@ function navigationState({currentIndex = 1} = {}) {
         updateNavigation() {
         const navLinks = document.querySelectorAll('[x-ref^="navLink-"]');
             navLinks.forEach((link, idx) => {
-            if (idx == this.currentIndex - 1) {
+                console.log(`Updating nav link ${idx + 1}: currentIndex=${this.currentIndex}: text=${link.textContent.trim()}`);
+            if (idx == this.currentIndex ) {
                 link.classList.add('bg-pine-300', 'text-pine-900');
-                link.classList.remove('bg-pine-600', 'text-pine-300');
             } else {
                 link.classList.remove('bg-pine-300', 'text-pine-900');
-                link.classList.add('bg-pine-600', 'text-pine-300');
             }
-            });
+        });
         }
     }
 }
