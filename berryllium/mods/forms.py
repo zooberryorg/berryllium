@@ -207,7 +207,7 @@ class FileGroupForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
-                "class": "bg-transparent text-white font-medium w-full focus:outline-none",
+                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",
             }
         ),
     )
@@ -216,7 +216,7 @@ class FileGroupForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group description (optional)",
-                "class": "zb-textarea",
+                "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10",
             }
         ),
     )
