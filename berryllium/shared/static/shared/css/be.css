@@ -918,6 +918,12 @@
       background-color: color-mix(in oklab, var(--color-gold-400) 10%, transparent);
     }
   }
+  .bg-gold-400\/20 {
+    background-color: color-mix(in srgb, #d6b15d 20%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-gold-400) 20%, transparent);
+    }
+  }
   .bg-gold-400\/30 {
     background-color: color-mix(in srgb, #d6b15d 30%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1322,6 +1328,9 @@
   }
   .text-gold-200 {
     color: var(--color-gold-200);
+  }
+  .text-gold-300 {
+    color: var(--color-gold-300);
   }
   .text-gold-400 {
     color: var(--color-gold-400);
