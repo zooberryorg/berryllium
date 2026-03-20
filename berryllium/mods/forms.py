@@ -221,6 +221,30 @@ class FileGroupForm(forms.Form):
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
+class SingleFileForm(forms.Form):
+    """
+    This form is for editing single files within a FileGroup.
+    """
+
+    title = forms.CharField(
+        max_length=255,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "File title",
+                "class": "bg-transparent text-white text-sm w-full focus:outline-none",
+            }
+        ),
+    )
+    description = forms.CharField(
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "placeholder": "File description (optional)",
+                "class": "zb-textarea",
+                "rows": 2,
+            }
+        ),
+    )
 
 class FileDetailsForm(forms.ModelForm):
     group_index = forms.IntegerField(widget=forms.HiddenInput())
