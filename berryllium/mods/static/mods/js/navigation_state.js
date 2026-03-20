@@ -6,9 +6,9 @@ function navigationState({currentIndex = 1} = {}) {
             navLinks.forEach((link, idx) => {
                 console.log(`Updating nav link ${idx + 1}: currentIndex=${this.currentIndex}: text=${link.textContent.trim()}`);
             if (idx == this.currentIndex ) {
-                link.classList.add('bg-pine-300', 'text-pine-900');
+                link.classList.add('text-white', 'bg-gradient-to-r', 'from-gold-500/50', 'to-gold-300/50', 'border-gold-300/30');
             } else {
-                link.classList.remove('bg-pine-300', 'text-pine-900');
+                link.classList.remove('text-white', 'bg-gradient-to-r', 'from-gold-500/50', 'to-gold-300/50', 'border-gold-300/30');
             }
         });
         }
