@@ -7,12 +7,16 @@
     {% for group_form, file_forms in file_groups %}
         <input type="text"
             name="{{ group_form.prefix }}-name"
-            value="{{ group_form.cleaned_data.name }}"
+            {% if group_form.instance.name != None %}
+            value="{{ group_form.instance.name }}"
+            {% endif %}
             class="pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10"
             placeholder="Group Name">
         <input type="text"
             name="{{ group_form.prefix }}-description"
-            value="{{ group_form.cleaned_data.description }}"
+            {% if group_form.instance.description != None %}
+            value="{{ group_form.instance.description }}"
+            {% endif %}
             class="px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
             placeholder="Group Description">
         {% for file_form in file_forms %}
