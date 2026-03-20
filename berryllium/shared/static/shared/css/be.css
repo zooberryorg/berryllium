@@ -1703,6 +1703,19 @@
       box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     }
   }
+  .peer-focus\:ring-gold-400\/50 {
+    &:is(:where(.peer):focus ~ *) {
+      --tw-ring-color: color-mix(in srgb, #d6b15d 50%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        --tw-ring-color: color-mix(in oklab, var(--color-gold-400) 50%, transparent);
+      }
+    }
+  }
+  .peer-focus\:ring-gold-500 {
+    &:is(:where(.peer):focus ~ *) {
+      --tw-ring-color: var(--color-gold-500);
+    }
+  }
   .peer-focus\:outline-none {
     &:is(:where(.peer):focus ~ *) {
       --tw-outline-style: none;
