@@ -29,9 +29,9 @@ function navigationState({currentIndex = 1} = {}) {
         },
 
         updateNavigation() {
-            const navLinks = document.querySelectorAll('[x-ref^="navLink-"]');
+            const navLinks = document.querySelectorAll('[data-nav-link]');
             navLinks.forEach((link, idx) => {
-                if (idx == this.currentIndex ) {
+                if (idx === this.currentIndex ) {
                     // update link bg and text color
                     link.classList.add(...this.linkClasses);
                     this.updateIcon(link, {
