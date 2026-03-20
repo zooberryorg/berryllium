@@ -5,6 +5,7 @@
     </div>
     {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
+        {{ group_form.name }}
         <input type="text"
             name="{{ group_form.prefix }}-name"
             {% if group_form.instance.name != None %}

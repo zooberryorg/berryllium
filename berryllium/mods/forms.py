@@ -201,15 +201,16 @@ class FileGroupForm(forms.ModelForm):
     into groups.
     """
 
+    # note: fields here need to match the fields in the FileGroup model
     class Meta:
         model = FileGroup
-        fields = ["group_name", "description"]
+        fields = ["name", "description"]
         help_texts = {
-            "group_name": "Name of the file group (e.g., Main Files, etc.)",
+            "name": "Name of the file group (e.g., Main Files, etc.)",
             "description": "Optional description for this file group.",
         }
 
-    group_name = forms.CharField(
+    name = forms.CharField(
         required=False,
         max_length=255,
         widget=forms.TextInput(
