@@ -236,6 +236,12 @@ class FileGroupForm(forms.ModelForm):
             MinLengthValidator(4)(self.cleaned_data["name"])
         except ValidationError as e:
             raise forms.ValidationError(e.message)
+        try:
+            MaxLengthValidator(60)(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+
+
         return self.cleaned_data["name"]
 
 class SingleFileForm(forms.Form):
