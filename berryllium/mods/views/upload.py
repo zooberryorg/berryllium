@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.forms import formset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 
 from berryllium.mods.forms import (
     FileUploadForm,
@@ -10,7 +10,7 @@ from berryllium.mods.forms import (
     FileGroupForm,
     SingleFileForm,
 )
-from berryllium.mods.models import Mod, FileGroup
+from berryllium.mods.models import Mod, FileGroup, FileUpload
 from berryllium.mods.services import init_context, upload_file
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
@@ -190,8 +190,8 @@ def upload_step3(request):
     """
     context = init_context(current_index=2, form=FileGroupForm())
     # TODO: iterative through formsets to validate forms
-    FileGroupFormset = formset_factory(FileGroupForm, extra=0)
-    SingleFileFormset = formset_factory(SingleFileForm, extra=0)
+    FileGroupFormset = formset_factory(FileGroupForm, fields=["group_name", "group_description"], extra=0)
+    SingleFileFormset = inlineformset_factory(FileGroup, FileUpload, fields=["title", "description"], extra=0)
     filegroupforms = FileGroupFormset(prefix="groups")
     singlefileforms = SingleFileFormset(prefix="files")
 
@@ -217,7 +217,8 @@ def upload_step3(request):
                 return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
-
+    context["filegroupforms"] = filegroupforms
+    context["singlefileforms"] = singlefileforms
     return render(request, "mods/upload/step/3.html", context)
 
 
