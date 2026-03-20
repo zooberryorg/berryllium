@@ -4,7 +4,12 @@ from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.forms import formset_factory
 
-from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm, SingleFileForm
+from berryllium.mods.forms import (
+    FileUploadForm,
+    MetadataForm,
+    FileGroupForm,
+    SingleFileForm,
+)
 from berryllium.mods.models import Mod, FileGroup
 from berryllium.mods.services import init_context, upload_file
 from berryllium.mods.settings import UPLOAD_NAVIGATION

@@ -222,6 +222,7 @@ class FileGroupForm(forms.Form):
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
+
 class SingleFileForm(forms.Form):
     """
     This form is for editing single files within a FileGroup.
@@ -247,6 +248,7 @@ class SingleFileForm(forms.Form):
             }
         ),
     )
+
 
 class FileDetailsForm(forms.ModelForm):
     group_index = forms.IntegerField(widget=forms.HiddenInput())

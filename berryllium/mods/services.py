@@ -15,7 +15,9 @@ def init_context(current_index, form):
     context = {
         "form": form,
     }
-    progress_bar = generate_progress_bar(current_index, total_steps=len(UPLOAD_NAVIGATION))
+    progress_bar = generate_progress_bar(
+        current_index, total_steps=len(UPLOAD_NAVIGATION)
+    )
 
     return context | progress_bar
 

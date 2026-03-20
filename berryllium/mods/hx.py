@@ -6,7 +6,6 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
 
-
 @require_POST
 def hx_process_url_field(request):
     """HTMX endpoint to validate file URL field."""
@@ -49,12 +48,14 @@ def hx_process_url_field(request):
     # if valid, return empty response
     return HttpResponse()
 
+
 @require_POST
 def hx_toggle_group_manager(request):
     """HTMX endpoint to toggle file group manager visibility."""
-    isToggled = 'group_manager_toggle' in request.POST
+    isToggled = "group_manager_toggle" in request.POST
     request.session["group_manager_toggled"] = isToggled
     return HttpResponse()
+
 
 @require_POST
 def hx_update_file_title(request, file_id):
