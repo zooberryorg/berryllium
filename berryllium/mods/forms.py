@@ -1,7 +1,7 @@
 import os
 from django import forms
 from django.forms import formset_factory
-from django.core.validators import URLValidator
+from django.core.validators import URLValidator, MaxLengthValidator, MinLengthValidator
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
@@ -231,6 +231,12 @@ class FileGroupForm(forms.ModelForm):
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
+    def clean_name(self):
+        try:
+            MinLengthValidator(4)(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+        return self.cleaned_data["name"]
 
 class SingleFileForm(forms.Form):
     """
