@@ -2,8 +2,9 @@
 {% load static %}
 {% block title %}Upload{% endblock %}
 {% block content %}
+    <script src="{% static 'mods/js/navigation_state.js' %}"></script>
     <div class="container px-4 py-8"
-        x-data="navigateState()"
+        x-data="navigationState()"
          hx-trigger="load"
          hx-swap="innerHTML"
          hx-target="#upload-frame"
