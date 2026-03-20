@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm
 from berryllium.mods.models import Mod, FileGroup
 from berryllium.mods.services import init_context, upload_file
-from berryllium.mods.settings import NAVIGATION
+from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
 def upload_mod(request):
@@ -19,7 +19,7 @@ def upload_mod(request):
         "mods/upload/base.html",
         {
             "form": FileUploadForm(),
-            "mod_navigation": NAVIGATION,
+            "mod_navigation": UPLOAD_NAVIGATION,
         },
     )
 

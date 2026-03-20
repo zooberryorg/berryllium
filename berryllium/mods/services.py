@@ -1,7 +1,7 @@
 import os
 import uuid
 
-from berryllium.mods.settings import NAVIGATION
+from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
 from berryllium.mods.models import FileGroup, FileUpload
 
@@ -15,7 +15,7 @@ def init_context(current_index, form):
     context = {
         "form": form,
     }
-    progress_bar = generate_progress_bar(current_index, total_steps=len(NAVIGATION))
+    progress_bar = generate_progress_bar(current_index, total_steps=len(UPLOAD_NAVIGATION))
 
     return context | progress_bar
 
@@ -25,7 +25,7 @@ def generate_progress_bar(current_index, total_steps):
     Generates progress bar data for the upload steps.
     """
 
-    title = f"Step {current_index + 1} of {total_steps}: {NAVIGATION[current_index]['name']}"
+    title = f"Step {current_index + 1} of {total_steps}: {UPLOAD_NAVIGATION[current_index]['name']}"
 
     completed_range = list(range(current_index + 1))
     remaining_range = list(range(current_index + 1, total_steps))
