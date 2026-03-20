@@ -35,6 +35,7 @@ def generate_progress_bar(current_index, total_steps):
         "completed": completed_range,
         "remaining": remaining_range,
         "total_steps": total_steps,
+        "current_index": current_index,
     }
 
 
