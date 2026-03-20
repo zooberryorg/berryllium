@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mods', '0004_alter_fileupload_url'),
+        ("mods", "0004_alter_fileupload_url"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mod',
-            name='prlicense',
+            model_name="mod",
+            name="prlicense",
             field=models.CharField(blank=True, max_length=100),
         ),
     ]
