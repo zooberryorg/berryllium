@@ -189,6 +189,7 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     mod_id = request.session.get("session_id")
     # TODO: iterative through formsets to validate forms
     FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
@@ -229,7 +230,6 @@ def upload_step3(request):
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_groups
     context["group_formset"] = group_formset
-    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     return render(request, "mods/upload/step/3.html", context)
 
 

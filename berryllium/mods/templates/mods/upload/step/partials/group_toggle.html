@@ -11,6 +11,7 @@
     class="w-80 inline-flex cursor-pointer p-4 bg-pine-600/15 border border-white/5 rounded-xl shadow-xs ml-6 mb-4 items-center hover:bg-gold-400/10">
     <input type="checkbox"
            x-model="toggled"
+           value="{{ group_manager_toggled|yesno:'true,false' }}"
            id="group_manager_toggle"
            name="group_manager_toggle"
            class="sr-only peer"
