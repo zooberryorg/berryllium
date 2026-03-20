@@ -1756,28 +1756,10 @@
       border-radius: calc(infinity * 1px);
     }
   }
-  .after\:border-pine-200 {
-    &::after {
-      content: var(--tw-content);
-      border-color: var(--color-pine-200);
-    }
-  }
-  .after\:border-pine-500 {
-    &::after {
-      content: var(--tw-content);
-      border-color: var(--color-pine-500);
-    }
-  }
   .after\:bg-pine-500 {
     &::after {
       content: var(--tw-content);
       background-color: var(--color-pine-500);
-    }
-  }
-  .after\:bg-white {
-    &::after {
-      content: var(--tw-content);
-      background-color: var(--color-white);
     }
   }
   .after\:transition-all {
