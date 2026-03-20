@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
+from django.forms import formset_factory
 
 from berryllium.mods.forms import FileUploadForm, MetadataForm, FileGroupForm, SingleFileForm
 from berryllium.mods.models import Mod, FileGroup
@@ -183,6 +184,8 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    file_group_forms = formset_factory(FileGroupForm, extra=0)
+    single_file_forms = formset_factory(SingleFileForm, extra=0)
 
     mod_id = request.session.get("session_id")
     mod = Mod.objects.filter(id=mod_id).first()
