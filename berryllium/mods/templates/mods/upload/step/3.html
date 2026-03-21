@@ -13,11 +13,21 @@
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
-    <div x-show="toggled" x-ref="fileGroups">
+    <div x-show="toggled" x-ref="fileGroups" id="fileGroups">
         {{ group_formset.management_form }}
-        {% for group in file_groups %}
-            {% include "mods/upload/step/partials/group_base.html" with group=group group_index=group_index %}
+        {% for group, files in file_groups %}
+            {% include "mods/upload/step/partials/group_header.html" with group=group files=files %}
         {% endfor %}
+        <div class="flex justify-end w-full px-6 mb-4">
+            <button class="zb-action flex items-center justify-center"
+                    type="button"
+                    hx-post="{% url 'hx_add_filegroup_form' %}"
+                    hx-target="#fileGroups"
+                    hx-swap="beforeend"
+                    id="addGroup">
+                <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
+            </button>
+        </div>
     </div>
 </div>
 {% include "mods/upload/actions.html" %}

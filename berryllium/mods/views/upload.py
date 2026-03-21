@@ -1,3 +1,5 @@
+from importlib.resources import files
+
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
@@ -225,18 +227,8 @@ def upload_step3(request):
             if request.POST.get("action") == "next":
                 return redirect("upload_step4")
         else:
-            file_groups = [
-                (form, SingleFileFormset(instance=form.instance))
-                for form in group_formset.forms
-            ]
-            context["group_formset"] = group_formset
             context["file_groups"] = file_groups
-            if group_formset.errors:
-                print("Group formset errors:", group_formset.errors)
-            else:
-                print(
-                    "Group formset is not valid, but no errors found. This may indicate a problem with form validation logic."
-                )
+            context["group_formset"] = group_formset
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
