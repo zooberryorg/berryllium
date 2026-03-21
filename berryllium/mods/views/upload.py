@@ -202,7 +202,7 @@ def upload_step3(request):
     group_formset = FileGroupFormset(queryset=group_objects)
 
     # pair each file group with its set of files
-    file_groups = [
+    files = [
         (form, SingleFileFormset(instance=form.instance))
         for form in group_formset.forms
     ]
@@ -226,16 +226,12 @@ def upload_step3(request):
                 return redirect("upload_step4")
         else:            
             context["file_groups"] = group_formset
-            if group_formset.errors:
-                print("Group formset errors:", group_formset.errors)
-            else:
-                print(
-                    "Group formset is not valid, but no errors found. This may indicate a problem with form validation logic."
-                )
+            context["files"] = files
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = group_formset
+    context["files"] = files
     return render(request, "mods/upload/step/3.html", context)
 
 
