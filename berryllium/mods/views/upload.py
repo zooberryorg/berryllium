@@ -226,7 +226,7 @@ def upload_step3(request):
             # all valid, go to next step
             if request.POST.get("action") == "next":
                 return redirect("upload_step4")
-        else:            
+        else:
             context["file_groups"] = file_groups
             context["group_formset"] = group_formset
             return render(request, "mods/upload/step/3.html", context)

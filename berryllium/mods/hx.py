@@ -176,6 +176,7 @@ def hx_validate_singlefile_description(request, file_id, prefix_id):
 
     return HttpResponse()
 
+
 @require_POST
 def hx_add_filegroup_form(request):
     """HTMX endpoint to add a new file group form."""
