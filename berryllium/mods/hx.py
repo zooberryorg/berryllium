@@ -1,6 +1,5 @@
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm
-from berryllium.mods.settings import MAX_TEXTFIELD_LENGTH, MIN_TEXTFIELD_LENGTH
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST

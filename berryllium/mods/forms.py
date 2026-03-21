@@ -13,12 +13,7 @@ from django.core.exceptions import ValidationError
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
-
-ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
-ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
-MAX_SUMMARY_LENGTH = 200
-
+from berryllium.mods.settings import *
 
 class MetadataForm(forms.Form):
     """
@@ -28,7 +23,7 @@ class MetadataForm(forms.Form):
     """
 
     title = forms.CharField(
-        max_length=200,
+        max_length=MAX_TEXTFIELD_LENGTH,
         required=True,
         widget=forms.TextInput(
             attrs={"class": "zb-input text-sm", "placeholder": "Enter title"}
@@ -87,8 +82,10 @@ class MetadataForm(forms.Form):
 
     def clean_summary(self):
         summary = self.cleaned_data.get("summary")
-        if len(summary) < 10:
-            raise forms.ValidationError("Summary must be at least 10 characters long.")
+        if len(summary) < MIN_TEXTFIELD_LENGTH:
+            raise forms.ValidationError(
+                f"Summary must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
         if len(summary) > MAX_SUMMARY_LENGTH:
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
@@ -229,7 +226,7 @@ class FileGroupForm(forms.ModelForm):
 
     name = forms.CharField(
         required=False,
-        max_length=255,
+        max_length=MAX_TEXTFIELD_LENGTH,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
@@ -252,13 +249,13 @@ class FileGroupForm(forms.ModelForm):
 
     def clean_name(self):
         try:
-            MinLengthValidator(4)(self.cleaned_data["name"])
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(self.cleaned_data["name"])
         except ValidationError:
             raise forms.ValidationError(
                 "Group name must be at least 4 characters long."
             )
         try:
-            MaxLengthValidator(60)(self.cleaned_data["name"])
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(self.cleaned_data["name"])
         except ValidationError:
             raise forms.ValidationError("Group name cannot exceed 60 characters.")
         try:
@@ -276,7 +273,7 @@ class SingleFileForm(forms.Form):
 
     title = forms.CharField(
         required=False,
-        max_length=255,
+        max_length=MAX_TEXTFIELD_LENGTH,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "File title",
