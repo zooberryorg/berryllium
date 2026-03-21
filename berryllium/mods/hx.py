@@ -62,18 +62,20 @@ def hx_toggle_group_manager(request):
 @require_POST
 def hx_validate_filegroup_name(request, fg_id, prefix_id):
     """HTMX endpoint to validate filegroup name field."""
-    print("Validating filegroup name...")
-    print(f"Using prefix: {prefix_id} and file group id: {fg_id}")
     name = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
-    print(f"Received name: '{name}' with length {len(name)} and "f"field name: 'form-{fg_id}-name'")
 
-    if len(name) < MIN_TEXTFIELD_LENGTH:
-        error_message = f"Title must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+    
+    form = FileGroupForm(data={"name": name}, instance=FileGroup(id=fg_id))
+    form.is_valid()
+
+    errors = form.errors.get("name", [])
+    if errors:
         return render(
             request,
             "mods/upload/step/partials/hx_errors.html",
-            {"error_message": error_message},
+            {"error_message": errors[0]},
         )
+        
 
     # if valid, save to FileGroup draft
     file_group = FileGroup.objects.filter(id=fg_id).first()
