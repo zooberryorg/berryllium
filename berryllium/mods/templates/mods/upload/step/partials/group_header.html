@@ -4,6 +4,8 @@
         <div class="h-full"></div>
     </div>
     {% for group_form, file_forms in file_groups %}
+        {% comment %} This is required because our form has id and order fields we need to render {% endcomment %}
+        {% for hidden in group_form.hidden_fields %}{{ hidden }}{% endfor %}
         {{ group_form.name }}
         {% if group_form.name.errors %}
             <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>

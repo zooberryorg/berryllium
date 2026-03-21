@@ -9,6 +9,7 @@ from berryllium.mods.forms import (
     MetadataForm,
     FileGroupForm,
     SingleFileForm,
+    FileDetailsForm
 )
 from berryllium.mods.models import Mod, FileGroup, FileUpload
 from berryllium.mods.services import init_context, upload_file
@@ -245,8 +246,9 @@ def upload_step3(request):
 
 
 def upload_step4(request):
+
     return render(
-        request, "mods/upload/step/4.html", context=init_context(current_index=3)
+        request, "mods/upload/step/4.html", context=init_context(current_index=3, form=None)
     )
 
 
