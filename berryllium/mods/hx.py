@@ -84,13 +84,18 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
 
     return HttpResponse()
 
+
 @require_POST
 def hx_validate_filegroup_description(request, fg_id, prefix_id):
     """HTMX endpoint to validate filegroup description field."""
     print("Validating description for FileGroup ID:", fg_id)
-    description = request.POST.get("form-" + str(prefix_id) + "-description", "").strip()
+    description = request.POST.get(
+        "form-" + str(prefix_id) + "-description", ""
+    ).strip()
 
-    form = FileGroupForm(data={"description": description}, instance=FileGroup(id=fg_id))
+    form = FileGroupForm(
+        data={"description": description}, instance=FileGroup(id=fg_id)
+    )
     form.is_valid()
 
     errors = form.errors.get("description", [])
@@ -109,6 +114,7 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
 
     return HttpResponse()
 
+
 @require_POST
 def hx_validate_singlefile_title(request, file_id, prefix_id):
     """HTMX endpoint to validate single file title field."""
@@ -120,9 +126,13 @@ def hx_validate_singlefile_title(request, file_id, prefix_id):
     form.is_valid()
 
     errors = form.errors.get("title", [])
-    print("Validating title for FileUpload ID:", file_id
-          , "Title:", title
-        , "Errors:", errors
+    print(
+        "Validating title for FileUpload ID:",
+        file_id,
+        "Title:",
+        title,
+        "Errors:",
+        errors,
     )
     if errors:
         return render(
@@ -139,10 +149,13 @@ def hx_validate_singlefile_title(request, file_id, prefix_id):
 
     return HttpResponse()
 
+
 @require_POST
 def hx_validate_singlefile_description(request, file_id, prefix_id):
     """HTMX endpoint to validate single file description field."""
-    description = request.POST.get("fileform-" + str(prefix_id) + "-description", "").strip()
+    description = request.POST.get(
+        "fileform-" + str(prefix_id) + "-description", ""
+    ).strip()
 
     form = SingleFileForm(data={"description": description})
     form.is_valid()

@@ -33,4 +33,3 @@ COLLAPSIBLE_WIDGET_ATTRS = {
     ":value": "focused ? content : trimDisplayedContent()",
     "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
 }
-

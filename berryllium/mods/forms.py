@@ -15,6 +15,7 @@ from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
 from berryllium.mods.settings import *
 
+
 class MetadataForm(forms.Form):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -240,7 +241,7 @@ class FileGroupForm(forms.ModelForm):
 
         if len(name) == 0:
             return name
-        
+
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(name)
         except ValidationError:
@@ -259,13 +260,13 @@ class FileGroupForm(forms.ModelForm):
             raise forms.ValidationError("Group name cannot contain null characters.")
 
         return name
-    
+
     def clean_description(self):
         description = self.cleaned_data.get("description", "").strip()
 
         if len(description) == 0:
             return description
-        
+
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
         except ValidationError:
@@ -281,7 +282,9 @@ class FileGroupForm(forms.ModelForm):
         try:
             ProhibitNullCharactersValidator()(description)
         except ValidationError:
-            raise forms.ValidationError("Group description cannot contain null characters.")
+            raise forms.ValidationError(
+                "Group description cannot contain null characters."
+            )
 
         return description
 
@@ -319,7 +322,7 @@ class SingleFileForm(forms.Form):
 
         if len(title) == 0:
             return title
-        
+
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(title)
         except ValidationError:
@@ -338,14 +341,14 @@ class SingleFileForm(forms.Form):
             raise forms.ValidationError("File title cannot contain null characters.")
 
         return title
-    
+
     def clean_description(self):
         description = self.cleaned_data.get("description", "").strip()
         print("Validating description:", description)
 
         if len(description) == 0:
             return description
-        
+
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
         except ValidationError:
@@ -361,7 +364,9 @@ class SingleFileForm(forms.Form):
         try:
             ProhibitNullCharactersValidator()(description)
         except ValidationError:
-            raise forms.ValidationError("File description cannot contain null characters.")
+            raise forms.ValidationError(
+                "File description cannot contain null characters."
+            )
 
         return description
 
