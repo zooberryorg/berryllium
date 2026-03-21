@@ -24,6 +24,9 @@
             {% render_field group_form.description hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target="#group-description-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
             {{ group_form.description.errors }}
         </div>
+        <div class="text-red-500 text-sm" id="group-description-errors">
+            {% if group_form.description.errors %}{{ group_form.description.errors|join:", " }}{% endif %}
+        </div>
         {% for file_form in file_forms %}
             {% include "mods/upload/step/partials/group_files.html" with file_form=file_form.instance %}
         {% endfor %}
