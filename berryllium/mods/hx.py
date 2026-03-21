@@ -1,5 +1,5 @@
-from berryllium.mods.models import Mod
-from berryllium.mods.models import FileUpload, FileGroup
+from berryllium.mods.models import Mod, FileUpload, FileGroup
+from berryllium.mods.forms import FileGroupForm
 from berryllium.mods.settings import MAX_TEXTFIELD_LENGTH, MIN_TEXTFIELD_LENGTH
 
 from django.shortcuts import render, HttpResponse
@@ -60,10 +60,11 @@ def hx_toggle_group_manager(request):
 
 
 @require_POST
-def hx_validate_filegroup_name(request, fg_id):
+def hx_validate_filegroup_name(request, fg_id, prefix_id):
     """HTMX endpoint to validate filegroup name field."""
     print("Validating filegroup name...")
-    name = request.POST.get("form-" + str(fg_id) + "-name", "").strip()
+    print(f"Using prefix: {prefix_id} and file group id: {fg_id}")
+    name = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
     print(f"Received name: '{name}' with length {len(name)} and "f"field name: 'form-{fg_id}-name'")
 
     if len(name) < MIN_TEXTFIELD_LENGTH:
