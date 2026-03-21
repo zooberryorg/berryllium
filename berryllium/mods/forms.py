@@ -351,6 +351,32 @@ class SingleFileForm(forms.Form):
             raise forms.ValidationError("File title cannot contain null characters.")
 
         return title
+    
+    def clean_description(self):
+        description = self.cleaned_data.get("description", "").strip()
+        print("Validating description:", description)
+
+        if len(description) == 0:
+            return description
+        
+        try:
+            MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File description must be at least {MIN_SUMMARY_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File description cannot exceed {MAX_SUMMARY_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(description)
+        except ValidationError:
+            raise forms.ValidationError("File description cannot contain null characters.")
+
+        return description
 
 
 class FileDetailsForm(forms.ModelForm):

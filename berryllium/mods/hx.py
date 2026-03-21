@@ -138,3 +138,27 @@ def hx_validate_singlefile_title(request, file_id, prefix_id):
         file_upload.save()
 
     return HttpResponse()
+
+@require_POST
+def hx_validate_singlefile_description(request, file_id, prefix_id):
+    """HTMX endpoint to validate single file description field."""
+    description = request.POST.get("fileform-" + str(prefix_id) + "-description", "").strip()
+
+    form = SingleFileForm(data={"description": description})
+    form.is_valid()
+
+    errors = form.errors.get("description", [])
+    if errors:
+        return render(
+            request,
+            "mods/upload/step/partials/hx_errors.html",
+            {"error_message": errors[0]},
+        )
+
+    # if valid, save to FileUpload draft
+    file_upload = FileUpload.objects.filter(id=file_id).first()
+    if file_upload:
+        file_upload.description = description
+        file_upload.save()
+
+    return HttpResponse()
