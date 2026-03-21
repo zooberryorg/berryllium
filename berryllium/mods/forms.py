@@ -236,6 +236,7 @@ class FileGroupForm(forms.ModelForm):
         ),
     )
     description = forms.CharField(
+        max_length=MAX_SUMMARY_LENGTH,
         required=False,
         widget=forms.Textarea(
             attrs={
