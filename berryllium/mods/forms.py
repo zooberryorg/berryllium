@@ -1,7 +1,13 @@
 import os
 from django import forms
 from django.forms import formset_factory
-from django.core.validators import URLValidator
+from django.core.validators import (
+    URLValidator,
+    MaxLengthValidator,
+    MinLengthValidator,
+    FileExtensionValidator,
+    ProhibitNullCharactersValidator,
+)
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
@@ -134,7 +140,11 @@ class FileUploadForm(forms.Form):
             return cleaned_file
 
         # Validate file extension
-        if not self.valid_file_extension(cleaned_file.name, ALLOWED_EXTENSIONS):
+        try:
+            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(
+                cleaned_file.name
+            )
+        except ValidationError:
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
             )
@@ -201,6 +211,20 @@ class FileGroupForm(forms.ModelForm):
     into groups.
     """
 
+    COLLAPSIBLE_WIDGET_ATTRS = {
+        "@focus": "expand()",
+        "x-ref": "collapsibleField",
+        # if click away from field, collapse
+        "@blur": "collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()",
+        ":rows": "focused ? 4 : 1",
+        ":class": "focused ? 'h-32' : 'h-10'",
+        "@keydown.escape": "$el.blur()",
+        "@keydown.enter.prevent": "$el.blur()",
+        # watch for changes to content and update content state
+        ":value": "focused ? content : trimDisplayedContent()",
+        "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
+    }
+
     # note: fields here need to match the fields in the FileGroup model
     class Meta:
         model = FileGroup
@@ -222,14 +246,31 @@ class FileGroupForm(forms.ModelForm):
     )
     description = forms.CharField(
         required=False,
-        widget=forms.TextInput(
+        widget=forms.Textarea(
             attrs={
-                "placeholder": "Group description",
-                "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10",
+                "placeholder": "Enter group description",
+                "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 resize-none transition-all duration-200 ",
+                **COLLAPSIBLE_WIDGET_ATTRS,
             }
         ),
     )
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
+
+    def clean_name(self):
+        try:
+            MinLengthValidator(4)(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+        try:
+            MaxLengthValidator(60)(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+        try:
+            ProhibitNullCharactersValidator()(self.cleaned_data["name"])
+        except ValidationError as e:
+            raise forms.ValidationError(e.message)
+
+        return self.cleaned_data["name"]
 
 
 class SingleFileForm(forms.Form):

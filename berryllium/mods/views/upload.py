@@ -189,8 +189,9 @@ def upload_step3(request):
     Step 3 of upload form.
     """
     context = init_context(current_index=2, form=FileGroupForm())
+    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     mod_id = request.session.get("session_id")
-    # TODO: iterative through formsets to validate forms
+
     FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
     SingleFileFormset = inlineformset_factory(
         FileGroup, FileUpload, fields=["title", "description"], extra=0
@@ -205,27 +206,24 @@ def upload_step3(request):
         for form in group_formset.forms
     ]
 
-    # TODO: address likely duplication with block above
-    mod_id = request.session.get("session_id")
-    mod = Mod.objects.filter(id=mod_id).first()
-    uploaded_files = mod.files.all() if mod else []
-    context["uploaded_files"] = uploaded_files
-    context["file_groups"] = [fg for fg in mod.file_groups.all()] if mod else []
-
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
-        form = FileGroupForm(request.POST)
+        if request.POST.get("action") == "previous":
+            return redirect("upload_step2")
+        for group_form, file_formset in file_groups:
+            group_form = FileGroupForm(request.POST, instance=group_form.instance)
+            file_formset = SingleFileFormset(request.POST, instance=group_form.instance)
 
-        # if form isn't valid, return same page with errors
-        if not form.is_valid():
-            return render(request, "mods/upload/step/3.html", context)
-        action = request.POST.get("action")
+            if group_form.is_valid() and file_formset.is_valid():
+                group_form.save()
+                file_formset.save()
+            else:
+                context["group_formset"] = group_formset
+                context["file_groups"] = file_groups
+                return render(request, "mods/upload/step/3.html", context)
 
-        if action in ("next", "previous"):
-            if action == "previous":
-                return redirect("upload_step2")
-            if action == "next":
-                return redirect("upload_step4")
+        if request.POST.get("action") == "next":
+            return redirect("upload_step4")
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_groups

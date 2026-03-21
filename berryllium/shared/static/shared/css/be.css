@@ -59,6 +59,7 @@
     --radius-xl: 0.75rem;
     --radius-2xl: 1rem;
     --radius-3xl: 1.5rem;
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
     --ease-out: cubic-bezier(0, 0, 0.2, 1);
     --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --animate-spin: spin 1s linear infinite;
@@ -237,6 +238,9 @@
 @layer utilities {
   .pointer-events-none {
     pointer-events: none;
+  }
+  .collapse {
+    visibility: collapse;
   }
   .visible {
     visibility: visible;
@@ -435,6 +439,9 @@
   .h-2\.5 {
     height: calc(var(--spacing) * 2.5);
   }
+  .h-4 {
+    height: calc(var(--spacing) * 4);
+  }
   .h-5 {
     height: calc(var(--spacing) * 5);
   }
@@ -449,6 +456,12 @@
   }
   .h-12 {
     height: calc(var(--spacing) * 12);
+  }
+  .h-32 {
+    height: calc(var(--spacing) * 32);
+  }
+  .h-40 {
+    height: calc(var(--spacing) * 40);
   }
   .h-fit {
     height: fit-content;
@@ -572,6 +585,9 @@
   }
   .resize {
     resize: both;
+  }
+  .resize-none {
+    resize: none;
   }
   .appearance-none {
     appearance: none;
@@ -1335,6 +1351,12 @@
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
   }
+  .text-wrap {
+    text-wrap: wrap;
+  }
+  .whitespace-normal {
+    white-space: normal;
+  }
   .whitespace-nowrap {
     white-space: nowrap;
   }
@@ -1419,6 +1441,9 @@
       color: color-mix(in oklab, var(--color-red-400) 40%, transparent);
     }
   }
+  .text-red-500 {
+    color: var(--color-red-500);
+  }
   .text-red-600 {
     color: var(--color-red-600);
   }
@@ -1486,6 +1511,10 @@
     outline-style: var(--tw-outline-style);
     outline-width: 1px;
   }
+  .blur {
+    --tw-blur: blur(8px);
+    filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
+  }
   .filter {
     filter: var(--tw-blur,) var(--tw-brightness,) var(--tw-contrast,) var(--tw-grayscale,) var(--tw-hue-rotate,) var(--tw-invert,) var(--tw-saturate,) var(--tw-sepia,) var(--tw-drop-shadow,);
   }
@@ -1540,9 +1569,17 @@
     --tw-duration: 500ms;
     transition-duration: 500ms;
   }
+  .ease-in {
+    --tw-ease: var(--ease-in);
+    transition-timing-function: var(--ease-in);
+  }
   .ease-in-out {
     --tw-ease: var(--ease-in-out);
     transition-timing-function: var(--ease-in-out);
+  }
+  .ease-out {
+    --tw-ease: var(--ease-out);
+    transition-timing-function: var(--ease-out);
   }
   .select-none {
     -webkit-user-select: none;

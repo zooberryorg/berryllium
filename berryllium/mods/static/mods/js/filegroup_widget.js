@@ -1,5 +1,41 @@
-function fileGroups() {
+function textFieldExpand({ trimLen = 0, content = "" }) {
     return {
+        focused: false, // textfield is focused
+        content: content, // textfield content
+        trimLen: trimLen, // number of characters to show when not focused
+
+        expand() {
+            this.focused = true;
+        },
+
+        collapse() {
+            this.focused = false;
+        },
+
+        init() {
+            this.updateTrimLength(this.$refs.collapsibleField.offsetWidth);
+        },
+
+        trimDisplayedContent() {
+            if (this.content.length > trimLen) {
+                return this.content.slice(0, trimLen) + "...";
+            } else {
+                return this.content;
+            }
+        },
+
+        updateTrimLength(elwidth) {
+             // average width of a character in pixels
+            const avgCharWidth = 8;
+            this.trimLen = Math.floor(elwidth / avgCharWidth);
+            console.log("Updated trim length to: " + this.trimLen);
+        },
         
+    }
+}
+
+function toggleGroupManager({ toggled = false }) {
+    return {
+        toggled,
     }
 }

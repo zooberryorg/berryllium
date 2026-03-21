@@ -6,7 +6,13 @@
     {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
         {{ group_form.name }}
-        {{ group_form.description }}
+        {% if group_form.name.errors %}
+            <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>
+        {% endif %}
+        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })" x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
+            {{ group_form.description }}
+            {{ group_form.description.errors }}
+        </div>
         {% for file_form in file_forms %}
             {% include "mods/upload/step/partials/group_files.html" with file_form=file_form.instance %}
         {% endfor %}
