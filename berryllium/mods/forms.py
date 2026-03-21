@@ -248,22 +248,29 @@ class FileGroupForm(forms.ModelForm):
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
     def clean_name(self):
+        name = self.cleaned_data.get("name", "").strip()
+
+        if len(name) == 0:
+            return name
+        
         try:
-            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(self.cleaned_data["name"])
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(name)
         except ValidationError:
             raise forms.ValidationError(
-                "Group name must be at least 4 characters long."
+                f"Group name must be at least {MIN_TEXTFIELD_LENGTH} characters long."
             )
         try:
-            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(self.cleaned_data["name"])
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(name)
         except ValidationError:
-            raise forms.ValidationError("Group name cannot exceed 60 characters.")
+            raise forms.ValidationError(
+                f"Group name cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+            )
         try:
-            ProhibitNullCharactersValidator()(self.cleaned_data["name"])
+            ProhibitNullCharactersValidator()(name)
         except ValidationError:
             raise forms.ValidationError("Group name cannot contain null characters.")
 
-        return self.cleaned_data["name"]
+        return name
 
 
 class SingleFileForm(forms.Form):
