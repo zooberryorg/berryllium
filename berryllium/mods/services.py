@@ -7,7 +7,7 @@ from berryllium.mods.models import FileGroup, FileUpload
 from berryllium.mods.forms import FileGroupForm
 
 from django.core.files.storage import default_storage
-from django.forms import modelformset_factory, inlineformset_factory\
+from django.forms import modelformset_factory, inlineformset_factory
 
 
 def init_context(current_index, form):
@@ -88,17 +88,28 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
-def create_file_group(mod_id):
-    FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
-    SingleFileFormset = inlineformset_factory(
-        FileGroup, FileUpload, fields=["title", "description"], extra=0
+
+def create_filegroup_formsets(extra=0):
+    return (
+        modelformset_factory(FileGroup, form=FileGroupForm, extra=extra),
+        inlineformset_factory(
+            FileGroup, FileUpload, fields=["title", "description"], extra=extra
+        ),
     )
 
-    group_objects = FileGroup.objects.filter(mod_id=mod_id)
-    group_formset = FileGroupFormset(queryset=group_objects)
+
+def create_file_group(mod_id):
+    FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
+
+    filegroups = FileGroup.objects.filter(mod_id=mod_id)
+    group_formset = FileGroupFormset(queryset=filegroups)
 
     # pair each file group with its set of files
     return [
-        (form, SingleFileFormset(instance=form.instance))
-        for form in group_formset.forms
+        [
+            (filegroup_form, SingleFileFormset(instance=filegroup_form.instance))
+            for filegroup_form in group_formset.forms
+        ],
+        filegroups,
+        group_formset,
     ]
