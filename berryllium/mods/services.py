@@ -4,8 +4,10 @@ import uuid
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
 from berryllium.mods.models import FileGroup, FileUpload
+from berryllium.mods.forms import FileGroupForm
 
 from django.core.files.storage import default_storage
+from django.forms import modelformset_factory, inlineformset_factory\
 
 
 def init_context(current_index, form):
@@ -85,3 +87,18 @@ def upload_file(uploaded_file, mod_id=None):
     )
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
+
+def create_file_group(mod_id):
+    FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
+    SingleFileFormset = inlineformset_factory(
+        FileGroup, FileUpload, fields=["title", "description"], extra=0
+    )
+
+    group_objects = FileGroup.objects.filter(mod_id=mod_id)
+    group_formset = FileGroupFormset(queryset=group_objects)
+
+    # pair each file group with its set of files
+    return [
+        (form, SingleFileFormset(instance=form.instance))
+        for form in group_formset.forms
+    ]
