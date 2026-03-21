@@ -1,6 +1,5 @@
-function fileGroups({ toggled = false }) {
+function textFieldExpand() {
     return {
-        toggled: toggled, // default state for group mgr toggle
         focused: false, // textfield is focused
 
         expand() {
@@ -9,7 +8,13 @@ function fileGroups({ toggled = false }) {
 
         collapse() {
             this.focused = false;
-        }
+        },
         
+    }
+}
+
+function toggleGroupManager({ toggled = false }) {
+    return {
+        toggled,
     }
 }

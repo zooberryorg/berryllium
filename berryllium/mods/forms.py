@@ -218,14 +218,14 @@ class FileGroupForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
-                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",
+                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10 text-wrap ",
                 "@focus": "expand()",
                 # if click away from field, collapse
-                "x-model.blur": "collapse()",
+                "@blur": "collapse()",
                 ":class": "focused ? 'h-32' : 'h-10'",
+                "@keydown.escape": "$el.blur()",
+                "@keydown.enter.prevent": "$el.blur()",
                 
-                "@keydown.escape": "collapse()",
-                "@keydown.enter.prevent": "if($event.shiftKey) { this.focus() } else { $event.preventDefault() }",
             }
         ),
     )

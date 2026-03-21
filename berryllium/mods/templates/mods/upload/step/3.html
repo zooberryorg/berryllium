@@ -8,7 +8,7 @@
       hx-swap="innerHTML"
       enctype="multipart/form-data"
       hx-encoding="multipart/form-data"
-      x-data="fileGroups({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
+      x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
       x-ref="uploadForm">
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
