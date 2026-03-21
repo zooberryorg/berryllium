@@ -33,4 +33,9 @@ urlpatterns = [
         hx.hx_validate_filegroup_name,
         name="hx_validate_filegroup_name",
     ),
+    path(
+        "mods/update-file-description/<int:fg_id>/<int:prefix_id>/",
+        hx.hx_validate_filegroup_description,
+        name="hx_validate_filegroup_description",
+    ),    
 ]
