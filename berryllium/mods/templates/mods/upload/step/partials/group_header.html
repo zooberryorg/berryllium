@@ -9,39 +9,20 @@
         {% comment %} This is required because our form has id and order fields we need to render {% endcomment %}
         {% for hidden in group_form.hidden_fields %}{{ hidden }}{% endfor %}
         {% comment %} fileground url with file group id (not mod id) {% endcomment %}
-        {% url 'hx_validate_filegroup_name' fg_id=group_form.instance.id prefix_id=forloop.counter0 as validate_url %}
-        {{ validate_url|json_script:"validate-url" }}
+        {% url 'hx_validate_filegroup_name' fg_id=group_form.instance.id prefix_id=forloop.counter0 as name_endpoint %}
 
         {# djlint:off #}
-        {% render_field 
-            group_form.name hx-post=validate_url 
-            hx-trigger="input delay:500ms" 
-            hx-target="#group-name-errors" 
-            hx-swap="innerHTML" 
-            hx-on::after-swap="htmx.process(this)" 
-        %}
+        {% render_field group_form.name hx-post=name_endpoint hx-trigger="input delay:500ms" hx-target="#group-name-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
         {# djlint:on #}
         <div class="text-red-500 text-sm" id="group-name-errors">
             {% if group_form.name.errors %}{{ group_form.name.errors|join:", " }}{% endif %}
         </div>
 
-        {% url 'hx_validate_filegroup_description' fg_id=group_form.instance.id prefix_id=forloop.counter0 as validate_description_url %}
-        {# djlint:off #}
-        {% render_field 
-            group_form.description
-            x-data="textFieldExpand({ content: '{{ instance_value }}' })"
-            x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))"
-
-            hx-post=validate_description_url
-            hx-trigger="input delay:500ms" 
-            hx-target="#group-description-errors" 
-            hx-swap="innerHTML" 
-            hx-on::after-swap="htmx.process(this)" 
-        %}
-        {# djlint:on #}
-        <div class="text-red-500 text-sm" id="group-description-errors">
-            {% if group_form.description.errors %}{{ group_form.description.errors|join:", " }}{% endif %}
-        </div>
+        {% url 'hx_validate_filegroup_description' fg_id=group_form.instance.id prefix_id=forloop.counter0 as desc_endpoint %}
+        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })"
+             x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
+            {% render_field group_form.description hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target="#group-description-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
+            {{ group_form.description.errors }}
         </div>
         {% for file_form in file_forms %}
             {% include "mods/upload/step/partials/group_files.html" with file_form=file_form.instance %}
