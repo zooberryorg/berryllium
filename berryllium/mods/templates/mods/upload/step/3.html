@@ -18,6 +18,13 @@
         {% for group in file_groups %}
             {% include "mods/upload/step/partials/group_base.html" with group=group group_index=group_index %}
         {% endfor %}
+        <div class="flex justify-end w-full px-6 mb-4">
+            <button class="zb-action flex items-center justify-center"
+                    type="button"
+                    id="addGroup">
+                <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
+            </button>
+        </div>
     </div>
 </div>
 {% include "mods/upload/actions.html" %}
