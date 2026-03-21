@@ -238,7 +238,7 @@ class FileGroupForm(forms.ModelForm):
         name = self.cleaned_data.get("name", "").strip()
 
         if len(name) == 0:
-            return name
+            return None
 
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(name)
@@ -263,7 +263,7 @@ class FileGroupForm(forms.ModelForm):
         description = self.cleaned_data.get("description", "").strip()
 
         if len(description) == 0:
-            return description
+            return None
 
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
@@ -319,7 +319,7 @@ class SingleFileForm(forms.Form):
         print("Validating title:", title)
 
         if len(title) == 0:
-            return title
+            return None
 
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(title)
@@ -345,7 +345,7 @@ class SingleFileForm(forms.Form):
         print("Validating description:", description)
 
         if len(description) == 0:
-            return description
+            return None
 
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
