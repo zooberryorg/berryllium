@@ -315,6 +315,7 @@ class SingleFileForm(forms.Form):
         ),
     )
     description = forms.CharField(
+        max_length=MAX_SUMMARY_LENGTH,
         required=False,
         widget=forms.Textarea(
             attrs={
@@ -324,6 +325,32 @@ class SingleFileForm(forms.Form):
             }
         ),
     )
+
+    def clean_title(self):
+        title = self.cleaned_data.get("title", "").strip()
+        print("Validating title:", title)
+
+        if len(title) == 0:
+            return title
+        
+        try:
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(title)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File title must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(title)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File title cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(title)
+        except ValidationError:
+            raise forms.ValidationError("File title cannot contain null characters.")
+
+        return title
 
 
 class FileDetailsForm(forms.ModelForm):

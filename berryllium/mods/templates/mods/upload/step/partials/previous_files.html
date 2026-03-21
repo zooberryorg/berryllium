@@ -6,11 +6,11 @@
         <div class="space-y-2">
             {% for file in existing_files %}
                 <div data-file="{{ file.id }}"
-                     class="flex items-center justify-between bg-white/5 border border-white/10 rounded-lg px-4 py-3">
+                     class="flex items-center justify-between gap-2 w-full bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/50 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 focus:border-transparent hover:bg-pine-800">
                     <div class="flex items-center gap-3">
-                        <ion-icon name="document" class="text-xl text-pine-100"></ion-icon>
+                        <ion-icon name="document" class="text-xl text-pine-100/50"></ion-icon>
                         <div>
-                            <p class="text-white text-sm font-medium">{{ file.filename }}</p>
+                            <p class="text-white/70 text-sm font-medium">{{ file.filename }}</p>
                             <p class="text-white/50 text-xs">{{ file.size|filesizeformat }}</p>
                         </div>
                     </div>
@@ -20,8 +20,8 @@
                             hx-swap="outerHTML"
                             @click="updateQueueState()"
                             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                            class="text-red-400/40 hover:text-red-400 p-1 cursor-pointer p-1 rounded-md border border-red-400/40 hover:border-red-400 transition items-center flex gap-1">
-                        <ion-icon name="trash" class="text-xl align-middle"></ion-icon>
+                            class="zb-action-delete">
+                        <ion-icon name="trash"></ion-icon>
                     </button>
                 </div>
             {% endfor %}
