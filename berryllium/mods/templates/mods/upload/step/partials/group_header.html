@@ -11,7 +11,15 @@
         {% comment %} fileground url with file group id (not mod id) {% endcomment %}
         {% url 'hx_validate_filegroup_name' fg_id=group_form.instance.id prefix_id=forloop.counter0 as name_endpoint %}
         {# djlint:off #}
-        {% render_field group_form.name hx-post=name_endpoint hx-trigger="input delay:500ms" hx-target="#group-name-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
+        {% render_field 
+            group_form.name 
+            @keydown.escape="$el.blur()"
+             @keydown.enter.prevent="$el.blur()"  
+             hx-post=name_endpoint hx-trigger="input delay:500ms" 
+             hx-target="#group-name-errors" 
+             hx-swap="innerHTML" 
+             hx-on::after-swap="htmx.process(this)" 
+        %}
         {# djlint:on #}
         <div class="text-red-500 text-sm" id="group-name-errors">
             {% if group_form.name.errors %}{{ group_form.name.errors|join:", " }}{% endif %}
@@ -19,7 +27,14 @@
         {% url 'hx_validate_filegroup_description' fg_id=group_form.instance.id prefix_id=forloop.counter0 as desc_endpoint %}
         <div x-data="textFieldExpand({ content: '{{ instance_value }}', ref: 'collapsibleGroupDesc' })"
              x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
-            {% render_field group_form.description hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target="#group-description-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
+            {% render_field 
+                group_form.description 
+                hx-post=desc_endpoint 
+                hx-trigger="input delay:500ms" 
+                hx-target="#group-description-errors" 
+                hx-swap="innerHTML" 
+                hx-on::after-swap="htmx.process(this)" 
+            %}
             {{ group_form.description.errors }}
         </div>
         <div class="text-red-500 text-sm" id="group-description-errors">
