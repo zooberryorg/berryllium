@@ -175,3 +175,21 @@ def hx_validate_singlefile_description(request, file_id, prefix_id):
         file_upload.save()
 
     return HttpResponse()
+
+@require_POST
+def hx_add_filegroup_form(request):
+    """HTMX endpoint to add a new file group form."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        return HttpResponse(status=400)
+
+    # create new FileGroup draft
+    new_group = FileGroup.objects.create(mod_id=mod_id, name="New File Group")
+
+    # render the new form HTML and return
+    group_index = request.POST.get("group_index", 0)  # get current index from request
+    return render(
+        request,
+        "mods/upload/step/partials/group_base.html",
+        {"group": (new_group, []), "group_index": group_index},
+    )
