@@ -20,3 +20,16 @@ MAX_SUMMARY_LENGTH = 200
 ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+
+COLLAPSIBLE_WIDGET_ATTRS = {
+    "@focus": "expand()",
+    # if click away from field, collapse
+    "@blur": "collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()",
+    ":rows": "focused ? 4 : 1",
+    ":class": "focused ? 'h-32' : 'h-10'",
+    "@keydown.escape": "$el.blur()",
+    "@keydown.enter.prevent": "$el.blur()",
+    # watch for changes to content and update content state
+    ":value": "focused ? content : trimDisplayedContent()",
+    "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
+}

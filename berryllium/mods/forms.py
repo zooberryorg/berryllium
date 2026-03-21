@@ -15,6 +15,7 @@ from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
 from berryllium.mods.settings import *
 
+
 class MetadataForm(forms.Form):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -201,20 +202,6 @@ class FileGroupForm(forms.ModelForm):
     into groups.
     """
 
-    COLLAPSIBLE_WIDGET_ATTRS = {
-        "@focus": "expand()",
-        "x-ref": "collapsibleField",
-        # if click away from field, collapse
-        "@blur": "collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()",
-        ":rows": "focused ? 4 : 1",
-        ":class": "focused ? 'h-32' : 'h-10'",
-        "@keydown.escape": "$el.blur()",
-        "@keydown.enter.prevent": "$el.blur()",
-        # watch for changes to content and update content state
-        ":value": "focused ? content : trimDisplayedContent()",
-        "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
-    }
-
     # note: fields here need to match the fields in the FileGroup model
     class Meta:
         model = FileGroup
@@ -241,6 +228,7 @@ class FileGroupForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 "placeholder": "Enter group description",
+                "x-ref": "collapsibleGroupDesc",
                 "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 resize-none transition-all duration-200 ",
                 **COLLAPSIBLE_WIDGET_ATTRS,
             }
@@ -253,7 +241,7 @@ class FileGroupForm(forms.ModelForm):
 
         if len(name) == 0:
             return name
-        
+
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(name)
         except ValidationError:
@@ -272,13 +260,13 @@ class FileGroupForm(forms.ModelForm):
             raise forms.ValidationError("Group name cannot contain null characters.")
 
         return name
-    
+
     def clean_description(self):
         description = self.cleaned_data.get("description", "").strip()
 
         if len(description) == 0:
             return description
-        
+
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
         except ValidationError:
@@ -294,7 +282,9 @@ class FileGroupForm(forms.ModelForm):
         try:
             ProhibitNullCharactersValidator()(description)
         except ValidationError:
-            raise forms.ValidationError("Group description cannot contain null characters.")
+            raise forms.ValidationError(
+                "Group description cannot contain null characters."
+            )
 
         return description
 
@@ -320,8 +310,8 @@ class SingleFileForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 "placeholder": "File description (optional)",
-                "class": "zb-textarea",
-                "rows": 2,
+                "class": "zb-textarea transition-all duration-200",
+                **COLLAPSIBLE_WIDGET_ATTRS,
             }
         ),
     )
@@ -332,7 +322,7 @@ class SingleFileForm(forms.Form):
 
         if len(title) == 0:
             return title
-        
+
         try:
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(title)
         except ValidationError:
@@ -351,14 +341,14 @@ class SingleFileForm(forms.Form):
             raise forms.ValidationError("File title cannot contain null characters.")
 
         return title
-    
+
     def clean_description(self):
         description = self.cleaned_data.get("description", "").strip()
         print("Validating description:", description)
 
         if len(description) == 0:
             return description
-        
+
         try:
             MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
         except ValidationError:
@@ -374,7 +364,9 @@ class SingleFileForm(forms.Form):
         try:
             ProhibitNullCharactersValidator()(description)
         except ValidationError:
-            raise forms.ValidationError("File description cannot contain null characters.")
+            raise forms.ValidationError(
+                "File description cannot contain null characters."
+            )
 
         return description
 
