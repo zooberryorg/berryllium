@@ -212,7 +212,7 @@ def upload_step3(request):
             return redirect("upload_step2")
 
         # get formset data and validate
-        group_formset = FileGroupFormset(request.POST, queryset=group_objects)    
+        group_formset = FileGroupFormset(request.POST, queryset=group_objects)
         if group_formset.is_valid():
             saved_groups = group_formset.save()
             for group in saved_groups:
@@ -233,7 +233,9 @@ def upload_step3(request):
             if group_formset.errors:
                 print("Group formset errors:", group_formset.errors)
             else:
-                print("Group formset is not valid, but no errors found. This may indicate a problem with form validation logic.")
+                print(
+                    "Group formset is not valid, but no errors found. This may indicate a problem with form validation logic."
+                )
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)

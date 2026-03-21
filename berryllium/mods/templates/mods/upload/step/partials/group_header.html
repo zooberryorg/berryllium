@@ -8,7 +8,8 @@
         {% if group_form.name.errors %}
             <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>
         {% endif %}
-        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })" x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
+        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })"
+             x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
             {{ group_form.description }}
             {{ group_form.description.errors }}
         </div>

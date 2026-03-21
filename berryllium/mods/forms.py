@@ -131,12 +131,12 @@ class FileUploadForm(forms.Form):
         # if no file uploaded, check if file URL is provided, if not raise error
         if not cleaned_file:
             return cleaned_file
-        print("Validating uploaded file:", cleaned_file.name, cleaned_file.size, "bytes")
+        print(
+            "Validating uploaded file:", cleaned_file.name, cleaned_file.size, "bytes"
+        )
         # Validate file extension
         try:
-            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(
-                cleaned_file
-            )
+            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(cleaned_file)
         except ValidationError:
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
