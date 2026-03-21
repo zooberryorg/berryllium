@@ -1,7 +1,7 @@
-function textFieldExpand({ trimLen = 20 }) {
+function textFieldExpand({ trimLen = 20, content = "" }) {
     return {
         focused: false, // textfield is focused
-        content: "", // textfield content
+        content: content, // textfield content
 
         expand() {
             this.focused = true;
@@ -14,6 +14,8 @@ function textFieldExpand({ trimLen = 20 }) {
         trimDisplayedContent() {
             if (this.content.length > trimLen) {
                 return this.content.slice(0, trimLen) + "...";
+            } else {
+                return this.content;
             }
         }
         

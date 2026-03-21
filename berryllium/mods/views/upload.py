@@ -212,9 +212,7 @@ def upload_step3(request):
             return redirect("upload_step2")
         for group_form, file_formset in file_groups:
             group_form = FileGroupForm(request.POST, instance=group_form.instance)
-            file_formset = SingleFileFormset(
-                request.POST, instance=group_form.instance
-            )
+            file_formset = SingleFileFormset(request.POST, instance=group_form.instance)
 
             if group_form.is_valid() and file_formset.is_valid():
                 group_form.save()

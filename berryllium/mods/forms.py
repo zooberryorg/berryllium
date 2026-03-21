@@ -1,7 +1,13 @@
 import os
 from django import forms
 from django.forms import formset_factory
-from django.core.validators import URLValidator, MaxLengthValidator, MinLengthValidator, FileExtensionValidator, ProhibitNullCharactersValidator
+from django.core.validators import (
+    URLValidator,
+    MaxLengthValidator,
+    MinLengthValidator,
+    FileExtensionValidator,
+    ProhibitNullCharactersValidator,
+)
 from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
@@ -135,7 +141,9 @@ class FileUploadForm(forms.Form):
 
         # Validate file extension
         try:
-            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(cleaned_file.name)
+            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(
+                cleaned_file.name
+            )
         except ValidationError:
             raise forms.ValidationError(
                 f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
@@ -203,6 +211,20 @@ class FileGroupForm(forms.ModelForm):
     into groups.
     """
 
+    COLLAPSIBLE_WIDGET_ATTRS = {
+        "x-data": "textFieldExpand({ content: $el.value, trimLen: 100 })",
+        "@focus": "expand()",
+        # if click away from field, collapse
+        "@blur": "collapse()",
+        ":rows": "focused ? 4 : 1",
+        ":class": "focused ? 'h-32' : 'h-10'",
+        "@keydown.escape": "$el.blur()",
+        "@keydown.enter.prevent": "$el.blur()",
+        # watch for changes to content and update content state
+        ":value": "focused ? content : trimDisplayedContent()",
+        "@input": "content = $el.value, elwidth = $el.offsetWidth, updateTrimLen(elwidth)",
+    }
+
     # note: fields here need to match the fields in the FileGroup model
     class Meta:
         model = FileGroup
@@ -218,7 +240,7 @@ class FileGroupForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
-                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",              
+                "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",
             }
         ),
     )
@@ -228,13 +250,7 @@ class FileGroupForm(forms.ModelForm):
             attrs={
                 "placeholder": "Group description",
                 "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 resize-none transition-all duration-200 ",
-                "@focus": "expand()",
-                # if click away from field, collapse
-                "@blur": "collapse()",
-                ":rows": "focused ? 4 : 1",
-                ":class": "focused ? 'h-32' : 'h-10'",
-                "@keydown.escape": "$el.blur()",
-                "@keydown.enter.prevent": "$el.blur()",
+                **COLLAPSIBLE_WIDGET_ATTRS,
             }
         ),
     )
@@ -254,8 +270,8 @@ class FileGroupForm(forms.ModelForm):
         except ValidationError as e:
             raise forms.ValidationError(e.message)
 
-
         return self.cleaned_data["name"]
+
 
 class SingleFileForm(forms.Form):
     """
