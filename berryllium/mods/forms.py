@@ -328,6 +328,7 @@ class SingleFileForm(forms.Form):
 
     def clean_title(self):
         title = self.cleaned_data.get("title", "").strip()
+        print("Validating title:", title)
 
         if len(title) == 0:
             return title

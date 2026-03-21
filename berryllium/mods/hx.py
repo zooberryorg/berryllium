@@ -110,14 +110,20 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
     return HttpResponse()
 
 @require_POST
-def hx_validate_singlefile_title(request, file_id):
+def hx_validate_singlefile_title(request, file_id, prefix_id):
     """HTMX endpoint to validate single file title field."""
     title = request.POST.get("title", "").strip()
+    print("Received title for validation:", title, "for FileUpload ID:", file_id)
 
-    form = SingleFileForm(data={"title": title}, instance=FileUpload(id=file_id))
+    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance if valid, can't use instance here since FileUpload is not a real model instance yet, just a draft with an id, so we create a temporary instance with the id for validation purposes
+    form = SingleFileForm(data={"title": title})
     form.is_valid()
 
     errors = form.errors.get("title", [])
+    print("Validating title for FileUpload ID:", file_id
+          , "Title:", title
+        , "Errors:", errors
+    )
     if errors:
         return render(
             request,
