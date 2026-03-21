@@ -29,7 +29,7 @@
                     <div class="text-red-500 text-sm" id="group-description-errors">
                         {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
                     </div>
-                    {% comment %} {% include "mods/upload/step/partials/group_files.html" with file_forms=file_forms group_index=forloop.counter0 %} {% endcomment %}
+                    {% include "mods/upload/step/partials/group_files.html" with files=files group_index=forloop.counter0 %}
             </div>
         </div>
     </div>

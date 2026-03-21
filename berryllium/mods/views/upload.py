@@ -1,3 +1,5 @@
+from importlib.resources import files
+
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
@@ -202,7 +204,7 @@ def upload_step3(request):
     group_formset = FileGroupFormset(queryset=group_objects)
 
     # pair each file group with its set of files
-    files = [
+    file_groups = [
         (form, SingleFileFormset(instance=form.instance))
         for form in group_formset.forms
     ]
@@ -225,13 +227,13 @@ def upload_step3(request):
             if request.POST.get("action") == "next":
                 return redirect("upload_step4")
         else:            
-            context["file_groups"] = group_formset
-            context["files"] = files
+            context["file_groups"] = file_groups
+            context["group_formset"] = group_formset
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
-    context["file_groups"] = group_formset
-    context["files"] = files
+    context["file_groups"] = file_groups
+    context["group_formset"] = group_formset
     return render(request, "mods/upload/step/3.html", context)
 
 
