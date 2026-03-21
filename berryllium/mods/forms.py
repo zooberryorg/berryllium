@@ -13,12 +13,7 @@ from django.core.exceptions import ValidationError
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
-
-ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
-ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
-MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
-MAX_SUMMARY_LENGTH = 200
-
+from berryllium.mods.settings import *
 
 class MetadataForm(forms.Form):
     """
@@ -28,7 +23,7 @@ class MetadataForm(forms.Form):
     """
 
     title = forms.CharField(
-        max_length=200,
+        max_length=MAX_TEXTFIELD_LENGTH,
         required=True,
         widget=forms.TextInput(
             attrs={"class": "zb-input text-sm", "placeholder": "Enter title"}
@@ -87,8 +82,10 @@ class MetadataForm(forms.Form):
 
     def clean_summary(self):
         summary = self.cleaned_data.get("summary")
-        if len(summary) < 10:
-            raise forms.ValidationError("Summary must be at least 10 characters long.")
+        if len(summary) < MIN_TEXTFIELD_LENGTH:
+            raise forms.ValidationError(
+                f"Summary must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
         if len(summary) > MAX_SUMMARY_LENGTH:
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
@@ -229,7 +226,7 @@ class FileGroupForm(forms.ModelForm):
 
     name = forms.CharField(
         required=False,
-        max_length=255,
+        max_length=MAX_TEXTFIELD_LENGTH,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
@@ -239,6 +236,7 @@ class FileGroupForm(forms.ModelForm):
         ),
     )
     description = forms.CharField(
+        max_length=MAX_SUMMARY_LENGTH,
         required=False,
         widget=forms.Textarea(
             attrs={
@@ -251,22 +249,54 @@ class FileGroupForm(forms.ModelForm):
     order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
     def clean_name(self):
+        name = self.cleaned_data.get("name", "").strip()
+
+        if len(name) == 0:
+            return name
+        
         try:
-            MinLengthValidator(4)(self.cleaned_data["name"])
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(name)
         except ValidationError:
             raise forms.ValidationError(
-                "Group name must be at least 4 characters long."
+                f"Group name must be at least {MIN_TEXTFIELD_LENGTH} characters long."
             )
         try:
-            MaxLengthValidator(60)(self.cleaned_data["name"])
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(name)
         except ValidationError:
-            raise forms.ValidationError("Group name cannot exceed 60 characters.")
+            raise forms.ValidationError(
+                f"Group name cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+            )
         try:
-            ProhibitNullCharactersValidator()(self.cleaned_data["name"])
+            ProhibitNullCharactersValidator()(name)
         except ValidationError:
             raise forms.ValidationError("Group name cannot contain null characters.")
 
-        return self.cleaned_data["name"]
+        return name
+    
+    def clean_description(self):
+        description = self.cleaned_data.get("description", "").strip()
+
+        if len(description) == 0:
+            return description
+        
+        try:
+            MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Group description must be at least {MIN_SUMMARY_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Group description cannot exceed {MAX_SUMMARY_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(description)
+        except ValidationError:
+            raise forms.ValidationError("Group description cannot contain null characters.")
+
+        return description
 
 
 class SingleFileForm(forms.Form):
@@ -276,7 +306,7 @@ class SingleFileForm(forms.Form):
 
     title = forms.CharField(
         required=False,
-        max_length=255,
+        max_length=MAX_TEXTFIELD_LENGTH,
         widget=forms.TextInput(
             attrs={
                 "placeholder": "File title",
