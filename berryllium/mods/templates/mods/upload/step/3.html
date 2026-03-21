@@ -14,6 +14,7 @@
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
     <div x-show="toggled" x-ref="fileGroups">
+        {{ group_formset.management_form }}
         {% for group in file_groups %}
             {% include "mods/upload/step/partials/group_base.html" with group=group group_index=group_index %}
         {% endfor %}

@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
 
-ALLOWED_EXTENSIONS = [".z2f", ".ztd", ".zip"]
+ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 MAX_SUMMARY_LENGTH = 200
@@ -121,28 +121,21 @@ class FileUploadForm(forms.Form):
         super().__init__(*args, **kwargs)
         self.existing_files = existing_files or []
 
-    @staticmethod
-    def valid_file_extension(filename, allowed_extensions):
-        """Validate file extension"""
-        ext = os.path.splitext(filename)[1].lower()
-        if ext not in allowed_extensions:
-            return False
-        return True
-
     def clean_file(self):
         """
         Form validation and cleanup.
         """
         cleaned_file = self.cleaned_data.get("file")
+        cleaned_file.__str__
 
         # if no file uploaded, check if file URL is provided, if not raise error
         if not cleaned_file:
             return cleaned_file
-
+        print("Validating uploaded file:", cleaned_file.name, cleaned_file.size, "bytes")
         # Validate file extension
         try:
             FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(
-                cleaned_file.name
+                cleaned_file
             )
         except ValidationError:
             raise forms.ValidationError(

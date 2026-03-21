@@ -3,7 +3,6 @@
         <div class="flex items-center gap-1">{% include "mods/upload/step/partials/group_actions.html" %}</div>
         <div class="h-full"></div>
     </div>
-    {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
         {{ group_form.name }}
         {% if group_form.name.errors %}
