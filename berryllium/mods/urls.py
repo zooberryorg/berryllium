@@ -49,7 +49,7 @@ urlpatterns = [
         name="hx_validate_singlefile_description",
     ),
     path(
-        "mods/add-filegroup-form/",
+        "mods/add-filegroup-form/<int:group_index>/",
         hx.hx_add_filegroup_form,
         name="hx_add_filegroup_form",
     ),

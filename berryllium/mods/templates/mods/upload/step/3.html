@@ -22,7 +22,7 @@
         <div class="flex justify-end w-full px-6 mb-4">
             <button class="zb-action flex items-center justify-center"
                     type="button"
-                    hx-post="{% url 'hx_add_filegroup_form' %}"
+                    hx-post="{% url 'hx_add_filegroup_form' group_index=file_groups|length %}"
                     hx-target="#addGroup"
                     hx-swap="beforeend"
                     id="addGroup">
