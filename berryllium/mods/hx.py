@@ -1,7 +1,7 @@
 from unicodedata import name
 
 from berryllium.mods.models import Mod, FileUpload, FileGroup
-from berryllium.mods.forms import FileGroupForm
+from berryllium.mods.forms import FileGroupForm, SingleFileForm
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
@@ -106,5 +106,29 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
     if file_group:
         file_group.description = description
         file_group.save()
+
+    return HttpResponse()
+
+@require_POST
+def hx_validate_singlefile_title(request, file_id):
+    """HTMX endpoint to validate single file title field."""
+    title = request.POST.get("title", "").strip()
+
+    form = SingleFileForm(data={"title": title}, instance=FileUpload(id=file_id))
+    form.is_valid()
+
+    errors = form.errors.get("title", [])
+    if errors:
+        return render(
+            request,
+            "mods/upload/step/partials/hx_errors.html",
+            {"error_message": errors[0]},
+        )
+
+    # if valid, save to FileUpload draft
+    file_upload = FileUpload.objects.filter(id=file_id).first()
+    if file_upload:
+        file_upload.title = title
+        file_upload.save()
 
     return HttpResponse()
