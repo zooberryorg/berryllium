@@ -210,20 +210,33 @@ def upload_step3(request):
     if request.method == "POST":
         if request.POST.get("action") == "previous":
             return redirect("upload_step2")
-        for group_form, file_formset in file_groups:
-            group_form = FileGroupForm(request.POST, instance=group_form.instance)
-            file_formset = SingleFileFormset(request.POST, instance=group_form.instance)
 
-            if group_form.is_valid() and file_formset.is_valid():
-                group_form.save()
-                file_formset.save()
+        # get formset data and validate
+        group_formset = FileGroupFormset(request.POST, queryset=group_objects)
+        if group_formset.is_valid():
+            saved_groups = group_formset.save()
+            for group in saved_groups:
+                # now that groups are saved, validate their files
+                file_formset = SingleFileFormset(request.POST, instance=group)
+                if file_formset.is_valid():
+                    file_formset.save()
+            # all valid, go to next step
+            if request.POST.get("action") == "next":
+                return redirect("upload_step4")
+        else:
+            file_groups = [
+                (form, SingleFileFormset(instance=form.instance))
+                for form in group_formset.forms
+            ]
+            context["group_formset"] = group_formset
+            context["file_groups"] = file_groups
+            if group_formset.errors:
+                print("Group formset errors:", group_formset.errors)
             else:
-                context["group_formset"] = group_formset
-                context["file_groups"] = file_groups
-                return render(request, "mods/upload/step/3.html", context)
-
-        if request.POST.get("action") == "next":
-            return redirect("upload_step4")
+                print(
+                    "Group formset is not valid, but no errors found. This may indicate a problem with form validation logic."
+                )
+            return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_groups

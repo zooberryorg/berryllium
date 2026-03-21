@@ -3,13 +3,13 @@
         <div class="flex items-center gap-1">{% include "mods/upload/step/partials/group_actions.html" %}</div>
         <div class="h-full"></div>
     </div>
-    {{ group_formset.management_form }}
     {% for group_form, file_forms in file_groups %}
         {{ group_form.name }}
         {% if group_form.name.errors %}
             <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>
         {% endif %}
-        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })" x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
+        <div x-data="textFieldExpand({ content: '{{ instance_value }}' })"
+             x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
             {{ group_form.description }}
             {{ group_form.description.errors }}
         </div>
