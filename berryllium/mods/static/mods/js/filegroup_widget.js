@@ -1,8 +1,9 @@
-function textFieldExpand({ trimLen = 0, content = "" }) {
+function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
     return {
         focused: false, // textfield is focused
         content: content, // textfield content
         trimLen: trimLen, // number of characters to show when not focused
+        ref: ref,
 
         expand() {
             this.focused = true;
@@ -13,7 +14,7 @@ function textFieldExpand({ trimLen = 0, content = "" }) {
         },
 
         init() {
-            this.updateTrimLength(this.$refs.collapsibleField.offsetWidth);
+            this.updateTrimLength(this.ref.offsetWidth);
         },
 
         trimDisplayedContent() {

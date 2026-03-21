@@ -201,20 +201,6 @@ class FileGroupForm(forms.ModelForm):
     into groups.
     """
 
-    COLLAPSIBLE_WIDGET_ATTRS = {
-        "@focus": "expand()",
-        "x-ref": "collapsibleField",
-        # if click away from field, collapse
-        "@blur": "collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()",
-        ":rows": "focused ? 4 : 1",
-        ":class": "focused ? 'h-32' : 'h-10'",
-        "@keydown.escape": "$el.blur()",
-        "@keydown.enter.prevent": "$el.blur()",
-        # watch for changes to content and update content state
-        ":value": "focused ? content : trimDisplayedContent()",
-        "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
-    }
-
     # note: fields here need to match the fields in the FileGroup model
     class Meta:
         model = FileGroup
@@ -241,6 +227,7 @@ class FileGroupForm(forms.ModelForm):
         widget=forms.Textarea(
             attrs={
                 "placeholder": "Enter group description",
+                "x-ref": "collapsibleGroupDesc",
                 "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 resize-none transition-all duration-200 ",
                 **COLLAPSIBLE_WIDGET_ATTRS,
             }
@@ -320,8 +307,8 @@ class SingleFileForm(forms.Form):
         widget=forms.Textarea(
             attrs={
                 "placeholder": "File description (optional)",
-                "class": "zb-textarea",
-                "rows": 2,
+                "class": "zb-textarea transition-all duration-200",
+                **COLLAPSIBLE_WIDGET_ATTRS,
             }
         ),
     )
