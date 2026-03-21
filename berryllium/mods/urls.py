@@ -38,4 +38,8 @@ urlpatterns = [
         hx.hx_validate_filegroup_description,
         name="hx_validate_filegroup_description",
     ),    
+    path(
+        "mods/update-single-file-title/<int:file_id>/",
+        hx.hx_validate_single_file_title,
+        name="hx_validate_single_file_title",
 ]
