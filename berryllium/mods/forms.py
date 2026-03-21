@@ -315,6 +315,7 @@ class SingleFileForm(forms.Form):
         ),
     )
     description = forms.CharField(
+        max_length=MAX_SUMMARY_LENGTH,
         required=False,
         widget=forms.Textarea(
             attrs={
