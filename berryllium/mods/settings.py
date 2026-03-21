@@ -33,3 +33,40 @@ COLLAPSIBLE_WIDGET_ATTRS = {
     ":value": "focused ? content : trimDisplayedContent()",
     "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
 }
+
+DISABLE_SUBMIT_BUTTON_ATTRS = {
+    "autocomplete": "off",
+    "@keydown.escape": "$el.blur()",
+    "@keydown.enter.prevent": "$el.blur()",
+}
+
+MOD_CATEGORIES = [
+    ("animals", "Animals"),
+    ("animal_needs", "Animal Needs"),
+    ("props_and_structures", "Props & Structures"),
+    ("packs", "Packs"),
+    ("utilities", "Utilities"),
+    ("texture_variants", "Texture Variants"),
+    ("texture_replacements", "Texture Replacements"),
+    ("gameplay_tweaks", "Gameplay Tweaks"),
+    ("remakes", "Remakes"),
+    ("scripts", "Scripts"),
+    ("zoos_and_saves", "Zoos & Saves"),
+    ("assets", "Assets"),
+]
+
+GAME_OPTIONS = [
+            ("na", "Not Applicable"),
+            ("zt1", "Zoo Tycoon 1"),
+            ("zt2", "Zoo Tycoon 2"),
+        ]
+
+EXPANSION_REQUIREMENTS = [
+            ("none", "None"),
+            ("mm1", "Marine Mania"),
+            ("dd", "Dinosaur Digs"),
+            ("aa", "African Adventure"),
+            ("es", "Endangered Species"),
+            ("mm2", "Marine Mania 2"),
+            ("ea", "Extinct Animals"),
+        ]

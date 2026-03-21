@@ -43,6 +43,8 @@
                        placeholder="https://example.com/file.zip"
                        class="zb-input text-sm"
                        autocomplete="off"
+                       @keydown.escape="$el.blur()"
+                       @keydown.enter.prevent="$el.blur()"
                        hx-post="{% url 'hx_process_url_field' %}"
                        hx-trigger="input delay:500ms"
                        hx-target="#file-url-error"
