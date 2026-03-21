@@ -1,3 +1,5 @@
+{% load static %}
+{% load widget_tweaks %}
 <div class="relative flex flex-col gap-1 w-full">
     <div class="absolute top-0 right-0 flex items-center gap-1">
         <div class="flex items-center gap-1">{% include "mods/upload/step/partials/group_actions.html" %}</div>
@@ -6,17 +8,22 @@
     {% for group_form, file_forms in file_groups %}
         {% comment %} This is required because our form has id and order fields we need to render {% endcomment %}
         {% for hidden in group_form.hidden_fields %}{{ hidden }}{% endfor %}
-        {{ group_form.name }}
+
+        {% url 'hx_validate_filegroup_name' file_id=group_form.instance.id as validate_url %}
+        {% render_field group_form.name hx-post=validate_url hx-trigger="keyup changed delay:500ms" hx-target="#group-name-errors" hx-swap="innerHTML" %}
         {% if group_form.name.errors %}
-            <div class="text-red-500 text-sm">{{ group_form.name.errors|join:", " }}</div>
+            <div class="text-red-500 text-sm" id="group-name-errors">{{ group_form.name.errors|join:", " }}</div>
         {% endif %}
+
         <div x-data="textFieldExpand({ content: '{{ instance_value }}' })"
              x-init="$nextTick(() => updateTrimLength($refs.collapsibleField.offsetWidth))">
             {{ group_form.description }}
             {{ group_form.description.errors }}
         </div>
+
         {% for file_form in file_forms %}
             {% include "mods/upload/step/partials/group_files.html" with file_form=file_form.instance %}
         {% endfor %}
+
     {% endfor %}
 </div>

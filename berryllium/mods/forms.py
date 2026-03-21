@@ -234,7 +234,7 @@ class FileGroupForm(forms.ModelForm):
             attrs={
                 "placeholder": "Group name (e.g., Main Files)",
                 "class": "pl-2 py-1 mr-24 text-sm text-white/80 focus:outline-none min-w-0 rounded-xl hover:bg-gold-400/10",
-                "autocomplete": "off"
+                "autocomplete": "off",
             }
         ),
     )
@@ -254,7 +254,9 @@ class FileGroupForm(forms.ModelForm):
         try:
             MinLengthValidator(4)(self.cleaned_data["name"])
         except ValidationError:
-            raise forms.ValidationError("Group name must be at least 4 characters long.")
+            raise forms.ValidationError(
+                "Group name must be at least 4 characters long."
+            )
         try:
             MaxLengthValidator(60)(self.cleaned_data["name"])
         except ValidationError:

@@ -25,7 +25,7 @@ pip install -r requirements.txt
 5. Build containers
 
 ```bash
-docker-compose build
+docker build . -t berryllium
 ```
 
 Local server instance will be accessible at `http://localhost:8001`

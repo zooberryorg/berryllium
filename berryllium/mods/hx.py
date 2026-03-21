@@ -1,5 +1,5 @@
 from berryllium.mods.models import Mod
-from berryllium.mods.models import FileUpload
+from berryllium.mods.models import FileUpload, FileGroup
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
@@ -59,7 +59,7 @@ def hx_toggle_group_manager(request):
 
 
 @require_POST
-def hx_validate_file_title(request, file_id):
+def hx_validate_filegroup_name(request, fg_id):
     """HTMX endpoint to validate file title field."""
     title = request.POST.get("title", "")
 
@@ -71,10 +71,10 @@ def hx_validate_file_title(request, file_id):
             {"error_message": error_message},
         )
 
-    # if valid, save to FileUpload draft
-    file_upload = FileUpload.objects.filter(id=file_id).first()
-    if file_upload:
-        file_upload.title = title
-        file_upload.save()
+    # if valid, save to FileGroup draft
+    file_group = FileGroup.objects.filter(id=fg_id).first()
+    if file_group:
+        file_group.title = title
+        file_group.save()
 
     return HttpResponse()
