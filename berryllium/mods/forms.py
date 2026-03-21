@@ -212,17 +212,17 @@ class FileGroupForm(forms.ModelForm):
     """
 
     COLLAPSIBLE_WIDGET_ATTRS = {
-        "x-data": "textFieldExpand({ content: $el.value, trimLen: 100 })",
         "@focus": "expand()",
+        "x-ref": "collapsibleField",
         # if click away from field, collapse
-        "@blur": "collapse()",
+        "@blur": "collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()",
         ":rows": "focused ? 4 : 1",
         ":class": "focused ? 'h-32' : 'h-10'",
         "@keydown.escape": "$el.blur()",
         "@keydown.enter.prevent": "$el.blur()",
         # watch for changes to content and update content state
         ":value": "focused ? content : trimDisplayedContent()",
-        "@input": "content = $el.value, elwidth = $el.offsetWidth, updateTrimLen(elwidth)",
+        "@input": "content = $el.value, updateTrimLength($el.offsetWidth)",
     }
 
     # note: fields here need to match the fields in the FileGroup model
@@ -248,7 +248,7 @@ class FileGroupForm(forms.ModelForm):
         required=False,
         widget=forms.Textarea(
             attrs={
-                "placeholder": "Group description",
+                "placeholder": "Enter group description",
                 "class": "px-2 py-1 mt-2 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 resize-none transition-all duration-200 ",
                 **COLLAPSIBLE_WIDGET_ATTRS,
             }
