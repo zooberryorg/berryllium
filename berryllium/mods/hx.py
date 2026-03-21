@@ -1,3 +1,5 @@
+from unicodedata import name
+
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm
 
@@ -78,6 +80,30 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
     file_group = FileGroup.objects.filter(id=fg_id).first()
     if file_group:
         file_group.name = name
+        file_group.save()
+
+    return HttpResponse()
+
+@require_POST
+def hx_validate_filegroup_description(request, fg_id, prefix_id):
+    """HTMX endpoint to validate filegroup description field."""
+    description = request.POST.get("form-" + str(prefix_id) + "-description", "").strip()
+
+    form = FileGroupForm(data={"description": description}, instance=FileGroup(id=fg_id))
+    form.is_valid()
+
+    errors = form.errors.get("description", [])
+    if errors:
+        return render(
+            request,
+            "mods/upload/step/partials/hx_errors.html",
+            {"error_message": errors[0]},
+        )
+
+    # if valid, save to FileGroup draft
+    file_group = FileGroup.objects.filter(id=fg_id).first()
+    if file_group:
+        file_group.description = description
         file_group.save()
 
     return HttpResponse()
