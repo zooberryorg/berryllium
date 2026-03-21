@@ -27,50 +27,48 @@ class MetadataForm(forms.Form):
         max_length=MAX_TEXTFIELD_LENGTH,
         required=True,
         widget=forms.TextInput(
-            attrs={"class": "zb-input text-sm", "placeholder": "Enter title"}
+            attrs={
+                "class": "zb-input text-sm",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+                "placeholder": "Enter title",
+            }
         ),
     )
     summary = forms.CharField(
         required=True,
-        widget=forms.Textarea(attrs={"class": "zb-textarea text-sm", "rows": 4}),
+        widget=forms.Textarea(
+            attrs={
+                "class": "zb-textarea text-sm",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+                "placeholder": "Enter a brief summary of your mod (10-200 characters)",
+                "rows": 4,
+            }
+        ),
     )
     category = forms.MultipleChoiceField(
-        choices=[
-            ("animals", "Animals"),
-            ("animal_needs", "Animal Needs"),
-            ("props_and_structures", "Props & Structures"),
-            ("packs", "Packs"),
-            ("utilities", "Utilities"),
-            ("texture_variants", "Texture Variants"),
-            ("texture_replacements", "Texture Replacements"),
-            ("gameplay_tweaks", "Gameplay Tweaks"),
-            ("remakes", "Remakes"),
-            ("scripts", "Scripts"),
-            ("zoos_and_saves", "Zoos & Saves"),
-            ("assets", "Assets"),
-        ],
-        widget=PillCheckboxSelectMultiple(),
+        choices=MOD_CATEGORIES,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
     )
     game = forms.MultipleChoiceField(
-        choices=[
-            ("na", "Not Applicable"),
-            ("zt1", "Zoo Tycoon 1"),
-            ("zt2", "Zoo Tycoon 2"),
-        ],
-        widget=PillCheckboxSelectMultiple(),
+        choices=GAME_OPTIONS,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
     )
     expansions = forms.MultipleChoiceField(
         required=True,
-        choices=[
-            ("none", "None"),
-            ("mm1", "Marine Mania"),
-            ("dd", "Dinosaur Digs"),
-            ("aa", "African Adventure"),
-            ("es", "Endangered Species"),
-            ("mm2", "Marine Mania 2"),
-            ("ea", "Extinct Animals"),
-        ],
-        widget=PillCheckboxSelectMultiple(),
+        choices=EXPANSION_REQUIREMENTS,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
     )
 
     def clean_title(self):
