@@ -1,4 +1,5 @@
 from berryllium.mods.models import Mod
+from berryllium.mods.models import FileUpload
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
@@ -58,5 +59,22 @@ def hx_toggle_group_manager(request):
 
 
 @require_POST
-def hx_update_file_title(request, file_id):
-    pass
+def hx_validate_file_title(request, file_id):
+    """HTMX endpoint to validate file title field."""
+    title = request.POST.get("title", "")
+
+    if len(title) > 100:
+        error_message = "Title cannot exceed 100 characters."
+        return render(
+            request,
+            "mods/upload/step/partials/hx_errors.html",
+            {"error_message": error_message},
+        )
+
+    # if valid, save to FileUpload draft
+    file_upload = FileUpload.objects.filter(id=file_id).first()
+    if file_upload:
+        file_upload.title = title
+        file_upload.save()
+
+    return HttpResponse()

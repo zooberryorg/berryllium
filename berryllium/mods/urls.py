@@ -30,7 +30,7 @@ urlpatterns = [
     ),
     path(
         "mods/update-file-title/<int:file_id>/",
-        hx.hx_update_file_title,
-        name="hx_update_file_title",
+        hx.hx_validate_file_title,
+        name="hx_validate_file_title",
     ),
 ]
