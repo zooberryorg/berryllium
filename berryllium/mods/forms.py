@@ -271,6 +271,31 @@ class FileGroupForm(forms.ModelForm):
             raise forms.ValidationError("Group name cannot contain null characters.")
 
         return name
+    
+    def clean_description(self):
+        description = self.cleaned_data.get("description", "").strip()
+
+        if len(description) == 0:
+            return description
+        
+        try:
+            MinLengthValidator(MIN_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Group description must be at least {MIN_SUMMARY_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_SUMMARY_LENGTH)(description)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Group description cannot exceed {MAX_SUMMARY_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(description)
+        except ValidationError:
+            raise forms.ValidationError("Group description cannot contain null characters.")
+
+        return description
 
 
 class SingleFileForm(forms.Form):
