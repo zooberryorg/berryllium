@@ -29,7 +29,7 @@ urlpatterns = [
         name="hx_toggle_group_manager",
     ),
     path(
-        "mods/update-file-title/<int:file_id>/",
+        "mods/update-file-name/<int:fg_id>/",
         hx.hx_validate_filegroup_name,
         name="hx_validate_filegroup_name",
     ),

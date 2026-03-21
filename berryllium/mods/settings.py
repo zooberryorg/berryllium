@@ -10,3 +10,6 @@ UPLOAD_NAVIGATION = [
     {"name": "Details & Settings", "url": "upload_step4", "icon": "gear"},
     {"name": "Review & Submit", "url": "upload_step4", "icon": "check-circle"},
 ]
+
+MIN_TEXTFIELD_LENGTH = 4
+MAX_TEXTFIELD_LENGTH = 100

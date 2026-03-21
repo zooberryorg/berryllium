@@ -1,5 +1,6 @@
 from berryllium.mods.models import Mod
 from berryllium.mods.models import FileUpload, FileGroup
+from berryllium.mods.settings import MAX_TEXTFIELD_LENGTH, MIN_TEXTFIELD_LENGTH
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
@@ -60,11 +61,13 @@ def hx_toggle_group_manager(request):
 
 @require_POST
 def hx_validate_filegroup_name(request, fg_id):
-    """HTMX endpoint to validate file title field."""
-    title = request.POST.get("title", "")
+    """HTMX endpoint to validate filegroup name field."""
+    print("Validating filegroup name...")
+    name = request.POST.get("form-" + str(fg_id) + "-name", "").strip()
+    print(f"Received name: '{name}' with length {len(name)} and "f"field name: 'form-{fg_id}-name'")
 
-    if len(title) > 100:
-        error_message = "Title cannot exceed 100 characters."
+    if len(name) < MIN_TEXTFIELD_LENGTH:
+        error_message = f"Title must be at least {MIN_TEXTFIELD_LENGTH} characters long."
         return render(
             request,
             "mods/upload/step/partials/hx_errors.html",
@@ -74,7 +77,7 @@ def hx_validate_filegroup_name(request, fg_id):
     # if valid, save to FileGroup draft
     file_group = FileGroup.objects.filter(id=fg_id).first()
     if file_group:
-        file_group.title = title
+        file_group.name = name
         file_group.save()
 
     return HttpResponse()
