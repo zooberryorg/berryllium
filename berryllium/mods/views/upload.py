@@ -224,13 +224,8 @@ def upload_step3(request):
             # all valid, go to next step
             if request.POST.get("action") == "next":
                 return redirect("upload_step4")
-        else:
-            file_groups = [
-                (form, SingleFileFormset(instance=form.instance))
-                for form in group_formset.forms
-            ]
-            context["group_formset"] = group_formset
-            context["file_groups"] = file_groups
+        else:            
+            context["file_groups"] = group_formset
             if group_formset.errors:
                 print("Group formset errors:", group_formset.errors)
             else:
@@ -240,8 +235,7 @@ def upload_step3(request):
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
-    context["file_groups"] = file_groups
-    context["group_formset"] = group_formset
+    context["file_groups"] = group_formset
     return render(request, "mods/upload/step/3.html", context)
 
 

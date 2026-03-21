@@ -190,6 +190,6 @@ def hx_add_filegroup_form(request):
     group_index = request.POST.get("group_index", 0)  # get current index from request
     return render(
         request,
-        "mods/upload/step/partials/group_base.html",
+        "mods/upload/step/partials/group_header.html",
         {"group": (new_group, []), "group_index": group_index},
     )

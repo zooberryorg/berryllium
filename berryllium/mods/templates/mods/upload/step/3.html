@@ -16,7 +16,7 @@
     <div x-show="toggled" x-ref="fileGroups" id="fileGroups">
         {{ group_formset.management_form }}
         {% for group in file_groups %}
-            {% include "mods/upload/step/partials/group_base.html" with group=group group_index=group_index %}
+            {% include "mods/upload/step/partials/group_header.html" with group=group %}
         {% endfor %}
         <div class="flex justify-end w-full px-6 mb-4">
             <button class="zb-action flex items-center justify-center"
