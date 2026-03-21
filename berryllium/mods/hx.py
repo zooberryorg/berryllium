@@ -64,7 +64,6 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
     """HTMX endpoint to validate filegroup name field."""
     name = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
 
-    
     form = FileGroupForm(data={"name": name}, instance=FileGroup(id=fg_id))
     form.is_valid()
 
@@ -75,7 +74,6 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
             "mods/upload/step/partials/hx_errors.html",
             {"error_message": errors[0]},
         )
-        
 
     # if valid, save to FileGroup draft
     file_group = FileGroup.objects.filter(id=fg_id).first()
