@@ -56,17 +56,17 @@ MOD_CATEGORIES = [
 ]
 
 GAME_OPTIONS = [
-            ("na", "Not Applicable"),
-            ("zt1", "Zoo Tycoon 1"),
-            ("zt2", "Zoo Tycoon 2"),
-        ]
+    ("na", "Not Applicable"),
+    ("zt1", "Zoo Tycoon 1"),
+    ("zt2", "Zoo Tycoon 2"),
+]
 
 EXPANSION_REQUIREMENTS = [
-            ("none", "None"),
-            ("mm1", "Marine Mania"),
-            ("dd", "Dinosaur Digs"),
-            ("aa", "African Adventure"),
-            ("es", "Endangered Species"),
-            ("mm2", "Marine Mania 2"),
-            ("ea", "Extinct Animals"),
-        ]
+    ("none", "None"),
+    ("mm1", "Marine Mania"),
+    ("dd", "Dinosaur Digs"),
+    ("aa", "African Adventure"),
+    ("es", "Endangered Species"),
+    ("mm2", "Marine Mania 2"),
+    ("ea", "Extinct Animals"),
+]
