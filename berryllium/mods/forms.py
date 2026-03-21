@@ -326,6 +326,31 @@ class SingleFileForm(forms.Form):
         ),
     )
 
+    def clean_title(self):
+        title = self.cleaned_data.get("title", "").strip()
+
+        if len(title) == 0:
+            return title
+        
+        try:
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(title)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File title must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(title)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"File title cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(title)
+        except ValidationError:
+            raise forms.ValidationError("File title cannot contain null characters.")
+
+        return title
+
 
 class FileDetailsForm(forms.ModelForm):
     group_index = forms.IntegerField(widget=forms.HiddenInput())
