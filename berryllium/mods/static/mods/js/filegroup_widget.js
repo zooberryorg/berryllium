@@ -13,10 +13,6 @@ function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
             this.focused = false;
         },
 
-        init() {
-            this.updateTrimLength(this.ref.offsetWidth);
-        },
-
         trimDisplayedContent() {
             if (this.content.length > trimLen) {
                 return this.content.slice(0, trimLen) + "...";
@@ -45,10 +41,6 @@ function fileDragAndDrop() {
     return {
         isDragging: false,
         target: null,
-
-        init() {
-            console.log("Drag and drop initialized");
-        },
 
         onDragStart(event) {
             this.isDragging = true;

@@ -80,6 +80,8 @@
     <div id="file-drop-target-{{ file.instance.id }}"
          class="border-2 border-dashed border-red-500/50 rounded-lg p-4 mt-2 text-center text-sm text-red-400/80"
          hx-trigger="drop"
+         x-show="isDragging"
+         @dragenter.prevent="isDragging = true"
          @dragover.prevent
          x-cloak>
         Drop file here to replace
