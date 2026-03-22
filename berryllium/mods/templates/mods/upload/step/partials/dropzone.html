@@ -20,6 +20,7 @@
         </div>
     </div>
     <input type="file"
+            {# djlint:off #}
            x-init="$watch('isUploading', value => { 
                 if (value) {
                     disableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
@@ -27,6 +28,7 @@
                     enableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
                 }
             })"
+            {# djlint:on #}
            name="file"
            id="id_file"
            x-ref="fileInput"
