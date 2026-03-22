@@ -1,5 +1,6 @@
 {% load static %}
 {% load widget_tweaks %}
+{% load bfilters %}
 <div class="px-6 mb-4" x-data="{ keepForm: true }" x-show="keepForm">
     <div class="flex flex-col items-center shadow-xs gap-2 mb-2 w-full bg-pine-800/40 rounded-lg px-2 pt-1 pb-2 text-sm text-white/80 border border-white/8 focus-within:ring-2 focus-within:ring-gold-500/50 focus-within:border-transparent">
         <div class="flex items-center gap-2 w-full py-2">
@@ -13,23 +14,35 @@
                 {% comment %} This is required because our form has id and order fields we need to render {% endcomment %}
                 {% for hidden in group.hidden_fields %}{{ hidden }}{% endfor %}
                 {% comment %} fileground url with file group id (not mod id) {% endcomment %}
-                {% url 'hx_validate_filegroup_name' fg_id=group.instance.id prefix_id=forloop.counter0 as name_endpoint %}
-                {% with target="#group-name-errors-"|add:forloop.counter0|stringformat:"s" %}
-                    {# djlint:off #}
-                        {% render_field group.name @keydown.escape="$el.blur()" @keydown.enter.prevent="$el.blur()" hx-post=name_endpoint hx-trigger="input delay:500ms" hx-target=target hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
-                    {# djlint:on #}
-                    <div class="text-red-500 text-sm" id=target>
-                        {% if group.name.errors %}{{ group.name.errors|join:", " }}{% endif %}
-                    </div>
-                {% endwith %}
-                {% url 'hx_validate_filegroup_description' fg_id=group.instance.id prefix_id=forloop.counter0 as desc_endpoint %}
+                <input type="text"
+                    name="{{ group.name.html_name }}"
+                    id="{{ group.name.id_for_label }}"
+                    @keydown.escape="$el.blur()" 
+                    @keydown.enter.prevent="$el.blur()" 
+                    hx-post="{% url 'hx_validate_filegroup_name' fg_id=group.instance.id prefix_id=forloop.counter0 as name_endpoint %}"
+                    hx-trigger="input delay:500ms" 
+                    hx-target="#group-name-errors-{{ forloop.counter0 }}"
+                    hx-swap="innerHTML" 
+                    hx-on::after-swap="htmx.process(this)" 
+                >
+                <div class="text-red-500 text-sm" id="#group-name-errors-{{ forloop.counter0 }}">
+                {% if group.name.errors %}{{ group.name.errors|join:", " }}{% endif %}
+                </div>
+                
                 <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
                      x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
                     {# djlint:off #}
-                    {% with target="#group-description-errors-"|add:forloop.counter0|stringformat:"s" %}
-                    {% render_field group.description :hx-model="content" hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target=target hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
-                    {% endwith %}
-                    {# djlint:on #}
+                <textarea type="text"
+                    name="{{ group.description.html_name }}"
+                    id="{{ group.description.id_for_label }}"
+                    :hx-model="content" 
+                    hx-post="{% url 'hx_validate_filegroup_description' fg_id=group.instance.id prefix_id=forloop.counter0 as desc_endpoint %}"
+                    hx-trigger="input delay:500ms" 
+                    hx-target="#group-description-errors-{{ forloop.counter0 }}"
+                    hx-swap="innerHTML" 
+                    hx-on::after-swap="htmx.process(this)" 
+                    x-ref="collapsibleGroupDesc"
+                >{{ group.instance.description }}</textarea>
                 </div>
                 <div class="text-red-500 text-sm" id="group-description-errors-{{ forloop.counter0 }}">
                     {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
