@@ -1,4 +1,4 @@
-<div x-show="toggled" x-ref="fileGroups" id="fileGroups" >
+<div x-show="toggled" x-ref="fileGroups" id="fileGroups">
     {{ group_formset.management_form }}
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
@@ -6,18 +6,19 @@
     <div id="addGroup"></div>
     <div class="flex justify-end w-full px-6 mb-4">
         <button class="zb-action flex items-center justify-center"
-                type="button"
-                hx-post="{% url 'hx_add_filegroup_form' %}"
-                hx-target="#addGroup"
-                hx-swap="beforeend"
-                {# djlint:off #}
+            type="button"
+            hx-post="{% url 'hx_add_filegroup_form' %}"
+            hx-target="#addGroup"
+            hx-swap="beforeend"
+            {# djlint:off #}
                 {# refreshes alpine state after swap #}
                 hx-on:htmx:after-swap="
                     Alpine.initTree(event.detail.elt);
                     "
                 @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })"
-                {# djlint:on #}
-            <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
+            {# djlint:on #}
+            <ion-icon name="add-circle" class="pr-2">
+            </ion-icon> Add Group
         </button>
     </div>
 </div>
