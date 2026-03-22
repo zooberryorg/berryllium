@@ -4,6 +4,16 @@
                 bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 
                 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
                 focus:border-transparent hover:bg-pine-800"
+         x-data="fileDragAndDrop()"
+         x-init="$watch('isDragging', value => {
+             if (value) {
+                console.log('dragging file over', $el);
+                 $el.classList.add('border-gold-400', 'bg-gold-400/10');
+             } else {
+                 $el.classList.remove('border-gold-400', 'bg-gold-400/10');
+             }
+         })"
+         @dragenter.prevent="isDragging = true"
          draggable="true">
     {# djlint:on #}
         <span class="text-pine-200 px-2 py-1 font-size-md">

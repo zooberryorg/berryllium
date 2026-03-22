@@ -31,7 +31,7 @@
                      id="group-name-errors-{{ group.instance.id }}">
                     {% if group.name.errors %}{{ group.name.errors|join:", " }}{% endif %}
                 </div>
-                <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
+                <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: '$refs.collapsibleGroupDesc' })"
                      x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
                     <textarea type="text"
                               x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
