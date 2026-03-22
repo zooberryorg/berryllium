@@ -46,11 +46,15 @@ function fileDragAndDrop() {
         isDragging: false,
         target: null,
 
+        init() {
+            console.log("Drag and drop initialized");
+        },
+
         onDragStart(event) {
             this.isDragging = true;
             event.dataTransfer.effectAllowed = 'move';
             // for firefox compatibility
-            event.dataTransfer.setData('text/html', 'event.target.outerHTML');
+            event.dataTransfer.setData('text/html', 'event.target.outerHTML');          
         },
 
         onDragOver(event) {
@@ -61,6 +65,10 @@ function fileDragAndDrop() {
         onDragEnd(event) {
             this.isDragging = false;
             this.target = null;
+        },
+
+        onDragOver(event) {
+            // get target drop element id
         }
     }
 }

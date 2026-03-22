@@ -14,6 +14,10 @@
              }
          })"
          @dragenter.prevent="isDragging = true"
+         @dragstart="onDragStart($event, {{ file.instance.id }})"
+         @dragover.prevent="onDragOver($event)"
+         @dragleave.prevent="isDragging = false"
+         @drop.prevent="handleFileDrop($event, {{ file.instance.id }})"
          draggable="true">
     {# djlint:on #}
         <span class="text-pine-200 px-2 py-1 font-size-md">
@@ -75,7 +79,8 @@
     </div>
     <div id="file-drop-target-{{ file.instance.id }}"
          class="border-2 border-dashed border-red-500/50 rounded-lg p-4 mt-2 text-center text-sm text-red-400/80"
-         x-show="isDragging"
+         hx-trigger="drop"
+         @dragover.prevent
          x-cloak>
         Drop file here to replace
     </div>
