@@ -44,12 +44,18 @@ function toggleGroupManager({ toggled = false }) {
 function fileDragAndDrop() {
     return {
         isDragging: false,
+        target: null,
 
         onDragStart(event) {
             this.isDragging = true;
             event.dataTransfer.effectAllowed = 'move';
             // for firefox compatibility
             event.dataTransfer.setData('text/html', 'event.target.outerHTML');
+        },
+
+        onDragOver(event) {
+            event.preventDefault();
+            this.target = event.target;
         }
     }
 }
