@@ -29,22 +29,22 @@ urlpatterns = [
         name="hx_toggle_group_manager",
     ),
     path(
-        "mods/update-file-name/<int:fg_id>/<int:prefix_id>/",
+        "mods/update-file-name/<int:fg_id>/",
         hx.hx_validate_filegroup_name,
         name="hx_validate_filegroup_name",
     ),
     path(
-        "mods/update-file-description/<int:fg_id>/<int:prefix_id>/",
+        "mods/update-file-description/<int:fg_id>/",
         hx.hx_validate_filegroup_description,
         name="hx_validate_filegroup_description",
     ),
     path(
-        "mods/update-single-file-title/<int:file_id>/<int:prefix_id>/",
+        "mods/update-single-file-title/<int:file_id>/",
         hx.hx_validate_singlefile_title,
         name="hx_validate_singlefile_title",
     ),
     path(
-        "mods/update-single-file-description/<int:file_id>/<int:prefix_id>/",
+        "mods/update-single-file-description/<int:file_id>/",
         hx.hx_validate_singlefile_description,
         name="hx_validate_singlefile_description",
     ),
