@@ -56,7 +56,7 @@ function fileDragAndDrop() {
             this.target = null;
         },
 
-        onDragOver(event) {
+        handleFileDrop(event, targetId) {
             // get target drop element id
         }
     }
