@@ -2,6 +2,7 @@ from unicodedata import name
 
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
+from berryllium.mods.services import init_context, create_file_group
 
 from django.shortcuts import render, HttpResponse
 from django.views.decorators.http import require_POST
@@ -178,19 +179,28 @@ def hx_validate_singlefile_description(request, file_id, prefix_id):
 
 
 @require_POST
-def hx_add_filegroup_form(request, group_index):
+def hx_add_filegroup_form(request):
     """HTMX endpoint to add a new file group form."""
+
+    # ------------ Rebuild context and file group data for re-rendering
     mod_id = request.session.get("session_id")
     if not mod_id:
         return HttpResponse(status=400)
+    
+    context = init_context(current_index=2, form=FileGroupForm())
+    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
 
-    # create new FileGroup draft
-    new_group = FileGroup.objects.create(mod_id=mod_id, name="New File Group")
+    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
-    # render the new form HTML and return
-    print("Adding new FileGroup with ID:", new_group.id, "at index:", group_index)
+    context["file_groups"] = file_group_forms
+    context["group_formset"] = group_formset
+
+    # ------------ Create new FileGroup instance for the new form
+    FileGroup.objects.create(mod_id=mod_id, name="New Group")
+
+    # ------------ Re-render
     return render(
         request,
-        "mods/upload/step/partials/group_header.html",
-        {"group": (new_group, []), "group_index": group_index},
+        "mods/upload/step/partials/group_filegroups.html",
+        context
     )

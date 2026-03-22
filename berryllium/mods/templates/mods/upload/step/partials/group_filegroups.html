@@ -1,0 +1,17 @@
+<div x-show="toggled" x-ref="fileGroups" id="fileGroups">
+    {{ group_formset.management_form }}
+    {% for group, files in file_groups %}
+        {% include "mods/upload/step/partials/group_header.html" with group=group files=files %}
+    {% endfor %}
+    <div id="addGroup"></div>
+    <div class="flex justify-end w-full px-6 mb-4">
+        <button class="zb-action flex items-center justify-center"
+                type="button"
+                hx-post="{% url 'hx_add_filegroup_form' %}"
+                hx-target="#fileGroups"
+                hx-swap="outerHTML"
+                id="addGroup">
+            <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
+        </button>
+    </div>
+</div>
