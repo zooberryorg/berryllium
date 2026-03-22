@@ -39,14 +39,11 @@ function toggleGroupManager({ toggled = false }) {
 
 function fileDragAndDrop() {
     return {
-        isDragging: false,
-        target: null,
-
-        onDragStart(event) {
-            this.isDragging = true;
+        onDragStart(event, fileId) {
+            Alpine.store('dnd').isDragging = true;
+            Alpine.store('dnd').draggedId = fileId;
             event.dataTransfer.effectAllowed = 'move';
-            // for firefox compatibility
-            event.dataTransfer.setData('text/html', 'event.target.outerHTML');          
+            event.dataTransfer.setData('text/plain', String(fileId));    
         },
 
         onDragOver(event) {
