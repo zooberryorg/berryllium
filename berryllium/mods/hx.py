@@ -192,21 +192,15 @@ def hx_validate_singlefile_description(request, file_id, prefix_id):
 def hx_add_filegroup_form(request):
     """HTMX endpoint to add a new file group form."""
 
-    # ------------ Rebuild context and file group data for re-rendering
     mod_id = request.session.get("session_id")
     if not mod_id:
         return HttpResponse(status=400)
-    
-    context = init_context(current_index=2, form=FileGroupForm())
-    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
-
-    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
-
-    context["file_groups"] = file_group_forms
-    context["group_formset"] = group_formset
 
     # ------------ Create new FileGroup instance for the new form
     FileGroup.objects.create(mod_id=mod_id, name="New Group")
+
+    # ------------ Rebuild context and file group data for re-rendering
+    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
     # ------------ Re-render
     return render(
@@ -214,6 +208,7 @@ def hx_add_filegroup_form(request):
         "mods/upload/step/partials/group_filegroup.html",
         {"group": group_formset.forms[-1], "file_groups": filegroups},
     )
+
 
 @require_POST
 def hx_remove_filegroup_form(request, fg_id):
