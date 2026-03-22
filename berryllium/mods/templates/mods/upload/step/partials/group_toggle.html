@@ -1,7 +1,7 @@
 <label
     {# djlint:off #}
     x-init="$watch('toggled', value => {
-        if (value) {
+        if (!value) {
             $refs.fileGroups.classList.add('disabled');
         } else {
             $refs.fileGroups.classList.remove('disabled');
