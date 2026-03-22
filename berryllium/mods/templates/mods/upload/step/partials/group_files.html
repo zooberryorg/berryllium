@@ -1,94 +1,75 @@
-{% for file in files %}
-    {# djlint:off #}
-    <div class="flex items-center gap-2 w-full 
-                bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 
-                border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
-                focus:border-transparent hover:bg-pine-800"
-         x-data="fileDragAndDrop()"
-         x-show="!($store.dnd.draggedId == {{ file.instance.id }})"
-
-         @dragstart="onDragStart($event, {{ file.instance.id }})"
-         @dragover.prevent="onDragOver($event)"
-         @dragend="onDragEnd($event)"
-         @drop.prevent="handleFileDrop($event, {{ file.instance.id }})"
-         draggable="true">
-    {# djlint:on #}
-    <span class="text-pine-200 px-2 py-1 font-size-md">
-        <ion-icon name="document"></ion-icon>
-    </span>
-    <div class="flex flex-col w-full">
-        <input type="text"
-               name="fileform-{{ file.instance.id }}-title"
-               class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
-               placeholder="{{ file.instance.filename }}"
-               hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
-               hx-trigger="input delay:500ms"
-               hx-target="#file-title-errors-{{ file.instance.id }}"
-               hx-swap="innerHTML"
-               autocomplete="off"
-               @keydown.escape="$el.blur()"
-               @keydown.enter.prevent="$el.blur()"
-               hx-on::after-swap="htmx.process(this)"
-               {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
-        <div class="text-red-500 text-sm"
-             id="file-title-errors-{{ file.instance.id }}">
-            {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
-        </div>
-    </div>
-    <div class="flex flex-col w-full">
+<div id="files-group-{{ group.instance.id }}" class="w-100" x-sort.ghost>
+    {% for file in files %}
         {# djlint:off #}
-            <textarea type="text"
-                x-data="textFieldExpand({ content: '{{ file.instance.description }}', ref: 'collapsibleSingleFileDesc' })"
-                x-ref="collapsibleSingleFileDesc"
-                x-init="$nextTick(() => updateTrimLength($refs.collapsibleSingleFileDesc.offsetWidth))"
+        <div class="flex items-center gap-2 w-full 
+                    bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 
+                    border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
+                    focus:border-transparent hover:bg-pine-800"
+            x-sort:item>
+            {# djlint:on #}
+            <span class="text-pine-200 px-2 py-1 font-size-md" x-sort:handle>
+                <ion-icon name="document"></ion-icon>
+            </span>
+            <div class="flex flex-col w-full">
+                <input type="text"
+                    name="fileform-{{ file.instance.id }}-title"
+                    class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
+                    placeholder="{{ file.instance.filename }}"
+                    hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
+                    hx-trigger="input delay:500ms"
+                    hx-target="#file-title-errors-{{ file.instance.id }}"
+                    hx-swap="innerHTML"
+                    autocomplete="off"
+                    @keydown.escape="$el.blur()"
+                    @keydown.enter.prevent="$el.blur()"
+                    hx-on::after-swap="htmx.process(this)"
+                    {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
+                <div class="text-red-500 text-sm"
+                    id="file-title-errors-{{ file.instance.id }}">
+                    {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
+                </div>
+            </div>
+            <div class="flex flex-col w-full">
+                {# djlint:off #}
+                    <textarea type="text"
+                        x-data="textFieldExpand({ content: '{{ file.instance.description }}', ref: 'collapsibleSingleFileDesc' })"
+                        x-ref="collapsibleSingleFileDesc"
+                        x-init="$nextTick(() => updateTrimLength($refs.collapsibleSingleFileDesc.offsetWidth))"
 
-                :rows="focused ? 4 : 1"
-                :class="focused ? 'h-32' : 'h-7'"
-                :value="focused ? content : trimDisplayedContent()"
+                        :rows="focused ? 4 : 1"
+                        :class="focused ? 'h-32' : 'h-7'"
+                        :value="focused ? content : trimDisplayedContent()"
 
-                @focus="expand()"
-                @blur="collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()"
-                @keydown.escape="$el.blur()"
-                @keydown.enter.prevent="$el.blur()"
-                @input="content = $el.value, updateTrimLength($el.offsetWidth)"
+                        @focus="expand()"
+                        @blur="collapse(), updateTrimLength($el.offsetWidth), trimDisplayedContent()"
+                        @keydown.escape="$el.blur()"
+                        @keydown.enter.prevent="$el.blur()"
+                        @input="content = $el.value, updateTrimLength($el.offsetWidth)"
 
-                name="fileform-{{ file.instance.id }}-description"
-                {% if file.instance.description != None %}value="{{ file.instance.description }}"{% endif %}
-                class="px-2 py-1 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 transition-all duration-200 resize-none"
-                placeholder="File Description"
+                        name="fileform-{{ file.instance.id }}-description"
+                        {% if file.instance.description != None %}value="{{ file.instance.description }}"{% endif %}
+                        class="px-2 py-1 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 transition-all duration-200 resize-none"
+                        placeholder="File Description"
 
-                hx-post="{% url 'hx_validate_singlefile_description' file_id=file.instance.id %}"
-                hx-trigger="input delay:500ms"
-                hx-target="#file-description-errors-{{ file.instance.id }}"
-                hx-swap="innerHTML"
-                hx-on::after-swap="htmx.process(this)">
-            </textarea>
-        {# djlint:on #}
-        <div class="text-red-500 text-sm"
-             id="file-description-errors-{{ file.instance.id }}">
-            {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
+                        hx-post="{% url 'hx_validate_singlefile_description' file_id=file.instance.id %}"
+                        hx-trigger="input delay:500ms"
+                        hx-target="#file-description-errors-{{ file.instance.id }}"
+                        hx-swap="innerHTML"
+                        hx-on::after-swap="htmx.process(this)">
+                    </textarea>
+                {# djlint:on #}
+                <div class="text-red-500 text-sm"
+                    id="file-description-errors-{{ file.instance.id }}">
+                    {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
+                </div>
+            </div>
         </div>
-    </div>
+    {% endfor %}
 </div>
-<div id="file-drop-target-{{ file.instance.id }}"
-     class="border-2 border-dashed border-gold/50 rounded-lg p-4 mt-2 text-center text-sm text-gold-400/80 bg-gold-400/10"
-     hx-trigger="drop"
-     x-show="($store.dnd.isDragging && $store.dnd.draggedId != {{ file.instance.id }})"
-     x-transition:enter="transition ease-out duration-200"
-     x-transition:enter-start="max-h-0 p-0 opacity-0"
-     x-transition:enter-end="max-h-40 p-4 opacity-100"
-     x-transition:leave="transition ease-in duration-200"
-     x-transition:leave-start="max-h-40 p-4 opacity-100"
-     x-transition:leave-end="max-h-0 p-0 opacity-0"
-     @dragover.prevent=""
-     x-cloak>
-    <ion-icon name="add-outline" class="text-gold-400/80 w-full text-xl"></ion-icon>
-</div>
-{% endfor %}
 <style>[x-cloak] { display: none !important; }
 
     .ui-draggable-dragging {
-        opacity: 0.0 !important;
+        opacity: 1.0 !important;
     }
 </style>
 <script>
