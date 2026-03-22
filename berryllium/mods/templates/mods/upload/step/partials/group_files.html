@@ -1,4 +1,4 @@
-<div id="files-group-{{ group.instance.id }}" x-sort.ghost>
+<div id="files-group-{{ group.instance.id }}" x-sort.ghost x-sort:group="fileGroup">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
