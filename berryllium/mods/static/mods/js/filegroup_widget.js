@@ -42,25 +42,16 @@ function fileDragAndDrop() {
         updateCurrentElementVisibility(event, el = null) {
             console.log("Updating visibility for element: ", el);
             const currentElement = el || event.currentTarget;
-            const visibility = event.type === 'dragstart' ? 'hidden' : 'visible';
+
             for (const child of currentElement.children) {
-                child.style.visibility = visibility;
+                child.classList.add('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
             }
+            
             if (event.type === 'dragstart') {
-                currentElement.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+                currentElement.classList.add('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
             } else {
-                currentElement.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+                currentElement.classList.remove('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
             }
-        },
-
-        isNeighboring(targetId, draggedId) {
-            if (targetId === draggedId) return true;
-
-            const draggedRow = document.getElementById(`file-row-${draggedId}`);
-            const targetDropZone = document.getElementById(`file-drop-target-${targetId}`);
-            if (!draggedRow || !targetDropZone) return false;
-
-            return draggedRow.nextElementSibling === targetDropZone;
         },
 
         onDragStart(event, fileId) {
@@ -70,11 +61,16 @@ function fileDragAndDrop() {
             event.dataTransfer.setData('text/plain', String(fileId));
             const currentElement = event.currentTarget;
 
-            // ghost customization
-            const ghost = currentElement.cloneNode(true);
-            ghost.classList.add('hidden');
-            document.body.appendChild(ghost);
-            event.dataTransfer.setDragImage(ghost, 0, 0);
+            // chosen customization
+            const chosen = currentElement.cloneNode(true);
+            chosen.classList.add('hidden');
+            chosen.classList.add('cursor-grabbing');
+            document.body.appendChild(chosen);
+            event.dataTransfer.setDragImage(chosen, 0, 0);
+
+            // ghost customization (default class="sortable-ghost" with opacity: 0.5)
+            // select based on class
+            this.updateCurrentElementVisibility(event, currentElement);
         },
 
         onDragOver(event) {

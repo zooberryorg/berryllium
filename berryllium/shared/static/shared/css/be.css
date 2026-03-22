@@ -829,6 +829,12 @@
       border-color: color-mix(in oklab, var(--color-gold-400) 40%, transparent);
     }
   }
+  .border-gold-400\/50 {
+    border-color: color-mix(in srgb, #d6b15d 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      border-color: color-mix(in oklab, var(--color-gold-400) 50%, transparent);
+    }
+  }
   .border-gold-500 {
     border-color: var(--color-gold-500);
   }
@@ -1444,6 +1450,12 @@
   .text-gold-400 {
     color: var(--color-gold-400);
   }
+  .text-gold-400\/50 {
+    color: color-mix(in srgb, #d6b15d 50%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      color: color-mix(in oklab, var(--color-gold-400) 50%, transparent);
+    }
+  }
   .text-gold-400\/80 {
     color: color-mix(in srgb, #d6b15d 80%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1713,6 +1725,13 @@
     &:is(:where(.group):hover *) {
       @media (hover: hover) {
         color: var(--color-gold-300);
+      }
+    }
+  }
+  .group-hover\:text-gold-400 {
+    &:is(:where(.group):hover *) {
+      @media (hover: hover) {
+        color: var(--color-gold-400);
       }
     }
   }
