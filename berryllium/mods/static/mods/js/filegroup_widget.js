@@ -57,7 +57,8 @@ function fileDragAndDrop() {
         },
 
         handleFileDrop(event, targetId) {
-            // get target drop element id
+            event.preventDefault();
+            const draggedId = Alpine.store('dnd').draggedId;
         }
     }
 }

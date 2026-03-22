@@ -5,45 +5,36 @@
                 border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
                 focus:border-transparent hover:bg-pine-800"
          x-data="fileDragAndDrop()"
-         x-init="$watch('isDragging', value => {
-             if (value) {
-                console.log('dragging file over', $el);
-                 $el.classList.add('border-gold-400', 'bg-gold-400/10');
-             } else {
-                 $el.classList.remove('border-gold-400', 'bg-gold-400/10');
-             }
-         })"
-         @dragenter.prevent="isDragging = true"
          @dragstart="onDragStart($event, {{ file.instance.id }})"
          @dragover.prevent="onDragOver($event)"
-         @dragleave.prevent="isDragging = false"
+         @dragend="onDragEnd($event)"
          @drop.prevent="handleFileDrop($event, {{ file.instance.id }})"
          draggable="true">
     {# djlint:on #}
-        <span class="text-pine-200 px-2 py-1 font-size-md">
-            <ion-icon name="document"></ion-icon>
-        </span>
-        <div class="flex flex-col w-full">
-            <input type="text"
-                   name="fileform-{{ file.instance.id }}-title"
-                   class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
-                   placeholder="{{ file.instance.filename }}"
-                   hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
-                   hx-trigger="input delay:500ms"
-                   hx-target="#file-title-errors-{{ file.instance.id }}"
-                   hx-swap="innerHTML"
-                   autocomplete="off"
-                   @keydown.escape="$el.blur()"
-                   @keydown.enter.prevent="$el.blur()"
-                   hx-on::after-swap="htmx.process(this)"
-                   {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
-            <div class="text-red-500 text-sm"
-                 id="file-title-errors-{{ file.instance.id }}">
-                {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
-            </div>
+    <span class="text-pine-200 px-2 py-1 font-size-md">
+        <ion-icon name="document"></ion-icon>
+    </span>
+    <div class="flex flex-col w-full">
+        <input type="text"
+               name="fileform-{{ file.instance.id }}-title"
+               class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
+               placeholder="{{ file.instance.filename }}"
+               hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
+               hx-trigger="input delay:500ms"
+               hx-target="#file-title-errors-{{ file.instance.id }}"
+               hx-swap="innerHTML"
+               autocomplete="off"
+               @keydown.escape="$el.blur()"
+               @keydown.enter.prevent="$el.blur()"
+               hx-on::after-swap="htmx.process(this)"
+               {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
+        <div class="text-red-500 text-sm"
+             id="file-title-errors-{{ file.instance.id }}">
+            {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
         </div>
-        <div class="flex flex-col w-full">
-            {# djlint:off #}
+    </div>
+    <div class="flex flex-col w-full">
+        {# djlint:off #}
             <textarea type="text"
                 x-data="textFieldExpand({ content: '{{ file.instance.description }}', ref: 'collapsibleSingleFileDesc' })"
                 x-ref="collapsibleSingleFileDesc"
@@ -70,20 +61,43 @@
                 hx-swap="innerHTML"
                 hx-on::after-swap="htmx.process(this)">
             </textarea>
-            {# djlint:on #}
-            <div class="text-red-500 text-sm"
-                 id="file-description-errors-{{ file.instance.id }}">
-                {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
-            </div>
+        {# djlint:on #}
+        <div class="text-red-500 text-sm"
+             id="file-description-errors-{{ file.instance.id }}">
+            {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
         </div>
     </div>
-    <div id="file-drop-target-{{ file.instance.id }}"
-         class="border-2 border-dashed border-red-500/50 rounded-lg p-4 mt-2 text-center text-sm text-red-400/80"
-         hx-trigger="drop"
-         x-show="isDragging"
-         @dragenter.prevent="isDragging = true"
-         @dragover.prevent
-         x-cloak>
-        Drop file here to replace
-    </div>
+</div>
+<div id="file-drop-target-{{ file.instance.id }}"
+     class="border-2 border-dashed border-red-500/50 rounded-lg p-4 mt-2 text-center text-sm text-red-400/80"
+     hx-trigger="drop"
+     x-show="$store.dnd.isDragging"
+     x-init="$watch('$store.dnd.isDragging', value => {
+                if (!value) {
+                    $el.classList.add('hidden');
+                } else {
+                    $el.classList.remove('hidden');
+                }
+            })"
+     @dragover.prevent=""
+     x-cloak>Drop file here to replace</div>
 {% endfor %}
+<style>
+    [x-cloak] { display: none !important; }
+</style>
+<script>
+    // in case alpine already loaded before
+    if (window.Alpine) {
+        Alpine.store('dnd', {
+            isDragging: false,
+            draggedId: null,
+        });
+    } else {
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('dnd', {
+                isDragging: false,
+                draggedId: null,
+            });
+        });
+    }
+</script>
