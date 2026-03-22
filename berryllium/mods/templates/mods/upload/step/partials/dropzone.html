@@ -20,6 +20,13 @@
         </div>
     </div>
     <input type="file"
+           x-init="$watch('isUploading', value => { 
+                if (value) {
+                    disableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
+                } else {
+                    enableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
+                }
+            })"
            name="file"
            id="id_file"
            x-ref="fileInput"
