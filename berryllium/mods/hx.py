@@ -204,3 +204,9 @@ def hx_add_filegroup_form(request):
         "mods/upload/step/partials/group_filegroups.html",
         context
     )
+
+@require_POST
+def hx_remove_filegroup_form(request, fg_id):
+    """HTMX endpoint to remove a file group form."""
+    FileGroup.objects.filter(id=fg_id).delete()
+    return HttpResponse()
