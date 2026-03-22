@@ -54,10 +54,13 @@ function fileDragAndDrop() {
     },
 
     isNeighboring(targetId, draggedId) {
-        const targetEl = document.getElementById(`file-drop-target-${targetId}`);
-        const draggedEl = document.getElementById(`file-drop-target-${draggedId}`);
-        if (!targetEl || !draggedEl) return false;
-        return targetEl === draggedEl;
+        if (targetId === draggedId) return true;
+
+        const draggedRow = document.getElementById(`file-row-${draggedId}`);
+        const targetDropZone = document.getElementById(`file-drop-target-${targetId}`);
+        if (!draggedRow || !targetDropZone) return false;
+
+        return draggedRow.nextElementSibling === targetDropZone;
     },
 
     onDragStart(event, fileId) {
