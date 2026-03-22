@@ -62,9 +62,9 @@ def hx_toggle_group_manager(request):
 
 
 @require_POST
-def hx_validate_filegroup_name(request, fg_id, prefix_id):
+def hx_validate_filegroup_name(request, fg_id):
     """HTMX endpoint to validate filegroup name field."""
-    groupname = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
+    groupname = request.POST.get("form-" + str(fg_id) + "-name", "").strip()
     print("Received group name for validation:", groupname, "for FileGroup ID:", fg_id)
 
     form = FileGroupForm(data={"name": groupname}, instance=FileGroup(id=fg_id))
@@ -88,11 +88,11 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
 
 
 @require_POST
-def hx_validate_filegroup_description(request, fg_id, prefix_id):
+def hx_validate_filegroup_description(request, fg_id):
     """HTMX endpoint to validate filegroup description field."""
     print("Validating description for FileGroup ID:", fg_id)
     description = request.POST.get(
-        "form-" + str(prefix_id) + "-description", ""
+        "form-" + str(fg_id) + "-description", ""
     ).strip()
 
     form = FileGroupForm(
@@ -128,9 +128,9 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
 
 
 @require_POST
-def hx_validate_singlefile_title(request, file_id, prefix_id):
+def hx_validate_singlefile_title(request, file_id):
     """HTMX endpoint to validate single file title field."""
-    title = request.POST.get("fileform-" + str(prefix_id) + "-title", "").strip()
+    title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
     print("Received title for validation:", title, "for FileUpload ID:", file_id)
 
     # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance if valid, can't use instance here since FileUpload is not a real model instance yet, just a draft with an id, so we create a temporary instance with the id for validation purposes
@@ -163,10 +163,10 @@ def hx_validate_singlefile_title(request, file_id, prefix_id):
 
 
 @require_POST
-def hx_validate_singlefile_description(request, file_id, prefix_id):
+def hx_validate_singlefile_description(request, file_id):
     """HTMX endpoint to validate single file description field."""
     description = request.POST.get(
-        "fileform-" + str(prefix_id) + "-description", ""
+        "fileform-" + str(file_id) + "-description", ""
     ).strip()
 
     form = SingleFileForm(data={"description": description})
@@ -203,14 +203,11 @@ def hx_add_filegroup_form(request):
     # ------------ Rebuild context and file group data for re-rendering
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
-    # create new index for the new form based on total number of forms
-    prefix_id = len(group_formset.forms) - 1
-
     # ------------ Re-render
     return render(
         request,
         "mods/upload/step/partials/group_filegroup.html",
-        {"group": group_formset.forms[-1], "file_groups": filegroups, "prefix_id": prefix_id},
+        {"group": group_formset.forms[-1], "file_groups": filegroups},
     )
 
 
