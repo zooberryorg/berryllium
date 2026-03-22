@@ -101,6 +101,14 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
 
     errors = form.errors.get("description", [])
     if errors:
+        print(
+            "Validation errors for FileGroup ID:",
+            fg_id,
+            "Description:",
+            description,
+            "Errors:",
+            errors,
+        )
         return render(
             request,
             "mods/upload/step/partials/hx_errors.html",
@@ -109,8 +117,10 @@ def hx_validate_filegroup_description(request, fg_id, prefix_id):
 
     # if valid, save to FileGroup draft
     file_group = FileGroup.objects.filter(id=fg_id).first()
+    print("Saving description for FileGroup ID:", fg_id, "Description:", description)
     if file_group:
         file_group.description = description
+        print("Saved description for FileGroup ID:", fg_id)
         file_group.save()
 
     return HttpResponse()
@@ -201,8 +211,8 @@ def hx_add_filegroup_form(request):
     # ------------ Re-render
     return render(
         request,
-        "mods/upload/step/partials/group_filegroups.html",
-        context
+        "mods/upload/step/partials/group_filegroup.html",
+        {"group": group_formset.forms[-1], "file_groups": filegroups},
     )
 
 @require_POST

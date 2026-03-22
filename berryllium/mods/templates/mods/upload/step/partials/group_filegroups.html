@@ -8,9 +8,14 @@
         <button class="zb-action flex items-center justify-center"
                 type="button"
                 hx-post="{% url 'hx_add_filegroup_form' %}"
-                hx-target="#fileGroups"
-                hx-swap="outerHTML"
-                x-on:click="$nextTick(() => $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }))">
+                hx-target="#addGroup"
+                hx-swap="beforeend"
+                {# djlint:off #}
+                {# refreshes alpine state after swap #}
+                hx-on:htmx:after-swap="
+                    Alpine.initTree(event.detail.elt);
+                    event.detail.elt.lastElementChild.scrollIntoView({ behavior: 'smooth' });">
+                {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
         </button>
     </div>

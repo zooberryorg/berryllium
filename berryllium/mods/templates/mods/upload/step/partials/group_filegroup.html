@@ -19,10 +19,10 @@
                     {% if group.name.errors %}{{ group.name.errors|join:", " }}{% endif %}
                 </div>
                 {% url 'hx_validate_filegroup_description' fg_id=group.instance.id prefix_id=forloop.counter0 as desc_endpoint %}
-                <div x-data="textFieldExpand({ content: '{{ instance_value }}', ref: 'collapsibleGroupDesc' })"
+                <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
                      x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
                     {# djlint:off #}
-                        {% render_field group.description hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target="#group-description-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
+                    {% render_field group.description :hx-model="content" hx-post=desc_endpoint hx-trigger="input delay:500ms" hx-target="#group-description-errors" hx-swap="innerHTML" hx-on::after-swap="htmx.process(this)" %}
                     {# djlint:on #}
                     {{ group.description.errors }}
                 </div>
