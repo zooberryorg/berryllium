@@ -594,6 +594,9 @@
   .animate-spin {
     animation: var(--animate-spin);
   }
+  .cursor-grabbing {
+    cursor: grabbing;
+  }
   .cursor-pointer {
     cursor: pointer;
   }
