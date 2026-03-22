@@ -72,16 +72,10 @@ function fileDragAndDrop() {
 
             // ghost customization
             const ghost = currentElement.cloneNode(true);
-            ghost.style.position = 'fixed';
-            ghost.style.top = '100px';
-            ghost.style.left = '100px';
-            ghost.style.opacity = '1.0';
-            ghost.style.width = currentElement.offsetWidth + 'px';
             ghost.classList.add('cursor-grabbing');
-            ghost.classList.add('w-full');
             ghost.style.zIndex = '9999';
             document.body.appendChild(ghost);
-            event.dataTransfer.setDragImage(ghost, ghost.offsetWidth / 2, 20);
+            event.dataTransfer.setDragImage(ghost, 50, 50);
 
             setTimeout(() => {
                 this.updateCurrentElementVisibility(event, currentElement);
