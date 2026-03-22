@@ -91,9 +91,7 @@ def hx_validate_filegroup_name(request, fg_id):
 def hx_validate_filegroup_description(request, fg_id):
     """HTMX endpoint to validate filegroup description field."""
     print("Validating description for FileGroup ID:", fg_id)
-    description = request.POST.get(
-        "form-" + str(fg_id) + "-description", ""
-    ).strip()
+    description = request.POST.get("form-" + str(fg_id) + "-description", "").strip()
 
     form = FileGroupForm(
         data={"description": description}, instance=FileGroup(id=fg_id)
