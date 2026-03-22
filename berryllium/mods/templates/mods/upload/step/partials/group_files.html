@@ -12,6 +12,7 @@
                    hx-trigger="input delay:500ms"
                    hx-target="#file-title-errors-{{ forloop.counter0 }}"
                    hx-swap="innerHTML"
+                   autocomplete="off"
                    @keydown.escape="$el.blur()"
                    @keydown.enter.prevent="$el.blur()"
                    hx-on::after-swap="htmx.process(this)"

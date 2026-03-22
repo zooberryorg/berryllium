@@ -64,9 +64,10 @@ def hx_toggle_group_manager(request):
 @require_POST
 def hx_validate_filegroup_name(request, fg_id, prefix_id):
     """HTMX endpoint to validate filegroup name field."""
-    name = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
+    groupname = request.POST.get("form-" + str(prefix_id) + "-name", "").strip()
+    print("Received group name for validation:", groupname, "for FileGroup ID:", fg_id)
 
-    form = FileGroupForm(data={"name": name}, instance=FileGroup(id=fg_id))
+    form = FileGroupForm(data={"name": groupname}, instance=FileGroup(id=fg_id))
     form.is_valid()
 
     errors = form.errors.get("name", [])
@@ -80,7 +81,7 @@ def hx_validate_filegroup_name(request, fg_id, prefix_id):
     # if valid, save to FileGroup draft
     file_group = FileGroup.objects.filter(id=fg_id).first()
     if file_group:
-        file_group.name = name
+        file_group.name = groupname
         file_group.save()
 
     return HttpResponse()
