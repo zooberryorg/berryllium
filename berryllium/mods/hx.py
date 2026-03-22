@@ -203,11 +203,14 @@ def hx_add_filegroup_form(request):
     # ------------ Rebuild context and file group data for re-rendering
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
+    # create new index for the new form based on total number of forms
+    prefix_id = len(group_formset.forms) - 1
+
     # ------------ Re-render
     return render(
         request,
         "mods/upload/step/partials/group_filegroup.html",
-        {"group": group_formset.forms[-1], "file_groups": filegroups},
+        {"group": group_formset.forms[-1], "file_groups": filegroups, "prefix_id": prefix_id},
     )
 
 

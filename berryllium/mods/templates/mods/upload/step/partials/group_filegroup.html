@@ -14,24 +14,23 @@
                 {% for hidden in group.hidden_fields %}{{ hidden }}{% endfor %}
                 {% comment %} fileground url with file group id (not mod id) {% endcomment %}
                 <input type="text"
-                       name="form-{{ forloop.counter0 }}-name"
+                       name="form-{{ group.instance.id }}-name"
                        {% if group.instance.name != None %}value="{{ group.instance.name }}"{% endif %}
                        id="Group Name Title"
                        class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
                        placeholder="{{ group.instance.name }}"
-                       hx-post="{% url 'hx_validate_filegroup_name' fg_id=group.instance.id prefix_id=forloop.counter0 %}"
+                       hx-post="{% url 'hx_validate_filegroup_name' fg_id=group.instance.id %}"
                        hx-trigger="input delay:500ms"
-                       hx-target="#group-name-errors-{{ forloop.counter0 }}"
+                       hx-target="#group-name-errors-{{ group.instance.id }}"
                        hx-swap="innerHTML"
                        autocomplete="off"
                        @keydown.escape="$el.blur()"
                        @keydown.enter.prevent="$el.blur()"
                        hx-on::after-swap="htmx.process(this)">
                 <div class="text-red-500 text-sm"
-                     id="group-name-errors-{{ forloop.counter0 }}">
+                     id="group-name-errors-{{ group.instance.id }}">
                     {% if group.name.errors %}{{ group.name.errors|join:", " }}{% endif %}
                 </div>
-                {% url 'hx_validate_filegroup_description' fg_id=group.instance.id prefix_id=forloop.counter0 as desc_endpoint %}
                 <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
                      x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
                     <textarea type="text"
@@ -46,21 +45,21 @@
                               @keydown.enter.prevent="$el.blur()"
                               :value="focused ? content : trimDisplayedContent()"
                               @input="content = $el.value, updateTrimLength($el.offsetWidth)"
-                              name="form-{{ forloop.counter0 }}-description"
+                              name="form-{{ group.instance.id }}-description"
                               {% if group.instance.description != None %}value="{{ group.instance.description }}"{% endif %}
                               class="px-2 py-1 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 transition-all duration-200 resize-none"
                               placeholder="Group Description"
-                              hx-post="{% url 'hx_validate_filegroup_description' fg_id=group.instance.id prefix_id=forloop.counter0 %}"
+                              hx-post="{% url 'hx_validate_filegroup_description' fg_id=group.instance.id %}"
                               hx-trigger="input delay:500ms"
-                              hx-target="#group-description-errors-{{ forloop.counter0 }}"
+                              hx-target="#group-description-errors-{{ group.instance.id }}"
                               hx-swap="innerHTML"
                               hx-on::after-swap="htmx.process(this)"></textarea>
                 </div>
                 <div class="text-red-500 text-sm"
-                     id="group-description-errors-{{ forloop.counter0 }}">
+                     id="group-description-errors-{{ group.instance.id }}">
                     {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
                 </div>
-                {% include "mods/upload/step/partials/group_files.html" with files=files group_index=forloop.counter0 %}
+                {% include "mods/upload/step/partials/group_files.html" with files=files group_index=group.instance.id %}
             </div>
         </div>
     </div>
