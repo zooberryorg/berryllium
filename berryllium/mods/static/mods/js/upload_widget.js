@@ -79,12 +79,14 @@ function fileInputProcessor({hasExistingUrl = false} = {}) {
 
     enableInput(ref, flag) {
       this[flag] = true;
-      ref.classList.remove('pointer-events-none', `opacity-20`);
+      ref.classList.remove('pointer-events-none', `opacity-50`);
+      ref.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled = false);
     },
 
     disableInput(ref, flag) {
       this[flag] = false;
-      ref.classList.add('pointer-events-none', `opacity-20`);
+      ref.classList.add('pointer-events-none', `opacity-50`);
+      ref.querySelectorAll('input, textarea, button, select').forEach(el => el.disabled = true);
     },
     
     handleFileSelect(event) {
