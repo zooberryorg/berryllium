@@ -17,5 +17,5 @@ def get_item(list_obj, index):
 
 @register.simple_tag
 def gen_field(field, **kwargs):
-    attrs = {k.replace('_', '-'): v for k, v in kwargs.items()}
-    return mark_safe(render_field(field, **attrs))
+    extra = {k.replace('_', '-'): v for k, v in kwargs.items()}
+    return mark_safe(field.as_widget(attrs=extra))

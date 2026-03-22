@@ -31,7 +31,6 @@
                 
                 <div x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
                      x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))">
-                    {# djlint:off #}
                 <textarea type="text"
                     name="{{ group.description.html_name }}"
                     id="{{ group.description.id_for_label }}"
@@ -44,7 +43,7 @@
                     x-ref="collapsibleGroupDesc"
                 >{{ group.instance.description }}</textarea>
                 </div>
-                <div class="text-red-500 text-sm" id="group-description-errors-{{ forloop.counter0 }}">
+                <div class="text-red-500 text-sm" id="#group-description-errors-{{ forloop.counter0 }}">
                     {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
                 </div>
                 {% include "mods/upload/step/partials/group_files.html" with files=files group_index=forloop.counter0 %}
