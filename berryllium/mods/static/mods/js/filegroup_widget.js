@@ -40,3 +40,6 @@ function toggleGroupManager({ toggled = false }) {
         toggled,
     }
 }
+
+function fileDragAndDrop() {
+}
