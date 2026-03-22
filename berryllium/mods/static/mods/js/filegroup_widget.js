@@ -39,17 +39,17 @@ function toggleGroupManager({ toggled = false }) {
 
 function fileDragAndDrop() {
     return {
-    updateCurrentElementVisibility(event) {
-        const currentElement = event.currentTarget;
-        console.log("Updating visibility for element: ", currentElement);
+    updateCurrentElementVisibility(event, el = null) {
+        console.log("Updating visibility for element: ", el);
+        const currentElement = el || event.currentTarget;
         const visibility = event.type === 'dragstart' ? 'hidden' : 'visible';
-        for (const child of event.currentTarget.children) {
+        for (const child of currentElement.children) {
             child.style.visibility = visibility;
         }
         if (event.type === 'dragstart') {
-            event.currentTarget.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+            currentElement.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         } else {
-            event.currentTarget.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+            currentElement.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         }
     },
     
@@ -58,8 +58,10 @@ function fileDragAndDrop() {
         Alpine.store('dnd').draggedId = fileId;
         event.dataTransfer.effectAllowed = 'move';
         event.dataTransfer.setData('text/plain', String(fileId));
+        const currentElement = event.currentTarget;
+
         setTimeout(() => {
-            this.updateCurrentElementVisibility(event);     
+            this.updateCurrentElementVisibility(event, currentElement);
         }, 0);
     },
 
@@ -72,8 +74,9 @@ function fileDragAndDrop() {
             this.isDragging = false;
             this.target = null;
             Alpine.store('dnd').isDragging = false;
+            Alpine.store('dnd').draggedId = null;
 
-            this.updateCurrentElementVisibility(event);
+            this.updateCurrentElementVisibility(event, event.currentTarget);
         },
 
         handleFileDrop(event, targetId) {
