@@ -52,7 +52,14 @@ function fileDragAndDrop() {
             currentElement.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         }
     },
-    
+
+    isNeighboring(targetId, draggedId) {
+        const targetEl = document.getElementById(`file-drop-target-${targetId}`);
+        const draggedEl = document.getElementById(`file-drop-target-${draggedId}`);
+        if (!targetEl || !draggedEl) return false;
+        return targetEl === draggedEl;
+    },
+
     onDragStart(event, fileId) {
         Alpine.store('dnd').isDragging = true;
         Alpine.store('dnd').draggedId = fileId;
