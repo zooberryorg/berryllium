@@ -43,7 +43,13 @@ function fileDragAndDrop() {
             Alpine.store('dnd').isDragging = true;
             Alpine.store('dnd').draggedId = fileId;
             event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/plain', String(fileId));    
+            event.dataTransfer.setData('text/plain', String(fileId));   
+            
+            // custom drag image to avoid default ghost image
+            ghostEl = event.target.cloneNode(true);
+            ghostEl.classList.add('ghost-drag-image');
+            document.body.appendChild(ghostEl);
+            event.dataTransfer.setDragImage(ghostEl, ghostEl.offsetWidth / 2, ghostEl.offsetHeight / 2);
         },
 
         onDragOver(event) {
@@ -54,6 +60,11 @@ function fileDragAndDrop() {
         onDragEnd(event) {
             this.isDragging = false;
             this.target = null;
+            // clean up custom drag image
+            const ghostEl = document.querySelector('.ghost-drag-image');
+            if (ghostEl) {
+                ghostEl.remove();
+            }
         },
 
         handleFileDrop(event, targetId) {
