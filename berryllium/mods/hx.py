@@ -1,5 +1,3 @@
-from unicodedata import name
-
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
 from berryllium.mods.services import init_context, create_file_group
