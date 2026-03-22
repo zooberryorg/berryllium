@@ -42,4 +42,12 @@ function toggleGroupManager({ toggled = false }) {
 }
 
 function fileDragAndDrop() {
+    return {
+        isDragging: false,
+
+        onDragStart(event) {
+            this.isDragging = true;
+            event.dataTransfer.effectAllowed = 'move';
+        }
+    }
 }
