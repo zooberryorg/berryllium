@@ -56,6 +56,11 @@ function fileDragAndDrop() {
         onDragOver(event) {
             event.preventDefault();
             this.target = event.target;
+        },
+
+        onDragEnd(event) {
+            this.isDragging = false;
+            this.target = null;
         }
     }
 }
