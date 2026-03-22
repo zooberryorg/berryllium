@@ -14,7 +14,8 @@
                 {# refreshes alpine state after swap #}
                 hx-on:htmx:after-swap="
                     Alpine.initTree(event.detail.elt);
-                    event.detail.elt.lastElementChild.scrollIntoView({ behavior: 'smooth' });">
+                    "
+                @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })"
                 {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
         </button>
