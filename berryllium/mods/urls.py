@@ -53,4 +53,9 @@ urlpatterns = [
         hx.hx_add_filegroup_form,
         name="hx_add_filegroup_form",
     ),
+    path(
+        "mods/remove-filegroup-form/<int:fg_id>/",
+        hx.hx_remove_filegroup_form,
+        name="hx_remove_filegroup_form",
+    ),
 ]

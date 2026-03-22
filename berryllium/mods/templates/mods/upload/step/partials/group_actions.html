@@ -7,7 +7,9 @@
 {% if file_groups|length > 1 %}
     <button type="button"
             class="zb-action-delete"
-            onclick="removeGroup({{ forloop.counter0 }})">
+                hx-post="{% url 'hx_remove_filegroup_form' fg_id=file_group.id %}"
+                hx-target="#fileGroups"
+                hx-swap="outerHTML"
         <ion-icon name="trash"></ion-icon>
     </button>
 {% endif %}
