@@ -48,7 +48,7 @@ function fileDragAndDrop() {
 
         onDragOver(event) {
             event.preventDefault();
-            this.target = event.target;
+            event.dataTransfer.dropEffect = 'move';
         },
 
         onDragEnd(event) {
