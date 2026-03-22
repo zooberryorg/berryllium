@@ -4,17 +4,19 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.forms import formset_factory, inlineformset_factory, modelformset_factory
 
 from berryllium.mods.forms import (
     FileUploadForm,
     MetadataForm,
     FileGroupForm,
-    SingleFileForm,
-    FileDetailsForm,
 )
-from berryllium.mods.models import Mod, FileGroup, FileUpload
-from berryllium.mods.services import init_context, upload_file
+from berryllium.mods.models import Mod
+from berryllium.mods.services import (
+    init_context,
+    upload_file,
+    create_file_group,
+    create_filegroup_formsets,
+)
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
@@ -195,27 +197,16 @@ def upload_step3(request):
     context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     mod_id = request.session.get("session_id")
 
-    FileGroupFormset = modelformset_factory(FileGroup, form=FileGroupForm, extra=0)
-    SingleFileFormset = inlineformset_factory(
-        FileGroup, FileUpload, fields=["title", "description"], extra=0
-    )
-
-    group_objects = FileGroup.objects.filter(mod_id=mod_id)
-    group_formset = FileGroupFormset(queryset=group_objects)
-
-    # pair each file group with its set of files
-    file_groups = [
-        (form, SingleFileFormset(instance=form.instance))
-        for form in group_formset.forms
-    ]
+    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         if request.POST.get("action") == "previous":
             return redirect("upload_step2")
 
+        FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
         # get formset data and validate
-        group_formset = FileGroupFormset(request.POST, queryset=group_objects)
+        group_formset = FileGroupFormset(request.POST, queryset=filegroups)
         if group_formset.is_valid():
             saved_groups = group_formset.save()
             for group in saved_groups:
@@ -227,12 +218,12 @@ def upload_step3(request):
             if request.POST.get("action") == "next":
                 return redirect("upload_step4")
         else:
-            context["file_groups"] = file_groups
+            context["file_groups"] = file_group_forms
             context["group_formset"] = group_formset
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
-    context["file_groups"] = file_groups
+    context["file_groups"] = file_group_forms
     context["group_formset"] = group_formset
     return render(request, "mods/upload/step/3.html", context)
 

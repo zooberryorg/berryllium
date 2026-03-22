@@ -4,31 +4,17 @@
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <form hx-post="{% url 'upload_step3' %}"
-      hx-target="#upload-frame"
-      hx-swap="innerHTML"
-      enctype="multipart/form-data"
-      hx-encoding="multipart/form-data"
-      x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
-      x-ref="uploadForm">
+    hx-target="#upload-frame"
+    id="uploadForm"
+    hx-swap="innerHTML"
+    enctype="multipart/form-data"
+    hx-encoding="multipart/form-data"
+    x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
+    x-ref="uploadForm">
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
-    <div x-show="toggled" x-ref="fileGroups" id="fileGroups">
-        {{ group_formset.management_form }}
-        {% for group, files in file_groups %}
-            {% include "mods/upload/step/partials/group_header.html" with group=group files=files %}
-        {% endfor %}
-        <div class="flex justify-end w-full px-6 mb-4">
-            <button class="zb-action flex items-center justify-center"
-                    type="button"
-                    hx-post="{% url 'hx_add_filegroup_form' %}"
-                    hx-target="#fileGroups"
-                    hx-swap="beforeend"
-                    id="addGroup">
-                <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
-            </button>
-        </div>
-    </div>
+    {% include "mods/upload/step/partials/group_filegroups.html" with file_groups=file_groups group_formset=group_formset %}
 </div>
 {% include "mods/upload/actions.html" %}
 </form>
