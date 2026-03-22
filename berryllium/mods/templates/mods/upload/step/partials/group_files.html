@@ -71,14 +71,13 @@
 <div id="file-drop-target-{{ file.instance.id }}"
      class="border-2 border-dashed border-gold/50 rounded-lg p-4 mt-2 text-center text-sm text-gold-400/80 bg-gold-400/10"
      hx-trigger="drop"
-     x-show="$store.dnd.isDragging"
-     x-init="$watch('$store.dnd.isDragging', value => {
-                if (!value) {
-                    $el.classList.add('hidden');
-                } else {
-                    $el.classList.remove('hidden');
-                }
-            })"
+     x-show="$store.dnd.isDragging && $store.dnd.draggedId != {{ file.instance.id }}"
+     x-transition:enter="transition ease-out duration-200"
+     x-transition:enter-start="max-h-0 p-0 opacity-0"
+     x-transition:enter-end="max-h-40 p-4 opacity-100"
+    x-transition:leave="transition ease-in duration-200"
+    x-transition:leave-start="max-h-40 p-4 opacity-100"
+    x-transition:leave-end="max-h-0 p-0 opacity-0"
      @dragover.prevent=""
      x-cloak>Drop file here to replace</div>
 {% endfor %}

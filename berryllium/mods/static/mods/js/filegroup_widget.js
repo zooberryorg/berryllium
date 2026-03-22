@@ -41,14 +41,15 @@ function fileDragAndDrop() {
     return {
     updateCurrentElementVisibility(event) {
         const currentElement = event.currentTarget;
+        console.log("Updating visibility for element: ", currentElement);
         const visibility = event.type === 'dragstart' ? 'hidden' : 'visible';
-        for (const child of currentElement.children) {
+        for (const child of event.currentTarget.children) {
             child.style.visibility = visibility;
         }
         if (event.type === 'dragstart') {
-            currentElement.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+            event.currentTarget.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         } else {
-            currentElement.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+            event.currentTarget.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         }
     },
     
