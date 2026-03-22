@@ -39,18 +39,25 @@ function toggleGroupManager({ toggled = false }) {
 
 function fileDragAndDrop() {
     return {
-        onDragStart(event, fileId) {
-            Alpine.store('dnd').isDragging = true;
-            Alpine.store('dnd').draggedId = fileId;
-            event.dataTransfer.effectAllowed = 'move';
-            event.dataTransfer.setData('text/plain', String(fileId));   
-            
-            // custom drag image to avoid default ghost image
-            ghostEl = event.target.cloneNode(true);
-            ghostEl.classList.add('ghost-drag-image');
-            document.body.appendChild(ghostEl);
-            event.dataTransfer.setDragImage(ghostEl, ghostEl.offsetWidth / 2, ghostEl.offsetHeight / 2);
-        },
+    onDragStart(event, fileId) {
+        Alpine.store('dnd').isDragging = true;
+        Alpine.store('dnd').draggedId = fileId;
+        event.dataTransfer.effectAllowed = 'move';
+        event.dataTransfer.setData('text/plain', String(fileId));
+        currentElement = event.currentTarget;
+        setTimeout(() => {
+            // set current element to invisible to hide default drag image
+            // hide all children of current el
+            for (const child of currentElement.children) {
+                child.style.visibility = 'hidden';
+            }
+            currentElement.classList.add('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
+            // 
+        }, 0);
+
+        // Clean up after drag ends
+        // this._ghost = ghost;
+    },
 
         onDragOver(event) {
             event.preventDefault();
@@ -60,11 +67,13 @@ function fileDragAndDrop() {
         onDragEnd(event) {
             this.isDragging = false;
             this.target = null;
-            // clean up custom drag image
-            const ghostEl = document.querySelector('.ghost-drag-image');
-            if (ghostEl) {
-                ghostEl.remove();
+            Alpine.store('dnd').isDragging = false;
+
+            // restore visibility of dragged element
+            for (const child of event.currentTarget.children) {
+                child.style.visibility = 'visible';
             }
+            event.currentTarget.classList.remove('bg-gray-200/50', 'border-gray-400/50', 'pointer-events-none');
         },
 
         handleFileDrop(event, targetId) {
