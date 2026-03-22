@@ -10,7 +10,6 @@
                 hx-post="{% url 'hx_add_filegroup_form' %}"
                 hx-target="#fileGroups"
                 hx-swap="outerHTML"
-                id="addGroup"
                 x-on:click="$nextTick(() => $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }))">
             <ion-icon name="add-circle" class="pr-2"></ion-icon> Add Group
         </button>
