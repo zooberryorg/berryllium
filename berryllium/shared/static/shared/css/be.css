@@ -438,6 +438,9 @@
   .table {
     display: table;
   }
+  .h-0 {
+    height: calc(var(--spacing) * 0);
+  }
   .h-2 {
     height: calc(var(--spacing) * 2);
   }
@@ -768,6 +771,10 @@
   .border-b {
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
+  }
+  .border-b-2 {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 2px;
   }
   .border-dashed {
     --tw-border-style: dashed;
