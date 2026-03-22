@@ -73,4 +73,10 @@
             </div>
         </div>
     </div>
+    <div id="file-drop-target-{{ file.instance.id }}"
+         class="border-2 border-dashed border-red-500/50 rounded-lg p-4 mt-2 text-center text-sm text-red-400/80"
+         x-show="isDragging"
+         x-cloak>
+        Drop file here to replace
+    </div>
 {% endfor %}
