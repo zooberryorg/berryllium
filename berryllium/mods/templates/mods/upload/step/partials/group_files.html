@@ -41,7 +41,7 @@
                         x-init="$nextTick(() => updateTrimLength($refs.collapsibleSingleFileDesc.offsetWidth))"
 
                         :rows="focused ? 4 : 1"
-                        :class="focused ? 'h-32' : 'h-7'"
+                        :class="focused ? 'h-15' : 'h-7'"
                         :value="focused ? content : trimDisplayedContent()"
 
                         @focus="expand()"
