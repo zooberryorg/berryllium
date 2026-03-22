@@ -1,4 +1,4 @@
-<div id="files-group-{{ group.instance.id }}" class="w-100" x-sort.ghost>
+<div id="files-group-{{ group.instance.id }}" x-sort.ghost>
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
@@ -7,7 +7,7 @@
                     focus:border-transparent hover:bg-pine-800"
             x-sort:item>
             {# djlint:on #}
-            <span class="text-pine-200 px-2 py-1 font-size-md" x-sort:handle>
+            <span class="text-pine-200 px-2 py-1 font-size-md cursor-grab" x-sort:handle>
                 <ion-icon name="document"></ion-icon>
             </span>
             <div class="flex flex-col w-full">
