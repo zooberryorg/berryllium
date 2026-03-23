@@ -3,18 +3,18 @@ function createModal() {
         // modal closed by default
         isOpen: false,
         modalTitle: "Modal Title",
-        form: "",
+        endpoint: "",
 
         openModal(detail = {}) {
             this.isOpen = true;
-            this.form = detail.form || "";
+            this.endpoint = detail.endpoint || "";
             this.modalTitle = detail.title || "Modal Title";
 
             // HTMX for form content
             setTimeout(() => {
                 const modalContent = document.getElementById('modal-content');
                 if (modalContent) {
-                    htmx.trigger(modalContent, 'load-form', { form: this.form });
+                    htmx.post(this.endpoint, { target: '#modal-content', swap: 'innerHTML' });
                 }
             }, 100);
         },
