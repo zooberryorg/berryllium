@@ -129,7 +129,7 @@ def hx_validate_singlefile_title(request, file_id):
     title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
     print("Received title for validation:", title, "for FileUpload ID:", file_id)
 
-    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance if valid, can't use instance here since FileUpload is not a real model instance yet, just a draft with an id, so we create a temporary instance with the id for validation purposes
+    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance 
     form = SingleFileForm(data={"title": title})
     form.is_valid()
 
