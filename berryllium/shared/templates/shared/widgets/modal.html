@@ -1,46 +1,29 @@
-    <div 
-        x-data="createModal()"
-        @open-modal.window="openModal()"
-        @close-modal.window="closeModal()"
-        x-show="isOpen"
-        x-cloak
-        class="fixed inset-0 z-50 overflow-y-auto"
-        style="display: none;"
-    >
-        <!-- Backdrop -->
-        <div 
-            class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-            @click="closeModal()"
-        ></div>
-
-        <!-- Modal -->
-        <div class="flex items-center justify-center min-h-screen p-4">
-            <div 
-                class="bg-white rounded-lg shadow-xl max-w-2xl w-full relative"
-                @click.stop
-                x-transition
-            >
-                <!-- Header -->
-                <div class="border-b px-6 py-4 flex items-center justify-between">
-                    <h2 class="text-xl font-semibold">
-                        Upload Content
-                    </h2>
-                    <button 
-                        @click="closeModal()"
-                        class="text-gray-400 hover:text-gray-600"
-                    >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
-      <div id="modal-content" 
-           class="max-h-[90vh] overflow-y-auto"
-           hx-swap="innerHTML"
-           x-ref="modalContent"
-      >
-        Loading...
-      </div>
+<div x-data="createModal()"
+     @open-modal.window="openModal()"
+     @close-modal.window="closeModal()"
+     x-show="isOpen"
+     x-cloak
+     class="fixed inset-0 z-50 overflow-y-auto"
+     style="display: none">
+    <!-- Backdrop -->
+    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
+         @click="closeModal()"></div>
+    <!-- Modal -->
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full relative"
+             @click.stop
+             x-transition>
+            <!-- Header -->
+            <div class="border-b px-6 py-4 flex items-center justify-between">
+                <h2 class="text-xl font-semibold">Upload Content</h2>
+                <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+                    <ion-icon name="close" size="large"></ion-icon>
+                </button>
+            </div>
+            <div id="modal-content"
+                 class="max-h-[90vh] overflow-y-auto"
+                 hx-swap="innerHTML"
+                 x-ref="modalContent">Loading...</div>
+        </div>
     </div>
-  </div>
 </div>

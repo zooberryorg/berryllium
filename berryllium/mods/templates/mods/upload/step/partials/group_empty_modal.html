@@ -1,26 +1,15 @@
-<div x-data="{ isOpen: {{ onEmptyGroupFound }} }"
-     x-cloak
-     x-ref="modal"
-     x-init:"$watch('isOpen', value => {
-         if (value) {
-             $nextTick(() => {
-                 $el.setAtribute('x-show', 'isOpen');
-                 
-             });
-         }
-     })"
-     x-show="isOpen"
-     x-transition.opacity
-     class="fixed inset-0 z-9999 flex items-center justify-center p-4 h-full"
-     @keydown.escape.window="isOpen = false">
-    <div class="glass absolute inset-0 bg-black/50" @click="isOpen = false"></div>
-    <div class="relative w-full max-w-2xl rounded-2xl bg-pine-700 border border-pine-300/40 shadow-2xl"
-         @click.stop
-         x-transition>
-        <div class="border-b border-[#4a5a4b]/50 px-6 py-4 flex items-center justify-between bg-pine-600/90 rounded-t-2xl">
-            <h2 class="text-2xl font-bold text-white" id="modal-title">Are you sure?</h2>
-        </div>
-        <div id="modal-content" ref="modalContent"></div>
+<div id="empty-group-modal"
+     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+     <div class="bg-white rounded-lg shadow-lg p-6 relative">
+        <h2 class="text-xl font-semibold mb-4">Empty Group Detected</h2>
+        <p class="mb-4">One or more empty groups were found. Do you want to discard them?</p>
+     </div>
+    <div id="empty-group-actions">
+        <button class="absolute inset-0 w-full h-full"
+                @click="$dispatch('close-modal')"
+                x-text="Discard Empty Group(s)"></button>
+        <button class="absolute inset-0 w-full h-full"
+                @click="$dispatch('close-modal'); $refs.uploadForm.submit()"
+                x-text="Keep Empty Group(s)"></button>
     </div>
-</div>
 </div>
