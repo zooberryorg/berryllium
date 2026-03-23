@@ -105,13 +105,6 @@
     @apply cursor-grabbing;
   }
 
-  :is(.file-chosen) {
-    @apply cursor-move;
-    @apply opacity-100;
-    @apply border-2 border-gold-400;
-    @apply cursor-grabbing;
-  }
-
   /* Gradient text */
   .gradient-text {
     background: linear-gradient(135deg, #d4af37 0%, #c9a961 100%);
