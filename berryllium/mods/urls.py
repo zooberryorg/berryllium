@@ -79,4 +79,14 @@ urlpatterns = [
         hx.hx_remove_empty_filegroups,
         name="hx_remove_empty_filegroups",
     ),
+    path(
+        "mods/move-filegroup-up/<int:current_index>/",
+        hx.hx_move_filegroup_up,
+        name="hx_move_filegroup_up",
+    ),
+    path(
+        "mods/move-filegroup-down/<int:current_index>/",
+        hx.hx_move_filegroup_down,
+        name="hx_move_filegroup_down",
+    ),
 ]

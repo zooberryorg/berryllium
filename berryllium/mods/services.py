@@ -1,3 +1,4 @@
+from ast import mod
 import os
 import uuid
 
@@ -115,3 +116,41 @@ def create_file_group(mod_id):
         filegroups,
         group_formset,
     ]
+
+def update_filegroup_order(mod_id):
+    """
+    Updates the order of file groups.
+    """
+    groups = FileGroup.objects.filter(mod_id=mod_id)
+    if not groups:
+        return False
+    
+    # update order
+    for index, fg in enumerate(groups):
+        fg.order = index
+        fg.save()
+    return True
+
+def swap_filegroup_order(filegroups, current_index, direction):
+    """
+    Moves a file group up in the order.
+    """
+    if direction == "up" and current_index > 0:
+        # swap with previous group
+        filegroups[current_index - 1], filegroups[current_index] = (
+            filegroups[current_index],
+            filegroups[current_index - 1],
+        )
+    elif direction == "down" and current_index < len(filegroups) - 1:
+        # swap with next group
+        filegroups[current_index + 1], filegroups[current_index] = (
+            filegroups[current_index],
+            filegroups[current_index + 1],
+        )
+    
+    # save new order to database
+    for index, fg in enumerate(filegroups):
+        fg.order = index
+        fg.save()
+    
+

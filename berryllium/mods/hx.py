@@ -1,6 +1,6 @@
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
-from berryllium.mods.services import init_context, create_file_group
+from berryllium.mods.services import  create_file_group, update_filegroup_order, swap_filegroup_order
 
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
@@ -194,7 +194,7 @@ def hx_add_filegroup_form(request):
         return HttpResponse(status=400)
 
     # ------------ Create new FileGroup instance for the new form
-    FileGroup.objects.create(mod_id=mod_id, name="New Group")
+    FileGroup.objects.create(mod_id=mod_id, name="New Group", order=FileGroup.objects.filter(mod_id=mod_id).count())
 
     # ------------ Rebuild context and file group data for re-rendering
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
@@ -212,6 +212,7 @@ def hx_remove_filegroup_form(request, fg_id):
     """HTMX endpoint to remove a file group form."""
     print("Attempting to delete FileGroup with ID:", fg_id)
     FileGroup.objects.filter(id=fg_id).delete()
+    update_filegroup_order(request.session.get("session_id"))
     return HttpResponse()
 
 
@@ -279,5 +280,36 @@ def hx_remove_empty_filegroups(request):
 
     for group in empty_groups:
         group.delete()
+
+    # update order
+    update_filegroup_order(mod_id)
+
+    return redirect("upload_step3")
+
+@require_POST
+def hx_move_filegroup_up(request, current_index):
+    """HTMX endpoint to move a file group up in the order."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        return HttpResponse(status=400)
+
+    groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
+
+    # swap order with the previous group
+    swap_filegroup_order(groups, current_index, "up")
+
+    return redirect("upload_step3")
+
+@require_POST
+def hx_move_filegroup_down(request, current_index):
+    """HTMX endpoint to move a file group down in the order."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        return HttpResponse(status=400)
+
+    groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
+
+    # swap order with the next group
+    swap_filegroup_order(groups, current_index, "down")
 
     return redirect("upload_step3")
