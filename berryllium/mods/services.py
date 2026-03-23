@@ -115,3 +115,19 @@ def create_file_group(mod_id):
         filegroups,
         group_formset,
     ]
+
+def update_filegroup_order(mod_id):
+    """
+    Updates the order of file groups.
+    """
+    mod = FileGroup.objects.filter(mod_id=mod_id).first()
+    if not mod:
+        return False
+    
+    filegroups = list(mod.file_groups.all())
+
+    # update order
+    for index, fg in enumerate(filegroups):
+        fg.order = index
+        fg.save()
+    return True

@@ -199,6 +199,11 @@ def upload_step3(request):
 
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
+    # print the order of the filegroups for debugging
+    print("FileGroup order in view:")
+    for fg in filegroups:
+        print(f"FileGroup order: {fg.order}, Name: {fg.name}")
+
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         if request.POST.get("action") == "previous":
