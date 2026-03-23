@@ -147,7 +147,10 @@ class FileGroup(models.Model):
 
     def __str__(self):
         return f"{self.mod.title} - {self.name}"
-
+    
+    @property
+    def files(self):
+        return self.fileupload_set.all()
 
 class FileUpload(models.Model):
     """

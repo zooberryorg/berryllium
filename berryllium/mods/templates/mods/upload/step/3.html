@@ -4,14 +4,25 @@
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <form hx-post="{% url 'upload_step3' %}"
-      hx-target="#upload-frame"
-      id="uploadForm"
-      hx-swap="innerHTML"
-      @open-modal.window="(event) => { openModal({ endpoint: event.detail.contentUrl, onClose: () => { console.log('Modal closed, re-checking empty groups...'); // custom event to re-check empty groups when the modal closes window.dispatchEvent(new CustomEvent('files-state-changed')); } });"
-      enctype="multipart/form-data"
-      hx-encoding="multipart/form-data"
-      x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
-      x-ref="uploadForm">
+    hx-target="#upload-frame"
+    id="uploadForm"
+    hx-swap="innerHTML"
+    {# djlint:off #}
+      @open-modal.window="(event) => { 
+        openModal({ 
+            endpoint: event.detail.contentUrl, 
+            onClose: () => { 
+                console.log('Modal closed, re-checking empty groups...'); 
+                // custom event to re-check empty groups when the modal closes window.
+                dispatchEvent(new CustomEvent('files-state-changed')); 
+            } 
+        });
+    }"
+    {# djlint:on #}
+    enctype="multipart/form-data"
+    hx-encoding="multipart/form-data"
+    x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
+    x-ref="uploadForm">
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}
