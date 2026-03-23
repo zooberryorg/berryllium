@@ -1,9 +1,10 @@
-<div id="files-group-{{ group.instance.id }}"
+<div id="files-group-{{ group.instance.id }}" x-ref="fileGroup-{{ group.instance.id }}"
     x-sort
     x-sort:group="fileGroup"
+    x-ref="fileGroup-{{ group.instance.id }}"
     {# djlint:off #}
     x-init="() => {
-        const files_in_group = $el.querySelectorAll('[x-sort\\:item]').length;
+        const files_in_group = $refs['fileGroup-{{ group.instance.id }}'].querySelectorAll('[x-sort\\:item]').length;
         if (files_in_group === 0) {
             $store.dnd.numEmptyGroups += 1;
         }
@@ -22,25 +23,27 @@
             ghostClass: 'file-ghost', 
             onChoose: (event) => { 
                 $store.dnd.isDragging = true; 
-                $store.dnd.draggedId = event.item.dataset.fileId; 
+                $store.dnd.draggedFileId = event.item.dataset.fileId; 
             }, 
             onUnchoose: (event) => { 
                 $store.dnd.isDragging = false; 
             }, 
             onAdd: (event) => { 
                 const fgId = event.to.dataset.groupId; 
-                console.log('File with ID ' + $store.dnd.draggedId + ' added to group ' + fgId); 
+                const draggedFileId = $store.dnd.draggedFileId;
+                console.log('File with ID ' + $store.dnd.draggedFileId + ' added to group ' + fgId); 
+                const files_in_group = $refs['fileGroup-' + fgId].querySelectorAll('[x-sort\\:item]').length;
+                console.log('Group ' + fgId + ' has ' + files_in_group + ' files after drop.');
+                if (files_in_group === 0) {
+                    $store.dnd.numEmptyGroups += 1;
+                    console.log('Group ' + fgId + ' is now empty. Total empty groups: ' + $store.dnd.numEmptyGroups);
+                }
                 htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 
                     values: { 
-                        dragged_id: $store.dnd.draggedId, 
+                        dragged_id: $store.dnd.draggedFileId, 
                         fg_id: fgId, 
                     } 
                 }); 
-                const files_in_group = $el.querySelectorAll('[x-sort\\:item]').length;
-                if (files_in_group === 0) {
-                    $store.dnd.numEmptyGroups += 1;
-                    console.log('Group {{ group.instance.id }} is now empty. Total empty groups: ' + $store.dnd.numEmptyGroups);
-                }
             }, 
         }">
     {# djlint:on #}
@@ -145,21 +148,3 @@ body.sorting {
 }
 
 </style>
-<script>
-    // in case alpine already loaded before
-    if (window.Alpine) {
-        Alpine.store('dnd', {
-            isDragging: false,
-            draggedId: null,
-            numEmptyGroups: 0,
-        });
-    } else {
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('dnd', {
-                isDragging: false,
-                draggedId: null,
-                numEmptyGroups: 0,
-            });
-        });
-    }
-</script>

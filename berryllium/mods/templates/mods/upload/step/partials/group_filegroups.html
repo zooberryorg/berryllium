@@ -12,15 +12,11 @@
             hx-swap="beforeend"
             {# djlint:off #}
                 {# refreshes alpine state after swap #}
-                hx-on:htmx:after-swap="
-                    Alpine.initTree(event.detail.elt);
-                    // update id_form-TOTAL_FORMS value
-                    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
-                    console.log('Total forms input:', totalFormsInput);
-                    if (totalFormsInput) {
-                        totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
-                    }
-                    "
+                hx-on:htmx:after-swap="() => { 
+                    $store.dnd.numEmptyGroups += 1;
+                    console.log('Group added. Total empty groups: ' + $store.dnd.numEmptyGroups);
+                    Alpine.initTree(event.detail.elt); 
+                }"
                 @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
             {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2">
@@ -28,3 +24,22 @@
         </button>
     </div>
 </div>
+<script>
+    // in case alpine already loaded before
+    if (window.Alpine) {
+        Alpine.store('dnd', {
+            isDragging: false,
+            draggedFileId: null,
+            numEmptyGroups: 0,
+        });
+    } else {
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('dnd', {
+                isDragging: false,
+                draggedFileId: null,
+                numEmptyGroups: 0,
+            });
+        });
+    }
+</script>
+

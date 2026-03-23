@@ -56,7 +56,7 @@ function fileDragAndDrop() {
 
         onDragStart(event, fileId) {
             Alpine.store('dnd').isDragging = true;
-            Alpine.store('dnd').draggedId = fileId;
+            Alpine.store('dnd').draggedFileId = fileId;
             event.dataTransfer.effectAllowed = 'move';
             event.dataTransfer.setData('text/plain', String(fileId));
             const currentElement = event.currentTarget;
@@ -75,14 +75,14 @@ function fileDragAndDrop() {
             this.isDragging = false;
             this.target = null;
             Alpine.store('dnd').isDragging = false;
-            Alpine.store('dnd').draggedId = null;
+            Alpine.store('dnd').draggedFileId = null;
 
             this.updateCurrentElementVisibility(event, event.currentTarget);
         },
 
         handleFileDrop(event, targetId) {
             event.preventDefault();
-            const draggedId = Alpine.store('dnd').draggedId;
+            const draggedFileId = Alpine.store('dnd').draggedFileId;
         }
     }
 }
