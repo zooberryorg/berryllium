@@ -2,19 +2,19 @@
      x-sort.ghost
      x-sort:group="fileGroup"
      class="transition-all duration-200"
-     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : ''"
+     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
      x-sort:config="{
          dragClass: 'file-draggable',
-         chosenClass: 'cursor-grab',
+         chosenClass: 'file-chosen',
          ghostClass: 'file-ghost',
      }">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
-                    bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 
+                    bg-pine-800 rounded-lg px-2 py-1 text-sm text-white/80 
                     border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
-                    focus:border-transparent hover:bg-pine-800"
-            :class="$store.dnd.isDragging ? 'gap-3 mb-1' : 'gap-2'"
+                    focus:border-transparent hover:bg-pine-900"
+            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
             id="draggableFile"
             x-ref="files"
             x-data="fileDragAndDrop()"
@@ -84,6 +84,15 @@
 {% endfor %}
 </div>
 <style>[x-cloak] { display: none !important; }
+.file-draggable {
+    opacity: 0.0;
+    display: none;
+}
+
+.file-chosen {
+    opacity: 1.0;
+    background-color: var(--color-pine-600);
+}
 </style>
 <script>
     document.addEventListener('keydown', e => {

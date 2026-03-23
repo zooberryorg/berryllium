@@ -745,6 +745,10 @@
     border-bottom-style: var(--tw-border-style);
     border-bottom-width: 1px;
   }
+  .border-b-2 {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 2px;
+  }
   .border-dashed {
     --tw-border-style: dashed;
     border-style: dashed;
@@ -965,6 +969,12 @@
   }
   .bg-gold-500 {
     background-color: var(--color-gold-500);
+  }
+  .bg-gold-500\/10 {
+    background-color: color-mix(in srgb, #d4a435 10%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-gold-500) 10%, transparent);
+    }
   }
   .bg-gold-500\/15 {
     background-color: color-mix(in srgb, #d4a435 15%, transparent);
@@ -2046,6 +2056,16 @@
       }
     }
   }
+  .hover\:bg-gold-400\/20 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: color-mix(in srgb, #d6b15d 20%, transparent);
+        @supports (color: color-mix(in lab, red, red)) {
+          background-color: color-mix(in oklab, var(--color-gold-400) 20%, transparent);
+        }
+      }
+    }
+  }
   .hover\:bg-gold-600\/20 {
     &:hover {
       @media (hover: hover) {
@@ -2077,6 +2097,13 @@
     &:hover {
       @media (hover: hover) {
         background-color: var(--color-pine-800);
+      }
+    }
+  }
+  .hover\:bg-pine-900 {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-pine-900);
       }
     }
   }
