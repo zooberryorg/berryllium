@@ -2,7 +2,7 @@ from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
 from berryllium.mods.services import init_context, create_file_group
 
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
@@ -260,3 +260,24 @@ def hx_empty_filegroups_warning(request):
         )
 
     return HttpResponse(status=204)
+
+@require_POST
+def hx_remove_empty_filegroups(request):
+    """HTMX endpoint to remove a file from a file group (drag to ungroup)."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when checking for empty file groups.")
+        return HttpResponse(status=400)
+
+    empty_groups = FileGroup.objects.filter(
+        mod_id=mod_id, files__isnull=True
+    )
+    print(f"After a search, found {empty_groups.count()} empty file groups.")
+    if not empty_groups.exists():
+        print("No empty file groups found for mod ID:", mod_id)
+        return HttpResponse(status=400)
+
+    for group in empty_groups:
+        group.delete()
+
+    return redirect("upload_step3")

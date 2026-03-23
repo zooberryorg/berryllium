@@ -1,7 +1,19 @@
 <div x-data="createModal()"
      x-cloak
-     @open-modal.window="(event) => { console.log('Received open-modal event with detail:', event.detail); openModal({ endpoint: event.detail.endpoint, modalTitle: event.detail.modalTitle || 'Modal Title', icon: event.detail.icon || '', maxWidth: event.detail.maxWidth || 'max-w-2xl', hideHeader: event.detail.hideHeader || false, }); }"
-     @close-create-modal.window="closeModal()">
+     {# djlint:off #}
+     @open-modal.window="(event) => { 
+        console.log('Received open-modal event with detail:', event.detail); 
+        openModal({ 
+                endpoint: event.detail.endpoint, 
+                modalTitle: event.detail.modalTitle || 'Modal Title', 
+                icon: event.detail.icon || '', 
+                maxWidth: event.detail.maxWidth || 'max-w-2xl', 
+                hideHeader: event.detail.hideHeader || false, 
+                focusAfterRender: event.detail.focusAfterRender || null,
+            }); 
+        }"
+     {# djlint:on #}
+     @close-modal.window="closeModal()">
     <!-- Overlay -->
     <div x-show="isOpen"
          x-transition.opacity
@@ -10,7 +22,7 @@
         <!-- Backdrop -->
         <div class="glass absolute inset-0 bg-black/50" @click="closeModal()"></div>
         <!-- Modal panel -->
-        <div class="relative w-full rounded-2xl bg-pine-700 border border-pine-300/40 shadow-2xl"
+        <div class="relative w-full rounded-2xl bg-pine-700 border-4 border-pine-100/10 shadow-2xl"
              :class="maxWidth"
              @click.stop
              {% comment %}

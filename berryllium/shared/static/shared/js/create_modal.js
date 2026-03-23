@@ -13,6 +13,7 @@ function createModal() {
             this.icon = detail.icon || "";
             this.maxWidth = detail.maxWidth || "max-w-2xl";
             this.hideHeader = detail.hideHeader || false;
+            this.focusAfterRender = detail.focusAfterRender || null;
 
             // HTMX for form content
             setTimeout(() => {
@@ -24,6 +25,8 @@ function createModal() {
         },
 
         closeModal() {
+            console.log("focusAfterRender:", this.focusAfterRender);
+            this.focusAfterRender?.firstElementChild?.scrollIntoView({ behavior: 'smooth' });
             this.isOpen = false;
             // clear modal content
             const contentDiv = document.getElementById('modal-content');
