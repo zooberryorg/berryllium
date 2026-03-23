@@ -43,10 +43,13 @@
                             headers: {
                                 'X-CSRFToken': '{{ csrf_token }}'
                             },
-                            swap: 'none',
+                            target: '#upload-frame',
+                            swap: 'innerHTML',
+
                         });
                         $store.dnd.numEmptyGroups = 0;
                         $dispatch('close-modal');
+
                     }
                 }">
                 
