@@ -1,6 +1,6 @@
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
-from berryllium.mods.services import  create_file_group, update_filegroup_order, swap_filegroup_order
+from berryllium.mods.services import  create_file_group, update_filegroup_order, swap_order
 
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
@@ -296,7 +296,7 @@ def hx_move_filegroup_up(request, current_index):
     groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
 
     # swap order with the previous group
-    swap_filegroup_order(groups, current_index, "up")
+    swap_order(groups, current_index, "up")
 
     return redirect("upload_step3")
 
@@ -310,6 +310,6 @@ def hx_move_filegroup_down(request, current_index):
     groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
 
     # swap order with the next group
-    swap_filegroup_order(groups, current_index, "down")
+    swap_order(groups, current_index, "down")
 
     return redirect("upload_step3")

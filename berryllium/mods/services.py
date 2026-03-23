@@ -131,7 +131,7 @@ def update_filegroup_order(mod_id):
         fg.save()
     return True
 
-def swap_filegroup_order(filegroups, current_index, direction):
+def swap_order(filegroups, current_index, direction):
     """
     Moves a file group up in the order.
     """
