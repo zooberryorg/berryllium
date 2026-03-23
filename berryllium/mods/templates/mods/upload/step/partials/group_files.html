@@ -7,33 +7,36 @@
     {# djlint:on #}
     data-group-id="{{ group.instance.id }}"
     class="transition-all duration-200"
-    :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
     {# djlint:off #}
-        x-sort:config="{ 
-            forceFallback: true, 
-            dragClass: 'file-draggable', 
-            chosenClass: 'file-chosen', 
-            ghostClass: 'file-ghost', 
-            onChoose: (event) => { 
-                $store.dnd.isDragging = true; 
-                $store.dnd.draggedFileId = event.item.dataset.fileId; 
-                $store.dnd.draggedFromGroupId = event.from.dataset.groupId;
-            }, 
-            onUnchoose: (event) => { 
-                $store.dnd.isDragging = false; 
-            }, 
-            onAdd: (event) => {
-                $dispatch('files-state-changed');
-                const fgId = event.to.dataset.groupId; 
+    :class="
+        $store.dnd.isDragging ? 
+        'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' 
+        : 'border-transparent'"
+    x-sort:config="{ 
+        forceFallback: true, 
+        dragClass: 'file-draggable', 
+        chosenClass: 'file-chosen', 
+        ghostClass: 'file-ghost', 
+        onChoose: (event) => { 
+            $store.dnd.isDragging = true; 
+            $store.dnd.draggedFileId = event.item.dataset.fileId; 
+            $store.dnd.draggedFromGroupId = event.from.dataset.groupId;
+        }, 
+        onUnchoose: (event) => { 
+            $store.dnd.isDragging = false; 
+        }, 
+        onAdd: (event) => {
+            $dispatch('files-state-changed');
+            const fgId = event.to.dataset.groupId; 
 
-                htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 
-                    values: { 
-                        dragged_id: $store.dnd.draggedFileId, 
-                        fg_id: fgId, 
-                    } 
-                }); 
-            }, 
-        }">
+            htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 
+                values: { 
+                    dragged_id: $store.dnd.draggedFileId, 
+                    fg_id: fgId, 
+                } 
+            }); 
+        }, 
+    }">
     {# djlint:on #}
     {% for file in files %}
         {# djlint:off #}
@@ -41,6 +44,8 @@
                     bg-pine-800 rounded-lg px-2 py-1 text-sm text-white/80 
                     border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
                     focus:border-transparent hover:bg-pine-900"
+        {# djlint:on #}
+
             :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
             id="draggableFile"
             data-file-id="{{ file.instance.id }}"
@@ -50,7 +55,6 @@
             @dragend="onDragEnd($event)"
 
             x-sort:item>
-        {# djlint:on #}
         <span class="text-pine-200 px-2 py-1 font-size-md cursor-grab group"
               x-sort:handle>
             <i class="bi bi-grip-vertical group-hover:text-gold-400"></i>

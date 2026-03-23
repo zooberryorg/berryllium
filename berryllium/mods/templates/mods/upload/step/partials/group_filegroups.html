@@ -1,4 +1,7 @@
-<div x-show="toggled" x-ref="fileGroups" id="fileGroups" 
+<div x-show="toggled" 
+    x-ref="fileGroups" 
+    id="fileGroups" 
+    {# djlint:off #}
     @group-was-deleted.window="(event) => {
         if (event.detail?.wasEmpty) {
             console.log('Deleted group ' + event.detail.groupId + ' was empty. Decreasing empty group count.');
@@ -17,7 +20,9 @@
         });
         $store.dnd.numEmptyGroups = totalEmpty;
         console.log('Files state changed. Total empty groups: ' + $store.dnd.numEmptyGroups);
-    }" class="space-y-6">
+    }" 
+    {# djlint:on #}
+    class="space-y-6">
     {{ group_formset.management_form }}
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
