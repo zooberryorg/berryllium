@@ -16,10 +16,20 @@
     {% endif %}
     <!-- Next button only shows if steps remain -->
     {% if remaining|length > 0 %}
-        <button type="submit"
-                class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
-                value="next"
-                name="action">
+        <button :type="$store.dnd.numEmptyGroups > 0 ? 'button' : 'submit'"
+            class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
+            value="next"
+            {# djlint:off #}
+                @click="$store.dnd.numEmptyGroups > 0 ? 
+                $dispatch('open-modal', { 
+                    endpoint: '{% url 'hx_empty_filegroups_warning' %}',
+                    modalTitle: 'Empty File Groups Detected',
+                    icon: 'warning',
+                    maxWidth: 'max-w-md',
+                    hideHeader: true,
+                }) : $el.closest('form').submit()"
+            {# djlint:on #}
+            name="action">
             <span>Next <ion-icon name="arrow-forward" class="align-middle"></ion-icon></span>
         </button>
         <!-- Finish button when no steps left -->

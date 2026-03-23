@@ -213,3 +213,7 @@ package.json
 
 # File uploads
 files/
+
+# css files
+*.css
+!.tw/input.css

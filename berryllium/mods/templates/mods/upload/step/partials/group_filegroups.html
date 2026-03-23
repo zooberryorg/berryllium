@@ -1,4 +1,8 @@
-<div x-show="toggled" x-ref="fileGroups" id="fileGroups" 
+<div x-show="toggled"
+    x-ref="fileGroups"
+    id="fileGroups"
+    x-data="createModal()"
+    {# djlint:off #}
     @group-was-deleted.window="(event) => {
         if (event.detail?.wasEmpty) {
             console.log('Deleted group ' + event.detail.groupId + ' was empty. Decreasing empty group count.');
@@ -17,8 +21,9 @@
         });
         $store.dnd.numEmptyGroups = totalEmpty;
         console.log('Files state changed. Total empty groups: ' + $store.dnd.numEmptyGroups);
-    }" class="space-y-6">
-    {{ group_formset.management_form }}
+    }" 
+    {# djlint:on #}
+    class="space-y-6">
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
     {% endfor %}
@@ -30,11 +35,11 @@
             hx-target="#addGroup"
             hx-swap="beforeend"
             {# djlint:off #}
-                {# refreshes alpine state after swap #}
-                hx-on:htmx:after-swap="() => { 
-                    Alpine.initTree(event.detail.elt); 
-                }"
-                @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
+            {# refreshes alpine state after swap #}
+            hx-on:htmx:after-swap="() => { 
+                Alpine.initTree(event.detail.elt); 
+            }"
+            @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
             {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2">
             </ion-icon> Add Group
@@ -61,4 +66,3 @@
         });
     }
 </script>
-

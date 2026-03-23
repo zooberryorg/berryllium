@@ -3,7 +3,7 @@ from berryllium.mods.forms import FileGroupForm, SingleFileForm
 from berryllium.mods.services import init_context, create_file_group
 
 from django.shortcuts import render, HttpResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
@@ -129,7 +129,7 @@ def hx_validate_singlefile_title(request, file_id):
     title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
     print("Received title for validation:", title, "for FileUpload ID:", file_id)
 
-    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance 
+    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance
     form = SingleFileForm(data={"title": title})
     form.is_valid()
 
@@ -210,8 +210,10 @@ def hx_add_filegroup_form(request):
 @require_POST
 def hx_remove_filegroup_form(request, fg_id):
     """HTMX endpoint to remove a file group form."""
+    print("Attempting to delete FileGroup with ID:", fg_id)
     FileGroup.objects.filter(id=fg_id).delete()
     return HttpResponse()
+
 
 @require_POST
 def hx_add_file_to_group(request):
@@ -229,4 +231,32 @@ def hx_add_file_to_group(request):
     file.save()
 
     # empty response
+    return HttpResponse(status=204)
+
+
+@require_GET
+def hx_empty_filegroups_warning(request):
+    """HTMX endpoint to check for empty file groups before proceeding to next step."""
+    print("Checking for empty file groups for mod in session.")
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when checking for empty file groups.")
+        return HttpResponse(status=400)
+
+    empty_groups_count = FileGroup.objects.filter(
+        mod_id=mod_id, files__isnull=True
+    ).count()
+    print(
+        "Checking for empty file groups. Mod ID:",
+        mod_id,
+        "Empty Groups Count:",
+        empty_groups_count,
+    )
+    if empty_groups_count > 0:
+        return render(
+            request,
+            "mods/upload/step/partials/group_empty_modal.html",
+            {"empty_group_len": empty_groups_count},
+        )
+
     return HttpResponse(status=204)

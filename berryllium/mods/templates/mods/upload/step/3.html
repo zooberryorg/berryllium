@@ -11,6 +11,7 @@
       hx-encoding="multipart/form-data"
       x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
       x-ref="uploadForm">
+    {{ group_formset.management_form }}
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}

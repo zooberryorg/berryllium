@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mods', '0005_mod_prlicense'),
+        ("mods", "0005_mod_prlicense"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='filegroup',
-            name='name',
+            model_name="filegroup",
+            name="name",
             field=models.CharField(blank=True, max_length=255, null=True),
         ),
     ]

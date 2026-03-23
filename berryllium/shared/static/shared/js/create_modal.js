@@ -4,17 +4,21 @@ function createModal() {
         isOpen: false,
         modalTitle: "Modal Title",
         endpoint: "",
+        icon: "",
 
         openModal(detail = {}) {
             this.isOpen = true;
             this.endpoint = detail.endpoint || "";
-            this.modalTitle = detail.title || "Modal Title";
+            this.modalTitle = detail.modalTitle || "Modal Title";
+            this.icon = detail.icon || "";
+            this.maxWidth = detail.maxWidth || "max-w-2xl";
+            this.hideHeader = detail.hideHeader || false;
 
             // HTMX for form content
             setTimeout(() => {
                 const modalContent = document.getElementById('modal-content');
                 if (modalContent) {
-                    htmx.post(this.endpoint, { target: '#modal-content', swap: 'innerHTML' });
+                    htmx.ajax('GET', this.endpoint, { target: '#modal-content', swap: 'innerHTML' });
                 }
             }, 100);
         },

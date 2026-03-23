@@ -10,7 +10,7 @@ from berryllium.mods.forms import (
     MetadataForm,
     FileGroupForm,
 )
-from berryllium.mods.models import Mod
+from berryllium.mods.models import Mod, FileGroup
 from berryllium.mods.services import (
     init_context,
     upload_file,
@@ -208,6 +208,7 @@ def upload_step3(request):
         # get formset data and validate
         group_formset = FileGroupFormset(request.POST, queryset=filegroups)
         if group_formset.is_valid():
+            # only saves if data was changed
             saved_groups = group_formset.save()
             for group in saved_groups:
                 # now that groups are saved, validate their files
@@ -217,15 +218,19 @@ def upload_step3(request):
             # all valid, go to next step
             if request.POST.get("action") == "next":
                 print("Next button clicked. All file groups and files are valid.")
-
+                num_empty_groups = FileGroup.objects.filter(
+                    mod_id=mod_id, files__isnull=True
+                ).count()
                 # first see if any empty file groups need to be deleted
-                num_empty_groups = len([fg for fg in saved_groups if not fg.files.exists()])
                 print(f"Number of empty file groups: {num_empty_groups}")
                 if num_empty_groups > 0:
+                    print(
+                        "Empty file groups found. Prompting user to delete them before proceeding."
+                    )
                     # return form with modal asking user if they want to delete empty file group
                     context["file_groups"] = file_group_forms
                     context["num_empty_groups"] = num_empty_groups
-                    return render(request, "mods/upload/step/3.html", context)
+                    return HttpResponse(status=400)
                 return redirect("upload_step4")
         else:
             context["file_groups"] = file_group_forms
