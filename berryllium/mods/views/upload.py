@@ -216,6 +216,13 @@ def upload_step3(request):
                     file_formset.save()
             # all valid, go to next step
             if request.POST.get("action") == "next":
+
+                # first see if any empty file groups need to be deleted
+                for fg in filegroups:
+                    if not fg.files.exists():
+                        # return form with modal asking user if they want to delete empty file group
+                        context["file_groups"] = file_group_forms
+                        return render(request, "mods/upload/step/3.html", context)
                 return redirect("upload_step4")
         else:
             context["file_groups"] = file_group_forms
