@@ -61,13 +61,6 @@ function fileDragAndDrop() {
             event.dataTransfer.setData('text/plain', String(fileId));
             const currentElement = event.currentTarget;
 
-            // chosen customization
-            const chosen = currentElement.cloneNode(true);
-            chosen.classList.add('hidden');
-            chosen.classList.add('cursor-grabbing');
-            document.body.appendChild(chosen);
-            event.dataTransfer.setDragImage(chosen, 0, 0);
-
             // ghost customization (default class="sortable-ghost" with opacity: 0.5)
             // select based on class
             this.updateCurrentElementVisibility(event, currentElement);

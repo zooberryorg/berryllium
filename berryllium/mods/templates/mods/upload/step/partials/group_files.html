@@ -1,6 +1,13 @@
 <div id="files-group-{{ group.instance.id }}"
      x-sort.ghost
-     x-sort:group="fileGroup">
+     x-sort:group="fileGroup"
+     class="transition-all duration-200"
+     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-gold-400/50 p-2 rounded-xl' : ''"
+     x-sort:config="{
+         dragClass: 'file-draggable',
+         chosenClass: 'file-chosen',
+         ghostClass: 'file-ghost',
+     }">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
@@ -75,23 +82,18 @@
 {% endfor %}
 </div>
 <style>[x-cloak] { display: none !important; }
-
-    .sortable-ghost {
-        border: 2px solid var(--color-gold-400);
-    }
-
-    .sortable-ghost input, .sortable-ghost textarea, .sortable-ghost i {
-        color: #fff !important;
-        font-weight: normal;
-    }
 </style>
 <script>
+    document.addEventListener('keydown', e => {
+    if (e.key === 'd') debugger  // press D while dragging to freeze
+})
     // in case alpine already loaded before
     if (window.Alpine) {
         Alpine.store('dnd', {
             isDragging: false,
             draggedId: null,
         });
+
     } else {
         document.addEventListener('alpine:init', () => {
             Alpine.store('dnd', {
