@@ -1,8 +1,11 @@
 <div id="empty-group-modal"
-     class="flex flex-col items-center justify-center p-6 space-y-6 mt-6 text-white"
+     class="flex flex-col items-center justify-center p-6 space-y-6 text-white"
      x-data>
-    <p class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
-        <ion-icon name="warning" class="text-white-400 w-20 text-3xl"></ion-icon> One or more empty groups were found. Do you want to discard them?
+             <ion-icon name="warning" class="text-white-400 w-20 size-[4rem]"></ion-icon> 
+             <h2 class="text-2xl font-bold">Are you sure?</h2>
+    <p class="flex gap-4 bg-pine-600 border border-white/10 rounded-xl p-4 items-center">
+
+        {{empty_group_len}} empty file {% if empty_group_len == 1 %}group{% else %}groups{% endif %} detected. Please remove or add files to {%if empty_group_len == 1 %}this group{% else %}these groups{% endif %} before proceeding.
     </p>
     <div class="flex flex-row gap-4">
         <button class="zb-controls items-center justify-center"
