@@ -1,16 +1,30 @@
 <div x-data="createModal()"
-     @close-modal.window="closeModal()"
-     x-show="isOpen"
      x-cloak
-     class="fixed inset-0 z-50 overflow-y-auto bg-pine-600 rounded-xl"
-     style="display: none">
-    <!-- Backdrop -->
-    <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-         @click="closeModal()"></div>
-    <!-- Modal -->
-    <div class="flex items-center justify-center min-h-screen p-4 rounded-xl">
-        <div class="rounded-lg shadow-xl max-w-2xl w-full relative"
+          @open-modal.window="(event) => { 
+        openModal({ 
+            endpoint: event.detail.endpoint,
+        });
+     }"
+
+     @close-create-modal.window="closeModal()">
+    <!-- Overlay -->
+    <div x-show="isOpen"
+         x-transition.opacity
+         class="fixed inset-0 z-50 flex items-center justify-center p-4"
+         @keydown.escape.window="closeModal()">
+        <!-- Backdrop -->
+        <div class="glass absolute inset-0 bg-black/50" @click="closeModal()"></div>
+        <!-- Modal panel -->
+        <div class="relative w-full max-w-2xl rounded-2xl bg-pine-700 border border-pine-300/40 shadow-2xl"
              @click.stop
+             {% comment %}
+             Prevent
+             closing
+             when
+             clicking
+             inside
+             modal
+             {% endcomment %}
              x-transition>
             <!-- Header -->
             <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white">
@@ -21,7 +35,6 @@
             </div>
             <div id="modal-content"
                  class="max-h-[90vh] overflow-y-auto"
-                 hx-swap="innerHTML"
                  x-ref="modalContent">Loading...</div>
         </div>
     </div>
