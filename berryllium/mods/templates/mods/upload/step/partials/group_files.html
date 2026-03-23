@@ -1,16 +1,9 @@
-<div id="files-group-{{ group.instance.id }}" x-ref="fileGroup-{{ group.instance.id }}"
+<div id="files-group-{{ group.instance.id }}"
     x-sort
     x-sort:group="fileGroup"
     x-ref="fileGroup-{{ group.instance.id }}"
     {# djlint:off #}
-    x-init="() => {
-        const files_in_group = $refs['fileGroup-{{ group.instance.id }}'].querySelectorAll('[x-sort\\:item]').length;
-        if (files_in_group === 0) {
-            $store.dnd.numEmptyGroups += 1;
-        }
-        console.log('Group {{ group.instance.id }} initialized with ' + files_in_group + ' files. Total empty groups: ' + $store.dnd.numEmptyGroups);
-
-    }"
+    x-init="() => {$dispatch('files-state-changed')}"
     {# djlint:on #}
     data-group-id="{{ group.instance.id }}"
     class="transition-all duration-200"
@@ -29,7 +22,8 @@
             onUnchoose: (event) => { 
                 $store.dnd.isDragging = false; 
             }, 
-            onAdd: (event) => { 
+            onAdd: (event) => {
+                $dispatch('files-state-changed');
                 const fgId = event.to.dataset.groupId; 
 
                 htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 

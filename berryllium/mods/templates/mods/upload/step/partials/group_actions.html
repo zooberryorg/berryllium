@@ -9,7 +9,12 @@
             class="zb-action-delete"
             hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
             hx-swap="none"
-            @click="keepForm = false">
+            hx-on::afterSwap="() => {
+                console.log('Group with ID {{ group_id }} deleted. Dispatching group-was-deleted event.');
+            }"
+            @click="$nextTick(() => {
+                $dispatch('group-was-deleted', { groupId: {{ group_id }}, groupNodeCopy: $refs['fileGroup-' + {{ group_id }}] ? $refs['fileGroup-' + {{ group_id }}].cloneNode(true) : null });
+            }), keepForm = false">
         <ion-icon name="trash"></ion-icon>
     </button>
 {% endif %}

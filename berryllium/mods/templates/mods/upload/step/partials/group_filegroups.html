@@ -1,4 +1,5 @@
-<div x-show="toggled" x-ref="fileGroups" id="fileGroups"@files-state-changed.window="() => {
+<div x-show="toggled" x-ref="fileGroups" id="fileGroups" 
+    @files-state-changed.window="() => {
         const groups = $refs.fileGroups.querySelectorAll('[x-ref^=fileGroup-]');
         let totalEmpty = 0;
         groups.forEach(group => {
