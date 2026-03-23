@@ -148,4 +148,9 @@ def swap_filegroup_order(filegroups, current_index, direction):
             filegroups[current_index + 1],
         )
     
+    # save new order to database
+    for index, fg in enumerate(filegroups):
+        fg.order = index
+        fg.save()
+    
 
