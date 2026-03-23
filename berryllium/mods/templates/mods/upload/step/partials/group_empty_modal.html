@@ -1,11 +1,32 @@
+<div class="flex justify-end"
+     x-show="icon || !hideHeader"
+     x-transition
+     x-cloak>
+    <button class="text-gray-400 hover:text-gold-400 cursor-pointer hover:bg-pine-600/50 rounded-xl px-2 py-1 mt-2 mr-2 transition-colors"
+            @click="$dispatch('close-modal')">
+        <ion-icon name="close" size="large"></ion-icon>
+    </button>
+</div>
 <div id="empty-group-modal"
-     class="flex flex-col items-center justify-center p-6 space-y-6 text-white"
+     class="flex flex-col items-center justify-center p-6 space-y-6 text-white mt-[-3rem]"
+     {# djlint:off #}
      x-data>
-             <ion-icon name="warning" class="text-white-400 w-20 size-[4rem]"></ion-icon> 
-             <h2 class="text-2xl font-bold">Are you sure?</h2>
+    <ion-icon name="warning" class="text-white-400 w-20 size-[4rem]"></ion-icon>
+    <h2 class="text-2xl font-bold">Are you sure?</h2>
     <p class="flex gap-4 bg-pine-600 border border-white/10 rounded-xl p-4 items-center">
-
-        {{empty_group_len}} empty file {% if empty_group_len == 1 %}group{% else %}groups{% endif %} detected. Please remove or add files to {%if empty_group_len == 1 %}this group{% else %}these groups{% endif %} before proceeding.
+        {{ empty_group_len }} empty file
+        {% if empty_group_len == 1 %}
+            group
+        {% else %}
+            groups
+        {% endif %}
+        detected. Please remove or add files to
+        {% if empty_group_len == 1 %}
+            this group
+        {% else %}
+            these groups
+        {% endif %}
+        before proceeding.
     </p>
     <div class="flex flex-row gap-4">
         <button class="zb-controls items-center justify-center"
