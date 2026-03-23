@@ -8,8 +8,8 @@
     </button>
 </div>
 <div id="empty-group-modal"
-     class="flex flex-col items-center justify-center p-6 space-y-6 text-white mt-[-3rem]"
-     {# djlint:off #}
+    class="flex flex-col items-center justify-center p-6 space-y-6 text-white mt-[-3rem]"
+    {# djlint:off #}
      x-data>
     <ion-icon name="warning" class="text-white-400 w-20 size-[4rem]"></ion-icon>
     <h2 class="text-2xl font-bold">Hey, real quick...</h2>
@@ -33,7 +33,10 @@
             <i class="bi bi-x-lg mr-3"></i> Cancel
         </button>
         <button class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
-                @click="$dispatch('close-modal')">
+                x-post="{% url 'hx_remove_empty_filegroups' %}"
+                x-trigger="click"
+                x-swap="none"
+                @click="$dispatch('close-modal'); $store.dnd.numEmptyGroups = 0;">
             <i class="bi bi-trash-fill mr-3"></i> Discard
         </button>
     </div>

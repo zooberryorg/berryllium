@@ -260,3 +260,25 @@ def hx_empty_filegroups_warning(request):
         )
 
     return HttpResponse(status=204)
+
+@require_POST
+def hx_remove_empty_filegroups(request):
+    """HTMX endpoint to remove a file from a file group (drag to ungroup)."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when checking for empty file groups.")
+        return HttpResponse(status=400)
+
+    empty_groups = FileGroup.objects.filter(
+        mod_id=mod_id, files__isnull=True
+    )
+
+    if not empty_groups.exists():
+        print("No empty file groups found for mod ID:", mod_id)
+        return HttpResponse(status=400)
+
+    for group in empty_groups:
+        group.delete()
+
+    # empty response
+    return HttpResponse(status=204)
