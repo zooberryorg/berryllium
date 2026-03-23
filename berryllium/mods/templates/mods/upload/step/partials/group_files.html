@@ -1,32 +1,40 @@
 <div id="files-group-{{ group.instance.id }}"
-     x-sort
-     x-sort:group="fileGroup"
-     data-group-id="{{ group.instance.id }}"
-     class="transition-all duration-200"
-     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
-     x-sort:config="{
-        forceFallback: true,
-         dragClass: 'file-draggable',
-         chosenClass: 'file-chosen',
-         ghostClass: 'file-ghost',
-         onChoose: (event) => { 
-            $store.dnd.isDragging = true;
-            $store.dnd.draggedId = event.item.dataset.fileId;
-         },
-         onUnchoose: (event) => { 
-            $store.dnd.isDragging = false;
-        },
-        onAdd: (event) => {
-            const fgId = event.to.dataset.groupId;
-            console.log('File with ID ' + $store.dnd.draggedId + ' added to group ' + fgId);
-            htmx.ajax('POST', '{% url 'hx_add_file_to_group' fg_id=group.instance.id %}', { 
-                values: { 
-                    dragged_id: $store.dnd.draggedId,
-                    fg_id: fgId,
-                } 
-            });
-        },
-     }">
+    x-sort
+    x-sort:group="fileGroup"
+    x-ref="fileGroup-{{ group.instance.id }}"
+    {# djlint:off #}
+    x-init="() => {$dispatch('files-state-changed')}"
+    {# djlint:on #}
+    data-group-id="{{ group.instance.id }}"
+    class="transition-all duration-200"
+    :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
+    {# djlint:off #}
+        x-sort:config="{ 
+            forceFallback: true, 
+            dragClass: 'file-draggable', 
+            chosenClass: 'file-chosen', 
+            ghostClass: 'file-ghost', 
+            onChoose: (event) => { 
+                $store.dnd.isDragging = true; 
+                $store.dnd.draggedFileId = event.item.dataset.fileId; 
+                $store.dnd.draggedFromGroupId = event.from.dataset.groupId;
+            }, 
+            onUnchoose: (event) => { 
+                $store.dnd.isDragging = false; 
+            }, 
+            onAdd: (event) => {
+                $dispatch('files-state-changed');
+                const fgId = event.to.dataset.groupId; 
+
+                htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 
+                    values: { 
+                        dragged_id: $store.dnd.draggedFileId, 
+                        fg_id: fgId, 
+                    } 
+                }); 
+            }, 
+        }">
+    {# djlint:on #}
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
@@ -124,27 +132,7 @@
 
 body.sorting {
     user-select: none;
-    --webkit-user-select: none;
+    -webkit-user-select: none;
 }
 
 </style>
-<script>
-    document.addEventListener('keydown', e => {
-    if (e.key === 'd') debugger  // press D while dragging to freeze
-})
-    // in case alpine already loaded before
-    if (window.Alpine) {
-        Alpine.store('dnd', {
-            isDragging: false,
-            draggedId: null,
-        });
-
-    } else {
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('dnd', {
-                isDragging: false,
-                draggedId: null,
-            });
-        });
-    }
-</script>

@@ -285,6 +285,7 @@ class FileGroupForm(forms.ModelForm):
             )
 
         return description
+            
 
 
 class SingleFileForm(forms.Form):

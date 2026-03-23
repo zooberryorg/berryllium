@@ -214,9 +214,10 @@ def hx_remove_filegroup_form(request, fg_id):
     return HttpResponse()
 
 @require_POST
-def hx_add_file_to_group(request, fg_id):
+def hx_add_file_to_group(request):
     """HTMX endpoint to add a file to a file group after drag/drop."""
     file_id = request.POST.get("dragged_id")
+    fg_id = request.POST.get("fg_id")
     file = FileUpload.objects.filter(id=file_id).first()
     group = FileGroup.objects.filter(id=fg_id).first()
 

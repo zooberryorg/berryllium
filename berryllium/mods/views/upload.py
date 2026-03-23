@@ -216,15 +216,27 @@ def upload_step3(request):
                     file_formset.save()
             # all valid, go to next step
             if request.POST.get("action") == "next":
+                print("Next button clicked. All file groups and files are valid.")
+
+                # first see if any empty file groups need to be deleted
+                num_empty_groups = len([fg for fg in saved_groups if not fg.files.exists()])
+                print(f"Number of empty file groups: {num_empty_groups}")
+                if num_empty_groups > 0:
+                    # return form with modal asking user if they want to delete empty file group
+                    context["file_groups"] = file_group_forms
+                    context["num_empty_groups"] = num_empty_groups
+                    return render(request, "mods/upload/step/3.html", context)
                 return redirect("upload_step4")
         else:
             context["file_groups"] = file_group_forms
             context["group_formset"] = group_formset
+            context["onEmptyGroupFound"] = False
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_group_forms
     context["group_formset"] = group_formset
+    context["onEmptyGroupFound"] = False
     return render(request, "mods/upload/step/3.html", context)
 
 

@@ -1,4 +1,23 @@
-<div x-show="toggled" x-ref="fileGroups" id="fileGroups">
+<div x-show="toggled" x-ref="fileGroups" id="fileGroups" 
+    @group-was-deleted.window="(event) => {
+        if (event.detail?.wasEmpty) {
+            console.log('Deleted group ' + event.detail.groupId + ' was empty. Decreasing empty group count.');
+            $store.dnd.numEmptyGroups -= 1;
+            console.log('Total empty groups after deletion: ' + $store.dnd.numEmptyGroups);
+        } 
+    }"
+    @files-state-changed.window="(event) => {
+        const groups = $refs.fileGroups.querySelectorAll('[data-group-id]');
+        let totalEmpty = 0;
+        groups.forEach(group => {
+            const files_in_group = group.querySelectorAll('[x-sort\\:item]').length;
+            if (files_in_group === 0) {
+                totalEmpty += 1;
+            }
+        });
+        $store.dnd.numEmptyGroups = totalEmpty;
+        console.log('Files state changed. Total empty groups: ' + $store.dnd.numEmptyGroups);
+    }" class="space-y-6">
     {{ group_formset.management_form }}
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
@@ -12,9 +31,9 @@
             hx-swap="beforeend"
             {# djlint:off #}
                 {# refreshes alpine state after swap #}
-                hx-on:htmx:after-swap="
-                    Alpine.initTree(event.detail.elt);
-                    "
+                hx-on:htmx:after-swap="() => { 
+                    Alpine.initTree(event.detail.elt); 
+                }"
                 @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
             {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2">
@@ -22,3 +41,24 @@
         </button>
     </div>
 </div>
+<script>
+    // in case alpine already loaded before
+    if (window.Alpine) {
+        Alpine.store('dnd', {
+            isDragging: false,
+            draggedFileId: null,
+            draggedFromGroupId: null,
+            numEmptyGroups: 0,
+        });
+    } else {
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('dnd', {
+                isDragging: false,
+                draggedFileId: null,
+                draggedFromGroupId: null,
+                numEmptyGroups: 0,
+            });
+        });
+    }
+</script>
+
