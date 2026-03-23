@@ -80,12 +80,12 @@ urlpatterns = [
         name="hx_remove_empty_filegroups",
     ),
     path(
-        "mods/move-filegroup-up/<int:fg_id>/",
+        "mods/move-filegroup-up/",
         hx.hx_move_filegroup_up,
         name="hx_move_filegroup_up",
     ),
     path(
-        "mods/move-filegroup-down/<int:fg_id>/",
+        "mods/move-filegroup-down/",
         hx.hx_move_filegroup_down,
         name="hx_move_filegroup_down",
     ),
