@@ -23,7 +23,10 @@
                 @click="$store.dnd.numEmptyGroups > 0 ? 
                 $dispatch('open-modal', { 
                     endpoint: '{% url 'hx_empty_filegroups_warning' %}',
-                    modalTitle: 'Empty File Groups Detected'
+                    modalTitle: 'Empty File Groups Detected',
+                    icon: 'warning',
+                    maxWidth: 'max-w-md',
+                    hideHeader: true,
                 }) : $el.closest('form').submit()"
                 {# djlint:on #}
                 name="action">

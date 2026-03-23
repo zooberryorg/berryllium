@@ -5,6 +5,9 @@
         openModal({ 
             endpoint: event.detail.endpoint,
             modalTitle: event.detail.modalTitle || 'Modal Title',
+            icon: event.detail.icon || '',
+            maxWidth: event.detail.maxWidth || 'max-w-2xl',
+            hideHeader: event.detail.hideHeader || false,
         });
      }"
 
@@ -17,7 +20,8 @@
         <!-- Backdrop -->
         <div class="glass absolute inset-0 bg-black/50" @click="closeModal()"></div>
         <!-- Modal panel -->
-        <div class="relative w-full max-w-2xl rounded-2xl bg-pine-700 border border-pine-300/40 shadow-2xl"
+        <div class="relative w-full rounded-2xl bg-pine-700 border border-pine-300/40 shadow-2xl"
+             :class="maxWidth"
              @click.stop
              {% comment %}
              Prevent
@@ -29,8 +33,13 @@
              {% endcomment %}
              x-transition>
             <!-- Header -->
-            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white">
-                <h2 class="text-xl font-semibold" x-text="modalTitle">Upload Content</h2>
+            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white" 
+                 x-show="!hideHeader"
+                 x-transition>
+                <span class="flex items-center gap-3">
+                    <ion-icon :name="icon" size="large"></ion-icon>
+                    <h2 class="text-xl font-semibold" x-text="modalTitle">Modal Title</h2>
+                </span>
                 <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <ion-icon name="close" size="large"></ion-icon>
                 </button>

@@ -4,12 +4,15 @@ function createModal() {
         isOpen: false,
         modalTitle: "Modal Title",
         endpoint: "",
+        icon: "",
 
         openModal(detail = {}) {
             this.isOpen = true;
             this.endpoint = detail.endpoint || "";
             this.modalTitle = detail.modalTitle || "Modal Title";
-            console.log("Opening modal with endpoint:", this.endpoint);
+            this.icon = detail.icon || "";
+            this.maxWidth = detail.maxWidth || "max-w-2xl";
+            this.hideHeader = detail.hideHeader || false;
 
             // HTMX for form content
             setTimeout(() => {
