@@ -27,6 +27,7 @@
         <button type="submit"
                 class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
                 value="next"
+                @click="console.log('Alpine state on finish click:', $store.dnd)"
                 name="action">
             <span>Finish <ion-icon name="checkmark" class="align-middle"></ion-icon></span>
         </button>
