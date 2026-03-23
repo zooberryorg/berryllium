@@ -298,4 +298,18 @@ def hx_move_filegroup_up(request, current_index):
     # swap order with the previous group
     swap_filegroup_order(groups, current_index, "up")
 
-    return HttpResponse(status=204)
+    return redirect("upload_step3")
+
+@require_POST
+def hx_move_filegroup_down(request, current_index):
+    """HTMX endpoint to move a file group down in the order."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        return HttpResponse(status=400)
+
+    groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
+
+    # swap order with the next group
+    swap_filegroup_order(groups, current_index, "down")
+
+    return redirect("upload_step3")

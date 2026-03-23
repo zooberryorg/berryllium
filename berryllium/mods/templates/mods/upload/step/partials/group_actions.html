@@ -1,7 +1,15 @@
-<button type="button" class="zb-action">
+<button type="button"
+        class="zb-action"
+        hx-post="{% url 'hx_move_filegroup_up' current_index=forloop.counter0 %}"
+        hx-trigger="click"
+        hx-swap="#upload-frame">
     <ion-icon name="arrow-up"></ion-icon>
 </button>
-<button type="button" class="zb-action">
+<button type="button"
+        class="zb-action"
+        hx-post="{% url 'hx_move_filegroup_down' current_index=forloop.counter0 %}"
+        hx-trigger="click"
+        hx-swap="#upload-frame">
     <ion-icon name="arrow-down"></ion-icon>
 </button>
 {% if file_groups|length > 1 %}

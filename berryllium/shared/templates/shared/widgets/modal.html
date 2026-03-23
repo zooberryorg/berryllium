@@ -1,6 +1,6 @@
 <div x-data="createModal()"
-     x-cloak
-     {# djlint:off #}
+    x-cloak
+    {# djlint:off #}
      @open-modal.window="(event) => { 
         console.log('Received open-modal event with detail:', event.detail); 
         openModal({ 
@@ -12,8 +12,8 @@
                 focusAfterRender: event.detail.focusAfterRender || null,
             }); 
         }"
-     {# djlint:on #}
-     @close-modal.window="closeModal()">
+    {# djlint:on #}
+    @close-modal.window="closeModal()">
     <!-- Overlay -->
     <div x-show="isOpen"
          x-transition.opacity
