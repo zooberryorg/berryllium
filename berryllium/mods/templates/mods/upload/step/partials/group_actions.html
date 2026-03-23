@@ -9,12 +9,14 @@
             class="zb-action-delete"
             hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
             hx-swap="none"
-            hx-on::afterSwap="() => {
-                console.log('Group with ID {{ group_id }} deleted. Dispatching group-was-deleted event.');
-            }"
-            @click="$nextTick(() => {
-                $dispatch('group-was-deleted', { groupId: {{ group_id }}, groupNodeCopy: $refs['fileGroup-' + {{ group_id }}] ? $refs['fileGroup-' + {{ group_id }}].cloneNode(true) : null });
-            }), keepForm = false">
+            hx-on:htmx:before-request="window.dispatchEvent(new CustomEvent('group-was-deleted'))"
+            {# quick check for existing files before deletion #}
+            @click="
+                keepForm = false;
+                const groupEl = document.querySelector('[data-group-id=\'{{ group_id }}\']');
+                const fileCount = groupEl ? groupEl.querySelectorAll('[x-sort\\:item]').length : 0;
+                $dispatch('group-was-deleted', { groupId: {{ group_id }}, wasEmpty: fileCount === 0 });
+            ">
         <ion-icon name="trash"></ion-icon>
     </button>
 {% endif %}

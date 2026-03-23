@@ -1,6 +1,13 @@
 <div x-show="toggled" x-ref="fileGroups" id="fileGroups" 
-    @files-state-changed.window="() => {
-        const groups = $refs.fileGroups.querySelectorAll('[x-ref^=fileGroup-]');
+    @group-was-deleted.window="(event) => {
+        if (event.detail?.wasEmpty) {
+            console.log('Deleted group ' + event.detail.groupId + ' was empty. Decreasing empty group count.');
+            $store.dnd.numEmptyGroups -= 1;
+            console.log('Total empty groups after deletion: ' + $store.dnd.numEmptyGroups);
+        } 
+    }"
+    @files-state-changed.window="(event) => {
+        const groups = $refs.fileGroups.querySelectorAll('[data-group-id]');
         let totalEmpty = 0;
         groups.forEach(group => {
             const files_in_group = group.querySelectorAll('[x-sort\\:item]').length;
