@@ -216,10 +216,13 @@ def upload_step3(request):
                     file_formset.save()
             # all valid, go to next step
             if request.POST.get("action") == "next":
+                print("Next button clicked. All file groups and files are valid.")
 
                 # first see if any empty file groups need to be deleted
                 for fg in filegroups:
+                    print(f"Checking file group '{fg.name}' with ID {fg.id} for files...")
                     if not fg.files.exists():
+                        print(f"File group '{fg.name}' with ID {fg.id} is empty and will be deleted.")
                         # return form with modal asking user if they want to delete empty file group
                         context["file_groups"] = file_group_forms
                         context["onEmptyGroupFound"] = True
