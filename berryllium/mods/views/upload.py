@@ -10,7 +10,7 @@ from berryllium.mods.forms import (
     MetadataForm,
     FileGroupForm,
 )
-from berryllium.mods.models import Mod
+from berryllium.mods.models import Mod, FileGroup
 from berryllium.mods.services import (
     init_context,
     upload_file,
@@ -207,17 +207,10 @@ def upload_step3(request):
         FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
         # get formset data and validate
         group_formset = FileGroupFormset(request.POST, queryset=filegroups)
-        print("Number of file groups submitted:", len(group_formset.forms)  )
         if group_formset.is_valid():
-            print("Number of valid file groups:", len(group_formset.forms))
-            print("The object looks like this:", group_formset.cleaned_data)
-            empty_groups = []
+            # only saves if data was changed
             saved_groups = group_formset.save()
-            print("Saved groups:", saved_groups)
             for group in saved_groups:
-                print("The group looks like this:", group)
-                if not group.files.exists():
-                    empty_groups.append(group)
                 # now that groups are saved, validate their files
                 file_formset = SingleFileFormset(request.POST, instance=group)
                 if file_formset.is_valid():
@@ -225,9 +218,12 @@ def upload_step3(request):
             # all valid, go to next step
             if request.POST.get("action") == "next":
                 print("Next button clicked. All file groups and files are valid.")
-                num_empty_groups = len(empty_groups)
+                num_empty_groups = FileGroup.objects.filter(
+                    mod_id=mod_id,
+                    files__isnull=True
+                ).count()                
                 # first see if any empty file groups need to be deleted
-                print(f"Number of empty file groups: {len(empty_groups)}")
+                print(f"Number of empty file groups: {num_empty_groups}")
                 if num_empty_groups > 0:
                     # return form with modal asking user if they want to delete empty file group
                     context["file_groups"] = file_group_forms
