@@ -1,8 +1,10 @@
 <div x-data="createModal()"
      x-cloak
           @open-modal.window="(event) => { 
+          console.log('Received open-modal event with detail:', event.detail);
         openModal({ 
             endpoint: event.detail.endpoint,
+            modalTitle: event.detail.modalTitle || 'Modal Title',
         });
      }"
 
@@ -28,7 +30,7 @@
              x-transition>
             <!-- Header -->
             <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white">
-                <h2 class="text-xl font-semibold">Upload Content</h2>
+                <h2 class="text-xl font-semibold" x-text="modalTitle">Upload Content</h2>
                 <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <ion-icon name="close" size="large"></ion-icon>
                 </button>

@@ -1,13 +1,10 @@
-<div id="empty-group-modal" class="">
-    <div class="bg-white rounded-lg shadow-lg p-6 relative">
-        <h2 class="text-xl font-semibold mb-4">Empty Group Detected</h2>
-        <p class="mb-4">One or more empty groups were found. Do you want to discard them?</p>
-    </div>
+<div id="empty-group-modal" class="flex flex-col items-center justify-center p-6 space-y-6 mt-6" x-data>
+    <p class="mb-4">One or more empty groups were found. Do you want to discard them?</p>
     <div id="empty-group-actions">
         <button class="absolute inset-0 w-full h-full"
                 @click="$dispatch('close-modal')"
-                x-text="Discard Empty Group(s)"></button>
+               >Discard</button>
         <button class="absolute inset-0 w-full h-full"
-                @click="$dispatch('close-modal'); $refs.uploadForm.submit()">Keep Empty Groups</button>
+                @click="$dispatch('close-modal'); $refs.uploadForm.submit()">Cancel</button>
     </div>
 </div>
