@@ -24,8 +24,6 @@
             {# djlint:off #}
                 {# refreshes alpine state after swap #}
                 hx-on:htmx:after-swap="() => { 
-                    $store.dnd.numEmptyGroups += 1;
-                    console.log('Group added. Total empty groups: ' + $store.dnd.numEmptyGroups);
                     Alpine.initTree(event.detail.elt); 
                 }"
                 @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
