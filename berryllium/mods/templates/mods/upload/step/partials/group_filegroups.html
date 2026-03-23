@@ -14,6 +14,12 @@
                 {# refreshes alpine state after swap #}
                 hx-on:htmx:after-swap="
                     Alpine.initTree(event.detail.elt);
+                    // update id_form-TOTAL_FORMS value
+                    const totalFormsInput = document.getElementById('id_form-TOTAL_FORMS');
+                    console.log('Total forms input:', totalFormsInput);
+                    if (totalFormsInput) {
+                        totalFormsInput.value = parseInt(totalFormsInput.value) + 1;
+                    }
                     "
                 @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
             {# djlint:on #}

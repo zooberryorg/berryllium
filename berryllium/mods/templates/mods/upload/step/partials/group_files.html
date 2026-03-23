@@ -107,9 +107,6 @@ body.sorting {
 
 </style>
 <script>
-    document.addEventListener('keydown', e => {
-    if (e.key === 'd') debugger  // press D while dragging to freeze
-})
     // in case alpine already loaded before
     if (window.Alpine) {
         Alpine.store('dnd', {
