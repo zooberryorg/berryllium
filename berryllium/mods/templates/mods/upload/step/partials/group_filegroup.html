@@ -64,9 +64,9 @@
                 <div class="text-red-500 text-sm"
                      id="group-description-errors-{{ group.instance.id }}">
                     {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
+                    </div>
+                    {% include "mods/upload/step/partials/group_files.html" with files=files group_index=group.instance.id %}
                 </div>
-                {% include "mods/upload/step/partials/group_files.html" with files=files group_index=group.instance.id %}
             </div>
         </div>
     </div>
-</div>

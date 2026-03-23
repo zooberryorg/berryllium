@@ -1,4 +1,6 @@
-<div id="files-group-{{ group.instance.id }}" x-sort.ghost x-sort:group="fileGroup">
+<div id="files-group-{{ group.instance.id }}"
+     x-sort.ghost
+     x-sort:group="fileGroup">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
@@ -11,31 +13,32 @@
             @dragend="onDragEnd($event)"
 
             x-sort:item>
-            {# djlint:on #}
-            <span class="text-pine-200 px-2 py-1 font-size-md cursor-grab group" x-sort:handle>
-                <i class="bi bi-grip-vertical group-hover:text-gold-400"></i>
-            </span>
-            <div class="flex flex-col w-full">
-                <input type="text"
-                    name="fileform-{{ file.instance.id }}-title"
-                    class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
-                    placeholder="{{ file.instance.filename }}"
-                    hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
-                    hx-trigger="input delay:500ms"
-                    hx-target="#file-title-errors-{{ file.instance.id }}"
-                    hx-swap="innerHTML"
-                    autocomplete="off"
-                    @keydown.escape="$el.blur()"
-                    @keydown.enter.prevent="$el.blur()"
-                    hx-on::after-swap="htmx.process(this)"
-                    {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
-                <div class="text-red-500 text-sm"
-                    id="file-title-errors-{{ file.instance.id }}">
-                    {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
-                </div>
+        {# djlint:on #}
+        <span class="text-pine-200 px-2 py-1 font-size-md cursor-grab group"
+              x-sort:handle>
+            <i class="bi bi-grip-vertical group-hover:text-gold-400"></i>
+        </span>
+        <div class="flex flex-col w-full">
+            <input type="text"
+                   name="fileform-{{ file.instance.id }}-title"
+                   class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
+                   placeholder="{{ file.instance.filename }}"
+                   hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
+                   hx-trigger="input delay:500ms"
+                   hx-target="#file-title-errors-{{ file.instance.id }}"
+                   hx-swap="innerHTML"
+                   autocomplete="off"
+                   @keydown.escape="$el.blur()"
+                   @keydown.enter.prevent="$el.blur()"
+                   hx-on::after-swap="htmx.process(this)"
+                   {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
+            <div class="text-red-500 text-sm"
+                 id="file-title-errors-{{ file.instance.id }}">
+                {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
             </div>
-            <div class="flex flex-col w-full">
-                {# djlint:off #}
+        </div>
+        <div class="flex flex-col w-full">
+            {# djlint:off #}
                     <textarea type="text"
                         x-data="textFieldExpand({ content: '{{ file.instance.description }}', ref: 'collapsibleSingleFileDesc' })"
                         x-ref="collapsibleSingleFileDesc"
@@ -62,16 +65,15 @@
                         hx-swap="innerHTML"
                         hx-on::after-swap="htmx.process(this)">
                     </textarea>
-                {# djlint:on #}
-                <div class="text-red-500 text-sm"
-                    id="file-description-errors-{{ file.instance.id }}">
-                    {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
-                </div>
+            {# djlint:on #}
+            <div class="text-red-500 text-sm"
+                 id="file-description-errors-{{ file.instance.id }}">
+                {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
             </div>
         </div>
-    {% endfor %}
-</div>    
-
+    </div>
+{% endfor %}
+</div>
 <style>[x-cloak] { display: none !important; }
 
     .sortable-ghost {
