@@ -32,12 +32,25 @@
                 @click="$dispatch('close-modal'); $refs.uploadForm.submit()">
             <i class="bi bi-x-lg mr-3"></i> Cancel
         </button>
-        <button class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
-                x-post="{% url 'hx_remove_empty_filegroups' %}"
-                x-trigger="click"
-                x-swap="none"
-                @click="$dispatch('close-modal'); $store.dnd.numEmptyGroups = 0;">
-            <i class="bi bi-trash-fill mr-3"></i> Discard
+        <button type="button"
+                class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
+                @click="() => {
+                    if ($store.dnd.numEmptyGroups > 0) {
+                        htmx.ajax('POST', '{% url 'hx_remove_empty_filegroups' %}', {
+                            values: {
+                                num_groups: $store.dnd.numEmptyGroups,
+                            },
+                            headers: {
+                                'X-CSRFToken': '{{ csrf_token }}'
+                            },
+                            swap: 'none',
+                        });
+                        $store.dnd.numEmptyGroups = 0;
+                        $dispatch('close-modal');
+                    }
+                }">
+                
+            <i class="bi bi-trash-fill mr-3"></i> Discard Empties
         </button>
     </div>
 </div>

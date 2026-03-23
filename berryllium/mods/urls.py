@@ -3,25 +3,31 @@ from berryllium.mods.views import upload, explore
 import berryllium.mods.hx as hx
 
 urlpatterns = [
-    # Upload form
+    # Upload form (CREATE)
     path("mods/upload/", upload.upload_mod, name="upload_mod"),
     path("mods/upload/s1", upload.upload_step1, name="upload_step1"),
     path("mods/upload/s2", upload.upload_step2, name="upload_step2"),
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
     path("mods/upload/s4", upload.upload_step4, name="upload_step4"),
-    # File management
+
+    # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
         upload.remove_temp_file,
         name="remove_temp_file",
     ),
-    # Explore mods
+
+    # ---------------------------------------------- Explore mods (READ)
     path("explore/mods/", explore.mods, name="explore_mods"),
-    # File Drafts
+
+    # ---------------------------------------------- File Drafts (UPDATE)
     path("mods/drafts/<int:mod_id>/", upload.open_mod_draft, name="open_mod_draft"),
-    # Session management
+
+    # ---------------------------------------------- Session management
     path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
-    # HTMX endpoints
+
+
+    # ---------------------------------------------- HTMX endpoints
     path("mods/validate-url/", hx.hx_process_url_field, name="hx_process_url_field"),
     path(
         "mods/toggle-group-manager/",

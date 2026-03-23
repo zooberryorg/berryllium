@@ -272,7 +272,7 @@ def hx_remove_empty_filegroups(request):
     empty_groups = FileGroup.objects.filter(
         mod_id=mod_id, files__isnull=True
     )
-
+    print(f"After a search, found {empty_groups.count()} empty file groups.")
     if not empty_groups.exists():
         print("No empty file groups found for mod ID:", mod_id)
         return HttpResponse(status=400)
