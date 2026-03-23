@@ -1,13 +1,42 @@
 <div id="files-group-{{ group.instance.id }}"
-     x-sort.ghost
-     x-sort:group="fileGroup">
+     x-sort
+     x-sort:group="fileGroup"
+     data-group-id="{{ group.instance.id }}"
+     class="transition-all duration-200"
+     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
+     x-sort:config="{
+        forceFallback: true,
+         dragClass: 'file-draggable',
+         chosenClass: 'file-chosen',
+         ghostClass: 'file-ghost',
+         onChoose: (event) => { 
+            $store.dnd.isDragging = true;
+            $store.dnd.draggedId = event.item.dataset.fileId;
+         },
+         onUnchoose: (event) => { 
+            $store.dnd.isDragging = false;
+        },
+        onAdd: (event) => {
+            const fgId = event.to.dataset.groupId;
+            console.log('File with ID ' + $store.dnd.draggedId + ' added to group ' + fgId);
+            htmx.ajax('POST', '{% url 'hx_add_file_to_group' fg_id=group.instance.id %}', { 
+                values: { 
+                    dragged_id: $store.dnd.draggedId,
+                    fg_id: fgId,
+                } 
+            });
+        },
+     }">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
-                    bg-pine-800/40 rounded-lg px-2 py-1 text-sm text-white/80 
+                    bg-pine-800 rounded-lg px-2 py-1 text-sm text-white/80 
                     border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
-                    focus:border-transparent hover:bg-pine-800"
+                    focus:border-transparent hover:bg-pine-900"
+            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
             id="draggableFile"
+            data-file-id="{{ file.instance.id }}"
+            x-ref="files"
             x-data="fileDragAndDrop()"
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
@@ -76,22 +105,40 @@
 </div>
 <style>[x-cloak] { display: none !important; }
 
-    .sortable-ghost {
-        border: 2px solid var(--color-gold-400);
-    }
+/* specificity so it wins over sortablejs default styles */
+.file-draggable.file-draggable {
+    opacity: 1.0 !important;
+    pointer-events: none;
+}
 
-    .sortable-ghost input, .sortable-ghost textarea, .sortable-ghost i {
-        color: #fff !important;
-        font-weight: normal;
-    }
+.file-chosen {
+    opacity: 0.0 !important;
+    background-color: var(--color-pine-600);
+    pointer-events: none;
+}
+
+.file-ghost {
+    opacity: 0.0 !important;
+    pointer-events: none;
+}
+
+body.sorting {
+    user-select: none;
+    --webkit-user-select: none;
+}
+
 </style>
 <script>
+    document.addEventListener('keydown', e => {
+    if (e.key === 'd') debugger  // press D while dragging to freeze
+})
     // in case alpine already loaded before
     if (window.Alpine) {
         Alpine.store('dnd', {
             isDragging: false,
             draggedId: null,
         });
+
     } else {
         document.addEventListener('alpine:init', () => {
             Alpine.store('dnd', {
