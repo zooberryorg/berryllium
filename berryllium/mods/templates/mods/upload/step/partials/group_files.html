@@ -9,6 +9,7 @@
             x-data="fileDragAndDrop()"
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
+
             x-sort:item>
             {# djlint:on #}
             <span class="text-pine-200 px-2 py-1 font-size-md cursor-grab group" x-sort:handle>
@@ -69,12 +70,19 @@
             </div>
         </div>
     {% endfor %}
-</div>
+</div>    
+
 <style>[x-cloak] { display: none !important; }
 
-    .ui-draggable-dragging {
-        opacity: 0.0 !important;
-        display: none !important;
+    .sortable-ghost {
+        border: 2px solid var(--color-gold-300);
+        background: var(--color-gold-400);
+        opacity: 0.5;
+    }
+
+    .sortable-ghost input, .sortable-ghost textarea, .sortable-ghost i {
+        color: #fff !important;
+        font-weight: normal;
     }
 </style>
 <script>
