@@ -9,13 +9,7 @@
             class="zb-action-delete"
             hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
             hx-swap="none"
-            @click="() => {
-                const files_in_group = $refs['fileGroup-{{ group_id }}'].querySelectorAll('[x-sort\\:item]').length;
-                if (files_in_group === 0) {
-                    $store.dnd.numEmptyGroups -= 1;
-                    console.log('Group {{ group_id }} removed. Total empty groups: ' + $store.dnd.numEmptyGroups);
-                }
-            }, keepForm = false">
+            @click="keepForm = false">
         <ion-icon name="trash"></ion-icon>
     </button>
 {% endif %}
