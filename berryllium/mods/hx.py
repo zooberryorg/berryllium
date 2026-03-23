@@ -194,7 +194,7 @@ def hx_add_filegroup_form(request):
         return HttpResponse(status=400)
 
     # ------------ Create new FileGroup instance for the new form
-    FileGroup.objects.create(mod_id=mod_id, name="New Group")
+    FileGroup.objects.create(mod_id=mod_id, name="New Group", order=FileGroup.objects.filter(mod_id=mod_id).count())
 
     # ------------ Rebuild context and file group data for re-rendering
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
