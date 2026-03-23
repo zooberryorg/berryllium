@@ -9,8 +9,9 @@
     hx-swap="innerHTML"
     {# djlint:off #}
       @open-modal.window="(event) => { 
+        console.log('Opening modal for URL:', event.detail.endpoint);
         openModal({ 
-            endpoint: event.detail.contentUrl, 
+            endpoint: event.detail.endpoint, 
             onClose: () => { 
                 console.log('Modal closed, re-checking empty groups...'); 
                 // custom event to re-check empty groups when the modal closes window.
@@ -23,6 +24,7 @@
     hx-encoding="multipart/form-data"
     x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"
     x-ref="uploadForm">
+    {{ group_formset.management_form }}
     {% csrf_token %}
     <div class="p-6 mt-4">{% include "mods/upload/step/partials/group_blurb.html" %}</div>
     {% include "mods/upload/step/partials/group_toggle.html" %}

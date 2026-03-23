@@ -24,7 +24,6 @@
     }" 
     {# djlint:on #}
     class="space-y-6">
-    {{ group_formset.management_form }}
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
     {% endfor %}

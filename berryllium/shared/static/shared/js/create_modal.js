@@ -14,7 +14,7 @@ function createModal() {
             setTimeout(() => {
                 const modalContent = document.getElementById('modal-content');
                 if (modalContent) {
-                    htmx.post(this.endpoint, { target: '#modal-content', swap: 'innerHTML' });
+                    htmx.ajax('GET', this.endpoint, { target: '#modal-content', swap: 'innerHTML' });
                 }
             }, 100);
         },

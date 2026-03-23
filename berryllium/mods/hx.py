@@ -3,7 +3,7 @@ from berryllium.mods.forms import FileGroupForm, SingleFileForm
 from berryllium.mods.services import init_context, create_file_group
 
 from django.shortcuts import render, HttpResponse
-from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_POST, require_GET
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 
@@ -233,7 +233,7 @@ def hx_add_file_to_group(request):
     # empty response
     return HttpResponse(status=204)
 
-@require_POST
+@require_GET
 def hx_empty_filegroups_warning(request):
     """HTMX endpoint to check for empty file groups before proceeding to next step."""
     mod_id = request.session.get("session_id")
