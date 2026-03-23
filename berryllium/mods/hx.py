@@ -1,6 +1,6 @@
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
-from berryllium.mods.services import init_context, create_file_group
+from berryllium.mods.services import  create_file_group, update_filegroup_order
 
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
@@ -212,6 +212,7 @@ def hx_remove_filegroup_form(request, fg_id):
     """HTMX endpoint to remove a file group form."""
     print("Attempting to delete FileGroup with ID:", fg_id)
     FileGroup.objects.filter(id=fg_id).delete()
+    update_filegroup_order(request.session.get("session_id"))
     return HttpResponse()
 
 

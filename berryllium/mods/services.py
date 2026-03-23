@@ -1,3 +1,4 @@
+from ast import mod
 import os
 import uuid
 
@@ -120,14 +121,12 @@ def update_filegroup_order(mod_id):
     """
     Updates the order of file groups.
     """
-    mod = FileGroup.objects.filter(mod_id=mod_id).first()
-    if not mod:
+    groups = FileGroup.objects.filter(mod_id=mod_id)
+    if not groups:
         return False
     
-    filegroups = list(mod.file_groups.all())
-
     # update order
-    for index, fg in enumerate(filegroups):
+    for index, fg in enumerate(groups):
         fg.order = index
         fg.save()
     return True
