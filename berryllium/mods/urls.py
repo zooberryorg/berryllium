@@ -59,7 +59,7 @@ urlpatterns = [
         name="hx_remove_filegroup_form",
     ),
     path(
-        "mods/add-file-to-group/<int:fg_id>/",
+        "mods/add-file-to-group/",
         hx.hx_add_file_to_group,
         name="hx_add_file_to_group",
     ),

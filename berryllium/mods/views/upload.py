@@ -219,14 +219,13 @@ def upload_step3(request):
                 print("Next button clicked. All file groups and files are valid.")
 
                 # first see if any empty file groups need to be deleted
-                for fg in filegroups:
-                    print(f"Checking file group '{fg.name}' with ID {fg.id} for files...")
-                    if not fg.files.exists():
-                        print(f"File group '{fg.name}' with ID {fg.id} is empty and will be deleted.")
-                        # return form with modal asking user if they want to delete empty file group
-                        context["file_groups"] = file_group_forms
-                        context["onEmptyGroupFound"] = True
-                        return render(request, "mods/upload/step/3.html", context)
+                num_empty_groups = len([fg for fg in saved_groups if not fg.files.exists()])
+                print(f"Number of empty file groups: {num_empty_groups}")
+                if num_empty_groups > 0:
+                    # return form with modal asking user if they want to delete empty file group
+                    context["file_groups"] = file_group_forms
+                    context["num_empty_groups"] = num_empty_groups
+                    return render(request, "mods/upload/step/3.html", context)
                 return redirect("upload_step4")
         else:
             context["file_groups"] = file_group_forms
