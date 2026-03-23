@@ -1,6 +1,16 @@
 <div id="files-group-{{ group.instance.id }}"
     x-sort
     x-sort:group="fileGroup"
+    {# djlint:off #}
+    x-init="() => {
+        const files_in_group = $el.querySelectorAll('[x-sort\\:item]').length;
+        if (files_in_group === 0) {
+            $store.dnd.numEmptyGroups += 1;
+        }
+        console.log('Group {{ group.instance.id }} initialized empty. Total empty groups: ' + $store.dnd.numEmptyGroups);
+
+    }"
+    {# djlint:on #}
     data-group-id="{{ group.instance.id }}"
     class="transition-all duration-200"
     :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
@@ -26,6 +36,11 @@
                         fg_id: fgId, 
                     } 
                 }); 
+                const files_in_group = $el.querySelectorAll('[x-sort\\:item]').length;
+                if (files_in_group === 0) {
+                    $store.dnd.numEmptyGroups += 1;
+                    console.log('Group {{ group.instance.id }} is now empty. Total empty groups: ' + $store.dnd.numEmptyGroups);
+                }
             }, 
         }">
     {# djlint:on #}
@@ -136,16 +151,14 @@ body.sorting {
         Alpine.store('dnd', {
             isDragging: false,
             draggedId: null,
-            numEmptyGroups: {{ num_empty_groups }},
+            numEmptyGroups: 0,
         });
-        console.log("Alpine store 'dnd' initialized with numEmptyGroups:", {{ num_empty_groups }});
-
     } else {
         document.addEventListener('alpine:init', () => {
             Alpine.store('dnd', {
                 isDragging: false,
                 draggedId: null,
-                numEmptyGroups: {{ num_empty_groups }},
+                numEmptyGroups: 0,
             });
         });
     }
