@@ -64,7 +64,7 @@ urlpatterns = [
         name="hx_add_file_to_group",
     ),
     path(
-        "mods/empty-filegroups-warning/<int:file_id>/",
+        "mods/empty-filegroups-warning/",
         hx.hx_empty_filegroups_warning,
         name="hx_empty_filegroups_warning",
     ),

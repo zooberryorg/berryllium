@@ -1,6 +1,7 @@
 <div x-show="toggled"
     x-ref="fileGroups"
     id="fileGroups"
+    x-data="createModal()"
     {# djlint:off #}
     @group-was-deleted.window="(event) => {
         if (event.detail?.wasEmpty) {
