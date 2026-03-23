@@ -236,8 +236,10 @@ def hx_add_file_to_group(request):
 @require_GET
 def hx_empty_filegroups_warning(request):
     """HTMX endpoint to check for empty file groups before proceeding to next step."""
+    print("Checking for empty file groups for mod in session.")
     mod_id = request.session.get("session_id")
     if not mod_id:
+        print("No mod_id in session when checking for empty file groups.")
         return HttpResponse(status=400)
 
     empty_groups = FileGroup.objects.filter(mod_id=mod_id, fileupload__isnull=True)

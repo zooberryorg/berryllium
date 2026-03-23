@@ -3,6 +3,11 @@
     id="fileGroups"
     x-data="createModal()"
     {# djlint:off #}
+      @open-modal.window="(event) => { 
+        openModal({ 
+            endpoint: event.detail.endpoint,
+        });
+    }"
     @group-was-deleted.window="(event) => {
         if (event.detail?.wasEmpty) {
             console.log('Deleted group ' + event.detail.groupId + ' was empty. Decreasing empty group count.');

@@ -1,20 +1,19 @@
 <div x-data="createModal()"
-     @open-modal.window="openModal()"
      @close-modal.window="closeModal()"
      x-show="isOpen"
      x-cloak
-     class="fixed inset-0 z-50 overflow-y-auto"
+     class="fixed inset-0 z-50 overflow-y-auto bg-pine-600 rounded-xl"
      style="display: none">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
          @click="closeModal()"></div>
     <!-- Modal -->
-    <div class="flex items-center justify-center min-h-screen p-4">
-        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full relative"
+    <div class="flex items-center justify-center min-h-screen p-4 rounded-xl">
+        <div class="rounded-lg shadow-xl max-w-2xl w-full relative"
              @click.stop
              x-transition>
             <!-- Header -->
-            <div class="border-b px-6 py-4 flex items-center justify-between">
+            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white">
                 <h2 class="text-xl font-semibold">Upload Content</h2>
                 <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
                     <ion-icon name="close" size="large"></ion-icon>

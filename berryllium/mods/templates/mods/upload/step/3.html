@@ -7,19 +7,6 @@
     hx-target="#upload-frame"
     id="uploadForm"
     hx-swap="innerHTML"
-    {# djlint:off #}
-      @open-modal.window="(event) => { 
-        console.log('Opening modal for URL:', event.detail.endpoint);
-        openModal({ 
-            endpoint: event.detail.endpoint, 
-            onClose: () => { 
-                console.log('Modal closed, re-checking empty groups...'); 
-                // custom event to re-check empty groups when the modal closes window.
-                dispatchEvent(new CustomEvent('files-state-changed')); 
-            } 
-        });
-    }"
-    {# djlint:on #}
     enctype="multipart/form-data"
     hx-encoding="multipart/form-data"
     x-data="toggleGroupManager({ toggled: {{ group_manager_toggled|yesno:'true,false' }} })"

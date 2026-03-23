@@ -9,6 +9,7 @@ function createModal() {
             this.isOpen = true;
             this.endpoint = detail.endpoint || "";
             this.modalTitle = detail.title || "Modal Title";
+            console.log("Opening modal with endpoint:", this.endpoint);
 
             // HTMX for form content
             setTimeout(() => {
