@@ -91,15 +91,23 @@
 /* specificity so it wins over sortablejs default styles */
 .file-draggable.file-draggable {
     opacity: 1.0 !important;
+    pointer-events: none;
 }
 
 .file-chosen {
     opacity: 0.0 !important;
     background-color: var(--color-pine-600);
+    pointer-events: none;
 }
 
 .file-ghost {
     opacity: 0.0 !important;
+    pointer-events: none;
+}
+
+body.sorting {
+    user-select: none;
+    --webkit-user-select: none;
 }
 
 </style>
