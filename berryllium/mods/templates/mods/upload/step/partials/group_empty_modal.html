@@ -1,10 +1,10 @@
-<div id="empty-group-modal" class="flex flex-col items-center justify-center p-6 space-y-6 mt-6" x-data>
+<div id="empty-group-modal" class="flex flex-col items-center justify-center p-6 space-y-6 mt-6 text-white" x-data>
     <p class="mb-4">One or more empty groups were found. Do you want to discard them?</p>
-    <div id="empty-group-actions">
-        <button class="absolute inset-0 w-full h-full"
+    <div class="flex flex-row gap-4">
+        <button class="zb-controls"
+                @click="$dispatch('close-modal'); $refs.uploadForm.submit()"><i class="bi bi-x-lg mr-3"></i> Cancel</button>
+        <button class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors"
                 @click="$dispatch('close-modal')"
-               >Discard</button>
-        <button class="absolute inset-0 w-full h-full"
-                @click="$dispatch('close-modal'); $refs.uploadForm.submit()">Cancel</button>
+               ><i class="bi bi-trash-fill mr-3"></i> Discard</button>
     </div>
 </div>
