@@ -72,7 +72,9 @@ def upload_file(uploaded_file, mod_id=None):
         return None
 
     # find file group that this file belongs to (if it exists)
-    fg, _ = FileGroup.objects.get_or_create(mod_id=mod_id, defaults={"name": "Files"})
+    fg = FileGroup.objects.filter(mod_id=mod_id).first()
+    if fg is None:
+        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
 
     # once all clear, save file to storage
     temp_path = default_storage.save(temp_filename, uploaded_file)

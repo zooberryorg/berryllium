@@ -13,10 +13,6 @@ function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
             this.focused = false;
         },
 
-        init() {
-            this.updateTrimLength(this.ref.offsetWidth);
-        },
-
         trimDisplayedContent() {
             if (this.content.length > trimLen) {
                 return this.content.slice(0, trimLen) + "...";
@@ -26,17 +22,74 @@ function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
         },
 
         updateTrimLength(elwidth) {
-             // average width of a character in pixels
+            // average width of a character in pixels
             const avgCharWidth = 8;
             this.trimLen = Math.floor(elwidth / avgCharWidth);
             console.log("Updated trim length to: " + this.trimLen);
         },
-        
+
     }
 }
 
 function toggleGroupManager({ toggled = false }) {
     return {
         toggled,
+    }
+}
+
+function fileDragAndDrop() {
+    return {
+        updateCurrentElementVisibility(event, el = null) {
+            console.log("Updating visibility for element: ", el);
+            const currentElement = el || event.currentTarget;
+
+            for (const child of currentElement.children) {
+                child.classList.add('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
+            }
+            
+            if (event.type === 'dragstart') {
+                currentElement.classList.add('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
+            } else {
+                currentElement.classList.remove('text-gold-400/50', 'border-gold-400/50', 'cursor-grabbing');
+            }
+        },
+
+        onDragStart(event, fileId) {
+            Alpine.store('dnd').isDragging = true;
+            Alpine.store('dnd').draggedId = fileId;
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', String(fileId));
+            const currentElement = event.currentTarget;
+
+            // chosen customization
+            const chosen = currentElement.cloneNode(true);
+            chosen.classList.add('hidden');
+            chosen.classList.add('cursor-grabbing');
+            document.body.appendChild(chosen);
+            event.dataTransfer.setDragImage(chosen, 0, 0);
+
+            // ghost customization (default class="sortable-ghost" with opacity: 0.5)
+            // select based on class
+            this.updateCurrentElementVisibility(event, currentElement);
+        },
+
+        onDragOver(event) {
+            event.preventDefault();
+            event.dataTransfer.dropEffect = 'move';
+        },
+
+        onDragEnd(event) {
+            this.isDragging = false;
+            this.target = null;
+            Alpine.store('dnd').isDragging = false;
+            Alpine.store('dnd').draggedId = null;
+
+            this.updateCurrentElementVisibility(event, event.currentTarget);
+        },
+
+        handleFileDrop(event, targetId) {
+            event.preventDefault();
+            const draggedId = Alpine.store('dnd').draggedId;
+        }
     }
 }
