@@ -281,4 +281,7 @@ def hx_remove_empty_filegroups(request):
     for group in empty_groups:
         group.delete()
 
+    # update order
+    update_filegroup_order(mod_id)
+
     return redirect("upload_step3")
