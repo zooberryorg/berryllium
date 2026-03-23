@@ -1,7 +1,7 @@
 <div x-data="createModal()"
      x-cloak
      @open-modal.window="(event) => { console.log('Received open-modal event with detail:', event.detail); openModal({ endpoint: event.detail.endpoint, modalTitle: event.detail.modalTitle || 'Modal Title', icon: event.detail.icon || '', maxWidth: event.detail.maxWidth || 'max-w-2xl', hideHeader: event.detail.hideHeader || false, }); }"
-     @close-create-modal.window="closeModal()">
+     @close-modal.window="closeModal()">
     <!-- Overlay -->
     <div x-show="isOpen"
          x-transition.opacity
