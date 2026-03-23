@@ -25,30 +25,13 @@
                 $store.dnd.isDragging = true; 
                 $store.dnd.draggedFileId = event.item.dataset.fileId; 
                 $store.dnd.draggedFromGroupId = event.from.dataset.groupId;
-                console.log('Started dragging file with ID ' + $store.dnd.draggedFileId + ' from group ' + $store.dnd.draggedFromGroupId);
             }, 
             onUnchoose: (event) => { 
                 $store.dnd.isDragging = false; 
             }, 
             onAdd: (event) => { 
                 const fgId = event.to.dataset.groupId; 
-                const draggedGroupId = $store.dnd.draggedFromGroupId;
-                console.log('Currently dragging away from group ' + draggedGroupId);
 
-
-                if (draggedGroupId) {
-                    console.log('File was dragged from group ' + draggedGroupId);
-                } else {
-                    console.log('No source group detected for dragged file.');
-                }
-
-
-                const files_in_group = document.querySelectorAll('#fileGroup-' + draggedGroupId + ' [x-sort\\:item]').length;
-                console.log('Group ' + draggedGroupId + ' has ' + files_in_group + ' files after drop.');
-                if (files_in_group === 0) {
-                    $store.dnd.numEmptyGroups += 1;
-                    console.log('Group ' + draggedGroupId + ' is now empty. Total empty groups: ' + $store.dnd.numEmptyGroups);
-                }
                 htmx.ajax('POST', '{% url 'hx_add_file_to_group' %}', { 
                     values: { 
                         dragged_id: $store.dnd.draggedFileId, 
