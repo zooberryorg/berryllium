@@ -68,4 +68,9 @@ urlpatterns = [
         hx.hx_empty_filegroups_warning,
         name="hx_empty_filegroups_warning",
     ),
+    path(
+        "mods/remove-empty-filegroups/",
+        hx.hx_remove_empty_filegroups,
+        name="hx_remove_empty_filegroups",
+    ),
 ]
