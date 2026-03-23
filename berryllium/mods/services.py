@@ -130,3 +130,22 @@ def update_filegroup_order(mod_id):
         fg.order = index
         fg.save()
     return True
+
+def swap_filegroup_order(filegroups, group_a_index, group_b_index, direction):
+    """
+    Moves a file group up in the order.
+    """
+    if direction == "up" and group_a_index > 0:
+        # swap with previous group
+        filegroups[group_a_index - 1], filegroups[group_a_index] = (
+            filegroups[group_a_index],
+            filegroups[group_a_index - 1],
+        )
+    elif direction == "down" and group_a_index < len(filegroups) - 1:
+        # swap with next group
+        filegroups[group_a_index + 1], filegroups[group_a_index] = (
+            filegroups[group_a_index],
+            filegroups[group_a_index + 1],
+        )
+    
+

@@ -287,17 +287,13 @@ def hx_remove_empty_filegroups(request):
     return redirect("upload_step3")
 
 @require_POST
-def hx_move_filegroup_up(request, fg_id):
+def hx_move_filegroup_up(request, fg_id, current_index):
     """HTMX endpoint to move a file group up in the order."""
     mod_id = request.session.get("session_id")
     if not mod_id:
         return HttpResponse(status=400)
 
     groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
-    group_index = next((index for (index, g) in enumerate(groups) if g.id == fg_id), None)
-
-    if group_index is None or group_index == 0:
-        return HttpResponse(status=400)
 
     # swap order with the previous group
 
