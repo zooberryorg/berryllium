@@ -222,16 +222,19 @@ def upload_step3(request):
                     if not fg.files.exists():
                         # return form with modal asking user if they want to delete empty file group
                         context["file_groups"] = file_group_forms
+                        context["onEmptyGroupFound"] = True
                         return render(request, "mods/upload/step/3.html", context)
                 return redirect("upload_step4")
         else:
             context["file_groups"] = file_group_forms
             context["group_formset"] = group_formset
+            context["onEmptyGroupFound"] = False
             return render(request, "mods/upload/step/3.html", context)
 
     # ---------------- GET (rehydrate Alpine)
     context["file_groups"] = file_group_forms
     context["group_formset"] = group_formset
+    context["onEmptyGroupFound"] = False
     return render(request, "mods/upload/step/3.html", context)
 
 
