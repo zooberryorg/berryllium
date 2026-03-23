@@ -1,16 +1,6 @@
 <div x-data="createModal()"
      x-cloak
-          @open-modal.window="(event) => { 
-          console.log('Received open-modal event with detail:', event.detail);
-        openModal({ 
-            endpoint: event.detail.endpoint,
-            modalTitle: event.detail.modalTitle || 'Modal Title',
-            icon: event.detail.icon || '',
-            maxWidth: event.detail.maxWidth || 'max-w-2xl',
-            hideHeader: event.detail.hideHeader || false,
-        });
-     }"
-
+     @open-modal.window="(event) => { console.log('Received open-modal event with detail:', event.detail); openModal({ endpoint: event.detail.endpoint, modalTitle: event.detail.modalTitle || 'Modal Title', icon: event.detail.icon || '', maxWidth: event.detail.maxWidth || 'max-w-2xl', hideHeader: event.detail.hideHeader || false, }); }"
      @close-create-modal.window="closeModal()">
     <!-- Overlay -->
     <div x-show="isOpen"
@@ -33,7 +23,7 @@
              {% endcomment %}
              x-transition>
             <!-- Header -->
-            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white" 
+            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white"
                  x-show="!hideHeader"
                  x-transition>
                 <span class="flex items-center gap-3">

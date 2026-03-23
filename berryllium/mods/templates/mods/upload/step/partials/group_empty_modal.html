@@ -1,10 +1,17 @@
-<div id="empty-group-modal" class="flex flex-col items-center justify-center p-6 space-y-6 mt-6 text-white" x-data>
-    <p class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center"><ion-icon name="warning" class="text-white-400 w-20 text-3xl"></ion-icon> One or more empty groups were found. Do you want to discard them?</p>
+<div id="empty-group-modal"
+     class="flex flex-col items-center justify-center p-6 space-y-6 mt-6 text-white"
+     x-data>
+    <p class="flex gap-4 bg-pine-600/15 border border-white/5 rounded-xl p-4 items-center">
+        <ion-icon name="warning" class="text-white-400 w-20 text-3xl"></ion-icon> One or more empty groups were found. Do you want to discard them?
+    </p>
     <div class="flex flex-row gap-4">
         <button class="zb-controls items-center justify-center"
-                @click="$dispatch('close-modal'); $refs.uploadForm.submit()"><i class="bi bi-x-lg mr-3"></i> Cancel</button>
+                @click="$dispatch('close-modal'); $refs.uploadForm.submit()">
+            <i class="bi bi-x-lg mr-3"></i> Cancel
+        </button>
         <button class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
-                @click="$dispatch('close-modal')"
-               ><i class="bi bi-trash-fill mr-3"></i> Discard</button>
+                @click="$dispatch('close-modal')">
+            <i class="bi bi-trash-fill mr-3"></i> Discard
+        </button>
     </div>
 </div>
