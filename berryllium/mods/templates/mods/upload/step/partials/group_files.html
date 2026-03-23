@@ -4,6 +4,7 @@
      class="transition-all duration-200"
      :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
      x-sort:config="{
+        forceFallback: true,
          dragClass: 'file-draggable',
          chosenClass: 'file-chosen',
          ghostClass: 'file-ghost',
@@ -85,8 +86,7 @@
 </div>
 <style>[x-cloak] { display: none !important; }
 .file-draggable {
-    opacity: 0.0;
-    display: none;
+    opacity: 1.0 !important;
 }
 
 .file-chosen {
