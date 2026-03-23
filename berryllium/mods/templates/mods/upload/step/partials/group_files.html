@@ -12,7 +12,15 @@
             $store.dnd.isDragging = true;
             $store.dnd.draggedId = event.item.dataset.fileId;
          },
-         onUnchoose: () => { $store.dnd.isDragging = false },
+         onUnchoose: (event) => { 
+            $store.dnd.isDragging = false;
+            htmx.ajax('POST', '{% url 'hx_add_file_to_group' fg_id=group.instance.id %}', { 
+                values: { 
+                    dragged_id: $store.dnd.draggedId 
+                    
+                } 
+            });
+        },
      }">
     {% for file in files %}
         {# djlint:off #}
@@ -25,8 +33,6 @@
             data-file-id="{{ file.instance.id }}"
             x-ref="files"
             x-data="fileDragAndDrop()"
-            hx-post="{% url 'hx_add_file_to_group' fg_id=group.instance.id %}"
-            hx-trigger="dragend"
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
 
