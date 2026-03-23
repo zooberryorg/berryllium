@@ -8,7 +8,10 @@
          dragClass: 'file-draggable',
          chosenClass: 'file-chosen',
          ghostClass: 'file-ghost',
-         onChoose: () => { $store.dnd.isDragging = true },
+         onChoose: (event) => { 
+            $store.dnd.isDragging = true;
+            $store.dnd.draggedId = event.item.dataset.fileId;
+         },
          onUnchoose: () => { $store.dnd.isDragging = false },
      }">
     {% for file in files %}
@@ -19,8 +22,11 @@
                     focus:border-transparent hover:bg-pine-900"
             :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
             id="draggableFile"
+            data-file-id="{{ file.instance.id }}"
             x-ref="files"
             x-data="fileDragAndDrop()"
+            hx-post="{% url 'hx_add_file_to_group' fg_id=group.instance.id %}"
+            hx-trigger="dragend"
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
 
