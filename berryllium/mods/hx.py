@@ -242,9 +242,12 @@ def hx_empty_filegroups_warning(request):
         print("No mod_id in session when checking for empty file groups.")
         return HttpResponse(status=400)
 
-    empty_groups = FileGroup.objects.filter(mod_id=mod_id, fileupload__isnull=True)
-    print("Checking for empty file groups. Mod ID:", mod_id, "Empty Groups Count:", empty_groups.count())
-    if empty_groups.exists():
-        return render(request, "mods/upload/step/partials/group_empty_modal.html", {"empty_group_len": empty_groups.count()})
+    empty_groups_count = FileGroup.objects.filter(
+        mod_id=mod_id,
+        files__isnull=True
+    ).count()                
+    print("Checking for empty file groups. Mod ID:", mod_id, "Empty Groups Count:", empty_groups_count)
+    if empty_groups_count > 0:
+        return render(request, "mods/upload/step/partials/group_empty_modal.html", {"empty_group_len": empty_groups_count})
 
     return HttpResponse(status=204)
