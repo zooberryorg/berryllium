@@ -1,6 +1,6 @@
-<div x-show="toggled" 
-    x-ref="fileGroups" 
-    id="fileGroups" 
+<div x-show="toggled"
+    x-ref="fileGroups"
+    id="fileGroups"
     {# djlint:off #}
     @group-was-deleted.window="(event) => {
         if (event.detail?.wasEmpty) {
@@ -35,11 +35,11 @@
             hx-target="#addGroup"
             hx-swap="beforeend"
             {# djlint:off #}
-                {# refreshes alpine state after swap #}
-                hx-on:htmx:after-swap="() => { 
-                    Alpine.initTree(event.detail.elt); 
-                }"
-                @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
+            {# refreshes alpine state after swap #}
+            hx-on:htmx:after-swap="() => { 
+                Alpine.initTree(event.detail.elt); 
+            }"
+            @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
             {# djlint:on #}
             <ion-icon name="add-circle" class="pr-2">
             </ion-icon> Add Group
@@ -66,4 +66,3 @@
         });
     }
 </script>
-

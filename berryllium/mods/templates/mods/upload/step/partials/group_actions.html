@@ -6,19 +6,19 @@
 </button>
 {% if file_groups|length > 1 %}
     <button type="button"
-            class="zb-action-delete"
-            hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
-            hx-swap="none"
-            hx-on:htmx:before-request="window.dispatchEvent(new CustomEvent('group-was-deleted'))"
-            {# quick check for existing files before deletion #}
-            {# djlint:off #}
+        class="zb-action-delete"
+        hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
+        hx-swap="none"
+        hx-on:htmx:before-request="window.dispatchEvent(new CustomEvent('group-was-deleted'))"
+        {# quick check for existing files before deletion #}
+        {# djlint:off #}
             @click="
                 keepForm = false;
                 const groupEl = document.querySelector('[data-group-id=\'{{ group_id }}\']');
                 const fileCount = groupEl ? groupEl.querySelectorAll('[x-sort\\:item]').length : 0;
                 $dispatch('group-was-deleted', { groupId: {{ group_id }}, wasEmpty: fileCount === 0 });
             ">
-            {# djlint:on #}
+        {# djlint:on #}
         <ion-icon name="trash"></ion-icon>
     </button>
 {% endif %}

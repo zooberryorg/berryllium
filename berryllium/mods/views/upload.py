@@ -219,7 +219,9 @@ def upload_step3(request):
                 print("Next button clicked. All file groups and files are valid.")
 
                 # first see if any empty file groups need to be deleted
-                num_empty_groups = len([fg for fg in saved_groups if not fg.files.exists()])
+                num_empty_groups = len(
+                    [fg for fg in saved_groups if not fg.files.exists()]
+                )
                 print(f"Number of empty file groups: {num_empty_groups}")
                 if num_empty_groups > 0:
                     # return form with modal asking user if they want to delete empty file group

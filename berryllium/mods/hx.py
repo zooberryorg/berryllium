@@ -129,7 +129,7 @@ def hx_validate_singlefile_title(request, file_id):
     title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
     print("Received title for validation:", title, "for FileUpload ID:", file_id)
 
-    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance 
+    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance
     form = SingleFileForm(data={"title": title})
     form.is_valid()
 
@@ -212,6 +212,7 @@ def hx_remove_filegroup_form(request, fg_id):
     """HTMX endpoint to remove a file group form."""
     FileGroup.objects.filter(id=fg_id).delete()
     return HttpResponse()
+
 
 @require_POST
 def hx_add_file_to_group(request):
