@@ -4,29 +4,7 @@
      data-group-id="{{ group.instance.id }}"
      class="transition-all duration-200"
      :class="$store.dnd.isDragging ? 'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' : 'border-transparent'"
-     x-sort:config="{
-        forceFallback: true,
-         dragClass: 'file-draggable',
-         chosenClass: 'file-chosen',
-         ghostClass: 'file-ghost',
-         onChoose: (event) => { 
-            $store.dnd.isDragging = true;
-            $store.dnd.draggedId = event.item.dataset.fileId;
-         },
-         onUnchoose: (event) => { 
-            $store.dnd.isDragging = false;
-        },
-        onAdd: (event) => {
-            const fgId = event.to.dataset.groupId;
-            console.log('File with ID ' + $store.dnd.draggedId + ' added to group ' + fgId);
-            htmx.ajax('POST', '{% url 'hx_add_file_to_group' fg_id=group.instance.id %}', { 
-                values: { 
-                    dragged_id: $store.dnd.draggedId,
-                    fg_id: fgId,
-                } 
-            });
-        },
-     }">
+     x-sort:config="{ forceFallback: true, dragClass: 'file-draggable', chosenClass: 'file-chosen', ghostClass: 'file-ghost', onChoose: (event) => { $store.dnd.isDragging = true; $store.dnd.draggedId = event.item.dataset.fileId; }, onUnchoose: (event) => { $store.dnd.isDragging = false; }, onAdd: (event) => { const fgId = event.to.dataset.groupId; console.log('File with ID ' + $store.dnd.draggedId + ' added to group ' + fgId); htmx.ajax('POST', '{% url 'hx_add_file_to_group' fg_id=group.instance.id %}', { values: { dragged_id: $store.dnd.draggedId, fg_id: fgId, } }); }, }">
     {% for file in files %}
         {# djlint:off #}
         <div class="flex items-center gap-2 w-full 
