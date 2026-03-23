@@ -227,4 +227,5 @@ def hx_add_file_to_group(request, fg_id):
     file.filegroup = group
     file.save()
 
-    return HttpResponse()   
+    # empty response
+    return HttpResponse(status=204)
