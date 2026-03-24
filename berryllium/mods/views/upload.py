@@ -2,7 +2,8 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, FormView
+from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -69,13 +70,18 @@ class ModCreateStep1(CreateView):
                 pass
         return kwargs
     
-class ModCreateStep2(CreateView):
+class ModCreateStep2(FormView):
     form_class = ModFileUploadForm
     template_name = "mods/upload/step/2.html"
     success_url = "/mods/upload/s3"
 
     def get_context_data(self, **kwargs):
+        """
+        Get context data for rendering the form, including existing uploaded files and progress bar information.
+        """
         context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=1)
+
         mod_id = self.request.session.get("session_id")
         existing_files = []
 
@@ -87,10 +93,12 @@ class ModCreateStep2(CreateView):
                 existing_files = [f for f in files.values("filename", "size", "id")]
                 context["existing_files"] = existing_files
 
-        progress_bar = init_context(current_index=1)
         return context | progress_bar
     
     def form_valid(self, form):
+        """
+        Handle file upload, save to storage, and re-render form with updated file list.
+        """
         clean_file = form.cleaned_data["file"]
         mod_id = self.request.session.get("session_id")
 
@@ -99,69 +107,20 @@ class ModCreateStep2(CreateView):
             if file:
                 # re-render form with new file included in existing_files
                 existing_files = self.get_context_data().get("existing_files", [])
-                existing_files.append(file)
                 context = self.get_context_data()
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
 
         return super().form_valid(form)
-
-def mod_create_step2(request):
-    """
-    Step 2 of the upload form.
-    """
-    context = init_context(current_index=1, form=ModFileUploadForm())
-    mod_id = request.session.get("session_id")
-    existing_files = []
-
-    # rehydrate file data (file url only if GET)
-    if mod_id:
-        mod = Mod.objects.get(id=mod_id)
-        files = mod.files.all()
-
-        if files.exists():
-            existing_files = [f for f in files.values("filename", "size", "id")]
-            context["existing_files"] = existing_files
-
-    # ---------------------- POST (Handle file uploads and navigation)
-    if request.method == "POST":
-        # get existing uploaded files saved in draft
-
-        # ----------------- Handle previous navigation
-        # validation not needed for back navigation
-        if request.POST.get("action") == "previous":
-            return redirect("mod_create_step1")
-
-        form = ModFileUploadForm(
-            request.POST, request.FILES, existing_files=existing_files
-        )
-
-        if form.is_valid():
-            clean_file = form.cleaned_data["file"]
-
-            if clean_file:
-                file = upload_file(clean_file, mod_id=mod_id)
-                if file:
-                    # update existing_files for re-rendering form with new file
-                    existing_files.append(file)
-                    context["existing_files"] = existing_files
-
-            # ------------------ Handle next navigation
-            if request.POST.get("action") == "next":
-                print("Next button clicked.")
-
-                return redirect("upload_step3")
-
-            # ----------------- Simple file upload without navigation (stay on step 2)
-            else:
-                return render(request, "mods/upload/step/2.html", context)
-
-        # ---------------------- Invalid form: return SAME state with errors
-        context["form"] = form
-        return render(request, "mods/upload/step/2.html", context)
-
-    # ---------------------- GET
-    return render(request, "mods/upload/step/2.html", context)
+    
+    def get_success_url(self):
+        """
+        Handle navigation based on which button was clicked (Next vs Previous).
+        """
+        previous = self.request.POST.get("action") == "previous"
+        if previous:
+            return lazy_reverse("mod_create_step1")
+        return super().get_success_url()
 
 
 def upload_step3(request):
