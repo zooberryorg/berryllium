@@ -107,7 +107,21 @@ class ModCategoriesForm(forms.ModelForm):
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
         return summary
+    
+    def multiple_choice_clean(self, field_name):
+        choices = self.cleaned_data.get(field_name)
+        if not choices:
+            raise forms.ValidationError(f"Please select at least one option for {field_name}.")
+        return ", ".join(choices)
+    
+    def clean_category(self):
+        return self.multiple_choice_clean("category")
 
+    def clean_game(self):
+        return self.multiple_choice_clean("game")
+    
+    def clean_expansions(self):
+        return self.multiple_choice_clean("expansions")
 
 class FileUploadForm(forms.Form):
     """
