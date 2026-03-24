@@ -20,33 +20,6 @@
                 </div>
             </div>
         {% endif %}
-        <div class="space-y-4 px-6">
-            <div x-ref="urlBlock">
-                <label class="block text-sm font-medium mb-1 text-white">External File URL</label>
-                <input type="url"
-                       name="file_url"
-                       id="file_url"
-                       value="{{ file_url }}"
-                       placeholder="https://example.com/file.zip"
-                       class="zb-input text-sm"
-                       autocomplete="off"
-                       @keydown.escape="$el.blur()"
-                       @keydown.enter.prevent="$el.blur()"
-                       hx-post="{% url 'hx_process_url_field' %}"
-                       hx-trigger="input delay:500ms"
-                       hx-target="#file-url-error"
-                       hx-swap="innerHTML"
-                       x-ref="urlInput"
-                       @input="onUrlFieldInput()">
-                <div class="pb-6" id="file-url-error">{% include "mods/upload/field_errors.html" with field=form.file_url %}</div>
-            </div>
-        </div>
-        <!-- divider -->
-        <div class="flex items-center mt-6 mb-6 px-6">
-            <div class="border-t border-white/10 my-6 w-full"></div>
-            <span class="font-semibold text-sm text-white px-1 w-1/3 text-center">Or Upload Files</span>
-            <div class="border-t border-white/10 my-6 w-full"></div>
-        </div>
         <div class="space-y-4 mt-6 mb-6">
             <div class="px-6" x-ref="dropzoneBlock">
                 <!-- Drag and Drop Zone -->

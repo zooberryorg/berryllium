@@ -167,6 +167,10 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError(
                 f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
+        
+        # no files uploaded or existing
+        if cleaned_file.size == 0 and len(self.existing_files) == 0:
+            raise forms.ValidationError("Please upload a file before proceeding.")
 
         if cleaned_file.size == 0:
             raise forms.ValidationError("The uploaded file is empty.")
