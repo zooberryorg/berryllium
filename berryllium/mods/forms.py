@@ -1,6 +1,6 @@
 import os
 from django import forms
-from django.forms import formset_factory
+from django.forms import formset_factory, Textarea, TextInput, CheckboxSelectMultiple
 from django.core.validators import (
     URLValidator,
     MaxLengthValidator,
@@ -13,6 +13,7 @@ from django.core.exceptions import ValidationError
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
+from berryllium.mods.models import Mod
 from berryllium.mods.settings import (
     ALLOWED_EXTENSIONS,
     MAX_FILE_SIZE,
@@ -29,60 +30,51 @@ from berryllium.mods.settings import (
 )
 
 
-class MetadataForm(forms.ModelForm):
+class ModCategoriesForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
-    fields like title and description. The group_index and file_order fields are hidden
+    fields like title and summary. The group_index and file_order fields are hidden
     and handled in the view.
     """
 
-    title = forms.CharField(
-        max_length=MAX_TEXTFIELD_LENGTH,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "zb-input text-sm",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-                "placeholder": "Enter title",
-            }
-        ),
-    )
-    summary = forms.CharField(
-        required=True,
-        widget=forms.Textarea(
-            attrs={
-                "class": "zb-textarea text-sm",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-                "placeholder": "Enter a brief summary of your mod (10-200 characters)",
-                "rows": 4,
-            }
-        ),
-    )
-    category = forms.MultipleChoiceField(
-        choices=MOD_CATEGORIES,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
-    game = forms.MultipleChoiceField(
-        choices=GAME_OPTIONS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
-    expansions = forms.MultipleChoiceField(
-        required=True,
-        choices=EXPANSION_REQUIREMENTS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
+    class Meta:
+        model = Mod
+        fields = ["title", "summary", "category", "game", "expansions"]
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Group name (e.g., Main Files)",
+                    "class": "zb-input text-sm",
+                    "autocomplete": "off",
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+            ),
+            "summary": Textarea(
+                attrs={
+                    "placeholder": "Enter a brief summary of your mod (10-200 characters)",
+                    "class": "zb-textarea text-sm",
+                    **COLLAPSIBLE_WIDGET_ATTRS,
+                },
+            ),
+            "category": PillCheckboxSelectMultiple(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+                choices=MOD_CATEGORIES,
+            ),
+            "game": PillCheckboxSelectMultiple(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+                choices=GAME_OPTIONS,
+            ),
+            "expansions": PillCheckboxSelectMultiple(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+                choices=EXPANSION_REQUIREMENTS,
+            ),
+        }
 
     def clean_title(self):
         title = self.cleaned_data.get("title")
