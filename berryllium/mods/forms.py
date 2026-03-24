@@ -13,7 +13,20 @@ from django.core.exceptions import ValidationError
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
-from berryllium.mods.settings import *
+from berryllium.mods.settings import (
+    ALLOWED_EXTENSIONS,
+    MAX_FILE_SIZE,
+    ILLEGAL_CHARACTERS,
+    MIN_TEXTFIELD_LENGTH,
+    MAX_TEXTFIELD_LENGTH,
+    MIN_SUMMARY_LENGTH,
+    MAX_SUMMARY_LENGTH,
+    COLLAPSIBLE_WIDGET_ATTRS,
+    DISABLE_SUBMIT_BUTTON_ATTRS,
+    MOD_CATEGORIES,
+    GAME_OPTIONS,
+    EXPANSION_REQUIREMENTS,
+)
 
 
 class MetadataForm(forms.Form):
