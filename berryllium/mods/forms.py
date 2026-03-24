@@ -37,6 +37,33 @@ class ModCategoriesForm(forms.ModelForm):
     and handled in the view.
     """
 
+    summary = forms.CharField(
+        required=True,
+        widget=Textarea(
+            attrs={
+                "placeholder": "Enter a brief summary...",
+                "class": "zb-textarea text-sm resize-none",
+                "rows": 4,
+            }
+        ),
+    )
+
+    def multiple_choice_attributes(choices, widget_class):
+        return forms.MultipleChoiceField(
+            choices=choices,
+            widget=widget_class(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                }
+            ),
+        )
+
+    category = multiple_choice_attributes(MOD_CATEGORIES, PillCheckboxSelectMultiple)
+    game = multiple_choice_attributes(GAME_OPTIONS, PillCheckboxSelectMultiple)
+    expansions = multiple_choice_attributes(
+        EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
+    )
+
     class Meta:
         model = Mod
         fields = ["title", "summary", "category", "game", "expansions"]
@@ -49,44 +76,8 @@ class ModCategoriesForm(forms.ModelForm):
                     **DISABLE_SUBMIT_BUTTON_ATTRS,
                 },
             ),
+            
         }
-    
-    field_order = ["title", "summary", "category", "game", "expansions"]
-
-    summary = forms.CharField(
-        required=True,
-        widget=Textarea(attrs={
-            "placeholder": "Enter a brief summary...",
-            "class": "zb-textarea text-sm",
-            **COLLAPSIBLE_WIDGET_ATTRS,
-        }),
-    )
-    
-    category = forms.MultipleChoiceField(
-        choices=MOD_CATEGORIES,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
-    game = forms.MultipleChoiceField(
-        choices=GAME_OPTIONS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
-    expansions = forms.MultipleChoiceField(
-        required=True,
-        choices=EXPANSION_REQUIREMENTS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )    
 
     def clean_title(self):
         title = self.cleaned_data.get("title")
@@ -106,22 +97,28 @@ class ModCategoriesForm(forms.ModelForm):
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
+        
+        # clean summary of leading/trailing whitespace and null characters
+        summary = summary.strip()
         return summary
-    
+
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
         if not choices:
-            raise forms.ValidationError(f"Please select at least one option for {field_name}.")
+            raise forms.ValidationError(
+                f"Please select at least one option for {field_name}."
+            )
         return ", ".join(choices)
-    
+
     def clean_category(self):
         return self.multiple_choice_clean("category")
 
     def clean_game(self):
         return self.multiple_choice_clean("game")
-    
+
     def clean_expansions(self):
         return self.multiple_choice_clean("expansions")
+
 
 class FileUploadForm(forms.Form):
     """
