@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import path
 from berryllium.mods.views import upload, explore
 import berryllium.mods.hx as hx
@@ -83,4 +85,9 @@ urlpatterns = [
         hx.hx_move_filegroup_down,
         name="hx_move_filegroup_down",
     ),
+    path(
+        "mods/file-order-update-in-group/<int:group_id>/",
+        hx.hx_update_file_order_in_group,
+        name="hx_update_file_order_in_group",
+    )
 ]
