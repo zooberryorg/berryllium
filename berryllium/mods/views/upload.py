@@ -95,16 +95,11 @@ def mod_create_step2(request):
     context = init_context(current_index=1, form=ModFileUploadForm())
     mod_id = request.session.get("session_id")
     existing_files = []
-    file_url = ""
 
     # rehydrate file data (file url only if GET)
     if mod_id:
         mod = Mod.objects.get(id=mod_id)
         files = mod.files.all()
-        file_url = mod.external_url if mod.is_external else ""
-
-        if file_url:
-            context["file_url"] = file_url
 
         if files.exists():
             existing_files = [f for f in files.values("filename", "size", "id")]
@@ -125,7 +120,6 @@ def mod_create_step2(request):
 
         if form.is_valid():
             clean_file = form.cleaned_data["file"]
-            clean_url = form.cleaned_data["file_url"]
 
             if clean_file:
                 file = upload_file(clean_file, mod_id=mod_id)
@@ -137,13 +131,6 @@ def mod_create_step2(request):
             # ------------------ Handle next navigation
             if request.POST.get("action") == "next":
                 print("Next button clicked.")
-                if clean_url:
-                    mod = Mod.objects.filter(id=mod_id).first()
-                    # TODO: Cleanup temp files and rework filegroups with url-based mods
-                    if mod:
-                        mod.is_external = True
-                        mod.external_url = clean_url
-                        mod.save()
 
                 return redirect("upload_step3")
 
