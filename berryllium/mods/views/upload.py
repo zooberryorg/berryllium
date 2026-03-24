@@ -56,17 +56,40 @@ class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/upload/step/1.html"
+    success_url = "/mods/upload/s2"
 
     def form_valid(self, form):
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
+        print(f"Created mod draft with ID {self.object.id} and saved to session.")
+        form.save()
+        # print object data for debugging
+        print(f"Mod title: {self.object.title}")
+        print(f"Mod category: {self.object.category}")
+        print(f"Mod summary: {self.object.summary}")
+        print(f"Mod game: {self.object.game}")
+
         return response
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=0, form=ModCategoriesForm())
+        progress_bar = init_context(current_index=0)
         return context | progress_bar
-
+    
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        session_id = self.request.session.get("session_id")
+        if session_id:
+            try:
+                print(f"Found existing session with ID {session_id}, loading draft data.")
+                kwargs["instance"] = Mod.objects.get(id=session_id)
+            except Mod.DoesNotExist:
+                print(f"Draft mod with ID {session_id} does not exist.")
+                pass
+        return kwargs    
+    
+    def form_invalid(self, form):
+        return super().form_invalid(form)
 
 def mod_create_step1(request):
     """
