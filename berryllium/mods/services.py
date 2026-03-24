@@ -87,6 +87,7 @@ def upload_file(uploaded_file, mod_id=None):
         staged_file=temp_path,
         filegroup=fg,
         file_hash=file_hash,
+        order=fg.files.count(),
     )
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}

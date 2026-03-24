@@ -204,7 +204,8 @@ def upload_step3(request):
     for group in filegroups:
         print(f"Group: {group.name} - order: {group.order}")
         for file in group.files.all():
-            print(f"{file.filename} - order: {file.order}")
+            print(f"-------------- {file.filename} - order: {file.order}")
+        print("\n")
 
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
