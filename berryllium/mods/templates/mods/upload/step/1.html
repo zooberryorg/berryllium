@@ -3,38 +3,22 @@
 <div class="px-6 pt-6">
     {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
-<form hx-post="{% url 'upload_step1' %}"
+<form hx-post="{% url 'mod_create_step1' %}"
       hx-target="#upload-frame"
       hx-swap="innerHTML"
       hx-encoding="multipart/form-data">
     {% csrf_token %}
     <div class="space-y-4 p-6">
         <div>
-            <label class="block text-sm font-medium mb-1 text-white">
-                Title <span class="text-red-400">*</span>
-            </label>
-            {{ form.title }}
-            {% include "mods/upload/field_errors.html" with field=form.title %}
-            <label class="block text-sm font-medium mb-1 mt-4 text-white">
-                Summary (Max 200 characters) <span class="text-red-400">*</span>
-            </label>
-            {{ form.summary }}
-            {% include "mods/upload/field_errors.html" with field=form.summary %}
-            <label class="block text-sm font-medium mb-1 mt-4 text-white">
-                Category <span class="text-red-400">*</span>
-            </label>
-            {{ form.category }}
-            {% include "mods/upload/field_errors.html" with field=form.category %}
-            <label class="block text-sm font-medium mb-1 mt-4 text-white">
-                Game <span class="text-red-400">*</span>
-            </label>
-            {{ form.game }}
-            {% include "mods/upload/field_errors.html" with field=form.game %}
-            <label class="block text-sm font-medium mb-1 mt-4 text-white">
-                Expansions <span class="text-red-400">*</span>
-            </label>
-            {{ form.expansions }}
-            {% include "mods/upload/field_errors.html" with field=form.expansions %}
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-white">
+                        {{ field.label }} {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% include "mods/upload/field_errors.html" with field=field %}
+                </div>
+            {% endfor %}
         </div>
     </div>
     {% include "mods/upload/actions.html" %}

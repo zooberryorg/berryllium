@@ -1,6 +1,6 @@
 import os
 from django import forms
-from django.forms import formset_factory
+from django.forms import formset_factory, Textarea, TextInput, CheckboxSelectMultiple
 from django.core.validators import (
     URLValidator,
     MaxLengthValidator,
@@ -13,63 +13,71 @@ from django.core.exceptions import ValidationError
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import FileUpload, FileGroup
-from berryllium.mods.settings import *
+from berryllium.mods.models import Mod
+from berryllium.mods.settings import (
+    ALLOWED_EXTENSIONS,
+    MAX_FILE_SIZE,
+    ILLEGAL_CHARACTERS,
+    MIN_TEXTFIELD_LENGTH,
+    MAX_TEXTFIELD_LENGTH,
+    MIN_SUMMARY_LENGTH,
+    MAX_SUMMARY_LENGTH,
+    COLLAPSIBLE_WIDGET_ATTRS,
+    DISABLE_SUBMIT_BUTTON_ATTRS,
+    MOD_CATEGORIES,
+    GAME_OPTIONS,
+    EXPANSION_REQUIREMENTS,
+)
 
 
-class MetadataForm(forms.Form):
+class ModCategoriesForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
-    fields like title and description. The group_index and file_order fields are hidden
+    fields like title and summary. The group_index and file_order fields are hidden
     and handled in the view.
     """
 
-    title = forms.CharField(
-        max_length=MAX_TEXTFIELD_LENGTH,
-        required=True,
-        widget=forms.TextInput(
-            attrs={
-                "class": "zb-input text-sm",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-                "placeholder": "Enter title",
-            }
-        ),
-    )
     summary = forms.CharField(
         required=True,
-        widget=forms.Textarea(
+        widget=Textarea(
             attrs={
-                "class": "zb-textarea text-sm",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-                "placeholder": "Enter a brief summary of your mod (10-200 characters)",
+                "placeholder": "Enter a brief summary...",
+                "class": "zb-textarea text-sm resize-none",
                 "rows": 4,
             }
         ),
     )
-    category = forms.MultipleChoiceField(
-        choices=MOD_CATEGORIES,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
+
+    def multiple_choice_attributes(choices, widget_class):
+        return forms.MultipleChoiceField(
+            choices=choices,
+            widget=widget_class(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                }
+            ),
+        )
+
+    category = multiple_choice_attributes(MOD_CATEGORIES, PillCheckboxSelectMultiple)
+    game = multiple_choice_attributes(GAME_OPTIONS, PillCheckboxSelectMultiple)
+    expansions = multiple_choice_attributes(
+        EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
     )
-    game = forms.MultipleChoiceField(
-        choices=GAME_OPTIONS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
-    expansions = forms.MultipleChoiceField(
-        required=True,
-        choices=EXPANSION_REQUIREMENTS,
-        widget=PillCheckboxSelectMultiple(
-            attrs={
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
-    )
+
+    class Meta:
+        model = Mod
+        fields = ["title", "summary", "category", "game", "expansions"]
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Group name (e.g., Main Files)",
+                    "class": "zb-input text-sm",
+                    "autocomplete": "off",
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+            ),
+            
+        }
 
     def clean_title(self):
         title = self.cleaned_data.get("title")
@@ -89,7 +97,27 @@ class MetadataForm(forms.Form):
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
+        
+        # clean summary of leading/trailing whitespace and null characters
+        summary = summary.strip()
         return summary
+
+    def multiple_choice_clean(self, field_name):
+        choices = self.cleaned_data.get(field_name)
+        if not choices:
+            raise forms.ValidationError(
+                f"Please select at least one option for {field_name}."
+            )
+        return ", ".join(choices)
+
+    def clean_category(self):
+        return self.multiple_choice_clean("category")
+
+    def clean_game(self):
+        return self.multiple_choice_clean("game")
+
+    def clean_expansions(self):
+        return self.multiple_choice_clean("expansions")
 
 
 class FileUploadForm(forms.Form):

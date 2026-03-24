@@ -1,13 +1,13 @@
-from importlib.resources import files
-
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
+from django.views.generic import CreateView
+from django.urls import reverse
 
 from berryllium.mods.forms import (
     FileUploadForm,
-    MetadataForm,
+    ModCategoriesForm,
     FileGroupForm,
 )
 from berryllium.mods.models import Mod, FileGroup
@@ -44,7 +44,7 @@ def open_mod_draft(request, mod_id):
         request.session["session_id"] = (
             mod.id
         )  # Set session to load draft in upload steps
-        return redirect("upload_step1")  # Redirect to step 1 to load draft data
+        return redirect("mod_create_step1")  # Redirect to step 1 to load draft data
     except Mod.DoesNotExist:
         print(f"Draft mod with ID {mod_id} does not exist.")
         # redirect to home
@@ -54,69 +54,40 @@ def open_mod_draft(request, mod_id):
     #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
 
 
-def upload_step1(request):
-    """
-    Step 1 of the upload form.
-    """
-    context = init_context(current_index=0, form=MetadataForm())
-    session_exists = request.session.get("session_id") is not None
+class ModCreateStep1(CreateView):
+    model = Mod
+    form_class = ModCategoriesForm
+    template_name = "mods/upload/step/1.html"
+    success_url = reverse('upload_step2')
 
-    # --------------------- POST
-    if request.method == "POST":
-        form = MetadataForm(request.POST)
-        if form.is_valid():
-            # Save data in db
-            data = {
-                "title": form.cleaned_data["title"],
-                "category": ",".join(form.cleaned_data.get("category", [])),
-                "summary": form.cleaned_data["summary"],
-                "game": ",".join(form.cleaned_data.get("game", [])),
-                "expansions": ",".join(form.cleaned_data.get("expansions", [])),
-            }
+    def form_valid(self, form):
+        """
+        Validate form and save draft mod, then store mod ID in session for later steps.
+        """
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        return response
 
-            mod_id = session_exists
+    def get_context_data(self, **kwargs):
+        """
+        Get context data for rendering the form, including progress bar information.
+        """
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=0)
+        return context | progress_bar
 
-            # If session exists, update draft mod
-            if mod_id:
-                Mod.objects.filter(id=mod_id, draft=True).update(**data)
-
-            # If no session, create new draft mod
-            else:
-                mod = Mod.objects.create(**data)
-                request.session["session_id"] = mod.id
-
-            # Return NEXT state (step 2) on success
-            return redirect("upload_step2")
-
-        # Invalid: return SAME state with errors
-        context["form"] = form
-        return render(request, "mods/upload/step/1.html", context=context)
-
-    # --------------------- GET with existing session
-    elif request.method == "GET" and session_exists:
-        # Send draft data if it exists
-        mod_id = request.session["session_id"]
-        try:
-            mod = Mod.objects.get(id=mod_id)
-            # Rehydrate form with draft data
-            form = MetadataForm(
-                initial={
-                    "title": mod.title,
-                    "category": mod.category.split(",") if mod.category else [],
-                    "summary": mod.summary,
-                    "game": mod.game.split(",") if mod.game else [],
-                    "expansions": mod.expansions.split(",") if mod.expansions else [],
-                }
-            )
-        except Mod.DoesNotExist:
-            form = MetadataForm()
-
-        context["form"] = form
-        return render(request, "mods/upload/step/1.html", context=context)
-
-    # --------------------- GET without session (new upload)
-    return render(request, "mods/upload/step/1.html", context=context)
-
+    def get_form_kwargs(self):
+        """
+        Re-hydrate form with existing draft data if session exists.
+        """
+        kwargs = super().get_form_kwargs()
+        session_id = self.request.session.get("session_id")
+        if session_id:
+            try:
+                kwargs["instance"] = Mod.objects.get(id=session_id)
+            except Mod.DoesNotExist:
+                pass
+        return kwargs
 
 def upload_step2(request):
     """
@@ -147,7 +118,7 @@ def upload_step2(request):
         # ----------------- Handle previous navigation
         # validation not needed for back navigation
         if request.POST.get("action") == "previous":
-            return redirect("upload_step1")
+            return redirect("mod_create_step1")
 
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files

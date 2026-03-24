@@ -11,18 +11,18 @@ from django.core.files.storage import default_storage
 from django.forms import modelformset_factory, inlineformset_factory
 
 
-def init_context(current_index, form):
+def init_context(current_index, form=None):
     """
     Initializes the multi-step form context with navigation information and progress.
     """
-    context = {
-        "form": form,
-    }
     progress_bar = generate_progress_bar(
         current_index, total_steps=len(UPLOAD_NAVIGATION)
     )
 
-    return context | progress_bar
+    if form:
+        progress_bar["form"] = form
+
+    return progress_bar
 
 
 def generate_progress_bar(current_index, total_steps):
