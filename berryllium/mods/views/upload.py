@@ -34,26 +34,6 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_step1")
 
-
-def open_mod_draft(request, mod_id):
-    """
-    View to open an existing mod draft for editing.
-    """
-    try:
-        mod = Mod.objects.get(id=mod_id, draft=True)
-        request.session["session_id"] = (
-            mod.id
-        )  # Set session to load draft in upload steps
-        return redirect("mod_create_step1")  # Redirect to step 1 to load draft data
-    except Mod.DoesNotExist:
-        print(f"Draft mod with ID {mod_id} does not exist.")
-        # redirect to home
-        return redirect("home")
-    # TODO: Add error handling for non-existent or non-draft mods
-    # except Mod.DoesNotExist:
-    #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
-
-
 class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
