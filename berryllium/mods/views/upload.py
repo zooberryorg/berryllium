@@ -5,7 +5,7 @@ from django.http import HttpResponse
 
 from berryllium.mods.forms import (
     FileUploadForm,
-    MetadataForm,
+    ModCategoriesForm,
     FileGroupForm,
 )
 from berryllium.mods.models import Mod, FileGroup
@@ -56,12 +56,12 @@ def upload_step1(request):
     """
     Step 1 of the upload form.
     """
-    context = init_context(current_index=0, form=MetadataForm())
+    context = init_context(current_index=0, form=ModCategoriesForm())
     session_exists = request.session.get("session_id") is not None
 
     # --------------------- POST
     if request.method == "POST":
-        form = MetadataForm(request.POST)
+        form = ModCategoriesForm(request.POST)
         if form.is_valid():
             # Save data in db
             data = {
@@ -97,7 +97,7 @@ def upload_step1(request):
         try:
             mod = Mod.objects.get(id=mod_id)
             # Rehydrate form with draft data
-            form = MetadataForm(
+            form = ModCategoriesForm(
                 initial={
                     "title": mod.title,
                     "category": mod.category.split(",") if mod.category else [],
@@ -107,7 +107,7 @@ def upload_step1(request):
                 }
             )
         except Mod.DoesNotExist:
-            form = MetadataForm()
+            form = ModCategoriesForm()
 
         context["form"] = form
         return render(request, "mods/upload/step/1.html", context=context)

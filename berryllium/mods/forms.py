@@ -29,7 +29,7 @@ from berryllium.mods.settings import (
 )
 
 
-class MetadataForm(forms.Form):
+class MetadataForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
     fields like title and description. The group_index and file_order fields are hidden
