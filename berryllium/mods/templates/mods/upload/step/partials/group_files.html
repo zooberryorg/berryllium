@@ -37,6 +37,18 @@
                 },
             }); 
         }, 
+        onUpdate: (event) => {
+            $dispatch('files-state-changed');
+            const fgId = event.to.dataset.groupId; 
+
+            htmx.ajax('POST', '{% url 'hx_reorder_files_in_group' %}', { 
+                values: { 
+                    fg_id: fgId, 
+                    old_index: event.oldIndex, 
+                    new_index: event.newIndex,
+                },
+            }); 
+        },
     }">
     {# djlint:on #}
     {% for file in files %}
