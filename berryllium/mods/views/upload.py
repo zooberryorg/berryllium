@@ -68,6 +68,43 @@ class ModCreateStep1(CreateView):
             except Mod.DoesNotExist:
                 pass
         return kwargs
+    
+class ModCreateStep2(CreateView):
+    form_class = ModFileUploadForm
+    template_name = "mods/upload/step/2.html"
+    success_url = "/mods/upload/s3"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        mod_id = self.request.session.get("session_id")
+        existing_files = []
+
+        if mod_id:
+            mod = Mod.objects.get(id=mod_id)
+            files = mod.files.all()
+
+            if files.exists():
+                existing_files = [f for f in files.values("filename", "size", "id")]
+                context["existing_files"] = existing_files
+
+        progress_bar = init_context(current_index=1)
+        return context | progress_bar
+    
+    def form_valid(self, form):
+        clean_file = form.cleaned_data["file"]
+        mod_id = self.request.session.get("session_id")
+
+        if clean_file:
+            file = upload_file(clean_file, mod_id=mod_id)
+            if file:
+                # re-render form with new file included in existing_files
+                existing_files = self.get_context_data().get("existing_files", [])
+                existing_files.append(file)
+                context = self.get_context_data()
+                context["existing_files"] = existing_files
+                return render(self.request, self.template_name, context)
+
+        return super().form_valid(form)
 
 def mod_create_step2(request):
     """
