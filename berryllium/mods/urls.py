@@ -89,5 +89,5 @@ urlpatterns = [
         "mods/file-order-update-in-group/",
         hx.hx_update_file_order_in_group,
         name="hx_update_file_order_in_group",
-    )
+    ),
 ]
