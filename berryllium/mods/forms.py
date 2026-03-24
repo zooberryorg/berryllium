@@ -49,32 +49,44 @@ class ModCategoriesForm(forms.ModelForm):
                     **DISABLE_SUBMIT_BUTTON_ATTRS,
                 },
             ),
-            "summary": Textarea(
-                attrs={
-                    "placeholder": "Enter a brief summary of your mod (10-200 characters)",
-                    "class": "zb-textarea text-sm",
-                    **COLLAPSIBLE_WIDGET_ATTRS,
-                },
-            ),
-            "category": PillCheckboxSelectMultiple(
-                attrs={
-                    **DISABLE_SUBMIT_BUTTON_ATTRS,
-                },
-                choices=MOD_CATEGORIES,
-            ),
-            "game": PillCheckboxSelectMultiple(
-                attrs={
-                    **DISABLE_SUBMIT_BUTTON_ATTRS,
-                },
-                choices=GAME_OPTIONS,
-            ),
-            "expansions": PillCheckboxSelectMultiple(
-                attrs={
-                    **DISABLE_SUBMIT_BUTTON_ATTRS,
-                },
-                choices=EXPANSION_REQUIREMENTS,
-            ),
         }
+    
+    field_order = ["title", "summary", "category", "game", "expansions"]
+
+    summary = forms.CharField(
+        required=True,
+        widget=Textarea(attrs={
+            "placeholder": "Enter a brief summary...",
+            "class": "zb-textarea text-sm",
+            **COLLAPSIBLE_WIDGET_ATTRS,
+        }),
+    )
+    
+    category = forms.MultipleChoiceField(
+        choices=MOD_CATEGORIES,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
+    )
+    game = forms.MultipleChoiceField(
+        choices=GAME_OPTIONS,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
+    )
+    expansions = forms.MultipleChoiceField(
+        required=True,
+        choices=EXPANSION_REQUIREMENTS,
+        widget=PillCheckboxSelectMultiple(
+            attrs={
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
+    )    
 
     def clean_title(self):
         title = self.cleaned_data.get("title")

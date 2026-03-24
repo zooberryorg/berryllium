@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
+from django.views.generic import CreateView
 
 from berryllium.mods.forms import (
     FileUploadForm,
@@ -42,7 +43,7 @@ def open_mod_draft(request, mod_id):
         request.session["session_id"] = (
             mod.id
         )  # Set session to load draft in upload steps
-        return redirect("upload_step1")  # Redirect to step 1 to load draft data
+        return redirect("mod_create_step1")  # Redirect to step 1 to load draft data
     except Mod.DoesNotExist:
         print(f"Draft mod with ID {mod_id} does not exist.")
         # redirect to home
@@ -51,8 +52,23 @@ def open_mod_draft(request, mod_id):
     # except Mod.DoesNotExist:
     #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
 
+class ModCreateStep1(CreateView):
+    model = Mod
+    form_class = ModCategoriesForm
+    template_name = "mods/upload/step/1.html"
 
-def upload_step1(request):
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        return response
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=0, form=ModCategoriesForm())
+        return context | progress_bar
+
+
+def mod_create_step1(request):
     """
     Step 1 of the upload form.
     """
@@ -145,7 +161,7 @@ def upload_step2(request):
         # ----------------- Handle previous navigation
         # validation not needed for back navigation
         if request.POST.get("action") == "previous":
-            return redirect("upload_step1")
+            return redirect("mod_create_step1")
 
         form = FileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
