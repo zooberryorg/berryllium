@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.generic import CreateView
-from django.urls import reverse
+from django.views.generic import CreateView, TemplateView, FormView
+from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
-    FileUploadForm,
+    ModFileUploadForm,
     ModCategoriesForm,
     FileGroupForm,
 )
@@ -20,45 +20,26 @@ from berryllium.mods.services import (
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
-def upload_mod(request):
-    """
-    Landing page for mod upload requests.
-    # TODO: Clear session to start fresh.
-    """
-    return render(
-        request,
-        "mods/upload/base.html",
-        {
-            "form": FileUploadForm(),
-            "mod_navigation": UPLOAD_NAVIGATION,
-        },
-    )
+class ModCreateLanding(TemplateView):
+    template_name = "mods/upload/base.html"
+    success_url = "/mods/upload/s1"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod_navigation"] = UPLOAD_NAVIGATION
+        return context
 
-def open_mod_draft(request, mod_id):
-    """
-    View to open an existing mod draft for editing.
-    """
-    try:
-        mod = Mod.objects.get(id=mod_id, draft=True)
-        request.session["session_id"] = (
-            mod.id
-        )  # Set session to load draft in upload steps
-        return redirect("mod_create_step1")  # Redirect to step 1 to load draft data
-    except Mod.DoesNotExist:
-        print(f"Draft mod with ID {mod_id} does not exist.")
-        # redirect to home
-        return redirect("home")
-    # TODO: Add error handling for non-existent or non-draft mods
-    # except Mod.DoesNotExist:
-    #     return render(request, "mods/explore/draft_not_found.html", {"mod_id": mod_id})
-
+    # def get(self, request, *args, **kwargs):
+    #     # Clear session later to start new
+    #     # request.session.pop("session_id", None)
+    #     # request.session.pop("group_manager_toggled", None)
+    #     return redirect("mod_create_step1")
 
 class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/upload/step/1.html"
-    success_url = reverse('upload_step2')
+    success_url = "/mods/upload/s2"
 
     def form_valid(self, form):
         """
@@ -88,76 +69,58 @@ class ModCreateStep1(CreateView):
             except Mod.DoesNotExist:
                 pass
         return kwargs
+    
+class ModCreateStep2(FormView):
+    form_class = ModFileUploadForm
+    template_name = "mods/upload/step/2.html"
+    success_url = "/mods/upload/s3"
 
-def upload_step2(request):
-    """
-    Step 2 of the upload form.
-    """
-    context = init_context(current_index=1, form=FileUploadForm())
-    mod_id = request.session.get("session_id")
-    existing_files = []
-    file_url = ""
+    def get_context_data(self, **kwargs):
+        """
+        Get context data for rendering the form, including existing uploaded files and progress bar information.
+        """
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=1)
 
-    # rehydrate file data (file url only if GET)
-    if mod_id:
-        mod = Mod.objects.get(id=mod_id)
-        files = mod.files.all()
-        file_url = mod.external_url if mod.is_external else ""
+        mod_id = self.request.session.get("session_id")
+        existing_files = []
 
-        if file_url:
-            context["file_url"] = file_url
+        if mod_id:
+            mod = Mod.objects.get(id=mod_id)
+            files = mod.files.all()
 
-        if files.exists():
-            existing_files = [f for f in files.values("filename", "size", "id")]
-            context["existing_files"] = existing_files
+            if files.exists():
+                existing_files = [f for f in files.values("filename", "size", "id")]
+                context["existing_files"] = existing_files
 
-    # ---------------------- POST (Handle file uploads and navigation)
-    if request.method == "POST":
-        # get existing uploaded files saved in draft
+        return context | progress_bar
+    
+    def form_valid(self, form):
+        """
+        Handle file upload, save to storage, and re-render form with updated file list.
+        """
+        clean_file = form.cleaned_data["file"]
+        mod_id = self.request.session.get("session_id")
 
-        # ----------------- Handle previous navigation
-        # validation not needed for back navigation
-        if request.POST.get("action") == "previous":
-            return redirect("mod_create_step1")
+        if clean_file:
+            file = upload_file(clean_file, mod_id=mod_id)
+            if file:
+                # re-render form with new file included in existing_files
+                existing_files = self.get_context_data().get("existing_files", [])
+                context = self.get_context_data()
+                context["existing_files"] = existing_files
+                return render(self.request, self.template_name, context)
 
-        form = FileUploadForm(
-            request.POST, request.FILES, existing_files=existing_files
-        )
-
-        if form.is_valid():
-            clean_file = form.cleaned_data["file"]
-            clean_url = form.cleaned_data["file_url"]
-
-            if clean_file:
-                file = upload_file(clean_file, mod_id=mod_id)
-                if file:
-                    # update existing_files for re-rendering form with new file
-                    existing_files.append(file)
-                    context["existing_files"] = existing_files
-
-            # ------------------ Handle next navigation
-            if request.POST.get("action") == "next":
-                print("Next button clicked.")
-                if clean_url:
-                    mod = Mod.objects.filter(id=mod_id).first()
-                    # TODO: Cleanup temp files and rework filegroups with url-based mods
-                    if mod:
-                        mod.is_external = True
-                        mod.external_url = clean_url
-                        mod.save()
-
-                return redirect("upload_step3")
-
-            # ----------------- Simple file upload without navigation (stay on step 2)
-            else:
-                return render(request, "mods/upload/step/2.html", context)
-
-        # ---------------------- Invalid form: return SAME state with errors
-        context["form"] = form
-        return render(request, "mods/upload/step/2.html", context)
-
-    # ---------------------- GET
-    return render(request, "mods/upload/step/2.html", context)
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        """
+        Handle navigation based on which button was clicked (Next vs Previous).
+        """
+        previous = self.request.POST.get("action") == "previous"
+        if previous:
+            return lazy_reverse("mod_create_step1")
+        return super().get_success_url()
 
 
 def upload_step3(request):
@@ -181,7 +144,7 @@ def upload_step3(request):
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         if request.POST.get("action") == "previous":
-            return redirect("upload_step2")
+            return redirect("mod_create_step2")
 
         FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
         # get formset data and validate
