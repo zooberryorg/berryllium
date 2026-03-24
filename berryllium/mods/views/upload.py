@@ -3,7 +3,6 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.generic import CreateView
-from django.urls import reverse
 
 from berryllium.mods.forms import (
     FileUploadForm,
@@ -58,7 +57,7 @@ class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/upload/step/1.html"
-    success_url = reverse('upload_step2')
+    success_url = "/mods/upload/s2"
 
     def form_valid(self, form):
         """
@@ -89,7 +88,7 @@ class ModCreateStep1(CreateView):
                 pass
         return kwargs
 
-def upload_step2(request):
+def mod_create_step2(request):
     """
     Step 2 of the upload form.
     """
@@ -181,7 +180,7 @@ def upload_step3(request):
     # ---------------- POST (Back/Next) uses formset validation
     if request.method == "POST":
         if request.POST.get("action") == "previous":
-            return redirect("upload_step2")
+            return redirect("mod_create_step2")
 
         FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
         # get formset data and validate
