@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.urls import path
 from berryllium.mods.views import upload, explore
 import berryllium.mods.hx as hx
@@ -9,24 +11,18 @@ urlpatterns = [
     path("mods/upload/s2", upload.upload_step2, name="upload_step2"),
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
     path("mods/upload/s4", upload.upload_step4, name="upload_step4"),
-
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
         upload.remove_temp_file,
         name="remove_temp_file",
     ),
-
     # ---------------------------------------------- Explore mods (READ)
     path("explore/mods/", explore.mods, name="explore_mods"),
-
     # ---------------------------------------------- File Drafts (UPDATE)
     path("mods/drafts/<int:mod_id>/", upload.open_mod_draft, name="open_mod_draft"),
-
     # ---------------------------------------------- Session management
     path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
-
-
     # ---------------------------------------------- HTMX endpoints
     path("mods/validate-url/", hx.hx_process_url_field, name="hx_process_url_field"),
     path(
@@ -88,5 +84,10 @@ urlpatterns = [
         "mods/move-filegroup-down/<int:current_index>/",
         hx.hx_move_filegroup_down,
         name="hx_move_filegroup_down",
+    ),
+    path(
+        "mods/file-order-update-in-group/",
+        hx.hx_update_file_order_in_group,
+        name="hx_update_file_order_in_group",
     ),
 ]
