@@ -41,7 +41,7 @@
             $dispatch('files-state-changed');
             const fgId = event.to.dataset.groupId; 
 
-            htmx.ajax('POST', '{% url 'hx_reorder_files_in_group' %}', { 
+            htmx.ajax('POST', '{% url 'hx_update_file_order_in_group' %}', { 
                 values: { 
                     fg_id: fgId, 
                     old_index: event.oldIndex, 

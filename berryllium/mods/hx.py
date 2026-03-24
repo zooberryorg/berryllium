@@ -250,6 +250,23 @@ def hx_add_file_to_group(request):
     # empty response
     return HttpResponse(status=204)
 
+@require_POST
+def hx_update_file_order_in_group(request):
+    """Update the order of files in a group after drag/drop."""
+    fg_id = request.POST.get("fg_id")
+    old_index = request.POST.get("old_index")
+    new_index = request.POST.get("new_index")
+    print("Updating file order in FileGroup ID", fg_id, "Old Index:", old_index, "New Index:", new_index)
+
+    group = FileGroup.objects.filter(id=fg_id).first()
+    if not group:
+        return HttpResponse(status=400)
+    
+    file = FileUpload.objects.filter(filegroup=group).order_by("order")[int(old_index)]
+    update_file_order(group, moved_file=file, index=int(new_index))
+
+    return HttpResponse(status=204)
+
 
 @require_GET
 def hx_empty_filegroups_warning(request):

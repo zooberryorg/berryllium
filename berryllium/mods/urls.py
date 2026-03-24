@@ -86,7 +86,7 @@ urlpatterns = [
         name="hx_move_filegroup_down",
     ),
     path(
-        "mods/file-order-update-in-group/<int:group_id>/",
+        "mods/file-order-update-in-group/",
         hx.hx_update_file_order_in_group,
         name="hx_update_file_order_in_group",
     )
