@@ -120,7 +120,7 @@ class ModCategoriesForm(forms.ModelForm):
         return self.multiple_choice_clean("expansions")
 
 
-class FileUploadForm(forms.Form):
+class ModModFileUploadForm(forms.Form):
     """
     This is Step 2 of the file upload form, which handles
     the actual file upload and validation.

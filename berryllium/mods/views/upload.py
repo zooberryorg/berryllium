@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from django.views.generic import CreateView
 
 from berryllium.mods.forms import (
-    FileUploadForm,
+    ModFileUploadForm,
     ModCategoriesForm,
     FileGroupForm,
 )
@@ -28,7 +28,7 @@ def upload_mod(request):
         request,
         "mods/upload/base.html",
         {
-            "form": FileUploadForm(),
+            "form": ModFileUploadForm(),
             "mod_navigation": UPLOAD_NAVIGATION,
         },
     )
@@ -92,7 +92,7 @@ def mod_create_step2(request):
     """
     Step 2 of the upload form.
     """
-    context = init_context(current_index=1, form=FileUploadForm())
+    context = init_context(current_index=1, form=ModFileUploadForm())
     mod_id = request.session.get("session_id")
     existing_files = []
     file_url = ""
@@ -119,7 +119,7 @@ def mod_create_step2(request):
         if request.POST.get("action") == "previous":
             return redirect("mod_create_step1")
 
-        form = FileUploadForm(
+        form = ModFileUploadForm(
             request.POST, request.FILES, existing_files=existing_files
         )
 
