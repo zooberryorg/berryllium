@@ -6,7 +6,7 @@ import berryllium.mods.hx as hx
 
 urlpatterns = [
     # Upload form (CREATE)
-    path("mods/upload/", upload.upload_mod, name="upload_mod"),
+    path("mods/upload/", upload.ModCreateLanding.as_view(), name="mod_create_landing"),
     path("mods/upload/s1", upload.ModCreateStep1.as_view(), name="mod_create_step1"),
     path("mods/upload/s2", upload.mod_create_step2, name="mod_create_step2"),
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),

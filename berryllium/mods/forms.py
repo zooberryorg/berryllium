@@ -33,8 +33,7 @@ from berryllium.mods.settings import (
 class ModCategoriesForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
-    fields like title and summary. The group_index and file_order fields are hidden
-    and handled in the view.
+    fields like title and summary.
     """
 
     summary = forms.CharField(

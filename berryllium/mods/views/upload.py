@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -19,19 +19,20 @@ from berryllium.mods.services import (
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
-def upload_mod(request):
-    """
-    Landing page for mod upload requests.
-    # TODO: Clear session to start fresh.
-    """
-    return render(
-        request,
-        "mods/upload/base.html",
-        {
-            "form": ModFileUploadForm(),
-            "mod_navigation": UPLOAD_NAVIGATION,
-        },
-    )
+class ModCreateLanding(TemplateView):
+    template_name = "mods/upload/base.html"
+    success_url = "/mods/upload/s1"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod_navigation"] = UPLOAD_NAVIGATION
+        return context
+
+    # def get(self, request, *args, **kwargs):
+    #     # Clear session later to start new
+    #     # request.session.pop("session_id", None)
+    #     # request.session.pop("group_manager_toggled", None)
+    #     return redirect("mod_create_step1")
 
 
 def open_mod_draft(request, mod_id):
