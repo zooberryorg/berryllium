@@ -118,6 +118,7 @@ def create_file_group(mod_id):
         group_formset,
     ]
 
+
 def update_filegroup_order(mod_id):
     """
     Updates the order of file groups.
@@ -125,30 +126,29 @@ def update_filegroup_order(mod_id):
     groups = FileGroup.objects.filter(mod_id=mod_id)
     if not groups:
         return False
-    
+
     # update order
     for index, fg in enumerate(groups):
         fg.order = index
         fg.save()
     return True
 
-def update_file_order(mod_id, fg_id):
-    """
-    Updates the order of files within a file group.
-    """
-    files = FileUpload.objects.filter(filegroup_id=fg_id, filegroup__mod_id=mod_id)
+
+def update_file_order(group, moved_file=None, index=None):
+    files = list(FileUpload.objects.filter(filegroup=group).order_by("order"))
     if not files:
-        return False
-    
-    # update order
-    for index, f in enumerate(files):
-        f.order = index
+        return
+    if moved_file and index is not None:
+        files.remove(moved_file)
+        files.insert(index, moved_file)
+    for i, f in enumerate(files):
+        f.order = i
         f.save()
-    return True
+
 
 def swap_order(models, current_index, direction):
     """
-    Moves a file group up in the order.
+    Swaps the order of file groups or files based on the direction.
     """
     if direction == "up" and current_index > 0:
         # swap with previous group
@@ -162,10 +162,8 @@ def swap_order(models, current_index, direction):
             models[current_index],
             models[current_index + 1],
         )
-    
+
     # save new order to database
     for index, fg in enumerate(models):
         fg.order = index
         fg.save()
-    
-

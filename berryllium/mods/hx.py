@@ -1,6 +1,11 @@
 from berryllium.mods.models import Mod, FileUpload, FileGroup
 from berryllium.mods.forms import FileGroupForm, SingleFileForm
-from berryllium.mods.services import  create_file_group, update_filegroup_order, swap_order
+from berryllium.mods.services import (
+    create_file_group,
+    update_file_order,
+    update_filegroup_order,
+    swap_order,
+)
 
 from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
@@ -194,7 +199,11 @@ def hx_add_filegroup_form(request):
         return HttpResponse(status=400)
 
     # ------------ Create new FileGroup instance for the new form
-    FileGroup.objects.create(mod_id=mod_id, name="New Group", order=FileGroup.objects.filter(mod_id=mod_id).count())
+    FileGroup.objects.create(
+        mod_id=mod_id,
+        name="New Group",
+        order=FileGroup.objects.filter(mod_id=mod_id).count(),
+    )
 
     # ------------ Rebuild context and file group data for re-rendering
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
@@ -221,8 +230,11 @@ def hx_add_file_to_group(request):
     """HTMX endpoint to add a file to a file group after drag/drop."""
     file_id = request.POST.get("dragged_id")
     fg_id = request.POST.get("fg_id")
+    new_index = int(request.POST.get("new_index"))
+    print("Adding file ID", file_id, "to FileGroup ID", fg_id, "at index", new_index)
     file = FileUpload.objects.filter(id=file_id).first()
     group = FileGroup.objects.filter(id=fg_id).first()
+    previous_group = file.filegroup if file else None
 
     if not file or not group:
         return HttpResponse(status=400)
@@ -230,6 +242,10 @@ def hx_add_file_to_group(request):
     # re-assign file to new group
     file.filegroup = group
     file.save()
+
+    update_file_order(group, moved_file=file, index=new_index)
+    if previous_group:
+        update_file_order(previous_group)
 
     # empty response
     return HttpResponse(status=204)
@@ -262,6 +278,7 @@ def hx_empty_filegroups_warning(request):
 
     return HttpResponse(status=204)
 
+
 @require_POST
 def hx_remove_empty_filegroups(request):
     """HTMX endpoint to remove a file from a file group (drag to ungroup)."""
@@ -270,9 +287,7 @@ def hx_remove_empty_filegroups(request):
         print("No mod_id in session when checking for empty file groups.")
         return HttpResponse(status=400)
 
-    empty_groups = FileGroup.objects.filter(
-        mod_id=mod_id, files__isnull=True
-    )
+    empty_groups = FileGroup.objects.filter(mod_id=mod_id, files__isnull=True)
     print(f"After a search, found {empty_groups.count()} empty file groups.")
     if not empty_groups.exists():
         print("No empty file groups found for mod ID:", mod_id)
@@ -285,6 +300,7 @@ def hx_remove_empty_filegroups(request):
     update_filegroup_order(mod_id)
 
     return redirect("upload_step3")
+
 
 @require_POST
 def hx_move_filegroup_up(request, current_index):
@@ -299,6 +315,7 @@ def hx_move_filegroup_up(request, current_index):
     swap_order(groups, current_index, "up")
 
     return redirect("upload_step3")
+
 
 @require_POST
 def hx_move_filegroup_down(request, current_index):
