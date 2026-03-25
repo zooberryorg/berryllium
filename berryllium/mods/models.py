@@ -93,7 +93,7 @@ class Mod(models.Model):
         return ModFileGroup.objects.filter(mod=self)
 
 
-class Dependency(models.Model):
+class ModDependency(models.Model):
     """
     Dependencies are files that a mod relies on; can be external link or internal reference
     Definitions:

@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
             ),
         ),
         migrations.CreateModel(
-            name="Dependency",
+            name="ModDependency",
             fields=[
                 (
                     "id",
