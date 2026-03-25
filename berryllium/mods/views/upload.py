@@ -35,6 +35,7 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_step1")
 
+
 class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
@@ -69,7 +70,8 @@ class ModCreateStep1(CreateView):
             except Mod.DoesNotExist:
                 pass
         return kwargs
-    
+
+
 class ModCreateStep2(FormView):
     form_class = ModFileUploadForm
     template_name = "mods/upload/step/2.html"
@@ -94,7 +96,7 @@ class ModCreateStep2(FormView):
                 context["existing_files"] = existing_files
 
         return context | progress_bar
-    
+
     def form_valid(self, form):
         """
         Handle file upload, save to storage, and re-render form with updated file list.
@@ -112,7 +114,7 @@ class ModCreateStep2(FormView):
                 return render(self.request, self.template_name, context)
 
         return super().form_valid(form)
-    
+
     def get_success_url(self):
         """
         Handle navigation based on which button was clicked (Next vs Previous).

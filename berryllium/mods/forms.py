@@ -73,7 +73,6 @@ class ModCategoriesForm(forms.ModelForm):
                     **DISABLE_SUBMIT_BUTTON_ATTRS,
                 },
             ),
-            
         }
 
     def clean_title(self):
@@ -94,7 +93,7 @@ class ModCategoriesForm(forms.ModelForm):
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
-        
+
         # clean summary of leading/trailing whitespace and null characters
         summary = summary.strip()
         return summary
@@ -164,7 +163,7 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError(
                 f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
-        
+
         # no files uploaded or existing
         if cleaned_file.size == 0 and len(self.existing_files) == 0:
             raise forms.ValidationError("Please upload a file before proceeding.")
@@ -173,6 +172,7 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
+
 
 class FileGroupForm(forms.ModelForm):
     """
