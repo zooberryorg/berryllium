@@ -267,7 +267,7 @@ class ModFileGroupForm(forms.ModelForm):
         return description
 
 
-class SingleFileForm(forms.Form):
+class ModFileUploadForm(forms.Form):
     """
     This form is for editing single files within a ModFileGroup.
     """
