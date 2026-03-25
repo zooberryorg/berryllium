@@ -21,6 +21,9 @@ from berryllium.mods.settings import UPLOAD_NAVIGATION
 
 
 class ModCreateLanding(TemplateView):
+    """
+    Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
+    """
     template_name = "mods/upload/base.html"
     success_url = "/mods/upload/s1"
 
@@ -37,10 +40,13 @@ class ModCreateLanding(TemplateView):
 
 
 class ModCreateStep1(CreateView):
+    """
+    Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
+    """
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/upload/step/1.html"
-    success_url = "/mods/upload/s2"
+    success_url = lazy_reverse("mod_create_step2")
 
     def form_valid(self, form):
         """
@@ -73,6 +79,9 @@ class ModCreateStep1(CreateView):
 
 
 class ModCreateStep2(FormView):
+    """
+    Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
+    """
     form_class = ModFileUploadForm
     template_name = "mods/upload/step/2.html"
     success_url = "/mods/upload/s3"
