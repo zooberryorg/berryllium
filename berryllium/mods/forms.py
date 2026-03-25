@@ -1,8 +1,6 @@
-import os
 from django import forms
-from django.forms import formset_factory, Textarea, TextInput, CheckboxSelectMultiple
+from django.forms import formset_factory, Textarea, TextInput
 from django.core.validators import (
-    URLValidator,
     MaxLengthValidator,
     MinLengthValidator,
     FileExtensionValidator,

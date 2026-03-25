@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.urls import path
 from berryllium.mods.views import upload, explore
 import berryllium.mods.hx as hx

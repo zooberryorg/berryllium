@@ -1,6 +1,5 @@
 from django import template
 from django.utils.safestring import mark_safe
-from widget_tweaks.templatetags.widget_tweaks import render_field
 
 register = template.Library()
 
