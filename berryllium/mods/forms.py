@@ -208,7 +208,7 @@ class ModFileGroupForm(forms.ModelForm):
         return description
 
 
-class ModFileUploadForm(forms.Form):
+class ModFileForm(forms.Form):
     """
     This form is for editing single files within a ModFileGroup.
     """
@@ -289,7 +289,7 @@ class ModFileUploadForm(forms.Form):
 
         return description
     
-class ModFileForm(forms.Form):
+class ModFileUploadForm(forms.Form):
     """
     This is Step 2 of the file upload form, which handles
     the actual file upload and validation.
