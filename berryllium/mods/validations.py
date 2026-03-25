@@ -1,5 +1,5 @@
 from berryllium.mods.models import Mod, ModFile, ModFileGroup
-from berryllium.mods.forms import ModFileGroupForm, SingleFileForm
+from berryllium.mods.forms import ModFileGroupForm, ModFileForm
 from berryllium.mods.services import (
     create_file_group,
     update_file_order,
@@ -135,7 +135,7 @@ def hx_validate_singlefile_title(request, file_id):
     print("Received title for validation:", title, "for ModFile ID:", file_id)
 
     # not a form.ModelForm so we can validate with a regular form and save to ModFile instance
-    form = SingleFileForm(data={"title": title})
+    form = ModFileForm(data={"title": title})
     form.is_valid()
 
     errors = form.errors.get("title", [])
@@ -170,7 +170,7 @@ def hx_validate_singlefile_description(request, file_id):
         "fileform-" + str(file_id) + "-description", ""
     ).strip()
 
-    form = SingleFileForm(data={"description": description})
+    form = ModFileForm(data={"description": description})
     form.is_valid()
 
     errors = form.errors.get("description", [])

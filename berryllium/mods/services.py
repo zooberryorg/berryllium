@@ -102,7 +102,7 @@ def create_filegroup_formsets(extra=0):
 
 
 def create_file_group(mod_id):
-    ModFileGroupFormset, SingleFileFormset = create_filegroup_formsets()
+    ModFileGroupFormset, ModFileFormset = create_filegroup_formsets()
 
     filegroups = ModFileGroup.objects.filter(mod_id=mod_id)
     group_formset = ModFileGroupFormset(queryset=filegroups)
@@ -110,7 +110,7 @@ def create_file_group(mod_id):
     # pair each file group with its set of files
     return [
         [
-            (filegroup_form, SingleFileFormset(instance=filegroup_form.instance))
+            (filegroup_form, ModFileFormset(instance=filegroup_form.instance))
             for filegroup_form in group_formset.forms
         ],
         filegroups,
