@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
-from berryllium.mods.models import FileUpload, FileGroup
+from berryllium.mods.models import FileUpload, ModFileGroup
 from berryllium.mods.models import Mod
 from berryllium.mods.settings import (
     ALLOWED_EXTENSIONS,
@@ -174,15 +174,15 @@ class ModFileUploadForm(forms.Form):
         return cleaned_file
 
 
-class FileGroupForm(forms.ModelForm):
+class ModFileGroupForm(forms.ModelForm):
     """
     Step 3 of the file upload form, which handles the file organization
     into groups.
     """
 
-    # note: fields here need to match the fields in the FileGroup model
+    # note: fields here need to match the fields in the ModFileGroup model
     class Meta:
-        model = FileGroup
+        model = ModFileGroup
         fields = ["name", "description"]
         help_texts = {
             "name": "Name of the file group (e.g., Main Files, etc.)",
@@ -269,7 +269,7 @@ class FileGroupForm(forms.ModelForm):
 
 class SingleFileForm(forms.Form):
     """
-    This form is for editing single files within a FileGroup.
+    This form is for editing single files within a ModFileGroup.
     """
 
     title = forms.CharField(
@@ -373,4 +373,4 @@ class FileDetailsForm(forms.ModelForm):
         }
 
 
-FileGroupFormSet = formset_factory(FileGroupForm, extra=0, can_delete=True)
+ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)

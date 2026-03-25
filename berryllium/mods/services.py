@@ -3,8 +3,8 @@ import uuid
 
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
-from berryllium.mods.models import FileGroup, FileUpload
-from berryllium.mods.forms import FileGroupForm
+from berryllium.mods.models import ModFileGroup, FileUpload
+from berryllium.mods.forms import ModFileGroupForm
 
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory, inlineformset_factory
@@ -72,9 +72,9 @@ def upload_file(uploaded_file, mod_id=None):
         return None
 
     # find file group that this file belongs to (if it exists)
-    fg = FileGroup.objects.filter(mod_id=mod_id).first()
+    fg = ModFileGroup.objects.filter(mod_id=mod_id).first()
     if fg is None:
-        fg = FileGroup.objects.create(mod_id=mod_id, name="Files")
+        fg = ModFileGroup.objects.create(mod_id=mod_id, name="Files")
 
     # once all clear, save file to storage
     temp_path = default_storage.save(temp_filename, uploaded_file)
@@ -94,18 +94,18 @@ def upload_file(uploaded_file, mod_id=None):
 
 def create_filegroup_formsets(extra=0):
     return (
-        modelformset_factory(FileGroup, form=FileGroupForm, extra=extra),
+        modelformset_factory(ModFileGroup, form=ModFileGroupForm, extra=extra),
         inlineformset_factory(
-            FileGroup, FileUpload, fields=["title", "description"], extra=extra
+            ModFileGroup, FileUpload, fields=["title", "description"], extra=extra
         ),
     )
 
 
 def create_file_group(mod_id):
-    FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
+    ModFileGroupFormset, SingleFileFormset = create_filegroup_formsets()
 
-    filegroups = FileGroup.objects.filter(mod_id=mod_id)
-    group_formset = FileGroupFormset(queryset=filegroups)
+    filegroups = ModFileGroup.objects.filter(mod_id=mod_id)
+    group_formset = ModFileGroupFormset(queryset=filegroups)
 
     # pair each file group with its set of files
     return [
@@ -122,7 +122,7 @@ def update_filegroup_order(mod_id):
     """
     Updates the order of file groups.
     """
-    groups = FileGroup.objects.filter(mod_id=mod_id)
+    groups = ModFileGroup.objects.filter(mod_id=mod_id)
     if not groups:
         return False
 

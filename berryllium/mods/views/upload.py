@@ -8,9 +8,9 @@ from django.urls import reverse_lazy as lazy_reverse
 from berryllium.mods.forms import (
     ModFileUploadForm,
     ModCategoriesForm,
-    FileGroupForm,
+    ModFileGroupForm,
 )
-from berryllium.mods.models import Mod, FileGroup
+from berryllium.mods.models import Mod, ModFileGroup
 from berryllium.mods.services import (
     init_context,
     upload_file,
@@ -138,7 +138,7 @@ def upload_step3(request):
     """
     Step 3 of upload form.
     """
-    context = init_context(current_index=2, form=FileGroupForm())
+    context = init_context(current_index=2, form=ModFileGroupForm())
     context["group_manager_toggled"] = request.session.get("group_manager_toggled")
     mod_id = request.session.get("session_id")
 
@@ -157,9 +157,9 @@ def upload_step3(request):
         if request.POST.get("action") == "previous":
             return redirect("mod_create_step2")
 
-        FileGroupFormset, SingleFileFormset = create_filegroup_formsets()
+        ModFileGroupFormset, SingleFileFormset = create_filegroup_formsets()
         # get formset data and validate
-        group_formset = FileGroupFormset(request.POST, queryset=filegroups)
+        group_formset = ModFileGroupFormset(request.POST, queryset=filegroups)
         if group_formset.is_valid():
             # only saves if data was changed
             saved_groups = group_formset.save()
@@ -170,7 +170,7 @@ def upload_step3(request):
                     file_formset.save()
             # all valid, go to next step
             if request.POST.get("action") == "next":
-                num_empty_groups = FileGroup.objects.filter(
+                num_empty_groups = ModFileGroup.objects.filter(
                     mod_id=mod_id, files__isnull=True
                 ).count()
                 # first see if any empty file groups need to be deleted

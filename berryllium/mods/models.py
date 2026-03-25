@@ -35,7 +35,7 @@ class Mod(models.Model):
 
     Examples:
     - Mod.objects.filter(game='zt2', category='animals') -> all animal mods for Zoo Tycoon 2
-    - Mod.files -> all files attached to the mod through FileGroups
+    - Mod.files -> all files attached to the mod through ModFileGroups
 
     """
 
@@ -90,7 +90,7 @@ class Mod(models.Model):
 
     @property
     def file_groups(self):
-        return FileGroup.objects.filter(mod=self)
+        return ModFileGroup.objects.filter(mod=self)
 
 
 class Dependency(models.Model):
@@ -127,9 +127,9 @@ class Dependency(models.Model):
     external_url = models.URLField(blank=True)
 
 
-class FileGroup(models.Model):
+class ModModFileGroup(models.Model):
     """
-    By default mods have FileGroup support for the cases where multiple files
+    By default mods have ModFileGroup support for the cases where multiple files
     need to be listed on the page. Each file needs its own metadata.
     """
 
@@ -189,7 +189,7 @@ class FileUpload(models.Model):
 
     # filegroup
     filegroup = models.ForeignKey(
-        FileGroup, on_delete=models.CASCADE, related_name="files"
+        ModFileGroup, on_delete=models.CASCADE, related_name="files"
     )
     order = models.PositiveIntegerField(default=0)
 
