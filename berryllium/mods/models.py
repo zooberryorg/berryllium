@@ -86,7 +86,7 @@ class Mod(models.Model):
 
     @property
     def files(self):
-        return FileUpload.objects.filter(filegroup__mod=self)
+        return ModFile.objects.filter(filegroup__mod=self)
 
     @property
     def file_groups(self):
@@ -127,7 +127,7 @@ class Dependency(models.Model):
     external_url = models.URLField(blank=True)
 
 
-class ModModFileGroup(models.Model):
+class ModFileGroup(models.Model):
     """
     By default mods have ModFileGroup support for the cases where multiple files
     need to be listed on the page. Each file needs its own metadata.
@@ -153,7 +153,7 @@ class ModModFileGroup(models.Model):
         return self.fileupload_set.all()
 
 
-class FileUpload(models.Model):
+class ModFile(models.Model):
     """
     File uploads attached to mod pages.
     """

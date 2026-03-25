@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
-from berryllium.mods.models import FileUpload, ModFileGroup
+from berryllium.mods.models import ModFile, ModFileGroup
 from berryllium.mods.models import Mod
 from berryllium.mods.settings import (
     ALLOWED_EXTENSIONS,
@@ -116,7 +116,7 @@ class ModCategoriesForm(forms.ModelForm):
         return self.multiple_choice_clean("expansions")
 
 
-class ModFileUploadForm(forms.Form):
+class ModModFileForm(forms.Form):
     """
     This is Step 2 of the file upload form, which handles
     the actual file upload and validation.
@@ -354,7 +354,7 @@ class FileDetailsForm(forms.ModelForm):
     file_order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
     class Meta:
-        model = FileUpload
+        model = ModFile
         fields = ["title", "description"]
         widgets = {
             "title": forms.TextInput(

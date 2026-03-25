@@ -6,7 +6,7 @@ from django.views.generic import CreateView, TemplateView, FormView
 from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
-    ModFileUploadForm,
+    ModModFileForm,
     ModCategoriesForm,
     ModFileGroupForm,
 )
@@ -82,7 +82,7 @@ class ModCreateStep2(FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
-    form_class = ModFileUploadForm
+    form_class = ModModFileForm
     template_name = "mods/upload/step/2.html"
     success_url = "/mods/upload/s3"
 
@@ -145,7 +145,7 @@ def upload_step3(request):
     file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
     # print the order of the files for debugging
-    print("FileUpload order in view:")
+    print("ModFile order in view:")
     for group in filegroups:
         print(f"Group: {group.name} - order: {group.order}")
         for file in group.files.all():

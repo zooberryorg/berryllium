@@ -1,4 +1,4 @@
-from berryllium.mods.models import Mod, FileUpload, ModFileGroup
+from berryllium.mods.models import Mod, ModFile, ModFileGroup
 from berryllium.mods.forms import ModFileGroupForm, SingleFileForm
 from berryllium.mods.services import (
     create_file_group,
@@ -132,15 +132,15 @@ def hx_validate_filegroup_description(request, fg_id):
 def hx_validate_singlefile_title(request, file_id):
     """HTMX endpoint to validate single file title field."""
     title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
-    print("Received title for validation:", title, "for FileUpload ID:", file_id)
+    print("Received title for validation:", title, "for ModFile ID:", file_id)
 
-    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance
+    # not a form.ModelForm so we can validate with a regular form and save to ModFile instance
     form = SingleFileForm(data={"title": title})
     form.is_valid()
 
     errors = form.errors.get("title", [])
     print(
-        "Validating title for FileUpload ID:",
+        "Validating title for ModFile ID:",
         file_id,
         "Title:",
         title,
@@ -154,8 +154,8 @@ def hx_validate_singlefile_title(request, file_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileUpload draft
-    file_upload = FileUpload.objects.filter(id=file_id).first()
+    # if valid, save to ModFile draft
+    file_upload = ModFile.objects.filter(id=file_id).first()
     if file_upload:
         file_upload.title = title
         file_upload.save()
@@ -181,8 +181,8 @@ def hx_validate_singlefile_description(request, file_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileUpload draft
-    file_upload = FileUpload.objects.filter(id=file_id).first()
+    # if valid, save to ModFile draft
+    file_upload = ModFile.objects.filter(id=file_id).first()
     if file_upload:
         file_upload.description = description
         file_upload.save()
@@ -232,7 +232,7 @@ def hx_add_file_to_group(request):
     fg_id = request.POST.get("fg_id")
     new_index = int(request.POST.get("new_index"))
     print("Adding file ID", file_id, "to ModFileGroup ID", fg_id, "at index", new_index)
-    file = FileUpload.objects.filter(id=file_id).first()
+    file = ModFile.objects.filter(id=file_id).first()
     group = ModFileGroup.objects.filter(id=fg_id).first()
     previous_group = file.filegroup if file else None
 
@@ -270,7 +270,7 @@ def hx_update_file_order_in_group(request):
     if not group:
         return HttpResponse(status=400)
 
-    file = FileUpload.objects.filter(filegroup=group).order_by("order")[int(old_index)]
+    file = ModFile.objects.filter(filegroup=group).order_by("order")[int(old_index)]
     update_file_order(group, moved_file=file, index=int(new_index))
 
     return HttpResponse(status=204)

@@ -3,7 +3,7 @@ import uuid
 
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
-from berryllium.mods.models import ModFileGroup, FileUpload
+from berryllium.mods.models import ModFileGroup, ModFile
 from berryllium.mods.forms import ModFileGroupForm
 
 from django.core.files.storage import default_storage
@@ -63,7 +63,7 @@ def upload_file(uploaded_file, mod_id=None):
     file_hash = calculate_file_hash(uploaded_file)
 
     # see if hash already exists in mod files
-    existing_file = FileUpload.objects.filter(
+    existing_file = ModFile.objects.filter(
         file_hash=file_hash, filegroup__mod_id=mod_id
     ).first()
 
@@ -80,7 +80,7 @@ def upload_file(uploaded_file, mod_id=None):
     temp_path = default_storage.save(temp_filename, uploaded_file)
 
     # Create DB row so Step 3 can actually query files
-    uf = FileUpload.objects.create(
+    uf = ModFile.objects.create(
         size=uploaded_file.size,
         filename=basename,
         staged_file=temp_path,
@@ -96,7 +96,7 @@ def create_filegroup_formsets(extra=0):
     return (
         modelformset_factory(ModFileGroup, form=ModFileGroupForm, extra=extra),
         inlineformset_factory(
-            ModFileGroup, FileUpload, fields=["title", "description"], extra=extra
+            ModFileGroup, ModFile, fields=["title", "description"], extra=extra
         ),
     )
 
@@ -134,7 +134,7 @@ def update_filegroup_order(mod_id):
 
 
 def update_file_order(group, moved_file=None, index=None):
-    files = list(FileUpload.objects.filter(filegroup=group).order_by("order"))
+    files = list(ModFile.objects.filter(filegroup=group).order_by("order"))
     if not files:
         return
     if moved_file and index is not None:

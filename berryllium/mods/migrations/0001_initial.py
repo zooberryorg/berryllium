@@ -70,7 +70,7 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name="FileUpload",
+            name="ModFile",
             fields=[
                 (
                     "id",
