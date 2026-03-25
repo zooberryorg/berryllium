@@ -348,29 +348,4 @@ class SingleFileForm(forms.Form):
 
         return description
 
-
-class FileDetailsForm(forms.ModelForm):
-    group_index = forms.IntegerField(widget=forms.HiddenInput())
-    file_order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
-
-    class Meta:
-        model = ModFile
-        fields = ["title", "description"]
-        widgets = {
-            "title": forms.TextInput(
-                attrs={
-                    "placeholder": "File title",
-                    "class": "bg-transparent text-white text-sm w-full focus:outline-none",
-                }
-            ),
-            "description": forms.Textarea(
-                attrs={
-                    "placeholder": "File description (optional)",
-                    "rows": 2,
-                    "class": "zb-textarea",
-                }
-            ),
-        }
-
-
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
