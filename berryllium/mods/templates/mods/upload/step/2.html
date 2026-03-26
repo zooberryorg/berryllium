@@ -40,9 +40,30 @@
             </div>
         </div>
         <!-- Previously Uploaded Files (from session) -->
-        {% include "mods/upload/step/partials/previous_files.html" %}
+        {% include "mods/upload/step/partials/group_toggle.html" %}
+        {% include "mods/upload/step/partials/group_filegroups.html" with file_groups=file_groups group_formset=group_formset %}
         <!-- Action Buttons -->
         {% include "mods/upload/actions.html" %}
     </form>
 </div>
 <style>[x-cloak] { display: none !important; }</style>
+<script>
+    // in case alpine already loaded before
+    if (window.Alpine) {
+        Alpine.store('dnd', {
+            isDragging: false,
+            draggedFileId: null,
+            draggedFromGroupId: null,
+            numEmptyGroups: 0,
+        });
+    } else {
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('dnd', {
+                isDragging: false,
+                draggedFileId: null,
+                draggedFromGroupId: null,
+                numEmptyGroups: 0,
+            });
+        });
+    }
+</script>

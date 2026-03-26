@@ -1,8 +1,6 @@
-import os
 from django import forms
-from django.forms import formset_factory, Textarea, TextInput, CheckboxSelectMultiple
+from django.forms import formset_factory, Textarea, TextInput
 from django.core.validators import (
-    URLValidator,
     MaxLengthValidator,
     MinLengthValidator,
     FileExtensionValidator,
@@ -12,7 +10,7 @@ from django.core.exceptions import ValidationError
 
 # from django.core.exceptions import ValidationError
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
-from berryllium.mods.models import FileUpload, FileGroup
+from berryllium.mods.models import ModFile, ModFileGroup
 from berryllium.mods.models import Mod
 from berryllium.mods.settings import (
     ALLOWED_EXTENSIONS,
@@ -75,7 +73,6 @@ class ModCategoriesForm(forms.ModelForm):
                     **DISABLE_SUBMIT_BUTTON_ATTRS,
                 },
             ),
-            
         }
 
     def clean_title(self):
@@ -96,7 +93,7 @@ class ModCategoriesForm(forms.ModelForm):
             raise forms.ValidationError(
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
-        
+
         # clean summary of leading/trailing whitespace and null characters
         summary = summary.strip()
         return summary
@@ -118,73 +115,15 @@ class ModCategoriesForm(forms.ModelForm):
     def clean_expansions(self):
         return self.multiple_choice_clean("expansions")
 
-
-class ModFileUploadForm(forms.Form):
-    """
-    This is Step 2 of the file upload form, which handles
-    the actual file upload and validation.
-    """
-
-    file = forms.FileField(
-        widget=forms.FileInput(attrs={"class": "hidden", "accept": ".z2f,.ztd,.zip"}),
-        required=False,
-    )
-
-    def __init__(self, *args, existing_files=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.existing_files = existing_files or []
-
-    def clean_file(self):
-        """
-        Form validation and cleanup.
-        """
-        cleaned_file = self.cleaned_data.get("file")
-        cleaned_file.__str__
-
-        # if no file uploaded, check if file URL is provided, if not raise error
-        if not cleaned_file:
-            return cleaned_file
-        print(
-            "Validating uploaded file:", cleaned_file.name, cleaned_file.size, "bytes"
-        )
-        # Validate file extension
-        try:
-            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(cleaned_file)
-        except ValidationError:
-            raise forms.ValidationError(
-                f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
-            )
-
-        # Validate file size
-        if cleaned_file.size > MAX_FILE_SIZE:
-            raise forms.ValidationError(
-                f"File size exceeds the maximum limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
-            )
-
-        # Check for illegal characters in filename
-        if any(char in cleaned_file.name for char in ILLEGAL_CHARACTERS):
-            raise forms.ValidationError(
-                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
-            )
-        
-        # no files uploaded or existing
-        if cleaned_file.size == 0 and len(self.existing_files) == 0:
-            raise forms.ValidationError("Please upload a file before proceeding.")
-
-        if cleaned_file.size == 0:
-            raise forms.ValidationError("The uploaded file is empty.")
-
-        return cleaned_file
-
-class FileGroupForm(forms.ModelForm):
+class ModFileGroupForm(forms.ModelForm):
     """
     Step 3 of the file upload form, which handles the file organization
     into groups.
     """
 
-    # note: fields here need to match the fields in the FileGroup model
+    # note: fields here need to match the fields in the ModFileGroup model
     class Meta:
-        model = FileGroup
+        model = ModFileGroup
         fields = ["name", "description"]
         help_texts = {
             "name": "Name of the file group (e.g., Main Files, etc.)",
@@ -269,9 +208,9 @@ class FileGroupForm(forms.ModelForm):
         return description
 
 
-class SingleFileForm(forms.Form):
+class ModFileForm(forms.Form):
     """
-    This form is for editing single files within a FileGroup.
+    This form is for editing single files within a ModFileGroup.
     """
 
     title = forms.CharField(
@@ -349,30 +288,64 @@ class SingleFileForm(forms.Form):
             )
 
         return description
+    
+class ModFileUploadForm(forms.Form):
+    """
+    This is Step 2 of the file upload form, which handles
+    the actual file upload and validation.
+    """
+
+    file = forms.FileField(
+        widget=forms.FileInput(attrs={"class": "hidden", "accept": ".z2f,.ztd,.zip"}),
+        required=False,
+    )
+
+    def __init__(self, *args, existing_files=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.existing_files = existing_files or []
+
+    def clean_file(self):
+        """
+        Form validation and cleanup.
+        """
+        cleaned_file = self.cleaned_data.get("file")
+        cleaned_file.__str__
+
+        # if no file uploaded, check if file URL is provided, if not raise error
+        if not cleaned_file:
+            return cleaned_file
+        print(
+            "Validating uploaded file:", cleaned_file.name, cleaned_file.size, "bytes"
+        )
+        # Validate file extension
+        try:
+            FileExtensionValidator(allowed_extensions=ALLOWED_EXTENSIONS)(cleaned_file)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Invalid file type. Allowed types: {', '.join(ALLOWED_EXTENSIONS)}"
+            )
+
+        # Validate file size
+        if cleaned_file.size > MAX_FILE_SIZE:
+            raise forms.ValidationError(
+                f"File size exceeds the maximum limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
+            )
+
+        # Check for illegal characters in filename
+        if any(char in cleaned_file.name for char in ILLEGAL_CHARACTERS):
+            raise forms.ValidationError(
+                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
+            )
+
+        # no files uploaded or existing
+        if cleaned_file.size == 0 and len(self.existing_files) == 0:
+            raise forms.ValidationError("Please upload a file before proceeding.")
+
+        if cleaned_file.size == 0:
+            raise forms.ValidationError("The uploaded file is empty.")
+
+        return cleaned_file
 
 
-class FileDetailsForm(forms.ModelForm):
-    group_index = forms.IntegerField(widget=forms.HiddenInput())
-    file_order = forms.IntegerField(widget=forms.HiddenInput(), initial=0)
 
-    class Meta:
-        model = FileUpload
-        fields = ["title", "description"]
-        widgets = {
-            "title": forms.TextInput(
-                attrs={
-                    "placeholder": "File title",
-                    "class": "bg-transparent text-white text-sm w-full focus:outline-none",
-                }
-            ),
-            "description": forms.Textarea(
-                attrs={
-                    "placeholder": "File description (optional)",
-                    "rows": 2,
-                    "class": "zb-textarea",
-                }
-            ),
-        }
-
-
-FileGroupFormSet = formset_factory(FileGroupForm, extra=0, can_delete=True)
+ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)

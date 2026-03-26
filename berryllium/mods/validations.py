@@ -1,5 +1,5 @@
-from berryllium.mods.models import Mod, FileUpload, FileGroup
-from berryllium.mods.forms import FileGroupForm, SingleFileForm
+from berryllium.mods.models import Mod, ModFile, ModFileGroup
+from berryllium.mods.forms import ModFileGroupForm, ModFileForm
 from berryllium.mods.services import (
     create_file_group,
     update_file_order,
@@ -68,9 +68,9 @@ def hx_toggle_group_manager(request):
 def hx_validate_filegroup_name(request, fg_id):
     """HTMX endpoint to validate filegroup name field."""
     groupname = request.POST.get("form-" + str(fg_id) + "-name", "").strip()
-    print("Received group name for validation:", groupname, "for FileGroup ID:", fg_id)
+    print("Received group name for validation:", groupname, "for ModFileGroup ID:", fg_id)
 
-    form = FileGroupForm(data={"name": groupname}, instance=FileGroup(id=fg_id))
+    form = ModFileGroupForm(data={"name": groupname}, instance=ModFileGroup(id=fg_id))
     form.is_valid()
 
     errors = form.errors.get("name", [])
@@ -81,8 +81,8 @@ def hx_validate_filegroup_name(request, fg_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileGroup draft
-    file_group = FileGroup.objects.filter(id=fg_id).first()
+    # if valid, save to ModFileGroup draft
+    file_group = ModFileGroup.objects.filter(id=fg_id).first()
     if file_group:
         file_group.name = groupname
         file_group.save()
@@ -93,18 +93,18 @@ def hx_validate_filegroup_name(request, fg_id):
 @require_POST
 def hx_validate_filegroup_description(request, fg_id):
     """HTMX endpoint to validate filegroup description field."""
-    print("Validating description for FileGroup ID:", fg_id)
+    print("Validating description for ModFileGroup ID:", fg_id)
     description = request.POST.get("form-" + str(fg_id) + "-description", "").strip()
 
-    form = FileGroupForm(
-        data={"description": description}, instance=FileGroup(id=fg_id)
+    form = ModFileGroupForm(
+        data={"description": description}, instance=ModFileGroup(id=fg_id)
     )
     form.is_valid()
 
     errors = form.errors.get("description", [])
     if errors:
         print(
-            "Validation errors for FileGroup ID:",
+            "Validation errors for ModFileGroup ID:",
             fg_id,
             "Description:",
             description,
@@ -117,12 +117,12 @@ def hx_validate_filegroup_description(request, fg_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileGroup draft
-    file_group = FileGroup.objects.filter(id=fg_id).first()
-    print("Saving description for FileGroup ID:", fg_id, "Description:", description)
+    # if valid, save to ModFileGroup draft
+    file_group = ModFileGroup.objects.filter(id=fg_id).first()
+    print("Saving description for ModFileGroup ID:", fg_id, "Description:", description)
     if file_group:
         file_group.description = description
-        print("Saved description for FileGroup ID:", fg_id)
+        print("Saved description for ModFileGroup ID:", fg_id)
         file_group.save()
 
     return HttpResponse()
@@ -132,15 +132,15 @@ def hx_validate_filegroup_description(request, fg_id):
 def hx_validate_singlefile_title(request, file_id):
     """HTMX endpoint to validate single file title field."""
     title = request.POST.get("fileform-" + str(file_id) + "-title", "").strip()
-    print("Received title for validation:", title, "for FileUpload ID:", file_id)
+    print("Received title for validation:", title, "for ModFile ID:", file_id)
 
-    # not a form.ModelForm so we can validate with a regular form and save to FileUpload instance
-    form = SingleFileForm(data={"title": title})
+    # not a form.ModelForm so we can validate with a regular form and save to ModFile instance
+    form = ModFileForm(data={"title": title})
     form.is_valid()
 
     errors = form.errors.get("title", [])
     print(
-        "Validating title for FileUpload ID:",
+        "Validating title for ModFile ID:",
         file_id,
         "Title:",
         title,
@@ -154,8 +154,8 @@ def hx_validate_singlefile_title(request, file_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileUpload draft
-    file_upload = FileUpload.objects.filter(id=file_id).first()
+    # if valid, save to ModFile draft
+    file_upload = ModFile.objects.filter(id=file_id).first()
     if file_upload:
         file_upload.title = title
         file_upload.save()
@@ -170,7 +170,7 @@ def hx_validate_singlefile_description(request, file_id):
         "fileform-" + str(file_id) + "-description", ""
     ).strip()
 
-    form = SingleFileForm(data={"description": description})
+    form = ModFileForm(data={"description": description})
     form.is_valid()
 
     errors = form.errors.get("description", [])
@@ -181,8 +181,8 @@ def hx_validate_singlefile_description(request, file_id):
             {"error_message": errors[0]},
         )
 
-    # if valid, save to FileUpload draft
-    file_upload = FileUpload.objects.filter(id=file_id).first()
+    # if valid, save to ModFile draft
+    file_upload = ModFile.objects.filter(id=file_id).first()
     if file_upload:
         file_upload.description = description
         file_upload.save()
@@ -198,29 +198,22 @@ def hx_add_filegroup_form(request):
     if not mod_id:
         return HttpResponse(status=400)
 
-    # ------------ Create new FileGroup instance for the new form
-    FileGroup.objects.create(
+    # ------------ Create new ModFileGroup instance for the new form
+    ModFileGroup.objects.create(
         mod_id=mod_id,
         name="New Group",
-        order=FileGroup.objects.filter(mod_id=mod_id).count(),
+        order=ModFileGroup.objects.filter(mod_id=mod_id).count(),
     )
-
-    # ------------ Rebuild context and file group data for re-rendering
-    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
 
     # ------------ Re-render
-    return render(
-        request,
-        "mods/upload/step/partials/group_filegroup.html",
-        {"group": group_formset.forms[-1], "file_groups": filegroups},
-    )
+    return redirect("mod_create_step2")
 
 
 @require_POST
 def hx_remove_filegroup_form(request, fg_id):
     """HTMX endpoint to remove a file group form."""
-    print("Attempting to delete FileGroup with ID:", fg_id)
-    FileGroup.objects.filter(id=fg_id).delete()
+    print("Attempting to delete ModFileGroup with ID:", fg_id)
+    ModFileGroup.objects.filter(id=fg_id).delete()
     update_filegroup_order(request.session.get("session_id"))
     return HttpResponse()
 
@@ -231,9 +224,9 @@ def hx_add_file_to_group(request):
     file_id = request.POST.get("dragged_id")
     fg_id = request.POST.get("fg_id")
     new_index = int(request.POST.get("new_index"))
-    print("Adding file ID", file_id, "to FileGroup ID", fg_id, "at index", new_index)
-    file = FileUpload.objects.filter(id=file_id).first()
-    group = FileGroup.objects.filter(id=fg_id).first()
+    print("Adding file ID", file_id, "to ModFileGroup ID", fg_id, "at index", new_index)
+    file = ModFile.objects.filter(id=file_id).first()
+    group = ModFileGroup.objects.filter(id=fg_id).first()
     previous_group = file.filegroup if file else None
 
     if not file or not group:
@@ -258,7 +251,7 @@ def hx_update_file_order_in_group(request):
     old_index = request.POST.get("old_index")
     new_index = request.POST.get("new_index")
     print(
-        "Updating file order in FileGroup ID",
+        "Updating file order in ModFileGroup ID",
         fg_id,
         "Old Index:",
         old_index,
@@ -266,11 +259,11 @@ def hx_update_file_order_in_group(request):
         new_index,
     )
 
-    group = FileGroup.objects.filter(id=fg_id).first()
+    group = ModFileGroup.objects.filter(id=fg_id).first()
     if not group:
         return HttpResponse(status=400)
 
-    file = FileUpload.objects.filter(filegroup=group).order_by("order")[int(old_index)]
+    file = ModFile.objects.filter(filegroup=group).order_by("order")[int(old_index)]
     update_file_order(group, moved_file=file, index=int(new_index))
 
     return HttpResponse(status=204)
@@ -285,7 +278,7 @@ def hx_empty_filegroups_warning(request):
         print("No mod_id in session when checking for empty file groups.")
         return HttpResponse(status=400)
 
-    empty_groups_count = FileGroup.objects.filter(
+    empty_groups_count = ModFileGroup.objects.filter(
         mod_id=mod_id, files__isnull=True
     ).count()
     print(
@@ -312,7 +305,7 @@ def hx_remove_empty_filegroups(request):
         print("No mod_id in session when checking for empty file groups.")
         return HttpResponse(status=400)
 
-    empty_groups = FileGroup.objects.filter(mod_id=mod_id, files__isnull=True)
+    empty_groups = ModFileGroup.objects.filter(mod_id=mod_id, files__isnull=True)
     print(f"After a search, found {empty_groups.count()} empty file groups.")
     if not empty_groups.exists():
         print("No empty file groups found for mod ID:", mod_id)
@@ -324,7 +317,7 @@ def hx_remove_empty_filegroups(request):
     # update order
     update_filegroup_order(mod_id)
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
 
 
 @require_POST
@@ -334,12 +327,12 @@ def hx_move_filegroup_up(request, current_index):
     if not mod_id:
         return HttpResponse(status=400)
 
-    groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
+    groups = list(ModFileGroup.objects.filter(mod_id=mod_id).order_by("order"))
 
     # swap order with the previous group
     swap_order(groups, current_index, "up")
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
 
 
 @require_POST
@@ -349,9 +342,9 @@ def hx_move_filegroup_down(request, current_index):
     if not mod_id:
         return HttpResponse(status=400)
 
-    groups = list(FileGroup.objects.filter(mod_id=mod_id).order_by("order"))
+    groups = list(ModFileGroup.objects.filter(mod_id=mod_id).order_by("order"))
 
     # swap order with the next group
     swap_order(groups, current_index, "down")
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
