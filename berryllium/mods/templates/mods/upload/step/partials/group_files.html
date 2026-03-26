@@ -131,6 +131,7 @@
             </div>
             <button type="button"
                     class="zb-action-delete"
+                    x-sort:ignore
                     @click="() => { 
                         keepFile = false; 
                         htmx.ajax('POST', '{% url 'remove_temp_file' file.instance.id %}', {
