@@ -145,7 +145,7 @@ class ModCreateStep2(FormView):
             return lazy_reverse("mod_create_step1")
         return super().get_success_url()
 
-def upload_step4(request):
+def upload_step3(request):
 
     return render(
         request,

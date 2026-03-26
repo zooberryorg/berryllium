@@ -8,7 +8,6 @@ urlpatterns = [
     path("mods/upload/s1", upload.ModCreateStep1.as_view(), name="mod_create_step1"),
     path("mods/upload/s2", upload.ModCreateStep2.as_view(), name="mod_create_step2"),
     path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
-    path("mods/upload/s4", upload.upload_step4, name="upload_step4"),
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",

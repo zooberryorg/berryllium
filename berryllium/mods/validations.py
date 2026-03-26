@@ -324,7 +324,7 @@ def hx_remove_empty_filegroups(request):
     # update order
     update_filegroup_order(mod_id)
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
 
 
 @require_POST
