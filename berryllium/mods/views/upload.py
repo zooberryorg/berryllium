@@ -236,7 +236,7 @@ def remove_temp_file(request, file_id):
         if temp_path and default_storage.exists(temp_path):
             default_storage.delete(temp_path)
 
-        return HttpResponse("")
+        return HttpResponse(status=204)
 
 
 @require_http_methods(["POST"])

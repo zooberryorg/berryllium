@@ -52,7 +52,7 @@
         }">
     {# djlint:on #}
     {% for file in files %}
-        <template x-if=>
+        <template x-data="{keepFile: true}" x-if="keepFile">
             {# djlint:off #}
             <div class="flex items-center gap-3 w-full 
                         bg-pine-800 rounded-lg px-2 py-1 text-sm text-white/80 
@@ -131,11 +131,16 @@
             </div>
             <button type="button"
                     class="zb-action-delete"
-                    hx-post="{% url 'remove_temp_file' file.instance.id %}"
-                    hx-target="[data-file='{{ file.instance.id }}']"
-                    hx-swap="outerHTML"
-                    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-                    class="zb-action-delete">
+                    @click="() => { 
+                        keepFile = false; 
+                        htmx.ajax('POST', '{% url 'remove_temp_file' file.instance.id %}', {
+                            headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                            values: { file_id: {{ file.instance.id }} },
+                            onAfterSwap: () => {
+                                $dispatch('files-state-changed');
+                            }
+                        });
+                    }">
                 {# djlint:on #}
                 <ion-icon name="trash"></ion-icon>
             </button>
