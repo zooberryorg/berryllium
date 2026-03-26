@@ -1,4 +1,5 @@
-<div x-show="toggled"
+<div 
+    {% comment %} x-show="toggled" {% endcomment %}
     x-ref="fileGroups"
     id="fileGroups"
     x-data="createModal()"
@@ -46,23 +47,3 @@
         </button>
     </div>
 </div>
-<script>
-    // in case alpine already loaded before
-    if (window.Alpine) {
-        Alpine.store('dnd', {
-            isDragging: false,
-            draggedFileId: null,
-            draggedFromGroupId: null,
-            numEmptyGroups: 0,
-        });
-    } else {
-        document.addEventListener('alpine:init', () => {
-            Alpine.store('dnd', {
-                isDragging: false,
-                draggedFileId: null,
-                draggedFromGroupId: null,
-                numEmptyGroups: 0,
-            });
-        });
-    }
-</script>

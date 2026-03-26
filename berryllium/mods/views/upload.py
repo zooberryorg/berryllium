@@ -83,7 +83,7 @@ class ModCreateStep2(FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
-    form_class = ModFileForm
+    form_class = ModFileUploadForm
     template_name = "mods/upload/step/2.html"
     success_url = "/mods/upload/s3"
 
@@ -96,14 +96,25 @@ class ModCreateStep2(FormView):
 
         mod_id = self.request.session.get("session_id")
         existing_files = []
+        existing_filegroups = []
 
         if mod_id:
             mod = Mod.objects.get(id=mod_id)
             files = mod.files.all()
 
+            # make formsets for existing file groups to render in template
+            file_group_forms, filegroups, group_formset = create_file_group(mod_id)
+            ModFileGroupFormset, ModFileFormset = create_filegroup_formsets()
+            group_formset = ModFileGroupFormset(queryset=filegroups)
+
             if files.exists():
                 existing_files = [f for f in files.values("filename", "size", "id")]
                 context["existing_files"] = existing_files
+            if filegroups.exists():
+                existing_filegroups = filegroups.values("name", "id")
+                print("Existing file groups:", existing_filegroups)
+                context["file_groups"] = file_group_forms
+                context["group_formset"] = group_formset
 
         return context | progress_bar
 
