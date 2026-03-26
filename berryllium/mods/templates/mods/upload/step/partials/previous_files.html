@@ -18,7 +18,6 @@
                             hx-post=""
                             hx-target="[data-file='{{ file.id }}']"
                             hx-swap="outerHTML"
-                            @click="updateQueueState()"
                             hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                             class="zb-action-delete">
                         <ion-icon name="trash"></ion-icon>

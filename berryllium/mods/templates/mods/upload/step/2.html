@@ -41,9 +41,8 @@
         </div>
         <!-- Previously Uploaded Files (from session) -->
         {% include "mods/upload/step/partials/previous_files.html" %}
-    {% include "mods/upload/step/partials/group_toggle.html" %}
-    
-    {% include "mods/upload/step/partials/group_filegroups.html" with file_groups=file_groups group_formset=group_formset %}
+        {% include "mods/upload/step/partials/group_toggle.html" %}
+        {% include "mods/upload/step/partials/group_filegroups.html" with file_groups=file_groups group_formset=group_formset %}
         <!-- Action Buttons -->
         {% include "mods/upload/actions.html" %}
     </form>

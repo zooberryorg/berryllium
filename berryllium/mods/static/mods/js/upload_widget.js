@@ -5,35 +5,6 @@ function fileInputProcessor() {
     isDragging: false,
     isUploading: false,
     fileDropzoneEnabled: true,
-    fileCount: 0,
-
-    // guarantee form state on page load
-    init() {
-      // get initial file queue length 
-      this.fileCount = this.getFileQueueLength();
-    },
-
-    // check if files are in the queue
-    get hasFiles() {
-      return this.fileCount > 0;
-    },
-
-    // fires when a file is removed from queue
-    updateQueueState(id = null) {
-      const fileEl = document.querySelector(`[data-file='${id}']`);
-      this.fileCount--;
-      console.log(`Found file element:`, fileEl, `Updated file count:`, this.fileCount);
-      if (!this.hasFiles && id) {
-        this.$nextTick(() => {
-          fileEl.remove();
-        });
-      }
-    },
-
-    getFileQueueLength() {
-      const fileQueue = document.querySelectorAll('[data-file]');
-      return fileQueue.length;
-    },
 
     enableInput(ref, flag) {
       this[flag] = true;
