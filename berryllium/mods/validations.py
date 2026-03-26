@@ -339,7 +339,7 @@ def hx_move_filegroup_up(request, current_index):
     # swap order with the previous group
     swap_order(groups, current_index, "up")
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
 
 
 @require_POST
@@ -354,4 +354,4 @@ def hx_move_filegroup_down(request, current_index):
     # swap order with the next group
     swap_order(groups, current_index, "down")
 
-    return redirect("upload_step3")
+    return redirect("mod_create_step2")
