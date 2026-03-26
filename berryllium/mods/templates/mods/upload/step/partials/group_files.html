@@ -85,6 +85,10 @@
                    @keydown.enter.prevent="$el.blur()"
                    hx-on::after-swap="htmx.process(this)"
                    {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
+            <div class="pl-2">
+                <p class="text-white/50 text-xs">{{ file.instance.size|filesizeformat }}</p>
+            </div>
+
             <div class="text-red-500 text-sm"
                  id="file-title-errors-{{ file.instance.id }}">
                 {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
