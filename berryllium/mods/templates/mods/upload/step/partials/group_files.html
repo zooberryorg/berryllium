@@ -129,6 +129,24 @@
                 {% if file.instance.description.errors %}{{ file.instance.description.errors|join:", " }}{% endif %}
             </div>
         </div>
+        <button type="button"
+            class="zb-action-delete"
+            hx-post="#"
+            hx-trigger="click"
+            hx-swap="none"
+            {# quick check for existing files before deletion #}
+            {# djlint:off #}
+            @click="
+                const groupEl = document.querySelector('[data-group-id=\'{{ group_id }}\']');
+                const fileCount = groupEl ? groupEl.querySelectorAll('[x-sort\\:item]').length : 0;
+                $dispatch('group-was-deleted', { groupId: {{ group_id }}, wasEmpty: fileCount === 0 });
+                setTimeout(() => {
+                    keepForm = false;
+                }, 300);
+            ">
+            {# djlint:on #}
+            <ion-icon name="trash"></ion-icon>
+        </button>
     </div>
 {% endfor %}
 </div>
