@@ -19,11 +19,13 @@ function fileInputProcessor() {
     },
 
     // fires when a file is removed from queue
-    updateQueueState() {
+    updateQueueState(id = null) {
+      const fileEl = document.querySelector(`[data-file='${id}']`);
       this.fileCount--;
-      if (!this.hasFiles) {
+      console.log(`Found file element:`, fileEl, `Updated file count:`, this.fileCount);
+      if (!this.hasFiles && id) {
         this.$nextTick(() => {
-          this.$refs.fileQueue.remove();
+          fileEl.remove();
         });
       }
     },

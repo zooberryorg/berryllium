@@ -15,7 +15,7 @@
                         </div>
                     </div>
                     <button type="button"
-                            hx-post="{% url 'remove_temp_file' file.id %}"
+                            hx-post=""
                             hx-target="[data-file='{{ file.id }}']"
                             hx-swap="outerHTML"
                             @click="updateQueueState()"

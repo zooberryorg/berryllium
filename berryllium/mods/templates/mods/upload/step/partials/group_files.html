@@ -74,16 +74,19 @@
             <input type="text"
                    name="fileform-{{ file.instance.id }}-title"
                    class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
-                   :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
+                   autocomplete="off"
                    placeholder="{{ file.instance.filename }}"
+
+                   :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
+
                    hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
                    hx-trigger="input delay:500ms"
                    hx-target="#file-title-errors-{{ file.instance.id }}"
                    hx-swap="innerHTML"
-                   autocomplete="off"
+                   hx-on::after-swap="htmx.process(this)"
+
                    @keydown.escape="$el.blur()"
                    @keydown.enter.prevent="$el.blur()"
-                   hx-on::after-swap="htmx.process(this)"
                    {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
             <div class="pl-2">
                 <p class="text-white/50 text-xs">{{ file.instance.size|filesizeformat }}</p>
@@ -102,7 +105,7 @@
                 x-init="$nextTick(() => updateTrimLength($refs.collapsibleSingleFileDesc.offsetWidth))"
 
                 :rows="focused ? 4 : 1"
-                :class="focused ? 'h-10' : 'h-7'"
+                :class="focused ? 'h-15' : 'h-11'"
                 :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
                 :value="focused ? content : trimDisplayedContent()"
 
@@ -131,19 +134,12 @@
         </div>
         <button type="button"
             class="zb-action-delete"
-            hx-post="#"
-            hx-trigger="click"
-            hx-swap="none"
-            {# quick check for existing files before deletion #}
-            {# djlint:off #}
-            @click="
-                const groupEl = document.querySelector('[data-group-id=\'{{ group_id }}\']');
-                const fileCount = groupEl ? groupEl.querySelectorAll('[x-sort\\:item]').length : 0;
-                $dispatch('group-was-deleted', { groupId: {{ group_id }}, wasEmpty: fileCount === 0 });
-                setTimeout(() => {
-                    keepForm = false;
-                }, 300);
-            ">
+            hx-post="{% url 'remove_temp_file' file.instance.id %}"
+            hx-target="[data-file='{{ file.instance.id }}']"
+            hx-swap="outerHTML"
+            @click="updateQueueState({{ file.instance.id }})"
+            hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+            class="zb-action-delete">
             {# djlint:on #}
             <ion-icon name="trash"></ion-icon>
         </button>
