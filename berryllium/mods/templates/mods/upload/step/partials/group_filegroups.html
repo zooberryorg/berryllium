@@ -28,13 +28,12 @@
     {% for group, files in file_groups %}
         {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
     {% endfor %}
-    <div id="addGroup"></div>
     <div class="flex justify-end w-full px-6 mb-4">
         <button class="zb-action flex items-center justify-center"
             type="button"
             hx-post="{% url 'hx_add_filegroup_form' %}"
-            hx-target="#addGroup"
-            hx-swap="beforeend"
+            hx-target="#upload-frame"
+            hx-swap="innerHTML"
             {# djlint:off #}
             {# refreshes alpine state after swap #}
             hx-on:htmx:after-swap="() => { 
