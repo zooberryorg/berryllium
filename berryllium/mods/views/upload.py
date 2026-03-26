@@ -145,66 +145,6 @@ class ModCreateStep2(FormView):
             return lazy_reverse("mod_create_step1")
         return super().get_success_url()
 
-
-def upload_step3(request):
-    """
-    Step 3 of upload form.
-    """
-    context = init_context(current_index=2, form=ModFileGroupForm())
-    context["group_manager_toggled"] = request.session.get("group_manager_toggled")
-    mod_id = request.session.get("session_id")
-
-    file_group_forms, filegroups, group_formset = create_file_group(mod_id)
-
-    # print the order of the files for debugging
-    print("ModFile order in view:")
-    for group in filegroups:
-        print(f"Group: {group.name} - order: {group.order}")
-        for file in group.files.all():
-            print(f"-------------- {file.filename} - order: {file.order}")
-        print("\n")
-
-    # ---------------- POST (Back/Next) uses formset validation
-    if request.method == "POST":
-        if request.POST.get("action") == "previous":
-            return redirect("mod_create_step2")
-
-        ModFileGroupFormset, ModFileFormset = create_filegroup_formsets()
-        # get formset data and validate
-        group_formset = ModFileGroupFormset(request.POST, queryset=filegroups)
-        if group_formset.is_valid():
-            # only saves if data was changed
-            saved_groups = group_formset.save()
-            for group in saved_groups:
-                # now that groups are saved, validate their files
-                file_formset = ModFileFormset(request.POST, instance=group)
-                if file_formset.is_valid():
-                    file_formset.save()
-            # all valid, go to next step
-            if request.POST.get("action") == "next":
-                num_empty_groups = ModFileGroup.objects.filter(
-                    mod_id=mod_id, files__isnull=True
-                ).count()
-                # first see if any empty file groups need to be deleted
-                if num_empty_groups > 0:
-                    # return form with modal asking user if they want to delete empty file group
-                    context["file_groups"] = file_group_forms
-                    context["num_empty_groups"] = num_empty_groups
-                    return HttpResponse(status=400)
-                return redirect("upload_step4")
-        else:
-            context["file_groups"] = file_group_forms
-            context["group_formset"] = group_formset
-            context["onEmptyGroupFound"] = False
-            return render(request, "mods/upload/step/3.html", context)
-
-    # ---------------- GET (rehydrate Alpine)
-    context["file_groups"] = file_group_forms
-    context["group_formset"] = group_formset
-    context["onEmptyGroupFound"] = False
-    return render(request, "mods/upload/step/3.html", context)
-
-
 def upload_step4(request):
 
     return render(
