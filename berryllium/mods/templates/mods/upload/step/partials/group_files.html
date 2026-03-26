@@ -78,6 +78,7 @@
                        autocomplete="off"
                        placeholder="{{ file.instance.filename }}"
                        :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
+                       x-sort:ignore
                        hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
                        hx-trigger="input delay:500ms"
                        hx-target="#file-title-errors-{{ file.instance.id }}"
@@ -121,7 +122,7 @@
                             hx-trigger="input delay:500ms"
                             hx-target="#file-description-errors-{{ file.instance.id }}"
                             hx-swap="innerHTML"
-                            hx-on::after-swap="htmx.process(this)">
+                            hx-on::after-swap="htmx.process(this)" x-sort:ignore>
                         </textarea>
                 {# djlint:on #}
                 <div class="text-red-500 text-sm"
