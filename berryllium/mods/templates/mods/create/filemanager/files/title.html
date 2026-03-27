@@ -16,7 +16,7 @@
            @keydown.enter.prevent="$el.blur()"
            {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
     <div class="pl-2 self-start">
-        <p class="text-xs py-1 px-2 bg-pine-400/80 text-pine-200/10 max-w-max rounded-full">{{ file.instance.size|filesizeformat }}</p>
+        <p class="text-xs py-1 px-2 bg-pine-400/80 text-granite-200/50 max-w-max rounded-full">{{ file.instance.size|filesizeformat }}</p>
     </div>
     <div class="text-red-500 text-sm"
          id="file-title-errors-{{ file.instance.id }}">

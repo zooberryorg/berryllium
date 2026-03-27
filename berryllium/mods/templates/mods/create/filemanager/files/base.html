@@ -8,7 +8,7 @@
     class="transition-all duration-200"
     :class="
         $store.dnd.isDragging ? 
-        'bg-pine-special-100/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' 
+        'bg-pine-special-100/10 border-2 border-dashed border-gold-400 rounded-xl px-2 py-2' 
         : 'border-transparent'"
     {% include 'mods/create/filemanager/files/sort_config.html' %}>
     {# djlint:on #}
@@ -19,9 +19,9 @@
                         bg-pine-draggable-200 rounded-lg px-2 py-1 text-sm text-granite-200 
                         border-1 border-pine-draggable-100 focus:ring-2 focus:ring-gold-500/50 
                         focus:border-transparent hover:brightness-110
-                        shadow-md hover:shadow-lg group"
+                        shadow-md hover:shadow-lg mb-3 nth-last-1:mb-0 group/file"
             {# djlint:on #}
-            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-3 mb-3'"
+            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-3'"
             id="draggableFile"
             data-file-id="{{ file.instance.id }}"
             x-ref="files"
@@ -29,9 +29,9 @@
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
             x-sort:item>
-            <span class="text-pine-600 px-2 py-1 cursor-grab group"
+            <span class="text-pine-600 px-2 py-1 cursor-grab"
                   x-sort:handle>
-                <i class="bi bi-grip-vertical group-hover:text-gold-400 text-lg"></i>
+                <i class="bi bi-grip-vertical group-hover/file:text-gold-400 text-lg"></i>
             </span>
             {% include 'mods/create/filemanager/files/title.html' %}
             {% include 'mods/create/filemanager/files/description.html' %}

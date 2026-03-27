@@ -88,8 +88,8 @@
   }
 
   :is(.zb-action) {
-    @apply text-pine-100/50 bg-pine-800/90;
-    @apply hover:brightness-150;
+    @apply text-pine-100/50 bg-pine-800/50;
+    @apply hover:brightness-120;
     @apply border border-white/10 rounded;
     @apply px-2 py-1;
     @apply cursor-pointer;
@@ -97,8 +97,8 @@
   }
 
   :is(.zb-action-delete) {
-    @apply text-pine-100/50 bg-pine-800/90;
-    @apply hover:brightness-150 hover:text-red-400/90;
+    @apply text-pine-100/50 bg-pine-info-200/90;
+    @apply hover:brightness-120;
     @apply border border-white/10 rounded;
     @apply px-2 py-1;
     @apply cursor-pointer;
