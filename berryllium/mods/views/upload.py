@@ -133,6 +133,8 @@ class ModCreateStep2(FormView):
                 context = self.get_context_data()
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
+        else:
+            print("No file uploaded or file failed validation.")
 
         return super().form_valid(form)
 
@@ -140,16 +142,18 @@ class ModCreateStep2(FormView):
         """
         Handle navigation based on which button was clicked (Next vs Previous).
         """
-        previous = self.request.POST.get("action") == "previous"
-        if previous:
+        action = self.request.POST.get("action") == "previous"
+        if action == "previous":
             return lazy_reverse("mod_create_step1")
+        elif action == "uploaded_file":
+            return self.request.path
         return super().get_success_url()
 
 def upload_step3(request):
 
     return render(
         request,
-        "mods/upload/step/4.html",
+        "mods/upload/step/3.html",
         context=init_context(current_index=3, form=None),
     )
 

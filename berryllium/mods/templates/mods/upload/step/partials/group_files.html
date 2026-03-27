@@ -55,9 +55,10 @@
         <template x-data="{keepFile: true}" x-if="keepFile">
             {# djlint:off #}
             <div class="flex items-center gap-3 w-full 
-                        bg-pine-800 rounded-lg px-2 py-1 text-sm text-white/80 
-                        border border-pine-700/50 focus:ring-2 focus:ring-gold-500/50 
-                        focus:border-transparent hover:bg-pine-900"
+                        bg-pine-draggable-200 rounded-lg px-2 py-1 text-sm text-white/80 
+                        border-1 border-pine-draggable-100 focus:ring-2 focus:ring-gold-500/50 
+                        focus:border-transparent hover:brightness-110
+                        box-shadow-md group-hover:shadow-lg"
             {# djlint:on #}
             :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
             id="draggableFile"
