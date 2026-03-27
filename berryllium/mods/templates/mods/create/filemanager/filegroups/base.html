@@ -26,7 +26,7 @@
     {# djlint:on #}
     class="space-y-6">
     {% for group, files in file_groups %}
-        {% include "mods/upload/step/partials/group_filegroup.html" with group=group files=files %}
+        {% include "mods/create/filemanager/filegroups/filegroup.html" with group=group files=files %}
     {% endfor %}
     <div class="flex justify-end w-full px-6 mb-4">
         <button class="zb-action flex items-center justify-center"

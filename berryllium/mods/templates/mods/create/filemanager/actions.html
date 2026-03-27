@@ -14,7 +14,7 @@
 </button>
 {% if file_groups|length > 1 %}
     <button type="button"
-        class="zb-action-delete"
+        class="zb-action"
         hx-post="{% url 'hx_remove_filegroup_form' fg_id=group_id %}"
         hx-trigger="click"
         hx-swap="none"

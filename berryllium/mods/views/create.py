@@ -25,8 +25,8 @@ class ModCreateLanding(TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
-    template_name = "mods/upload/base.html"
-    success_url = "/mods/upload/s1"
+    template_name = "mods/create/base.html"
+    success_url = "/mods/create/s1"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +46,7 @@ class ModCreateStep1(CreateView):
     """
     model = Mod
     form_class = ModCategoriesForm
-    template_name = "mods/upload/step/1.html"
+    template_name = "mods/create/step/1.html"
     success_url = lazy_reverse("mod_create_step2")
 
     def form_valid(self, form):
@@ -79,13 +79,13 @@ class ModCreateStep1(CreateView):
         return kwargs
 
 
-class ModCreateStep2(FormView):
+class ModCreateFiles(FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
     form_class = ModFileUploadForm
-    template_name = "mods/upload/step/2.html"
-    success_url = "/mods/upload/s3"
+    template_name = "mods/create/filemanager/base.html"
+    success_url = "/mods/create/s3"
 
     def get_context_data(self, **kwargs):
         """
@@ -124,15 +124,21 @@ class ModCreateStep2(FormView):
         """
         clean_file = form.cleaned_data["file"]
         mod_id = self.request.session.get("session_id")
-
+        print("form_valid called with file:", clean_file and clean_file.name, "and mod_id:", mod_id)
         if clean_file:
+            print("Attempting to upload file:", clean_file.name)
             file = upload_file(clean_file, mod_id=mod_id)
             if file:
+                print("File uploaded successfully:", file)
                 # re-render form with new file included in existing_files
                 existing_files = self.get_context_data().get("existing_files", [])
                 context = self.get_context_data()
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
+            else:
+                print("Failed to upload file:", clean_file.name)
+        else:
+            print("No file uploaded or file failed validation.")
 
         return super().form_valid(form)
 
@@ -140,16 +146,18 @@ class ModCreateStep2(FormView):
         """
         Handle navigation based on which button was clicked (Next vs Previous).
         """
-        previous = self.request.POST.get("action") == "previous"
-        if previous:
+        action = self.request.POST.get("action") == "previous"
+        if action == "previous":
             return lazy_reverse("mod_create_step1")
+        elif action == "uploaded_file":
+            return self.request.path
         return super().get_success_url()
 
 def upload_step3(request):
 
     return render(
         request,
-        "mods/upload/step/4.html",
+        "mods/create/step/3.html",
         context=init_context(current_index=3, form=None),
     )
 

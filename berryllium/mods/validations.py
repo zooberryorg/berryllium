@@ -42,7 +42,7 @@ def hx_process_url_field(request):
         )
         return render(
             request,
-            "mods/upload/step/partials/hx_errors.html",
+            "mods/create/step/partials/hx_errors.html",
             {"error_message": error_message},
         )
 
@@ -77,7 +77,7 @@ def hx_validate_filegroup_name(request, fg_id):
     if errors:
         return render(
             request,
-            "mods/upload/step/partials/hx_errors.html",
+            "mods/create/step/partials/hx_errors.html",
             {"error_message": errors[0]},
         )
 
@@ -113,7 +113,7 @@ def hx_validate_filegroup_description(request, fg_id):
         )
         return render(
             request,
-            "mods/upload/step/partials/hx_errors.html",
+            "mods/create/step/partials/hx_errors.html",
             {"error_message": errors[0]},
         )
 
@@ -150,7 +150,7 @@ def hx_validate_singlefile_title(request, file_id):
     if errors:
         return render(
             request,
-            "mods/upload/step/partials/hx_errors.html",
+            "mods/create/step/partials/hx_errors.html",
             {"error_message": errors[0]},
         )
 
@@ -177,7 +177,7 @@ def hx_validate_singlefile_description(request, file_id):
     if errors:
         return render(
             request,
-            "mods/upload/step/partials/hx_errors.html",
+            "mods/create/step/partials/hx_errors.html",
             {"error_message": errors[0]},
         )
 
@@ -290,7 +290,7 @@ def hx_empty_filegroups_warning(request):
     if empty_groups_count > 0:
         return render(
             request,
-            "mods/upload/step/partials/group_empty_modal.html",
+            "mods/create/step/partials/group_empty_modal.html",
             {"empty_group_len": empty_groups_count},
         )
 

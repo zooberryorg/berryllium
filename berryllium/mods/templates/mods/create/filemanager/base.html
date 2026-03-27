@@ -1,8 +1,9 @@
 {% load static %}
 <!-- progress bar -->
 <div class="px-6 pt-6">
-    {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
+{% include "mods/create/filemanager/blurb.html" %}
 <div x-data="fileInputProcessor()">
     <form hx-post="{% url 'mod_create_step2' %}"
           hx-target="#upload-frame"
@@ -23,7 +24,7 @@
         <div class="space-y-4 mt-6 mb-6">
             <div class="px-6" x-ref="dropzoneBlock">
                 <!-- Drag and Drop Zone -->
-                {% include "mods/upload/step/partials/dropzone.html" %}
+                {% include "mods/create/filemanager/dropzone.html" %}
                 <!-- Hidden submit button for htmx -->
                 <button type="submit"
                         x-ref="submitBtn"
@@ -40,10 +41,9 @@
             </div>
         </div>
         <!-- Previously Uploaded Files (from session) -->
-        {% include "mods/upload/step/partials/group_toggle.html" %}
-        {% include "mods/upload/step/partials/group_filegroups.html" with file_groups=file_groups group_formset=group_formset %}
+        {% include "mods/create/filemanager/filegroups/base.html" with file_groups=file_groups group_formset=group_formset %}
         <!-- Action Buttons -->
-        {% include "mods/upload/actions.html" %}
+        {% include "mods/create/actions.html" %}
     </form>
 </div>
 <style>[x-cloak] { display: none !important; }</style>

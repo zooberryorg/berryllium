@@ -1,0 +1,39 @@
+<label
+    {# djlint:off #}
+    x-init="$watch('toggled', value => {
+        if (!value) {
+            $refs.fileGroups.classList.add('disabled');
+        } else {
+            $refs.fileGroups.classList.remove('disabled');
+        }
+    })"
+    class="
+    inline-flex cursor-pointer pl-4 py-2 w-120 bg-pine-special-200 
+    border border-pine-special-100 rounded-full shadow-xs mb-4 mt-6 
+    items-center hover:brightness-110 transition-all 
+    transition-duration-300">
+    {# djlint:on #}
+    <input type="checkbox"
+           x-model="toggled"
+           value="{{ group_manager_toggled|yesno:'true,false' }}"
+           id="group_manager_toggle"
+           name="group_manager_toggle"
+           class="sr-only peer"
+           hx-post="{% url 'hx_toggle_group_manager' %}"
+           hx-trigger="change"
+           hx-include="[name='group_manager_toggle']"
+           hx-swap="none">
+    {# djlint:off #}
+    <div class="
+        shrink-0 relative peer w-9 h-5 rounded-full
+        bg-pine-400/30 after:bg-pine-info-200 peer-checked:bg-gold-400
+        peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full 
+        peer-checked:after:border-buffer after:content-[''] after:absolute 
+        after:top-[2px] after:start-[2px]  after:rounded-full 
+        after:h-4 after:w-4 after:transition-all">
+    </div>
+    {# djlint:on #}
+    <div class="ms-2.5 select-none text-white/80">
+        <p class="text-xs text-heading mb-1 flex">Enable File Manager</p>
+    </div>
+</label>

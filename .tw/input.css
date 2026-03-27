@@ -21,6 +21,19 @@
   --color-pine-900: #0b0e09;
   --color-pine-soft: #5a6a5b;
 
+  /* Special BG Colors */
+  --color-pine-info-200: #364b2d;
+  --color-pine-info-100: #5b844f;
+  --color-pine-special-300: #527643;
+  --color-pine-special-200: #5b844f;
+  --color-pine-special-100: #7ea56a;
+  --color-pine-draggable-200: #304429;
+  --color-pine-draggable-100: #3c4d37;
+  --color-pine-drop: #686b3c;
+
+  /* Gray color scale */
+  --color-granite-200: #c8ccc6;
+
   /* Gold color scale */
   --color-gold-50: #fef9ed;
   --color-gold-100: #fdf0d1;
@@ -75,19 +88,21 @@
   }
 
   :is(.zb-action) {
-    @apply text-pine-100/50 bg-pine-800/90;
-    @apply hover:text-gold-400/70 hover:border-gold-400/20;
+    @apply text-pine-100/50 bg-pine-800/50;
+    @apply hover:brightness-120;
     @apply border border-white/10 rounded;
     @apply px-2 py-1;
     @apply cursor-pointer;
+    @apply transition-all duration-200;
   }
 
   :is(.zb-action-delete) {
-    @apply text-pine-100/50 bg-pine-800/90;
-    @apply hover:text-red-400/50 hover:border-gold-400/20;
+    @apply text-pine-100/50 bg-pine-info-200/90;
+    @apply hover:brightness-120;
     @apply border border-white/10 rounded;
     @apply px-2 py-1;
     @apply cursor-pointer;
+    @apply transition-all duration-200;
   }
 
   :is(.file-draggable) {
