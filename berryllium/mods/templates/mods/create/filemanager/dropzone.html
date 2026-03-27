@@ -1,0 +1,40 @@
+<div @dragenter.prevent="isDragging = true"
+     @dragover.prevent="isDragging = true"
+     @dragleave.prevent="isDragging = false"
+     @drop.prevent="handleDrop($event)"
+     @click="$refs.fileInput.click()"
+     :class="isDragging ? 'border-gold-400 bg-gold-400' : 'border-white/20 hover:brightness-110'"
+     class="border-3 border-dashed rounded-xl p-8 text-center cursor-pointer bg-pine-400 transition-all hover:border-gold-400/50 hover:brightness-110">
+    <div class="flex flex-col items-center gap-3">
+        <ion-icon name="cloud-upload" class="text-4xl" :class="isDragging ? 'text-gold-400' : 'text-white/70'"></ion-icon>
+        <div>
+            <p class="text-white font-medium" x-show="!isDragging && !isUploading">Click to upload or drag and drop</p>
+            <p class="text-gold-400 font-medium" x-show="isDragging" x-cloak>Drop files here</p>
+            <p class="text-gold-200 font-medium flex items-center gap-2 justify-center"
+               x-show="isUploading"
+               x-cloak>
+                <ion-icon name="sync" class="animate-spin"></ion-icon>
+                Uploading...
+            </p>
+            <p class="text-white/50 text-sm mt-1">ZIP, ZTD, Z2F files only (Max 100MB each)</p>
+        </div>
+    </div>
+    <input type="file"
+        {# djlint:off #}
+           x-init="$watch('isUploading', value => { 
+                if (value) {
+                    disableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
+                } else {
+                    enableInput($refs.dropzoneBlock, 'isDropzoneDisabled');
+                }
+            })"
+        {# djlint:on #}
+        name="file"
+        id="id_file"
+        x-ref="fileInput"
+        @change="handleFileSelect($event)"
+        class="hidden"
+        accept=".zip,.ztd,.z2f"
+        action="file_uploaded"
+        multiple>
+    </div>

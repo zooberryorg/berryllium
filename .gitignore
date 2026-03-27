@@ -212,12 +212,8 @@ package-lock.json
 package.json
 
 # File uploads
-filemanager/
+files/
 
 # css files
 *.css
 !.tw/input.css
-
-# Files
-
-files/
