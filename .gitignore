@@ -212,8 +212,7 @@ package-lock.json
 package.json
 
 # File uploads
-files/
-
+/files/
 # css files
 *.css
 !.tw/input.css

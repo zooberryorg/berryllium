@@ -1,0 +1,25 @@
+<div class="flex flex-col w-full">
+    <input type="text"
+           name="fileform-{{ file.instance.id }}-title"
+           class="px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl transition-all duration-200 hover:text-white focus:text-white"
+            
+           autocomplete="off"
+           placeholder="{{ file.instance.filename }}"
+           :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
+           x-sort:ignore
+           hx-post="{% url 'hx_validate_singlefile_title' file_id=file.instance.id %}"
+           hx-trigger="input delay:500ms"
+           hx-target="#file-title-errors-{{ file.instance.id }}"
+           hx-swap="innerHTML"
+           hx-on::after-swap="htmx.process(this)"
+           @keydown.escape="$el.blur()"
+           @keydown.enter.prevent="$el.blur()"
+           {% if file.instance.title != None %}value="{{ file.instance.title }}"{% endif %}>
+    <div class="pl-2 self-start">
+        <p class="text-xs py-1 px-2 bg-pine-400/80 text-pine-200/10 max-w-max rounded-full">{{ file.instance.size|filesizeformat }}</p>
+    </div>
+    <div class="text-red-500 text-sm"
+         id="file-title-errors-{{ file.instance.id }}">
+        {% if file.instance.filename.errors %}{{ file.instance.filename.errors|join:", " }}{% endif %}
+    </div>
+</div>

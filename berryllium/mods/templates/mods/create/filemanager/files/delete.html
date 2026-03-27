@@ -1,0 +1,17 @@
+<button type="button"
+    class="zb-action-delete hidden group-hover:flex"
+    
+    x-sort:ignore
+    {# djlint:off #}
+        @click="() => { 
+            keepFile = false; 
+            htmx.ajax('POST', '{% url 'remove_temp_file' file.instance.id %}', {
+                headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                values: { file_id: {{ file.instance.id }} },
+                onAfterSwap: () => {
+                    $dispatch('files-state-changed');
+                }
+            });
+    }"{# djlint:on #}>
+    <ion-icon name="trash"></ion-icon>
+</button>
