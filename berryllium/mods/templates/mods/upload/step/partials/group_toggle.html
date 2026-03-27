@@ -8,7 +8,7 @@
         }
     })"
     {# djlint:on #}
-    class=" inline-flex cursor-pointer p-4 bg-pine-300/80 border border-white/5 rounded-full shadow-xs mb-4 mt-6 items-center hover:bg-gold-400/10">
+    class=" inline-flex cursor-pointer pl-4 py-2 w-120 bg-pine-special-200 border border-pine-special-100 rounded-full shadow-xs mb-4 mt-6 items-center hover:brightness-110 transition-all transition-duration-300">
     <input type="checkbox"
            x-model="toggled"
            value="{{ group_manager_toggled|yesno:'true,false' }}"
@@ -19,9 +19,9 @@
            hx-trigger="change"
            hx-include="[name='group_manager_toggle']"
            hx-swap="none">
-    <div class="shrink-0 relative w-9 h-5 bg-pine-soft/50 peer-focus:ring-4 peer-focus:ring-gold-400/50 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-pine-500 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-400">
+    <div class="shrink-0 relative w-9 h-5 bg-pine-400 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-pine-100 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-400">
     </div>
     <div class="ms-2.5 select-none text-white/80">
-        <p class="text-sm font-semibold text-heading mb-1 flex">Enable File Manager</p>
+        <p class="text-xs text-heading mb-1 flex">Enable File Manager</p>
     </div>
 </label>

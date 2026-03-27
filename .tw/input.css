@@ -21,6 +21,16 @@
   --color-pine-900: #0b0e09;
   --color-pine-soft: #5a6a5b;
 
+  /* Special BG Colors */
+  --color-pine-info-200: #364b2d;
+  --color-pine-info-100: #5b844f;
+  --color-pine-special-300: #527643;
+  --color-pine-special-200: #5b844f;
+  --color-pine-special-100: #7ea56a;
+
+  /* Gray color scale */
+  --color-granite-200: #c8ccc6;
+
   /* Gold color scale */
   --color-gold-50: #fef9ed;
   --color-gold-100: #fdf0d1;
