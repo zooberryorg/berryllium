@@ -1,7 +1,7 @@
 <div class="flex flex-col w-full">
     {# djlint:off #}
             <textarea type="text"
-                x-data="textFieldExpand({ content: '{{ file.instance.description }}', ref: 'collapsibleSingleFileDesc' })"
+                x-data="textFieldExpand({ ref: 'collapsibleSingleFileDesc' })"
                 x-ref="collapsibleSingleFileDesc"
                 x-sort:ignore
 
@@ -9,7 +9,6 @@
                 {% if file.instance.description != None %}value="{{ file.instance.description }}"{% endif %}
                 class="px-2 py-1 text-sm text-white/50 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
                 placeholder="File Description"
-                value="{{ file.instance.description }}"
 
                 :rows="focused ? 4 : 1"
                 :class="focused ? 'h-15' : 'h-11'"

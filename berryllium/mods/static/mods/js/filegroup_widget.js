@@ -1,8 +1,6 @@
-function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
+function textFieldExpand({ref = null }) {
     return {
         focused: false, // textfield is focused
-        content: content, // textfield content
-        trimLen: trimLen, // number of characters to show when not focused
         ref: ref,
 
         expand() {

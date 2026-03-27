@@ -1,14 +1,13 @@
 {# djlint:off #}
-<div x-data="textFieldExpand({ content: '{{ group.instance.description }}' })">
+<div x-data="textFieldExpand({ ref: 'collapsibleGroupDesc' })">
     <textarea 
         type="text"
         name="form-{{ group.instance.id }}-description"
         {% if group.instance.description != None %}value="{{ group.instance.description }}"{% endif %}
         class="px-2 py-1 text-sm text-granite-200 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
         placeholder="Group Description"
-        value="{{ group.instance.description }}"
 
-        x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
+        x-data="textFieldExpand({ ref: 'collapsibleGroupDesc' })"
         x-ref="collapsibleGroupDesc"
         
         :rows="focused ? 4 : 1"
