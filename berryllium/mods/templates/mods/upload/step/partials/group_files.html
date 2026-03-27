@@ -60,7 +60,7 @@
                         focus:border-transparent hover:brightness-110
                         box-shadow-md group-hover:shadow-lg"
             {# djlint:on #}
-            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-2'"
+            :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-3 mb-3'"
             id="draggableFile"
             data-file-id="{{ file.instance.id }}"
             x-ref="files"
@@ -75,7 +75,7 @@
             <div class="flex flex-col w-full">
                 <input type="text"
                        name="fileform-{{ file.instance.id }}-title"
-                       class="text-white/80 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:bg-gold-400/10"
+                       class="text-white/50 px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200"
                        autocomplete="off"
                        placeholder="{{ file.instance.filename }}"
                        :class="$store.dnd.isDragging ? 'pointer-events-none' : ''"
@@ -116,7 +116,7 @@
 
                             name="fileform-{{ file.instance.id }}-description"
                             {% if file.instance.description != None %}value="{{ file.instance.description }}"{% endif %}
-                            class="px-2 py-1 text-sm text-white/80 focus:outline-none w-full rounded-xl hover:bg-gold-400/10 transition-all duration-200 resize-none"
+                            class="px-2 py-1 text-sm text-white/50 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
                             placeholder="File Description"
 
                             hx-post="{% url 'hx_validate_singlefile_description' file_id=file.instance.id %}"

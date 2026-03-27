@@ -124,15 +124,19 @@ class ModCreateStep2(FormView):
         """
         clean_file = form.cleaned_data["file"]
         mod_id = self.request.session.get("session_id")
-
+        print("form_valid called with file:", clean_file and clean_file.name, "and mod_id:", mod_id)
         if clean_file:
+            print("Attempting to upload file:", clean_file.name)
             file = upload_file(clean_file, mod_id=mod_id)
             if file:
+                print("File uploaded successfully:", file)
                 # re-render form with new file included in existing_files
                 existing_files = self.get_context_data().get("existing_files", [])
                 context = self.get_context_data()
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
+            else:
+                print("Failed to upload file:", clean_file.name)
         else:
             print("No file uploaded or file failed validation.")
 

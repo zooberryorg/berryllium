@@ -48,6 +48,7 @@ def upload_file(uploaded_file, mod_id=None):
     Handles file upload and validation.
     """
     if mod_id is None:
+        print("No mod ID provided for file upload.")
         return None
 
     # Save to storage (temp namespace by session)
@@ -69,6 +70,7 @@ def upload_file(uploaded_file, mod_id=None):
 
     # if file duplicate, delete newly uploaded file from storage
     if existing_file:
+        print("Duplicate file detected. Will not upload.")
         return None
 
     # find file group that this file belongs to (if it exists)
