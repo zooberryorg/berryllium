@@ -1,23 +1,23 @@
 from django.urls import path
-from berryllium.mods.views create, explore
+from berryllium.mods.views import create, explore
 import berryllium.mods.validations as validations
 
 urlpatterns = [
     # Upload form (CREATE)
-    path("mods/upload/", upload.ModCreateLanding.as_view(), name="mod_create_landing"),
-    path("mods/upload/s1", upload.ModCreateStep1.as_view(), name="mod_create_step1"),
-    path("mods/upload/s2", upload.ModCreateFiles.as_view(), name="mod_create_step2"),
-    path("mods/upload/s3", upload.upload_step3, name="upload_step3"),
+    path("mods/create/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
+    path("mods/create/s1", create.ModCreateStep1.as_view(), name="mod_create_step1"),
+    path("mods/create/s2", create.ModCreateFiles.as_view(), name="mod_create_step2"),
+    path("mods/create/s3", create.upload_step3, name="upload_step3"),
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
-        upload.remove_temp_file,
+        create.remove_temp_file,
         name="remove_temp_file",
     ),
     # ---------------------------------------------- Explore mods (READ)
     path("explore/mods/", explore.mods, name="explore_mods"),
     # ---------------------------------------------- Session management
-    path("mods/upload/cancel/", upload.cancel_mod_upload, name="cancel_mod_upload"),
+    path("mods/create/cancel/", create.cancel_mod_upload, name="cancel_mod_upload"),
     # ---------------------------------------------- HTMX endpoints
     path("mods/validate-url/", validations.hx_process_url_field, name="hx_process_url_field"),
     path(

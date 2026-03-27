@@ -1,7 +1,7 @@
 <!-- scrollable form -->
 <!-- progress bar -->
 <div class="px-6 pt-6">
-    {% include "mods/upload/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 <form hx-post="{% url 'mod_create_step1' %}"
       hx-target="#upload-frame"
@@ -17,10 +17,10 @@
                         {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
                     </label>
                     {{ field }}
-                    {% include "mods/upload/field_errors.html" with field=field %}
+                    {% include "mods/create/field_errors.html" with field=field %}
                 </div>
             {% endfor %}
         </div>
     </div>
-    {% include "mods/upload/actions.html" %}
+    {% include "mods/create/actions.html" %}
 </form>

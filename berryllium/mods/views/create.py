@@ -25,8 +25,8 @@ class ModCreateLanding(TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
-    template_name = "mods/upload/base.html"
-    success_url = "/mods/upload/s1"
+    template_name = "mods/create/base.html"
+    success_url = "/mods/create/s1"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -46,7 +46,7 @@ class ModCreateStep1(CreateView):
     """
     model = Mod
     form_class = ModCategoriesForm
-    template_name = "mods/upload/step/1.html"
+    template_name = "mods/create/step/1.html"
     success_url = lazy_reverse("mod_create_step2")
 
     def form_valid(self, form):
@@ -84,8 +84,8 @@ class ModCreateFiles(FormView):
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
     form_class = ModFileUploadForm
-    template_name = "mods/upload/step/2.html"
-    success_url = "/mods/upload/s3"
+    template_name = "mods/create/filemanager/base.html"
+    success_url = "/mods/create/s3"
 
     def get_context_data(self, **kwargs):
         """
@@ -157,7 +157,7 @@ def upload_step3(request):
 
     return render(
         request,
-        "mods/upload/step/3.html",
+        "mods/create/step/3.html",
         context=init_context(current_index=3, form=None),
     )
 
