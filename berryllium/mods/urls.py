@@ -1,5 +1,5 @@
 from django.urls import path
-from berryllium.mods.views import upload, explore
+from berryllium.mods.views create, explore
 import berryllium.mods.validations as validations
 
 urlpatterns = [
