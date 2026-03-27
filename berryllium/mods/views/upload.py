@@ -79,7 +79,7 @@ class ModCreateStep1(CreateView):
         return kwargs
 
 
-class ModCreateStep2(FormView):
+class ModCreateFiles(FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """

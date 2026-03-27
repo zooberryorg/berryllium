@@ -10,7 +10,7 @@
     {# djlint:off #}
         :class="
             $store.dnd.isDragging ? 
-            'bg-gold-400/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' 
+            'bg-pine-special-100/10 border-2 border-dashed border-gold-400 p-2 rounded-xl' 
             : 'border-transparent'"
         x-sort:config="{ 
             forceFallback: true, 
@@ -58,7 +58,7 @@
                         bg-pine-draggable-200 rounded-lg px-2 py-1 text-sm text-white/80 
                         border-1 border-pine-draggable-100 focus:ring-2 focus:ring-gold-500/50 
                         focus:border-transparent hover:brightness-110
-                        box-shadow-md group-hover:shadow-lg"
+                        shadow-md hover:shadow-lg"
             {# djlint:on #}
             :class="$store.dnd.isDragging ? 'gap-3 mb-1 bg-pine-800' : 'gap-3 mb-3'"
             id="draggableFile"
