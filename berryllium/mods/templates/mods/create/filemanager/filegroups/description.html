@@ -6,10 +6,10 @@
         {% if group.instance.description != None %}value="{{ group.instance.description }}"{% endif %}
         class="px-2 py-1 text-sm text-granite-200 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
         placeholder="Group Description"
+        value="{{ group.instance.description }}"
 
         x-data="textFieldExpand({ content: '{{ group.instance.description }}', ref: 'collapsibleGroupDesc' })"
         x-ref="collapsibleGroupDesc"
-        x-init="$nextTick(() => updateTrimLength($refs.collapsibleGroupDesc.offsetWidth))"
         
         :rows="focused ? 4 : 1"
         :class="focused ? 'h-15' : 'h-7'"
@@ -19,7 +19,6 @@
         @blur="collapse()"
         @keydown.escape="$el.blur()"
         @keydown.enter.prevent="$el.blur()"
-        @input="content = $el.value, updateTrimLength($el.offsetWidth)"
 
         hx-post="{% url 'hx_validate_filegroup_description' fg_id=group.instance.id %}"
         hx-trigger="input delay:500ms"
