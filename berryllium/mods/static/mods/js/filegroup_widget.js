@@ -12,22 +12,6 @@ function textFieldExpand({ trimLen = 0, content = "", ref = null }) {
         collapse() {
             this.focused = false;
         },
-
-        trimDisplayedContent() {
-            if (this.content.length > trimLen) {
-                return this.content.slice(0, trimLen) + "...";
-            } else {
-                return this.content;
-            }
-        },
-
-        updateTrimLength(elwidth) {
-            // average width of a character in pixels
-            const avgCharWidth = 8;
-            this.trimLen = Math.floor(elwidth / avgCharWidth);
-            console.log("Updated trim length to: " + this.trimLen);
-        },
-
     }
 }
 
