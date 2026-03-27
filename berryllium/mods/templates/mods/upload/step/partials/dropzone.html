@@ -3,8 +3,8 @@
      @dragleave.prevent="isDragging = false"
      @drop.prevent="handleDrop($event)"
      @click="$refs.fileInput.click()"
-     :class="isDragging ? 'border-gold-400 bg-gold-400/10' : 'border-white/20 bg-white/5'"
-     class="border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-all hover:border-gold-400/50 hover:bg-white/10">
+     :class="isDragging ? 'border-gold-400 bg-gold-400' : 'border-white/20 hover:brightness-110'"
+     class="border-3 border-dashed rounded-xl p-8 text-center cursor-pointer bg-pine-400 transition-all hover:border-gold-400/50 hover:brightness-110">
     <div class="flex flex-col items-center gap-3">
         <ion-icon name="cloud-upload" class="text-4xl" :class="isDragging ? 'text-gold-400' : 'text-white/70'"></ion-icon>
         <div>
