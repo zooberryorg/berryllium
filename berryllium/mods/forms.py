@@ -405,4 +405,29 @@ class ModPictureForm(forms.Form):
         ),
     )
 
+    def clean_caption(self):
+        caption = self.cleaned_data.get("caption", "").strip()
+
+        if len(caption) == 0:
+            return None
+
+        try:
+            MinLengthValidator(MIN_TEXTFIELD_LENGTH)(caption)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Picture caption must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
+        try:
+            MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(caption)
+        except ValidationError:
+            raise forms.ValidationError(
+                f"Picture caption cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+            )
+        try:
+            ProhibitNullCharactersValidator()(caption)
+        except ValidationError:
+            raise forms.ValidationError("Picture caption cannot contain null characters.")
+
+        return caption
+
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
