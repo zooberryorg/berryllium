@@ -378,6 +378,14 @@ class ModPictureUploadForm(forms.Form):
             raise forms.ValidationError(
                 f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
+        
+        if cleaned_picture.name in [pic['filename'] for pic in self.existing_files]:
+            # rename file by appending a number to the end of the filename
+            base_name, extension = cleaned_picture.name.rsplit(".", 1)
+            counter = 1
+            while f"{base_name}_{counter}.{extension}" in [pic['filename'] for pic in self.existing_files]:
+                counter += 1
+            cleaned_picture.name = f"{base_name}_{counter}.{extension}"
 
         return cleaned_picture
 
