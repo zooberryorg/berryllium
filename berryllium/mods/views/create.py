@@ -85,7 +85,7 @@ class ModCreateFiles(FormView):
     """
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
-    success_url = "/mods/create/s3"
+    success_url = lazy_reverse("mod_create_step3")
 
     def get_context_data(self, **kwargs):
         """
@@ -152,6 +152,14 @@ class ModCreateFiles(FormView):
         elif action == "uploaded_file":
             return self.request.path
         return super().get_success_url()
+    
+class ModCreatePictures(FormView):
+    """
+    Mod Creation Multi-Step 3: Upload Pictures for the Mod
+    """
+    form_class = ModFileUploadForm  # Placeholder, replace with actual picture upload form
+    template_name = "mods/create/pictures/base.html"
+    success_url = "/mods/create/s3"
 
 def upload_step3(request):
 
