@@ -215,7 +215,7 @@ def hx_remove_filegroup_form(request, fg_id):
     print("Attempting to delete ModFileGroup with ID:", fg_id)
     ModFileGroup.objects.filter(id=fg_id).delete()
     update_filegroup_order(request.session.get("session_id"))
-    return HttpResponse()
+    return redirect("mod_create_step2")
 
 
 @require_POST
