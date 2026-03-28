@@ -25,6 +25,7 @@ from berryllium.mods.settings import (
     MOD_CATEGORIES,
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
+    MAX_IMAGE_SIZE
 )
 
 
@@ -345,7 +346,63 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
+    
+class ModPictureUploadForm(forms.Form):
+    """
+    This is Step 3 of the file upload form, which handles
+    the picture upload and validation.
+    """
 
+    picture = forms.ImageField(
+        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*"}),
+        required=False,
+    )
 
+    def clean_picture(self):
+        cleaned_picture = self.cleaned_data.get("picture")
+
+        if not cleaned_picture:
+            return cleaned_picture
+
+        # Validate image size
+        if cleaned_picture.size > MAX_IMAGE_SIZE:
+            raise forms.ValidationError(
+                f"Picture size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+            )
+        
+        if cleaned_picture.size == 0:
+            raise forms.ValidationError("The uploaded picture is empty.")
+
+         # Check for illegal characters in filename
+        if any(char in cleaned_picture.name for char in ILLEGAL_CHARACTERS):
+            raise forms.ValidationError(
+                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
+            )
+        
+        if cleaned_picture.name in [pic['filename'] for pic in self.existing_files]:
+            # rename file by appending a number to the end of the filename
+            base_name, extension = cleaned_picture.name.rsplit(".", 1)
+            counter = 1
+            while f"{base_name}_{counter}.{extension}" in [pic['filename'] for pic in self.existing_files]:
+                counter += 1
+            cleaned_picture.name = f"{base_name}_{counter}.{extension}"
+
+        return cleaned_picture
+
+class ModPictureForm(forms.Form):
+    """
+    This form is for editing single pictures within the mod creation process.
+    """
+
+    caption = forms.CharField(
+        required=False,
+        max_length=MAX_TEXTFIELD_LENGTH,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Picture caption",
+                "class": "bg-transparent text-white text-sm w-full focus:outline-none",
+            }
+        ),
+    )
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)

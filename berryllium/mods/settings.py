@@ -5,7 +5,7 @@
 UPLOAD_NAVIGATION = [
     {"name": "Basic Information", "url": "mod_create_step1", "icon": "info-circle"},
     {"name": "Upload Files", "url": "mod_create_step2", "icon": "upload"},
-    {"name": "Upload Pictures", "url": "upload_step3", "icon": "image"},
+    {"name": "Upload Pictures", "url": "mod_create_step3", "icon": "image"},
     {"name": "Details & Settings", "url": "upload_step3", "icon": "gear"},
     {"name": "Review & Submit", "url": "upload_step3", "icon": "check-circle"},
 ]
@@ -19,6 +19,7 @@ MAX_SUMMARY_LENGTH = 200
 ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 COLLAPSIBLE_WIDGET_ATTRS = {
     "@focus": "expand()",
