@@ -30,6 +30,8 @@
                     }, 300);
                     htmx.ajax('POST', '{% url 'hx_remove_filegroup_form' fg_id=group_id %}', {
                         headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                        target: '#upload-frame',
+                        swap: 'innerHTML',
                         values: { fg_id: {{ group_id }} },
                     });
                 }
@@ -40,6 +42,8 @@
                 }, 300);
                 htmx.ajax('POST', '{% url 'hx_remove_filegroup_form' fg_id=group_id %}', {
                     headers: {'X-CSRFToken': '{{ csrf_token }}'},
+                    target: '#upload-frame',
+                    swap: 'innerHTML',
                     values: { fg_id: {{ group_id }} },
                 });
             }
