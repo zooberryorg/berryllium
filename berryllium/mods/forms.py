@@ -345,7 +345,32 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
+    
+class ModPictureUploadForm(forms.Form):
+    """
+    This is Step 3 of the file upload form, which handles
+    the picture upload and validation.
+    """
 
+    picture = forms.ImageField(
+        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*"}),
+        required=False,
+    )
 
+class ModPictureForm(forms.Form):
+    """
+    This form is for editing single pictures within the mod creation process.
+    """
+
+    caption = forms.CharField(
+        required=False,
+        max_length=MAX_TEXTFIELD_LENGTH,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Picture caption",
+                "class": "bg-transparent text-white text-sm w-full focus:outline-none",
+            }
+        ),
+    )
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
