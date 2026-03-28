@@ -19,6 +19,7 @@ MAX_SUMMARY_LENGTH = 200
 ALLOWED_EXTENSIONS = ["z2f", "ztd", "zip"]
 ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
+MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB
 
 COLLAPSIBLE_WIDGET_ATTRS = {
     "@focus": "expand()",

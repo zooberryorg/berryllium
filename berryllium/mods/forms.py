@@ -357,6 +357,20 @@ class ModPictureUploadForm(forms.Form):
         required=False,
     )
 
+    def clean_picture(self):
+        cleaned_picture = self.cleaned_data.get("picture")
+
+        if not cleaned_picture:
+            return cleaned_picture
+
+        # Validate file size
+        if cleaned_picture.size > MAX_FILE_SIZE:
+            raise forms.ValidationError(
+                f"Picture size exceeds the maximum limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
+            )
+
+        return cleaned_picture
+
 class ModPictureForm(forms.Form):
     """
     This form is for editing single pictures within the mod creation process.
