@@ -25,6 +25,7 @@ from berryllium.mods.settings import (
     MOD_CATEGORIES,
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
+    MAX_IMAGE_SIZE
 )
 
 
@@ -363,10 +364,19 @@ class ModPictureUploadForm(forms.Form):
         if not cleaned_picture:
             return cleaned_picture
 
-        # Validate file size
-        if cleaned_picture.size > MAX_FILE_SIZE:
+        # Validate image size
+        if cleaned_picture.size > MAX_IMAGE_SIZE:
             raise forms.ValidationError(
-                f"Picture size exceeds the maximum limit of {MAX_FILE_SIZE // (1024 * 1024)} MB."
+                f"Picture size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+            )
+        
+        if cleaned_picture.size == 0:
+            raise forms.ValidationError("The uploaded picture is empty.")
+
+         # Check for illegal characters in filename
+        if any(char in cleaned_picture.name for char in ILLEGAL_CHARACTERS):
+            raise forms.ValidationError(
+                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
 
         return cleaned_picture
