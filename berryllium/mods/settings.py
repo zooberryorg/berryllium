@@ -5,7 +5,7 @@
 UPLOAD_NAVIGATION = [
     {"name": "General", "url": "mod_create_step1", "icon": "info-circle"},
     {"name": "Upload Files", "url": "mod_create_step2", "icon": "upload"},
-    {"name": "Upload Pictures", "url": "mod_create_step3", "icon": "image"},
+    {"name": "Upload Images", "url": "mod_create_step3", "icon": "image"},
     {"name": "Details & Settings", "url": "upload_step3", "icon": "gear"},
     {"name": "Review & Submit", "url": "upload_step3", "icon": "check-circle"},
 ]

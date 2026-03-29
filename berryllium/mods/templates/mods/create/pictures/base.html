@@ -24,7 +24,7 @@
         <div class="space-y-4 mt-6 mb-6">
             <div class="px-6" x-ref="dropzoneBlock">
                 <!-- Drag and Drop Zone -->
-                {% include "mods/create/filemanager/dropzone.html" %}
+                {% include "mods/create/pictures/dropzone.html" %}
                 <!-- Hidden submit button for htmx -->
                 <button type="submit"
                         x-ref="submitBtn"
@@ -54,7 +54,6 @@
             isDragging: false,
             draggedFileId: null,
             draggedFromGroupId: null,
-            numEmptyGroups: 0,
         });
     } else {
         document.addEventListener('alpine:init', () => {
@@ -62,7 +61,6 @@
                 isDragging: false,
                 draggedFileId: null,
                 draggedFromGroupId: null,
-                numEmptyGroups: 0,
             });
         });
     }
