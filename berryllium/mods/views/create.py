@@ -161,6 +161,14 @@ class ModCreatePictures(FormView):
     template_name = "mods/create/pictures/base.html"
     success_url = "/mods/create/s3"
 
+    def get_context_data(self, **kwargs):
+        """
+        Get context data for rendering the form, including progress bar information.
+        """
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=2)
+        return context | progress_bar
+
 def upload_step3(request):
 
     return render(

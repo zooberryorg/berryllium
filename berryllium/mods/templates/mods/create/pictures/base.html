@@ -1,0 +1,67 @@
+{% load static %}
+<!-- progress bar -->
+<div class="px-6 pt-6">
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+</div>
+{% include "mods/create/pictures/blurb.html" %}
+<div x-data="fileInputProcessor()">
+    <form hx-post="{% url 'mod_create_step2' %}"
+          hx-target="#upload-frame"
+          hx-swap="innerHTML"
+          enctype="multipart/form-data"
+          hx-encoding="multipart/form-data"
+          x-ref="uploadForm">
+        {% csrf_token %}
+        <!-- non-field errors -->
+        {% if form.non_field_errors %}
+            <div class="px-6 pb-6">
+                <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
+                    <ion-icon name="alert-circle" class="text-red-400 text-xl"></ion-icon>
+                    <span class="text-red-400 text-sm">{{ form.non_field_errors.0 }}</span>
+                </div>
+            </div>
+        {% endif %}
+        <div class="space-y-4 mt-6 mb-6">
+            <div class="px-6" x-ref="dropzoneBlock">
+                <!-- Drag and Drop Zone -->
+                {% include "mods/create/pictures/dropzone.html" %}
+                <!-- Hidden submit button for htmx -->
+                <button type="submit"
+                        x-ref="submitBtn"
+                        class="hidden"
+                        hx-disable="true"
+                        @click.once="isUploading = true">Upload</button>
+                <!-- Error Messages -->
+                {% if form.file.errors %}
+                    <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-3 mt-4 flex items-center gap-2">
+                        <ion-icon name="alert-circle" class="text-red-400 text-xl"></ion-icon>
+                        <span class="text-red-400 text-sm">{{ form.file.errors.0 }}</span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+        <!-- Previously Uploaded Files (from session) -->
+         {% include "mods/create/pictures/images.html" %}
+        <!-- Action Buttons -->
+        {% include "mods/create/actions.html" %}
+    </form>
+</div>
+<style>[x-cloak] { display: none !important; }</style>
+<script>
+    // in case alpine already loaded before
+    if (window.Alpine) {
+        Alpine.store('dnd', {
+            isDragging: false,
+            draggedFileId: null,
+            draggedFromGroupId: null,
+        });
+    } else {
+        document.addEventListener('alpine:init', () => {
+            Alpine.store('dnd', {
+                isDragging: false,
+                draggedFileId: null,
+                draggedFromGroupId: null,
+            });
+        });
+    }
+</script>
