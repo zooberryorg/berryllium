@@ -108,8 +108,9 @@ def upload_image(uploaded_image, mod_id=None):
 
     # Save image to storage
     temp_path = default_storage.save(temp_filename, uploaded_image)
+    print(f"Image saved to temporary path: {temp_path}")
 
-    return {"filename": basename, "size": uploaded_image.size, "temp_path": temp_path}
+    return {"name": basename, "size": uploaded_image.size, "temp_path": temp_path}
 
 
 def create_filegroup_formsets(extra=0):

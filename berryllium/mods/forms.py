@@ -354,7 +354,7 @@ class ModImageUploadForm(forms.Form):
     """
 
     image = forms.ImageField(
-        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*"}),
+        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*", "multiple": True}),
         required=False,
     )
 
@@ -363,35 +363,38 @@ class ModImageUploadForm(forms.Form):
         self.existing_images = existing_images or []
 
     def clean_image(self):
-        cleaned_image = self.cleaned_data.get("image")
-
-        if not cleaned_image:
-            return cleaned_image
+        images = self.files.getlist("image")
+        if not images:
+            return None
+        
+        # ------------------ clean each image and validate
+        cleaned_images = []
 
         # Validate image size
-        if cleaned_image.size > MAX_IMAGE_SIZE:
-            raise forms.ValidationError(
-                f"Image size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
-            )
-        
-        if cleaned_image.size == 0:
-            raise forms.ValidationError("The uploaded image is empty.")
+        for img in images:
+            if img.size > MAX_IMAGE_SIZE:
+                raise forms.ValidationError(
+                    f"Image size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+                )
+            
+            if img.size == 0:
+                raise forms.ValidationError("The uploaded image is empty.")
 
-         # Check for illegal characters in filename
-        if any(char in cleaned_image.name for char in ILLEGAL_CHARACTERS):
-            raise forms.ValidationError(
-                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
-            )
-        
-        if cleaned_image.name in [img['filename'] for img in self.existing_images]:
-            # rename file by appending a number to the end of the filename
-            base_name, extension = cleaned_image.name.rsplit(".", 1)
-            counter = 1
-            while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
-                counter += 1
-            cleaned_image.name = f"{base_name}_{counter}.{extension}"
+            # Check for illegal characters in filename
+            if any(char in img.name for char in ILLEGAL_CHARACTERS):
+                raise forms.ValidationError(
+                    f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
+                )
+            
+            if img.name in [img['filename'] for img in self.existing_images]:
+                # rename file by appending a number to the end of the filename
+                base_name, extension = img.name.rsplit(".", 1)
+                counter = 1
+                while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
+                    counter += 1
+                cleaned_images.append(img)
 
-        return cleaned_image
+        return cleaned_images
 
 class ModImageForm(forms.Form):
     """
