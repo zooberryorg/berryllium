@@ -216,3 +216,4 @@ package.json
 # css files
 *.css
 !.tw/input.css
+/uploads/
