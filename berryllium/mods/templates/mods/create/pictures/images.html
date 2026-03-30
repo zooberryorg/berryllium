@@ -4,7 +4,7 @@
      x-sort>
      {% if images %}
         {% for image in images %}
-            <div id="image"
+            <div id="image-{{ image.id }}"
                 class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
                 x-sort:item>
                 <!-- top right controls -->
@@ -18,7 +18,9 @@
                     <button type="button"
                             x-sort:ignore
                             class="zb-action"
-                            @click="$dispatch('delete-image', { id: {{ image.id }} })">
+                            hx-get="{% url 'delete_temp_image' image.id %}"
+                            hx-target="#image-{{ image.id }}"
+                            hx-swap="outerHTML">
                         <ion-icon name="trash" class="text-sm"></ion-icon>
                     </button>
                 </div>
