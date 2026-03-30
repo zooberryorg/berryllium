@@ -18,7 +18,7 @@
                     <button type="button"
                             x-sort:ignore
                             class="zb-action"
-                            hx-get="{% url 'delete_temp_image' image.id %}"
+                            hx-get="{% url 'hx_remove_temp_image' image.id %}"
                             hx-target="#image-{{ image.id }}"
                             hx-swap="outerHTML">
                         <ion-icon name="trash" class="text-sm"></ion-icon>
