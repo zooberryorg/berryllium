@@ -363,6 +363,12 @@ class MultipleImageInputField(forms.ImageField):
         kwargs.setdefault("widget", MultipleFileInput())
         super().__init__(*args, **kwargs)
 
+    def clean(self, data, initial=None):
+        single_file = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file(d, initial) for d in data]
+        return single_file(data, initial)
+
 class ModImageUploadForm(forms.Form):
     """
     This is Step 3 of the file upload form, which handles
