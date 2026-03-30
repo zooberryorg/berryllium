@@ -10,12 +10,14 @@
                 <!-- top right controls -->
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button type="button"
-                            class="bg-pine-600/80 hover:bg-pine-600 text-white rounded-full p-1"
+                            x-sort:ignore
+                            class="bg-pine-600/80 hover:bg-pine-600 text-white rounded-full p-1 cursor-pointer"
                             @click="$dispatch('edit-image', { id: {{ image.id }} })">
                         <ion-icon name="pencil" class="text-sm"></ion-icon>
                     </button>
                     <button type="button"
-                            class="bg-red-500/80 hover:bg-red-500 text-white rounded-full p-1"
+                            x-sort:ignore
+                            class="bg-red-500/80 hover:bg-red-500 text-white rounded-full p-1 cursor-pointer"
                             @click="$dispatch('delete-image', { id: {{ image.id }} })">
                         <ion-icon name="trash" class="text-sm"></ion-icon>
                     </button>
