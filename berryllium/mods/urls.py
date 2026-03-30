@@ -91,4 +91,9 @@ urlpatterns = [
         validations.hx_upload_images,
         name="hx_upload_images",
     ),
+    path(
+        "mods/remove-temp-image/<int:image_id>/",
+        validations.hx_remove_temp_image,
+        name="hx_remove_temp_image",
+    ),
 ]
