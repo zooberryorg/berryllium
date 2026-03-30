@@ -375,8 +375,7 @@ class ModImageUploadForm(forms.Form):
     the picture upload and validation.
     """
 
-    image = forms.ImageField(
-        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*", "multiple": True}),
+    image = MultipleImageInputField(
         required=False,
     )
 
@@ -386,6 +385,7 @@ class ModImageUploadForm(forms.Form):
 
     def clean_image(self):
         images = self.files.getlist("image")
+        print("Validating uploaded images:", [img.name for img in images])
         if not images:
             return None
         
@@ -414,7 +414,9 @@ class ModImageUploadForm(forms.Form):
                 counter = 1
                 while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
                     counter += 1
-                cleaned_images.append(img)
+            
+            cleaned_images.append(img)
+            
 
         return cleaned_images
 

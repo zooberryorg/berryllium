@@ -183,7 +183,7 @@ class ModCreateImages(FormView):
             for img in uploaded_images:               
                 file = upload_image(img, mod_id=mod_id)
                 if file:
-                    print("Image uploaded successfully:", file.name)
+                    print("Image uploaded successfully:", file["name"])
 
         return super().form_valid(form)
 
