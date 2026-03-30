@@ -346,7 +346,23 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-    
+
+class MultipleFileInput(forms.FileInput):
+    """
+    Custom widget to allow multiple file uploads.
+    """
+
+    allow_multiple_selected = True
+
+class MultipleImageInputField(forms.ImageField):
+    """
+    Custom form field to handle multiple image uploads.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
 class ModImageUploadForm(forms.Form):
     """
     This is Step 3 of the file upload form, which handles
