@@ -2,7 +2,8 @@
      @dragover.prevent="isDragging = true"
      @dragleave.prevent="isDragging = false"
      @drop.prevent="handleDrop($event)"
-     @click="$refs.fileInput.click()"
+     x-ref="dropzoneBlock"
+     @click="$refs.imageInput.click()"
      :class="isDragging ? 'border-gold-400 bg-gold-400' : 'border-white/20 hover:brightness-110'"
      class="border-3 border-dashed rounded-xl p-8 text-center cursor-pointer bg-pine-400 transition-all hover:border-gold-400/50 hover:brightness-110">
     <div class="flex flex-col items-center gap-3">
@@ -29,12 +30,17 @@
                 }
             })"
         {# djlint:on #}
-        name="file"
-        id="id_file"
-        x-ref="fileInput"
-        @change="handleFileSelect($event)"
+        name="image"
+        id="id_images"
+        x-ref="imageInput"
+        @change="console.log('Files selected:', $event.target.files); $refs.imgSubmitBtn.click()"
         class="hidden"
         accept=".jpg,.jpeg,.png,.webp"
         action="file_uploaded"
         multiple>
     </div>
+    <button type="submit"
+        x-ref="imgSubmitBtn"
+        class="hidden"
+        hx-disable="true"
+        @click.once="isUploading = true">Upload</button>

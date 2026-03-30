@@ -1,57 +1,101 @@
 {% load static %}
-<div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-6 mb-6" x-sort>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+<div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-6 mb-6"
+     {% include 'mods/create/pictures/sort_config.html' %}
+     x-sort>
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
-    <div id="image" class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg" x-sort:item> 
-        <div id="image-frame" class="border-r border-pine-600/30 hover:cursor-pointer">
-            <img src="{% static 'mods/images/placeholder.png' %}" alt="Image Upload Placeholder" class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+    <div id="image"
+         class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+         x-sort:item>
+        <div id="image-frame"
+             class="border-r border-pine-600/30 hover:cursor-pointer">
+            <img src="{% static 'mods/images/placeholder.png' %}"
+                 alt="Image Upload Placeholder"
+                 class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
         </div>
         <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
         <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-            <p>Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
+            <p>
+                Example caption for lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
         </div>
     </div>
 </div>

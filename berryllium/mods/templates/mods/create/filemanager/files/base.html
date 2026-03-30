@@ -29,8 +29,7 @@
             @dragstart="onDragStart($event, {{ file.instance.id }})"
             @dragend="onDragEnd($event)"
             x-sort:item>
-            <span class="text-pine-600 px-2 py-1 cursor-grab"
-                  x-sort:handle>
+            <span class="text-pine-600 px-2 py-1 cursor-grab" x-sort:handle>
                 <i class="bi bi-grip-vertical group-hover/file:text-gold-400 text-lg"></i>
             </span>
             {% include 'mods/create/filemanager/files/title.html' %}

@@ -346,52 +346,83 @@ class ModFileUploadForm(forms.Form):
             raise forms.ValidationError("The uploaded file is empty.")
 
         return cleaned_file
-    
-class ModPictureUploadForm(forms.Form):
+
+class MultipleFileInput(forms.FileInput):
+    """
+    Custom widget to allow multiple file uploads.
+    """
+
+    allow_multiple_selected = True
+
+class MultipleImageInputField(forms.ImageField):
+    """
+    Custom form field to handle multiple image uploads.
+    """
+
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file = super().clean
+        if isinstance(data, (list, tuple)):
+            return [single_file(d, initial) for d in data]
+        return single_file(data, initial)
+
+class ModImageUploadForm(forms.Form):
     """
     This is Step 3 of the file upload form, which handles
     the picture upload and validation.
     """
 
-    picture = forms.ImageField(
-        widget=forms.FileInput(attrs={"class": "hidden", "accept": "image/*"}),
+    image = MultipleImageInputField(
         required=False,
     )
 
-    def clean_picture(self):
-        cleaned_picture = self.cleaned_data.get("picture")
+    def __init__(self, *args, existing_images=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.existing_images = existing_images or []
 
-        if not cleaned_picture:
-            return cleaned_picture
+    def clean_image(self):
+        images = self.files.getlist("image")
+        print("Validating uploaded images:", [img.name for img in images])
+        if not images:
+            return None
+        
+        # ------------------ clean each image and validate
+        cleaned_images = []
 
         # Validate image size
-        if cleaned_picture.size > MAX_IMAGE_SIZE:
-            raise forms.ValidationError(
-                f"Picture size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
-            )
-        
-        if cleaned_picture.size == 0:
-            raise forms.ValidationError("The uploaded picture is empty.")
+        for img in images:
+            if img.size > MAX_IMAGE_SIZE:
+                raise forms.ValidationError(
+                    f"Image size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+                )
+            
+            if img.size == 0:
+                raise forms.ValidationError("The uploaded image is empty.")
 
-         # Check for illegal characters in filename
-        if any(char in cleaned_picture.name for char in ILLEGAL_CHARACTERS):
-            raise forms.ValidationError(
-                f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
-            )
-        
-        if cleaned_picture.name in [pic['filename'] for pic in self.existing_files]:
-            # rename file by appending a number to the end of the filename
-            base_name, extension = cleaned_picture.name.rsplit(".", 1)
-            counter = 1
-            while f"{base_name}_{counter}.{extension}" in [pic['filename'] for pic in self.existing_files]:
-                counter += 1
-            cleaned_picture.name = f"{base_name}_{counter}.{extension}"
+            # Check for illegal characters in filename
+            if any(char in img.name for char in ILLEGAL_CHARACTERS):
+                raise forms.ValidationError(
+                    f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
+                )
+            
+            if img.name in [img['filename'] for img in self.existing_images]:
+                # rename file by appending a number to the end of the filename
+                base_name, extension = img.name.rsplit(".", 1)
+                counter = 1
+                while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
+                    counter += 1
+            
+            cleaned_images.append(img)
+            
 
-        return cleaned_picture
+        return cleaned_images
 
-class ModPictureForm(forms.Form):
+class ModImageForm(forms.Form):
     """
-    This form is for editing single pictures within the mod creation process.
+    This form is for editing single images within the mod creation process.
     """
 
     caption = forms.CharField(
@@ -399,7 +430,7 @@ class ModPictureForm(forms.Form):
         max_length=MAX_TEXTFIELD_LENGTH,
         widget=forms.TextInput(
             attrs={
-                "placeholder": "Picture caption",
+                "placeholder": "Image caption",
                 "class": "bg-transparent text-white text-sm w-full focus:outline-none",
             }
         ),
@@ -415,18 +446,18 @@ class ModPictureForm(forms.Form):
             MinLengthValidator(MIN_TEXTFIELD_LENGTH)(caption)
         except ValidationError:
             raise forms.ValidationError(
-                f"Picture caption must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+                f"Image caption must be at least {MIN_TEXTFIELD_LENGTH} characters long."
             )
         try:
             MaxLengthValidator(MAX_TEXTFIELD_LENGTH)(caption)
         except ValidationError:
             raise forms.ValidationError(
-                f"Picture caption cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
+                f"Image caption cannot exceed {MAX_TEXTFIELD_LENGTH} characters."
             )
         try:
             ProhibitNullCharactersValidator()(caption)
         except ValidationError:
-            raise forms.ValidationError("Picture caption cannot contain null characters.")
+            raise forms.ValidationError("Image caption cannot contain null characters.")
 
         return caption
 

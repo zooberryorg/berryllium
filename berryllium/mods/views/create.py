@@ -10,6 +10,7 @@ from berryllium.mods.forms import (
     ModFileUploadForm,
     ModCategoriesForm,
     ModFileGroupForm,
+    ModImageUploadForm,
 )
 from berryllium.mods.models import Mod, ModFileGroup
 from berryllium.mods.services import (
@@ -17,6 +18,7 @@ from berryllium.mods.services import (
     upload_file,
     create_file_group,
     create_filegroup_formsets,
+    upload_image,
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
@@ -153,11 +155,11 @@ class ModCreateFiles(FormView):
             return self.request.path
         return super().get_success_url()
     
-class ModCreatePictures(FormView):
+class ModCreateImages(FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
-    form_class = ModFileUploadForm  # Placeholder, replace with actual picture upload form
+    form_class = ModImageUploadForm  # Placeholder, replace with actual picture upload form
     template_name = "mods/create/pictures/base.html"
     success_url = "/mods/create/s3"
 
@@ -168,6 +170,22 @@ class ModCreatePictures(FormView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=2)
         return context | progress_bar
+    
+    def form_valid(self, form):
+        """
+        Handle uploads and other validations
+        """
+        # get images from form and save to storage, associate with mod, etc.
+        uploaded_images = form.cleaned_data.get("image")
+        mod_id = self.request.session.get("session_id")
+        print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)        
+        if uploaded_images:
+            for img in uploaded_images:               
+                file = upload_image(img, mod_id=mod_id)
+                if file:
+                    print("Image uploaded successfully:", file["name"])
+
+        return super().form_valid(form)
 
 def upload_step3(request):
 

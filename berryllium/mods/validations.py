@@ -348,3 +348,20 @@ def hx_move_filegroup_down(request, current_index):
     swap_order(groups, current_index, "down")
 
     return redirect("mod_create_step2")
+
+@require_POST
+def hx_upload_images(request):
+    """HTMX endpoint to handle image uploads from the dropzone."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when attempting to upload images.")
+        return HttpResponse(status=400)
+
+    # get images
+    images = request.FILES.getlist("images")
+    print(f"Received {len(images)} images for upload in Mod ID: {mod_id}")
+
+    for image in images:
+        print("Processing image:", image.name)
+
+    return HttpResponse(status=204)

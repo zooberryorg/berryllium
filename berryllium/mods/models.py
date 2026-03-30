@@ -224,3 +224,16 @@ class ModFile(models.Model):
 
     def __str__(self):
         return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f'File #{self.pk}'} - {self.filegroup.name}"
+
+class ModImage(models.Model):
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(upload_to="mod_images/")
+    title = models.CharField(max_length=255, blank=True, null=True)
+    caption = models.CharField(max_length=255, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.mod.title} - Image {self.order}"
