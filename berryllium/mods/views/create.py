@@ -10,6 +10,7 @@ from berryllium.mods.forms import (
     ModFileUploadForm,
     ModCategoriesForm,
     ModFileGroupForm,
+    ModImageUploadForm,
 )
 from berryllium.mods.models import Mod, ModFileGroup
 from berryllium.mods.services import (
@@ -157,7 +158,7 @@ class ModCreatePictures(FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
-    form_class = ModFileUploadForm  # Placeholder, replace with actual picture upload form
+    form_class = ModImageUploadForm  # Placeholder, replace with actual picture upload form
     template_name = "mods/create/pictures/base.html"
     success_url = "/mods/create/s3"
 
