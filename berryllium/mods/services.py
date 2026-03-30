@@ -111,9 +111,15 @@ def upload_image(uploaded_image, mod_id=None):
     print(f"Image saved to temporary path: {temp_path}")
 
     # create db row for img
+    img = ModImage.objects.create(
+        mod_id=mod_id,
+        image=temp_path,
+        title=basename,
+        uploaded_by="temp_user",  # TODO: replace with user auth FK
+        order=ModImage.objects.filter(mod_id=mod_id).count(),
+    )
 
-
-    return {"name": basename, "size": uploaded_image.size, "temp_path": temp_path}
+    return {"name": basename, "size": uploaded_image.size, "temp_path": temp_path, "id": img.id}
 
 
 def create_filegroup_formsets(extra=0):
