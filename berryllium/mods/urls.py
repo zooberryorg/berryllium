@@ -86,4 +86,9 @@ urlpatterns = [
         validations.hx_update_file_order_in_group,
         name="hx_update_file_order_in_group",
     ),
+    path(
+        "mods/upload-images/",
+        validations.hx_upload_images,
+        name="hx_upload_images",
+    ),
 ]

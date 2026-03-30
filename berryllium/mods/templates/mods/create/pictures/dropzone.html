@@ -32,9 +32,20 @@
         name="file"
         id="id_file"
         x-ref="fileInput"
-        @change="handleFileSelect($event)"
+        @change="() = > {
+            if ($refs.fileInput.files.length > 0) {
+                $refs.submitBtn.click();
+            }
+        }"
         class="hidden"
         accept=".jpg,.jpeg,.png,.webp"
         action="file_uploaded"
         multiple>
     </div>
+    <button type="button"
+        x-ref="submitBtn"
+        class="hidden"
+        hx-post="{% url 'hx_upload_images' %}"
+        hx-disable="true"
+        hx-vals="{}"
+        @click.once="isUploading = true">Upload</button>
