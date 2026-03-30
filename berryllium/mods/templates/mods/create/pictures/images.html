@@ -4,9 +4,27 @@
      x-sort>
      {% if images %}
         {% for image in images %}
-            <div id="image"
-                class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+            <div id="image-{{ image.id }}"
+                class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
                 x-sort:item>
+                <!-- top right controls -->
+                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
+                    <button type="button"
+                            x-sort:ignore
+                            class="zb-action"
+                            @click="$dispatch('edit-image', { id: {{ image.id }} })">
+                        <ion-icon name="star" class="text-sm"></ion-icon>
+                    </button>
+                    <button type="button"
+                            x-sort:ignore
+                            class="zb-action"
+                            hx-get="{% url 'hx_remove_temp_image' image.id %}"
+                            hx-target="#image-{{ image.id }}"
+                            hx-swap="outerHTML"
+                            >
+                        <ion-icon name="trash" class="text-sm"></ion-icon>
+                    </button>
+                </div>
                 <div id="image-frame"
                     class="border-r border-pine-600/30 hover:cursor-pointer">
                     <img src="/uploads/{{ image.image }}"

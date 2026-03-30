@@ -1,4 +1,4 @@
-from berryllium.mods.models import Mod, ModFile, ModFileGroup
+from berryllium.mods.models import Mod, ModFile, ModFileGroup, ModImage
 from berryllium.mods.forms import ModFileGroupForm, ModFileForm
 from berryllium.mods.services import (
     create_file_group,
@@ -11,7 +11,7 @@ from django.shortcuts import render, HttpResponse, redirect
 from django.views.decorators.http import require_POST, require_GET
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
-
+from django.core.files.storage import default_storage
 
 @require_POST
 def hx_process_url_field(request):
@@ -365,3 +365,28 @@ def hx_upload_images(request):
         print("Processing image:", image.name)
 
     return HttpResponse(status=204)
+
+@require_GET
+def hx_remove_temp_image(request, image_id):
+    """HTMX endpoint to remove a temporary uploaded image."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when attempting to remove temp image.")
+        return HttpResponse(status=400)
+
+    image = ModImage.objects.filter(id=image_id, mod_id=mod_id).first()
+    if not image:
+        print(f"No temp image found with ID: {image_id} for Mod ID: {mod_id}")
+        return HttpResponse(status=404)
+
+    # delete the file from storage
+    temp_path = image.image.path
+    if temp_path and default_storage.exists(temp_path):
+        default_storage.delete(temp_path)
+        print(f"Deleted temp image file at path: {temp_path}")
+
+    # delete the database record
+    image.delete()
+    print(f"Deleted ModImage record with ID: {image_id} for Mod ID: {mod_id}")
+
+    return HttpResponse("")
