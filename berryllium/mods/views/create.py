@@ -12,7 +12,7 @@ from berryllium.mods.forms import (
     ModFileGroupForm,
     ModImageUploadForm,
 )
-from berryllium.mods.models import Mod, ModFileGroup
+from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
     init_context,
     upload_file,
@@ -169,6 +169,12 @@ class ModCreateImages(FormView):
         """
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=2)
+
+        # get images for current mod from session
+        mod_id = self.request.session.get("session_id")
+        if mod_id:
+            context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
+
         return context | progress_bar
     
     def form_valid(self, form):
@@ -184,6 +190,9 @@ class ModCreateImages(FormView):
                 file = upload_image(img, mod_id=mod_id)
                 if file:
                     print("Image uploaded successfully:", file["name"])
+        
+        context = self.get_context_data()
+        context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
 
         return super().form_valid(form)
 
