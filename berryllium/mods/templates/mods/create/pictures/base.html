@@ -10,7 +10,6 @@
           hx-swap="innerHTML"
           enctype="multipart/form-data"
           hx-encoding="multipart/form-data"
-            {% include 'mods/create/pictures/sort_config.html' %}
           x-ref="uploadForm">
         {% csrf_token %}
         <!-- non-field errors -->
@@ -42,7 +41,7 @@
             </div>
         </div>
         <!-- Previously Uploaded Files (from session) -->
-         {% include "mods/create/pictures/images.html" %}
+        {% include "mods/create/pictures/images.html" %}
         <!-- Action Buttons -->
         {% include "mods/create/actions.html" %}
     </form>
@@ -74,7 +73,6 @@ body.sorting {
 }
 
 </style>
-
 <script>
     // in case alpine already loaded before
     if (window.Alpine) {

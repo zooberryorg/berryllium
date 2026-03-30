@@ -28,11 +28,11 @@
                 <div class="text-red-500 text-sm"
                      id="group-description-errors-{{ group.instance.id }}">
                     {% if group.description.errors %}{{ group.description.errors|join:", " }}{% endif %}
-                    </div>
-                    {% include "mods/create/filemanager/files/base.html" with files=files group_index=group.instance.id %}
                 </div>
+                {% include "mods/create/filemanager/files/base.html" with files=files group_index=group.instance.id %}
             </div>
         </div>
     </div>
+</div>
 </div>
 </template>
