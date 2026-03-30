@@ -358,6 +358,10 @@ class ModImageUploadForm(forms.Form):
         required=False,
     )
 
+    def __init__(self, *args, existing_images=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.existing_images = existing_images or []
+
     def clean_image(self):
         cleaned_image = self.cleaned_data.get("image")
 
@@ -379,11 +383,11 @@ class ModImageUploadForm(forms.Form):
                 f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
             )
         
-        if cleaned_image.name in [img['filename'] for img in self.existing_files]:
+        if cleaned_image.name in [img['filename'] for img in self.existing_images]:
             # rename file by appending a number to the end of the filename
             base_name, extension = cleaned_image.name.rsplit(".", 1)
             counter = 1
-            while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_files]:
+            while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
                 counter += 1
             cleaned_image.name = f"{base_name}_{counter}.{extension}"
 

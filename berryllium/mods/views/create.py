@@ -154,7 +154,7 @@ class ModCreateFiles(FormView):
             return self.request.path
         return super().get_success_url()
     
-class ModCreatePictures(FormView):
+class ModCreateImages(FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
@@ -174,6 +174,7 @@ class ModCreatePictures(FormView):
         """
         Handle uploads and other validations
         """
+        
         return super().form_valid(form)
 
 def upload_step3(request):

@@ -93,6 +93,24 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
+def upload_image(uploaded_image, mod_id=None):
+    """
+    Handles image upload and validation.
+    """
+    if mod_id is None:
+        print("No mod ID provided for image upload.")
+        return None
+
+    # Save to storage (temp namespace by session)
+    basename = os.path.basename(uploaded_image.name)
+
+    temp_filename = f"temp_uploads/{mod_id}/{uuid.uuid4().hex}_{basename}"
+
+    # Save image to storage
+    temp_path = default_storage.save(temp_filename, uploaded_image)
+
+    return {"filename": basename, "size": uploaded_image.size, "temp_path": temp_path}
+
 
 def create_filegroup_formsets(extra=0):
     return (
