@@ -2,26 +2,33 @@
 <div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-6 mb-6"
      {% include 'mods/create/pictures/sort_config.html' %}
      x-sort>
-     {% for image in images %}
-        <div id="image"
-            class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
-            x-sort:item>
-            <div id="image-frame"
-                class="border-r border-pine-600/30 hover:cursor-pointer">
-                <img src="{% static 'mods/images/placeholder.png' %}"
-                    alt="Image Upload Placeholder"
-                    class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+     {% if images %}
+        {% for image in images %}
+            <div id="image"
+                class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg"
+                x-sort:item>
+                <div id="image-frame"
+                    class="border-r border-pine-600/30 hover:cursor-pointer">
+                    <img src="{% static 'mods/images/placeholder.png' %}"
+                        alt="Image Upload Placeholder"
+                        class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+                </div>
+                <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
+                <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
+                    <p>
+                        {% if image.caption %}
+                            {{ image.caption }}
+                        {% else %}
+                            No caption provided.
+                        {% endif %}
+                    </p>
+                </div>
             </div>
-            <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
-            <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
-                <p>
-                    {% if image.caption %}
-                        {{ image.caption }}
-                    {% else %}
-                        No caption provided.
-                    {% endif %}
-                </p>
-            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-span-full text-center text-granite-400 py-12 rounded-lg border border-granite-200/10 bg-pine-600/50 p-6 w-full text-granite-200">
+            <ion-icon name="images" class="text-4xl mb-4"></ion-icon>
+            <p class="text-sm mx-auto">No images uploaded yet.</p>
         </div>
-     {% endfor %}
+    {% endif %}
 </div>
