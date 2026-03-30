@@ -389,4 +389,4 @@ def hx_remove_temp_image(request, image_id):
     image.delete()
     print(f"Deleted ModImage record with ID: {image_id} for Mod ID: {mod_id}")
 
-    return HttpResponse(status=204)
+    return HttpResponse("")

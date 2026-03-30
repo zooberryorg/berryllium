@@ -20,7 +20,8 @@
                             class="zb-action"
                             hx-get="{% url 'hx_remove_temp_image' image.id %}"
                             hx-target="#image-{{ image.id }}"
-                            hx-swap="outerHTML">
+                            hx-swap="outerHTML"
+                            >
                         <ion-icon name="trash" class="text-sm"></ion-icon>
                     </button>
                 </div>
