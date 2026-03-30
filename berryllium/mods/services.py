@@ -3,7 +3,7 @@ import uuid
 
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
-from berryllium.mods.models import ModFileGroup, ModFile
+from berryllium.mods.models import ModFileGroup, ModFile, ModImage
 from berryllium.mods.forms import ModFileGroupForm
 
 from django.core.files.storage import default_storage
@@ -109,6 +109,9 @@ def upload_image(uploaded_image, mod_id=None):
     # Save image to storage
     temp_path = default_storage.save(temp_filename, uploaded_image)
     print(f"Image saved to temporary path: {temp_path}")
+
+    # create db row for img
+
 
     return {"name": basename, "size": uploaded_image.size, "temp_path": temp_path}
 
