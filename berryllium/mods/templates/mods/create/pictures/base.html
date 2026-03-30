@@ -10,6 +10,7 @@
           hx-swap="innerHTML"
           enctype="multipart/form-data"
           hx-encoding="multipart/form-data"
+            {% include 'mods/create/pictures/sort_config.html' %}
           x-ref="uploadForm">
         {% csrf_token %}
         <!-- non-field errors -->
@@ -46,7 +47,34 @@
         {% include "mods/create/actions.html" %}
     </form>
 </div>
-<style>[x-cloak] { display: none !important; }</style>
+<style>[x-cloak] { display: none !important; }
+
+/* specificity so it wins over sortablejs default styles */
+.file-draggable.file-draggable {
+    opacity: 1.0 !important;
+    pointer-events: none;
+}
+
+.file-chosen {
+    opacity: 0.0 !important;
+    filter: brightness(1.5) !important;
+    i {
+        color: --var(--color-gold-400) !important;
+    }
+}
+
+.file-ghost {
+    opacity: 0.0 !important;
+    pointer-events: none;
+}
+
+body.sorting {
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+</style>
+
 <script>
     // in case alpine already loaded before
     if (window.Alpine) {
