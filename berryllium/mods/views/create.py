@@ -169,6 +169,12 @@ class ModCreatePictures(FormView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=2)
         return context | progress_bar
+    
+    def form_valid(self, form):
+        """
+        Handle uploads and other validations
+        """
+        return super().form_valid(form)
 
 def upload_step3(request):
 

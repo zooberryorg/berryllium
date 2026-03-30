@@ -30,7 +30,7 @@
                 }
             })"
         {# djlint:on #}
-        name="images"
+        name="image"
         id="id_images"
         x-ref="imageInput"
         @change="console.log('Files selected:', $event.target.files); $refs.imgSubmitBtn.click()"
@@ -39,10 +39,8 @@
         action="file_uploaded"
         multiple>
     </div>
-    <button type="button"
+    <button type="submit"
         x-ref="imgSubmitBtn"
         class="hidden"
-        hx-post="{% url 'hx_upload_images' %}"
-        hx-trigger="click"
         hx-disable="true"
         @click.once="isUploading = true">Upload</button>

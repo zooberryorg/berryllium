@@ -5,7 +5,7 @@
 </div>
 {% include "mods/create/pictures/blurb.html" %}
 <div x-data="fileInputProcessor()">
-    <form hx-post="{% url 'mod_create_step2' %}"
+    <form hx-post="{% url 'mod_create_step3' %}"
           hx-target="#upload-frame"
           hx-swap="innerHTML"
           enctype="multipart/form-data"
