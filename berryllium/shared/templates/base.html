@@ -16,7 +16,7 @@
     </body>
     <script>
         document.addEventListener('htmx:afterSwap', (event) => {
-    Alpine.initTree(event.detail.elt);
-});
+            Alpine.initTree(event.detail.target);
+        });
     </script>
 </html>
