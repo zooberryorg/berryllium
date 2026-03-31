@@ -102,8 +102,8 @@ urlpatterns = [
         name="hx_update_image_title",
     ),
     path(
-        "mods/update-image-desc/<int:image_id>/",
-        validations.hx_update_image_desc,
-        name="hx_update_image_desc",
+        "mods/update-image-caption/<int:image_id>/",
+        validations.hx_update_image_caption,
+        name="hx_update_image_caption",
     ),
 ]
