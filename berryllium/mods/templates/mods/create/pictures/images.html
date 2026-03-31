@@ -6,18 +6,19 @@
         {% for image in images %}
             <div id="image-{{ image.id }}"
                  x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|escapejs }}', caption: '{{ image.caption|escapejs }}', isCover: {{ image.is_cover|yesno:'true,false' }} }"
-                 class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if image.is_cover %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
-                 :class="{{ image.is_cover|yesno:'true,false' }} ? 'border-gold-400/80' : 'border-granite-200/10' "
+                 class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
+                 :class="isCover ? 'border-gold-400/80 border-4' : 'border-granite-200/10 border' "
                  x-sort:item>
                 <!-- top right controls -->
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button type="button"
                             x-sort:ignore
-                            class="zb-action bg-pine-draggable-200"
+                            class="zb-action"
                             hx-get="{% url 'hx_set_cover_image' image.id %}"
                             hx-swap="none"
                             hx-trigger="click"
-                            :class="{'bg-gold-400/80': {{ image.is_cover|yesno:'true,false' }} }">
+                            :class="isCover ? 'bg-gold-400 text-pine-600' : 'bg-pine-draggable-200'"
+                            @click="isCover = !isCover">
                         <ion-icon name="star" class="text-sm"></ion-icon>
                     </button>
                     <button type="button"
