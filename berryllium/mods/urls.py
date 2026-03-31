@@ -106,4 +106,9 @@ urlpatterns = [
         validations.hx_update_image_caption,
         name="hx_update_image_caption",
     ),
+    path(
+        "mods/set-cover-image/<int:image_id>/",
+        validations.hx_set_cover_image,
+        name="hx_set_cover_image",
+    ),
 ]
