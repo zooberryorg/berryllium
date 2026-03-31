@@ -15,9 +15,8 @@
         </footer>
     </body>
     <script>
-document.addEventListener('htmx:afterSwap', (event) => {
-    const target = event.detail.target;
-    setTimeout(() => Alpine.initTree(target), 0);
-});
+        document.addEventListener('htmx:afterSettle', (event) => {
+            Alpine.initTree(event.detail.target);
+        });
     </script>
 </html>

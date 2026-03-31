@@ -1,4 +1,5 @@
 from django.db import models
+from markdownx.models import MarkdownxField
 # from users.models import User
 # from tags.models import Tag
 
@@ -60,7 +61,7 @@ class Mod(models.Model):
     draft = models.BooleanField(default=True)
     # tags = models.ManyToManyField(Tag, blank=True)
     version = models.CharField(max_length=100)
-    description = models.TextField(blank=True)
+    description = MarkdownxField(blank=True)
     prlicense = models.CharField(max_length=100, blank=True)
 
     # dates
