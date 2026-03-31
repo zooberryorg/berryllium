@@ -7,13 +7,17 @@
             <div id="image-{{ image.id }}"
                  x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
                  class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
+                 :class="{'border-4 border-gold-400': {{ image.is_cover|yesno:'true,false' }} }"
                  x-sort:item>
                 <!-- top right controls -->
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button type="button"
                             x-sort:ignore
                             class="zb-action bg-pine-draggable-200"
-                            @click="$dispatch('edit-image', { id: {{ image.id }} })">
+                            hx-get="{% url 'hx_set_cover_image' image.id %}"
+                            hx-swap="none"
+                            hx-trigger="click"
+                            :class="{'bg-gold-400/80': {{ image.is_cover|yesno:'true,false' }} }">
                         <ion-icon name="star" class="text-sm"></ion-icon>
                     </button>
                     <button type="button"
