@@ -424,3 +424,26 @@ def hx_update_image_caption(request, image_id):
     print(f"Updated caption for image ID: {image_id} to '{image.caption}'")
 
     return HttpResponse(status=204)
+
+@require_GET
+def hx_set_cover_image(request, image_id):
+    """HTMX endpoint to set an image as the cover image."""
+    mod_id = request.session.get("session_id")
+    if not mod_id:
+        print("No mod_id in session when attempting to set cover image.")
+        return HttpResponse(status=400)
+
+    image = ModImage.objects.filter(id=image_id, mod_id=mod_id).first()
+    if not image:
+        print(f"No image found with ID: {image_id} for setting cover.")
+        return HttpResponse(status=404)
+
+    # unset previous cover
+    ModImage.objects.filter(mod_id=mod_id, is_cover=True).update(is_cover=False)
+
+    # set new cover
+    image.is_cover = True
+    image.save()
+    print(f"Set image ID: {image_id} as cover for Mod ID: {mod_id}")
+
+    return HttpResponse(status=204)
