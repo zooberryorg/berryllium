@@ -35,7 +35,7 @@
                        type="text"
                        rows="1"
                        hx-post="{% url 'hx_update_image_title' image.id %}"
-                       hx-trigger="changed delay:500ms"
+                       hx-trigger="input delay:500ms"
                        hx-swap="none"
                        hx-vals="{
                             'title': $event.target.value
@@ -62,7 +62,7 @@
                        type="text"
                        rows="1"
                        hx-post="{% url 'hx_update_image_desc' image.id %}"
-                       hx-trigger="changed delay:500ms"
+                       hx-trigger="input delay:500ms"
                        hx-swap="none"
                        hx-vals="{
                             'description': $event.target.value
