@@ -6,7 +6,7 @@ urlpatterns = [
     # Upload form (CREATE)
     path("mods/create/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
     path("mods/create/s1", create.ModCreateStep1.as_view(), name="mod_create_step1"),
-    path("mods/create/s2", create.ModCreateFiles.as_view(), name="mod_create_step2"),
+    path("mods/create/s2", create.ModCreateFiles.as_view(), name="mod_create_files"),
     path("mods/create/s3", create.ModCreateImages.as_view(), name="mod_create_images"),
     path("mods/create/s4", create.ModCreateDescription.as_view(), name="mod_create_step4"),
     path("mods/create/s6", create.upload_step3, name="upload_step3"),

@@ -49,7 +49,7 @@ class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/create/step/1.html"
-    success_url = lazy_reverse("mod_create_step2")
+    success_url = lazy_reverse("mod_create_files")
 
     def form_valid(self, form):
         """

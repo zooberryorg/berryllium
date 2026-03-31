@@ -4,7 +4,7 @@
 #     icon: Icon name. See: https://icons.getbootstrap.com/
 UPLOAD_NAVIGATION = [
     {"name": "General", "url": "mod_create_step1", "icon": "info-circle"},
-    {"name": "Upload Files", "url": "mod_create_step2", "icon": "upload"},
+    {"name": "Upload Files", "url": "mod_create_files", "icon": "upload"},
     {"name": "Upload Images", "url": "mod_create_images", "icon": "image"},
     {"name": "Details & Settings", "url": "upload_step3", "icon": "gear"},
     {"name": "Review & Submit", "url": "upload_step3", "icon": "check-circle"},
