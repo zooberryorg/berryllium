@@ -407,3 +407,20 @@ def hx_update_image_title(request, image_id):
     print(f"Updated title for image ID: {image_id} to '{image.title}'")
 
     return HttpResponse(status=204)
+
+@require_POST
+def hx_update_image_desc(request, image_id):
+    """HTMX endpoint to update the description of an uploaded image."""
+    description = request.POST.get("description", "").strip()
+    print(f"Received description update for image ID: {image_id} - New Description: {description}")
+
+    image = ModImage.objects.filter(id=image_id).first()
+    if not image:
+        print(f"No image found with ID: {image_id} for description update.")
+        return HttpResponse(status=404)
+
+    image.caption = description
+    image.save()
+    print(f"Updated description for image ID: {image_id} to '{image.caption}'")
+
+    return HttpResponse(status=204)
