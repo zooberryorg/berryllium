@@ -1,0 +1,25 @@
+{% load static %}
+<!-- progress bar -->
+<div class="px-6 pt-6">
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+</div>
+{% include "mods/create/description/blurb.html" %}
+<form hx-post="{% url 'mod_create_description' %}"
+        hx-target="#upload-frame"
+        hx-swap="innerHTML"
+        enctype="multipart/form-data"
+        hx-encoding="multipart/form-data"
+        x-ref="modDescriptionForm">
+    {% csrf_token %}
+    <!-- non-field errors -->
+    {% if form.non_field_errors %}
+        <div class="px-6 pb-6">
+            <div class="bg-red-500/10 border border-red-500/30 rounded-lg p-4 flex items-center gap-2">
+                <ion-icon name="alert-circle" class="text-red-400 text-xl"></ion-icon>
+                <span class="text-red-400 text-sm">{{ form.non_field_errors.0 }}</span>
+            </div>
+        </div>
+    {% endif %}
+    <!-- Action Buttons -->
+    {% include "mods/create/actions.html" %}
+</form>
