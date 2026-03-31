@@ -173,7 +173,7 @@ class ModCreateImages(FormView):
         # get images for current mod from session
         mod_id = self.request.session.get("session_id")
         if mod_id:
-            context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
+            context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "caption", "title", "image")
 
         return context | progress_bar
     

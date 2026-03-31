@@ -96,4 +96,14 @@ urlpatterns = [
         validations.hx_remove_temp_image,
         name="hx_remove_temp_image",
     ),
+    path(
+        "mods/update-image-title/<int:image_id>/",
+        validations.hx_update_image_title,
+        name="hx_update_image_title",
+    ),
+    path(
+        "mods/update-image-caption/<int:image_id>/",
+        validations.hx_update_image_caption,
+        name="hx_update_image_caption",
+    ),
 ]
