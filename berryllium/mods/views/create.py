@@ -87,7 +87,7 @@ class ModCreateFiles(FormView):
     """
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
-    success_url = lazy_reverse("mod_create_step3")
+    success_url = lazy_reverse("mod_create_images")
 
     def get_context_data(self, **kwargs):
         """
