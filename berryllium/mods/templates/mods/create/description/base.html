@@ -21,7 +21,20 @@
             </div>
         </div>
     {% endif %}
-    {{ form  }}
+    <div id="text-editor" class="px-6 my-6">
+        {{ form.description }}
+    </div>
+    <div id="preview-frame" class="px-6 mb-6 hidden">
+        <h3 class="text-lg font-semibold mb-4">Live Preview</h3>
+        <div class="bg-pine-700 rounded-lg p-4 prose max-w-none">
+            {{ form.description.value|linebreaks }}
+        </div>
+        <button type="button" @click="$refs.modDescriptionForm.querySelector('#id_description').value = ''; $refs.modDescriptionForm.submit();"
+                class="mt-4 px-4 py-2 bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg hover:bg-red-500/20">
+            Clear Description
+        </button>
+    </div>
+
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>
