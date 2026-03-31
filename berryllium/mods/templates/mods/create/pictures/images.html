@@ -4,7 +4,7 @@
      x-sort>
      {% if images %}
         {% for image in images %}
-            <div id="image-{{ image.id }}"
+            <div id="image-{{ image.id }} x-data="{ editTitle: false, editDesc: false }"
                 class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
                 x-sort:item>
                 <!-- top right controls -->
@@ -31,7 +31,15 @@
                         alt="Image Upload Placeholder"
                         class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
                 </div>
-                <h2 class="text-white text-md font-semibold mt-4 px-6">Title</h2>
+                <h2 class="text-white text-md font-semibold mt-4 px-6" x-if="editTitle = true">Title</h2>
+                <div @click="editTitle = true">
+                    <p id="title" class="px-6 text-granite-200 text-sm">
+                        {% if image.title %}
+                            {{ image.title }}
+                        {% else %}
+                            No title provided.
+                        {% endif %}
+                    </p>
                 <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
                     <p>
                         {% if image.caption %}
