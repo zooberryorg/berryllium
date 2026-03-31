@@ -232,6 +232,7 @@ class ModImage(models.Model):
     caption = models.CharField(max_length=255, blank=True)
     order = models.PositiveIntegerField(default=0)
     uploaded_by = models.CharField(max_length=255, blank=True)  # change to user later
+    is_cover = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["order", "id"]
