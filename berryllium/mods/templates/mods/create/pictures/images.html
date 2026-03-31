@@ -33,14 +33,20 @@
                 </div>
                 <input x-show="editTitle"
                        type="text"
-                       class="px-6 mt-2 w-full border border-granite-200/30 rounded focus:ring-2 focus:ring-pine-500 focus:outline-none text-sm"
+                       class="mx-3 mt-2 w-full text-sm text-granite-200 focus-ring:none overflow-hidden"
+                       x-ref="titleInput"
                        value="{{ image.caption }}"
                        x-sort:ignore
-                       @blur="editTitle = false"
+                       @blur="() => { 
+                            if ($event.target.value.trim() === '') {
+                                editTitle = false;
+                                return;
+                            }
+                        }"
                        @keydown.enter.prevent="$event.target.blur()">
-                <span @click="editTitle = true"
+                <span @click="editTitle = true; $nextTick(() => { $refs.titleInput.focus(); })"
                       x-show="!editTitle"
-                      class="mx-6 mt-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
+                      class="mx-2 mt-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
                       x-sort:ignore>
                     Add Title <ion-icon name="create" class="text-xs"></ion-icon>
                 </span>
