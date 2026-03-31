@@ -56,27 +56,27 @@
                       x-sort:ignore>
                     Add Title <ion-icon name="create" class="text-xs"></ion-icon>
                 </span>
-                <textarea x-show="editCaption"
+                <textarea x-show="editCaption || caption"
                        type="text"
                        rows="1"
-                       hx-post="{% url 'hx_update_image_desc' image.id %}"
+                       hx-post="{% url 'hx_update_image_caption' image.id %}"
                        hx-trigger="input delay:500ms"
                        hx-swap="none"
-                       hx-model="caption"
                        name="caption"
                        class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none"
-                       x-ref="descInput"
+                       x-ref="captionInput"
                        @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
                        x-sort:ignore
                        @blur="() => { 
                             if ($event.target.value.trim() === '') {
                                 editCaption = false;
+                                caption = '';
                                 return;
                             }
                         }"
-                       @keydown.enter.prevent="$event.target.blur()"></textarea>
-                <span @click="editCaption = true; $nextTick(() => { $refs.descInput.focus(); })"
-                      x-show="!editCaption"
+                       @keydown.enter.prevent="$event.target.blur()">{{ image.caption }}</textarea>
+                <span @click="editCaption = true; $nextTick(() => { $refs.captionInput.focus(); })"
+                      x-show="!editCaption && !caption"
                     class="mx-2 mb-3 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
                       x-sort:ignore>
                     Add caption <ion-icon name="create" class="text-xs"></ion-icon>
