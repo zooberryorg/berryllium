@@ -1,7 +1,7 @@
 <div class="markdownx row" x-data="{ showPreview: false }">
     <div id="editor-actions" class="flex items-center gap-4 mt-6 mb-1" >
         <button type="button"
-                class="zb-action rounded-xl"
+                class="zb-action rounded-xl items-center gap-1"
                 @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
                                          
                 >
@@ -16,3 +16,28 @@
         <div class="markdownx-preview zb-textarea"></div>
     </div>
 </div>
+<style>
+        .markdownx-preview h1 {
+            font-size: 2em;
+            margin-bottom: 0.2rem;
+            padding: 0;
+        }
+        .markdownx-preview h2 {
+            font-size: 1.5em;
+            margin-bottom: 0.2rem;
+        }
+        .markdownx-preview h3 {
+            font-size: 1.17em;
+            margin-bottom: 0.2rem;
+        }
+        .markdownx-preview p {
+            padding: 1.5rem 0 0 0;
+            line-height: 1.6;
+        }
+        .markdownx-preview code {
+            background-color: #2d2d2d;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+</style>
