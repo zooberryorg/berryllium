@@ -1,5 +1,5 @@
 <div class="markdownx row" x-data="{ showPreview: false }">
-    <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6" >
+    <div id="editor-actions" class="flex items-center gap-4 mt-6 mb-1" >
         <button type="button"
                 class="zb-action rounded-xl"
                 @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
@@ -12,7 +12,7 @@
     <div class="col-md-6" x-show="!showPreview">
         {% include 'django/forms/widgets/textarea.html' %}
     </div>
-    <div class="col-md-6" x-show="showPreview">
-        <div class="markdownx-preview"></div>
+    <div class="col-md-6" x-show="showPreview" >
+        <div class="markdownx-preview zb-textarea"></div>
     </div>
 </div>
