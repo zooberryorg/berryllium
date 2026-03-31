@@ -31,7 +31,12 @@
                     </button>
                 </div>
                 <div id="image-frame"
-                     class="border-r border-pine-600/30 hover:cursor-pointer">
+                     class="border-r border-pine-600/30 hover:cursor-pointer relative">
+                    <span class="absolute bottom-2 left-2 text-xs px-2 py-1 bg-gold-400 rounded-full text-pine-600 z-10"
+                        x-show="isCover">
+                        Cover Image
+                    </span>
+
                     <img src="/uploads/{{ image.image }}"
                          alt="Image Upload Placeholder"
                          class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
