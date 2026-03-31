@@ -402,8 +402,8 @@ def hx_update_image_title(request, image_id):
         print(f"No image found with ID: {image_id} for title update.")
         return HttpResponse(status=404)
 
-    image.caption = title
+    image.title = title
     image.save()
-    print(f"Updated title for image ID: {image_id} to '{title}'")
+    print(f"Updated title for image ID: {image_id} to '{image.title}'")
 
-    return HttpResponse("")
+    return HttpResponse(status=204)
