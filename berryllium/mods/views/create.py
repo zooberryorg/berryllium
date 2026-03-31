@@ -11,6 +11,7 @@ from berryllium.mods.forms import (
     ModCategoriesForm,
     ModFileGroupForm,
     ModImageUploadForm,
+    ModDescriptionForm,
 )
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
@@ -195,6 +196,15 @@ class ModCreateImages(FormView):
         context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
 
         return super().form_valid(form)
+    
+class ModCreateDescription(CreateView):
+    """
+    Mod Creation Multi-Step 4: Add Description.
+    """
+    model = Mod
+    form_class = ModDescriptionForm
+    template_name = "mods/create/step/4.html"
+    success_url = "/mods/create/s6"
 
 def upload_step3(request):
 
