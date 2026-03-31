@@ -11,6 +11,7 @@ from berryllium.mods.forms import (
     ModCategoriesForm,
     ModFileGroupForm,
     ModImageUploadForm,
+    ModDescriptionForm,
 )
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
@@ -49,7 +50,7 @@ class ModCreateStep1(CreateView):
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/create/step/1.html"
-    success_url = lazy_reverse("mod_create_step2")
+    success_url = lazy_reverse("mod_create_files")
 
     def form_valid(self, form):
         """
@@ -87,7 +88,7 @@ class ModCreateFiles(FormView):
     """
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
-    success_url = lazy_reverse("mod_create_step3")
+    success_url = lazy_reverse("mod_create_images")
 
     def get_context_data(self, **kwargs):
         """
@@ -195,6 +196,21 @@ class ModCreateImages(FormView):
         context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
 
         return super().form_valid(form)
+    
+class ModCreateDescription(CreateView):
+    """
+    Mod Creation Multi-Step 4: Add Description.
+    """
+    model = Mod
+    form_class = ModDescriptionForm
+    template_name = "mods/create/description/base.html"
+    success_url = "/mods/create/s4"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=3)
+
+        return context | progress_bar
 
 def upload_step3(request):
 

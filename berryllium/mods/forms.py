@@ -28,6 +28,9 @@ from berryllium.mods.settings import (
     MAX_IMAGE_SIZE
 )
 
+from markdownx.fields import MarkdownxFormField
+from markdownx.widgets import MarkdownxWidget
+
 
 class ModCategoriesForm(forms.ModelForm):
     """
@@ -460,5 +463,26 @@ class ModImageForm(forms.Form):
             raise forms.ValidationError("Image caption cannot contain null characters.")
 
         return caption
+    
+class ModDescriptionForm(forms.ModelForm):
+    """
+    This is Step 4 of the mod creation form, which handles the detailed
+    description and other metadata.
+    """
+
+    description = MarkdownxFormField(
+        required=True,
+        widget=MarkdownxWidget(
+            attrs={
+                "placeholder": "Enter a detailed description of your mod...",
+                "class": "markdownx-textarea w-1/2 h-64 p-2 rounded bg-gray-700 text-white focus:outline-none hover:shadow-lg transition-shadow duration-200 hover:bg-gray-600",
+                "rows": 10,
+            }
+        ),
+    )
+
+    class Meta:
+        model = Mod
+        fields = ["description"]
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
