@@ -14,4 +14,9 @@
             {% include 'shared/footer.html' %}
         </footer>
     </body>
+    <script>
+        document.addEventListener('htmx:afterSwap', (event) => {
+    Alpine.initTree(event.detail.elt);
+});
+    </script>
 </html>

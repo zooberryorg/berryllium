@@ -1,8 +1,11 @@
-<div class="markdownx row" x-data="{ previewOn: false }">
-    <div class="col-md-6 bg-pine-600/50 rounded-lg mx-6 p-4 mt-6" x-bind:class="previewOn ? 'hidden' : ''">
+<div class="markdownx row" x-data="{ previewOn: true }">
+    <div class="col-md-6 bg-pine-600/50 rounded-lg w-full mx-6 p-4 mt-6" x-show="!previewOn">
          {% include 'django/forms/widgets/textarea.html' %}
-    </div>
-    <div class="col-md-6">
-        <div class="markdownx-preview" x-bind:class="previewOn ? '' : 'hidden'"></div>
+            <div x-init="$watch('previewOn', (val) => { 
+                if (val) {
+                    console.log('Generating preview...');
+                }
+            })">
+            <div x-ref="markdownxPreview" class="markdownx-preview"></div></div>
     </div>
 </div>

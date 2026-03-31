@@ -21,11 +21,17 @@
             </div>
         </div>
     {% endif %}
-    {{ form.description  }}
+    {{ form  }}
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>
     <style>
+        .markdownx {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            width: 100%;
+        }
         .markdownx-preview h1 {
             font-size: 2em;
             margin-bottom: 0.2rem;
