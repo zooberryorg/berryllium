@@ -2,11 +2,12 @@
 <div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-6 mb-6"
      {% include 'mods/create/pictures/sort_config.html' %}
      x-sort>
-     {% if images %}
+    {% if images %}
         {% for image in images %}
-            <div id="image-{{ image.id }} x-data="{ editTitle: false, editDesc: false }"
-                class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
-                x-sort:item>
+            <div id="image-{{ image.id }}"
+                 x-data="{ editTitle: false, editDesc: false }"
+                 class="bg-pine-draggable-200 border border-granite-200/10 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative"
+                 x-sort:item>
                 <!-- top right controls -->
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button type="button"
@@ -20,22 +21,30 @@
                             class="zb-action"
                             hx-get="{% url 'hx_remove_temp_image' image.id %}"
                             hx-target="#image-{{ image.id }}"
-                            hx-swap="outerHTML"
-                            >
+                            hx-swap="outerHTML">
                         <ion-icon name="trash" class="text-sm"></ion-icon>
                     </button>
                 </div>
                 <div id="image-frame"
-                    class="border-r border-pine-600/30 hover:cursor-pointer">
+                     class="border-r border-pine-600/30 hover:cursor-pointer">
                     <img src="/uploads/{{ image.image }}"
-                        alt="Image Upload Placeholder"
-                        class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
+                         alt="Image Upload Placeholder"
+                         class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
                 </div>
-                <h2 class="text-white text-md font-semibold mt-4 px-6" x-if="editTitle = true">Title</h2>
-                <span @click="editTitle = true" x-show="!editTitle" class="px-6 mt-2">
-                    Edit Title <ion-icon name="create" class="text-xs"></ion-icon>
+                <input x-show="editTitle"
+                       type="text"
+                       class="px-6 mt-2 w-full border border-granite-200/30 rounded focus:ring-2 focus:ring-pine-500 focus:outline-none text-sm"
+                       value="{{ image.caption }}"
+                       x-sort:ignore
+                       @blur="editTitle = false"
+                       @keydown.enter.prevent="$event.target.blur()">
+                <span @click="editTitle = true"
+                      x-show="!editTitle"
+                      class="mx-6 mt-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
+                      x-sort:ignore>
+                    Add Title <ion-icon name="create" class="text-xs"></ion-icon>
                 </span>
-                <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
+                <div id="caption" class="px-6 pb-6 text-granite-200 text-sm" x-sort:ignore>
                     <p>
                         {% if image.caption %}
                             {{ image.caption }}
