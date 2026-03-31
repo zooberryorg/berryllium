@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.forms",
     "widget_tweaks",
+    "markdownx",
     "berryllium.shared",
     "berryllium.landings",
     "berryllium.mods",

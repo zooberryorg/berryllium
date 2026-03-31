@@ -1,0 +1,18 @@
+<div class="markdownx row" x-data="{ showPreview: false }">
+    <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6" >
+        <button type="button"
+                class="zb-action rounded-xl"
+                @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
+                                         
+                >
+            <ion-icon :name="showPreview ? 'eye-off' : 'eye'" class="text-sm text-granite-100"></ion-icon>
+            <span class="text-sm" x-text="showPreview ? 'Hide Preview' : 'Show Preview'"></span>
+        </button>
+    </div>
+    <div class="col-md-6" x-show="!showPreview">
+        {% include 'django/forms/widgets/textarea.html' %}
+    </div>
+    <div class="col-md-6" x-show="showPreview">
+        <div class="markdownx-preview"></div>
+    </div>
+</div>

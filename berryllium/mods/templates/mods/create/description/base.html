@@ -10,6 +10,7 @@
         enctype="multipart/form-data"
         hx-encoding="multipart/form-data">
     {% csrf_token %}
+    {{ form.media }}
     <!-- non-field errors -->
     {% if form.non_field_errors %}
         <div class="px-6 pb-6">
@@ -19,7 +20,7 @@
             </div>
         </div>
     {% endif %}
-    <div x-data="{ showPreview: false }" class="flex flex-col" data-htmx-target="description">
+    {% comment %} <div x-data="{ showPreview: false }" class="flex flex-col" data-htmx-target="description">
         <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6" x-init="console.log('Description Editor Initialized')">
             <button type="button"
                     class="zb-action rounded-xl"
@@ -38,7 +39,12 @@
             <div class="bg-pine-700 rounded-lg p-4 prose max-w-none">
             </div>
         </div>
+    </div> {% endcomment %}
+    
+    <div id="description" class="px-6 mb-6 mt-6" data-htmx-target="description">
+        {{ form.description }}
     </div>
+
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>
