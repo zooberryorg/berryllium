@@ -36,7 +36,10 @@
                        rows="1"
                        hx-post="{% url 'hx_update_image_title' image.id %}"
                        hx-trigger="changed delay:500ms"
-                       hx-swap="none"  
+                       hx-swap="none"
+                       hx-vals="{
+                            'title': $event.target.value
+                        }"
                        class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold"
                        x-ref="titleInput"
                        value="{{ image.caption }}"
@@ -61,6 +64,9 @@
                        hx-post="{% url 'hx_update_image_desc' image.id %}"
                        hx-trigger="changed delay:500ms"
                        hx-swap="none"
+                       hx-vals="{
+                            'description': $event.target.value
+                        }"
                        class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none"
                        x-ref="descInput"
                        value="{{ image.description }}"

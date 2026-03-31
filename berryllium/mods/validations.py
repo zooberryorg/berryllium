@@ -390,3 +390,20 @@ def hx_remove_temp_image(request, image_id):
     print(f"Deleted ModImage record with ID: {image_id} for Mod ID: {mod_id}")
 
     return HttpResponse("")
+
+@require_POST
+def hx_update_image_title(request, image_id):
+    """HTMX endpoint to update the title of an uploaded image."""
+    title = request.POST.get("title", "").strip()
+    print(f"Received title update for image ID: {image_id} - New Title: {title}")
+
+    image = ModImage.objects.filter(id=image_id).first()
+    if not image:
+        print(f"No image found with ID: {image_id} for title update.")
+        return HttpResponse(status=404)
+
+    image.caption = title
+    image.save()
+    print(f"Updated title for image ID: {image_id} to '{title}'")
+
+    return HttpResponse("")
