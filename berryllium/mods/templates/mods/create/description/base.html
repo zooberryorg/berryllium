@@ -11,6 +11,7 @@
         hx-encoding="multipart/form-data"
         x-ref="modDescriptionForm">
     {% csrf_token %}
+    {{ form.media }}
     <!-- non-field errors -->
     {% if form.non_field_errors %}
         <div class="px-6 pb-6">

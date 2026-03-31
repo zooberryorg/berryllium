@@ -218,3 +218,4 @@ package.json
 !.tw/input.css
 /uploads/
 /staticfiles/
+/static/
