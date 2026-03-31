@@ -5,9 +5,9 @@
     {% if images %}
         {% for image in images %}
             <div id="image-{{ image.id }}"
-                 x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
+                 x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|escapejs }}', caption: '{{ image.caption|escapejs }}', isCover: {{ image.is_cover|yesno:'true,false' }} }"
                  class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if image.is_cover %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
-                 :class="{{ image.is_cover|yesno }} ? 'border-gold-400/80' : 'border-granite-200/10' "
+                 :class="{{ image.is_cover|yesno:'true,false' }} ? 'border-gold-400/80' : 'border-granite-200/10' "
                  x-sort:item>
                 <!-- top right controls -->
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
