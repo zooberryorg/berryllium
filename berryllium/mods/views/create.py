@@ -203,7 +203,7 @@ class ModCreateDescription(CreateView):
     """
     model = Mod
     form_class = ModDescriptionForm
-    template_name = "mods/create/step/4.html"
+    template_name = "mods/create/description/base.html"
     success_url = "/mods/create/s6"
 
 def upload_step3(request):
