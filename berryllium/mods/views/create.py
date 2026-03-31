@@ -204,7 +204,13 @@ class ModCreateDescription(CreateView):
     model = Mod
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
-    success_url = "/mods/create/s6"
+    success_url = "/mods/create/s4"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=3)
+
+        return context | progress_bar
 
 def upload_step3(request):
 
