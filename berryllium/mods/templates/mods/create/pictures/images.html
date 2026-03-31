@@ -31,15 +31,13 @@
                          alt="Image Upload Placeholder"
                          class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
                 </div>
-                <textarea x-show="editTitle"
+                <textarea x-show="editTitle || title"
                        type="text"
                        rows="1"
                        hx-post="{% url 'hx_update_image_title' image.id %}"
                        hx-trigger="input delay:500ms"
                        hx-swap="none"
-                       hx-vals="{
-                            'title': $refs.titleInput.value
-                        }"
+                       name="title"
                        class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold"
                        x-ref="titleInput"
                        @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
@@ -47,12 +45,13 @@
                        @blur="() => { 
                             if ($event.target.value.trim() === '') {
                                 editTitle = false;
+                                title = '';
                                 return;
                             }
                         }"
                        @keydown.enter.prevent="$event.target.blur()">{{ image.title }}</textarea>
                 <span @click="editTitle = true; $nextTick(() => { $refs.titleInput.focus(); })"
-                      x-show="!editTitle"
+                      x-show="!editTitle && !title"
                       class="mx-2 mt-2 mb-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
                       x-sort:ignore>
                     Add Title <ion-icon name="create" class="text-xs"></ion-icon>
