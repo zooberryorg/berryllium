@@ -25,3 +25,75 @@
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>
+    <style>
+        .markdownx {
+            display: flex;
+            flex-direction: row;
+            gap: 1rem;
+            width: 100%;
+        }
+        .markdownx-preview h1 {
+            font-size: 2em;
+            margin-bottom: 0.2rem;
+            padding: 0;
+        }
+        .markdownx-preview h2 {
+            font-size: 1.5em;
+            margin-bottom: 0.2rem;
+        }
+        .markdownx-preview h3 {
+            font-size: 1.17em;
+            margin-bottom: 0.2rem;
+        }
+        .markdownx-preview p {
+            padding: 1.5rem 0 0 0;
+            line-height: 1.6;
+        }
+        .markdownx-preview code {
+            background-color: #2d2d2d;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .markdownx-preview {
+            width: 50%;
+            padding: 1rem;
+
+        }
+
+        .markdownx-preview pre {
+            background-color: #18202bff;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+
+        .markdownx-preview blockquote {
+            border-left: 4px solid #4b5563;
+            padding-left: 1rem;
+            color: #9ca3af;
+            margin: 1rem 0;
+        }
+
+        .markdownx-preview blockquote p {
+            margin: 0;
+            padding: 0;
+        }
+
+        .markdownx-preview pre code {
+            background-color: transparent;
+            padding: 0;
+        }
+
+
+        .markdownx-textarea {
+            width: 50%;
+            height: 16rem;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: #374151;
+            color: #ffffff;
+            resize: vertical;
+        }
+    </style>
