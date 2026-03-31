@@ -63,12 +63,7 @@
                        hx-trigger="input delay:500ms"
                        hx-swap="none"
                        hx-model="caption"
-                       {% if image.caption %}
-                          value="{{ image.caption }}"
-                        {% endif %}
-                       hx-vals="{
-                            'caption': $event.target.value
-                        }"
+                       name="caption"
                        class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none"
                        x-ref="descInput"
                        @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
