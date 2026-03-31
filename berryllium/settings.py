@@ -40,7 +40,6 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.forms",
     "widget_tweaks",
-    "markdownx",
     "berryllium.shared",
     "berryllium.landings",
     "berryllium.mods",
@@ -144,20 +143,6 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 # for custom widgets
 FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
-
-MARKDOWNX_MARKDOWN_EXTENSIONS = [
-    "markdown.extensions.extra",
-    "markdown.extensions.nl2br",
-    "markdown.extensions.smarty",
-    "codehilite",
-]
-
-MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
-    "markdown.extensions.codehilite": {
-        "css_class": "highlight",
-        "linenums": True,
-    }
-}
 
 # Session configuration
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # or 'cache' for Redis
