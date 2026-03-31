@@ -32,14 +32,9 @@
                         class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
                 </div>
                 <h2 class="text-white text-md font-semibold mt-4 px-6" x-if="editTitle = true">Title</h2>
-                <div @click="editTitle = true">
-                    <p id="title" class="px-6 text-granite-200 text-sm">
-                        {% if image.title %}
-                            {{ image.title }}
-                        {% else %}
-                            No title provided.
-                        {% endif %}
-                    </p>
+                <span @click="editTitle = true" x-show="!editTitle" class="px-6 mt-2">
+                    Edit Title <ion-icon name="create" class="text-xs"></ion-icon>
+                </span>
                 <div id="caption" class="px-6 pb-6 text-granite-200 text-sm">
                     <p>
                         {% if image.caption %}
