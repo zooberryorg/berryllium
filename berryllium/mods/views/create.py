@@ -206,6 +206,10 @@ class ModCreateDescription(UpdateView):
     template_name = "mods/create/description/base.html"
     success_url = "/mods/create/s4"
 
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)

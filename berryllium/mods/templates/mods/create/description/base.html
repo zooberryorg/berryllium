@@ -8,8 +8,7 @@
         hx-target="#upload-frame"
         hx-swap="innerHTML"
         enctype="multipart/form-data"
-        hx-encoding="multipart/form-data"
-        x-ref="modDescriptionForm">
+        hx-encoding="multipart/form-data">
     {% csrf_token %}
     <!-- non-field errors -->
     {% if form.non_field_errors %}
@@ -21,13 +20,12 @@
         </div>
     {% endif %}
     <div x-data="{ showPreview: false }" class="flex flex-col" data-htmx-target="description">
-        <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6">
+        <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6" x-init="console.log('Description Editor Initialized')">
             <button type="button"
                     class="zb-action rounded-xl"
-                    @click="() => {
-                        showPreview = !showPreview; 
-                        console.log(showPreview);                 
-                    }">
+                    @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
+                                         
+                    >
                 <ion-icon :name="showPreview ? 'eye-off' : 'eye'" class="text-sm text-granite-100"></ion-icon>
                 <span class="text-sm" x-text="showPreview ? 'Hide Preview' : 'Show Preview'"></span>
             </button>
@@ -35,7 +33,7 @@
         <div id="text-editor" class="px-6 m-1 mb-6" x-show="!showPreview">
             {{ form.description }}
         </div>
-        <div id="preview-frame" class="px-6 mb-6 hidden" x-show="showPreview">
+        <div id="preview-frame" class="px-6 mb-6" x-show="showPreview">
             <h3 class="text-lg font-semibold mb-4">Live Preview</h3>
             <div class="bg-pine-700 rounded-lg p-4 prose max-w-none">
             </div>
