@@ -12,13 +12,13 @@
                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
                     <button type="button"
                             x-sort:ignore
-                            class="zb-action"
+                            class="zb-action bg-pine-draggable-200"
                             @click="$dispatch('edit-image', { id: {{ image.id }} })">
                         <ion-icon name="star" class="text-sm"></ion-icon>
                     </button>
                     <button type="button"
                             x-sort:ignore
-                            class="zb-action"
+                            class="zb-action bg-pine-draggable-200"
                             hx-get="{% url 'hx_remove_temp_image' image.id %}"
                             hx-target="#image-{{ image.id }}"
                             hx-swap="outerHTML">
@@ -38,7 +38,7 @@
                        hx-trigger="input delay:500ms"
                        hx-swap="none"
                        name="title"
-                       class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold"
+                       class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold hover:text-white"
                        x-ref="titleInput"
                        @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
                        x-sort:ignore
@@ -63,7 +63,7 @@
                        hx-trigger="input delay:500ms"
                        hx-swap="none"
                        name="caption"
-                       class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none"
+                       class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none hover:text-white"
                        x-ref="captionInput"
                        @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
                        x-sort:ignore
