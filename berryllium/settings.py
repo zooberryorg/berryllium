@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "widget_tweaks",
     "markdownx",
     "berryllium.shared",
@@ -140,6 +141,9 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 # file upload settings
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
+
+# for custom widgets
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
     "markdown.extensions.extra",
