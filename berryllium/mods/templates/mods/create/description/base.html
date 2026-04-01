@@ -10,7 +10,6 @@
         enctype="multipart/form-data"
         hx-encoding="multipart/form-data">
     {% csrf_token %}
-    {{ form.media }}
     <!-- non-field errors -->
     {% if form.non_field_errors %}
         <div class="px-6 pb-6">
@@ -48,4 +47,5 @@
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>
+{{ form.media }}
 <style>[x-cloak] { display: none !important; }</style>
