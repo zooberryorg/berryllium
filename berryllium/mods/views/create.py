@@ -41,7 +41,7 @@ class ModCreateLanding(TemplateView):
     #     # Clear session later to start new
     #     # request.session.pop("session_id", None)
     #     # request.session.pop("group_manager_toggled", None)
-    #     return redirect("mod_create_step1")
+    #     return redirect("mod_create_categorization")
 
 
 class ModCreateCategorization(CreateView):
@@ -159,7 +159,7 @@ class ModCreateFiles(FormView):
         """
         action = self.request.POST.get("action") == "previous"
         if action == "previous":
-            return lazy_reverse("mod_create_step1")
+            return lazy_reverse("mod_create_categorization")
         elif action == "uploaded_file":
             return self.request.path
         return super().get_success_url()
