@@ -28,6 +28,7 @@ class ModCreateLanding(TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
+
     template_name = "mods/create/base.html"
     success_url = "/mods/create/s1"
 
@@ -47,6 +48,7 @@ class ModCreateStep1(CreateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
+
     model = Mod
     form_class = ModCategoriesForm
     template_name = "mods/create/step/1.html"
@@ -86,6 +88,7 @@ class ModCreateFiles(FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
+
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
     success_url = lazy_reverse("mod_create_images")
@@ -127,7 +130,12 @@ class ModCreateFiles(FormView):
         """
         clean_file = form.cleaned_data["file"]
         mod_id = self.request.session.get("session_id")
-        print("form_valid called with file:", clean_file and clean_file.name, "and mod_id:", mod_id)
+        print(
+            "form_valid called with file:",
+            clean_file and clean_file.name,
+            "and mod_id:",
+            mod_id,
+        )
         if clean_file:
             print("Attempting to upload file:", clean_file.name)
             file = upload_file(clean_file, mod_id=mod_id)
@@ -155,12 +163,16 @@ class ModCreateFiles(FormView):
         elif action == "uploaded_file":
             return self.request.path
         return super().get_success_url()
-    
+
+
 class ModCreateImages(FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
-    form_class = ModImageUploadForm  # Placeholder, replace with actual picture upload form
+
+    form_class = (
+        ModImageUploadForm  # Placeholder, replace with actual picture upload form
+    )
     template_name = "mods/create/pictures/base.html"
     success_url = "/mods/create/s3"
 
@@ -174,10 +186,12 @@ class ModCreateImages(FormView):
         # get images for current mod from session
         mod_id = self.request.session.get("session_id")
         if mod_id:
-            context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "caption", "title", "image", "is_cover")
+            context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
+                "id", "caption", "title", "image", "is_cover"
+            )
 
         return context | progress_bar
-    
+
     def form_valid(self, form):
         """
         Handle uploads and other validations
@@ -185,22 +199,26 @@ class ModCreateImages(FormView):
         # get images from form and save to storage, associate with mod, etc.
         uploaded_images = form.cleaned_data.get("image")
         mod_id = self.request.session.get("session_id")
-        print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)        
+        print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)
         if uploaded_images:
-            for img in uploaded_images:               
+            for img in uploaded_images:
                 file = upload_image(img, mod_id=mod_id)
                 if file:
                     print("Image uploaded successfully:", file["name"])
-        
+
         context = self.get_context_data()
-        context["images"] = ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image")
+        context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
+            "id", "title", "caption", "image"
+        )
 
         return super().form_valid(form)
-    
+
+
 class ModCreateDescription(UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
     """
+
     model = Mod
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
@@ -209,12 +227,13 @@ class ModCreateDescription(UpdateView):
     def get_object(self, queryset=None):
         mod_id = self.request.session.get("session_id")
         return Mod.objects.get(id=mod_id)
-    
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)
 
         return context | progress_bar
+
 
 def upload_step3(request):
 

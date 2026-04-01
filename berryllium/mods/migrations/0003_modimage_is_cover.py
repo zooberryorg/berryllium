@@ -4,15 +4,14 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mods', '0002_modimage'),
+        ("mods", "0002_modimage"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='modimage',
-            name='is_cover',
+            model_name="modimage",
+            name="is_cover",
             field=models.BooleanField(default=False),
         ),
     ]

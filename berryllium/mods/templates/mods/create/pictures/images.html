@@ -33,33 +33,24 @@
                 <div id="image-frame"
                      class="border-r border-pine-600/30 hover:cursor-pointer relative">
                     <span class="absolute bottom-2 left-2 text-xs px-2 py-1 bg-gold-400 rounded-full text-pine-600 z-10"
-                        x-show="isCover">
-                        Cover Image
-                    </span>
-
+                          x-show="isCover">Cover Image</span>
                     <img src="/uploads/{{ image.image }}"
                          alt="Image Upload Placeholder"
                          class="w-full rounded-tl-lg rounded-tr-lg object-cover hover:brightness-110 transition-all">
                 </div>
                 <textarea x-show="editTitle || title"
-                       type="text"
-                       rows="1"
-                       hx-post="{% url 'hx_update_image_title' image.id %}"
-                       hx-trigger="input delay:500ms"
-                       hx-swap="none"
-                       name="title"
-                       class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold hover:text-white"
-                       x-ref="titleInput"
-                       @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
-                       x-sort:ignore
-                       @blur="() => { 
-                            if ($event.target.value.trim() === '') {
-                                editTitle = false;
-                                title = '';
-                                return;
-                            }
-                        }"
-                       @keydown.enter.prevent="$event.target.blur()">{{ image.title }}</textarea>
+                          type="text"
+                          rows="1"
+                          hx-post="{% url 'hx_update_image_title' image.id %}"
+                          hx-trigger="input delay:500ms"
+                          hx-swap="none"
+                          name="title"
+                          class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold hover:text-white"
+                          x-ref="titleInput"
+                          @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+                          x-sort:ignore
+                          @blur="() => { if ($event.target.value.trim() === '') { editTitle = false; title = ''; return; } }"
+                          @keydown.enter.prevent="$event.target.blur()">{{ image.title }}</textarea>
                 <span @click="editTitle = true; $nextTick(() => { $refs.titleInput.focus(); })"
                       x-show="!editTitle && !title"
                       class="mx-2 mt-2 mb-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
@@ -67,27 +58,21 @@
                     Add Title <ion-icon name="create" class="text-xs"></ion-icon>
                 </span>
                 <textarea x-show="editCaption || caption"
-                       type="text"
-                       rows="1"
-                       hx-post="{% url 'hx_update_image_caption' image.id %}"
-                       hx-trigger="input delay:500ms"
-                       hx-swap="none"
-                       name="caption"
-                       class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none hover:text-white"
-                       x-ref="captionInput"
-                       @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
-                       x-sort:ignore
-                       @blur="() => { 
-                            if ($event.target.value.trim() === '') {
-                                editCaption = false;
-                                caption = '';
-                                return;
-                            }
-                        }"
-                       @keydown.enter.prevent="$event.target.blur()">{{ image.caption }}</textarea>
+                          type="text"
+                          rows="1"
+                          hx-post="{% url 'hx_update_image_caption' image.id %}"
+                          hx-trigger="input delay:500ms"
+                          hx-swap="none"
+                          name="caption"
+                          class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none hover:text-white"
+                          x-ref="captionInput"
+                          @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+                          x-sort:ignore
+                          @blur="() => { if ($event.target.value.trim() === '') { editCaption = false; caption = ''; return; } }"
+                          @keydown.enter.prevent="$event.target.blur()">{{ image.caption }}</textarea>
                 <span @click="editCaption = true; $nextTick(() => { $refs.captionInput.focus(); })"
                       x-show="!editCaption && !caption"
-                    class="mx-2 mb-3 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
+                      class="mx-2 mb-3 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
                       x-sort:ignore>
                     Add caption <ion-icon name="create" class="text-xs"></ion-icon>
                 </span>

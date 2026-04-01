@@ -2,16 +2,16 @@
 
 from django.db import migrations, models
 
-class Migration(migrations.Migration):
 
+class Migration(migrations.Migration):
     dependencies = [
-        ('mods', '0003_modimage_is_cover'),
+        ("mods", "0003_modimage_is_cover"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='mod',
-            name='description',
+            model_name="mod",
+            name="description",
             field=models.TextField(blank=True),
         ),
     ]

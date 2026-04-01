@@ -143,7 +143,7 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
 # for custom widgets
-FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
+FORM_RENDERER = "django.forms.renderers.TemplatesSetting"
 
 # Session configuration
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # or 'cache' for Redis
@@ -153,15 +153,15 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True  # In production with HTTPS
 
 MARKDOWNX_MARKDOWN_EXTENSIONS = [
-    'markdown.extensions.extra',
-    'markdown.extensions.nl2br',
-    'markdown.extensions.smarty',
-    'codehilite',
+    "markdown.extensions.extra",
+    "markdown.extensions.nl2br",
+    "markdown.extensions.smarty",
+    "codehilite",
 ]
 
 MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
-    'markdown.extensions.codehilite': {
-        'css_class': 'highlight',
-        'linenums': True,
+    "markdown.extensions.codehilite": {
+        "css_class": "highlight",
+        "linenums": True,
     }
 }

@@ -1,5 +1,7 @@
 from django.db import models
 from markdownx.models import MarkdownxField
+
+from berryllium.shared.models import Tag
 # from users.models import User
 # from tags.models import Tag
 
@@ -59,7 +61,7 @@ class Mod(models.Model):
     # )
 
     draft = models.BooleanField(default=True)
-    # tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, through="ModTag", related_name="mods")
     version = models.CharField(max_length=100)
     description = MarkdownxField(blank=True)
     prlicense = models.CharField(max_length=100, blank=True)
@@ -68,7 +70,6 @@ class Mod(models.Model):
     submission_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
-    # images = models.ManyToManyField(UploadedImage, blank=True)
     contents = models.TextField(blank=True)
 
     # archival info
@@ -125,6 +126,27 @@ class ModDependency(models.Model):
     version = models.CharField(max_length=100, blank=True)
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
+
+class ModTag(models.Model):
+    """
+    Through model for Mod tags.
+
+    Definitions:
+    - mod: the mod being tagged
+    - tag: the tag being applied
+    - created_at: when the tag was applied
+    - created_by: who applied the tag
+    - upvotes: number of upvotes for the tag on the mod (too few upvotes may indicate 
+    the tag is not relevant to the mod and should be removed)
+    """
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=255, blank=True)  # change to user later
+    upvotes = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("mod", "tag")
 
 
 class ModFileGroup(models.Model):
@@ -224,6 +246,7 @@ class ModFile(models.Model):
 
     def __str__(self):
         return f"{self.title or self.filename or (self.staged_file.name if self.staged_file else None) or f'File #{self.pk}'} - {self.filegroup.name}"
+
 
 class ModImage(models.Model):
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="images")

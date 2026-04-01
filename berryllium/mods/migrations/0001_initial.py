@@ -6,86 +6,172 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='Mod',
+            name="Mod",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(db_index=True, max_length=200)),
-                ('category', models.CharField(blank=True, db_index=True, max_length=100)),
-                ('summary', models.CharField(blank=True, max_length=500)),
-                ('is_external', models.BooleanField(db_index=True, default=False)),
-                ('external_url', models.URLField(blank=True)),
-                ('game', models.CharField(db_index=True, max_length=100)),
-                ('expansions', models.CharField(blank=True, db_index=True, max_length=200)),
-                ('draft', models.BooleanField(default=True)),
-                ('version', models.CharField(max_length=100)),
-                ('prlicense', models.CharField(blank=True, max_length=100)),
-                ('submission_date', models.DateTimeField(auto_now_add=True)),
-                ('last_updated', models.DateTimeField(auto_now=True)),
-                ('contents', models.TextField(blank=True)),
-                ('former_hosts', models.CharField(blank=True, max_length=200)),
-                ('is_archived_file', models.BooleanField(default=False)),
-                ('original_release_date', models.DateField(blank=True, null=True)),
-                ('download_count', models.IntegerField(default=0)),
-                ('like_count', models.IntegerField(default=0)),
-                ('allow_fan_images', models.BooleanField(default=False)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("title", models.CharField(db_index=True, max_length=200)),
+                (
+                    "category",
+                    models.CharField(blank=True, db_index=True, max_length=100),
+                ),
+                ("summary", models.CharField(blank=True, max_length=500)),
+                ("is_external", models.BooleanField(db_index=True, default=False)),
+                ("external_url", models.URLField(blank=True)),
+                ("game", models.CharField(db_index=True, max_length=100)),
+                (
+                    "expansions",
+                    models.CharField(blank=True, db_index=True, max_length=200),
+                ),
+                ("draft", models.BooleanField(default=True)),
+                ("version", models.CharField(max_length=100)),
+                ("prlicense", models.CharField(blank=True, max_length=100)),
+                ("submission_date", models.DateTimeField(auto_now_add=True)),
+                ("last_updated", models.DateTimeField(auto_now=True)),
+                ("contents", models.TextField(blank=True)),
+                ("former_hosts", models.CharField(blank=True, max_length=200)),
+                ("is_archived_file", models.BooleanField(default=False)),
+                ("original_release_date", models.DateField(blank=True, null=True)),
+                ("download_count", models.IntegerField(default=0)),
+                ("like_count", models.IntegerField(default=0)),
+                ("allow_fan_images", models.BooleanField(default=False)),
             ],
         ),
         migrations.CreateModel(
-            name='ModDependency',
+            name="ModDependency",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('notes', models.TextField(blank=True)),
-                ('required', models.BooleanField(default=True)),
-                ('version', models.CharField(blank=True, max_length=100)),
-                ('is_external', models.BooleanField(default=False)),
-                ('external_url', models.URLField(blank=True)),
-                ('parent', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='dependencies', to='mods.mod')),
-                ('ref', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='required_by', to='mods.mod')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("notes", models.TextField(blank=True)),
+                ("required", models.BooleanField(default=True)),
+                ("version", models.CharField(blank=True, max_length=100)),
+                ("is_external", models.BooleanField(default=False)),
+                ("external_url", models.URLField(blank=True)),
+                (
+                    "parent",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="dependencies",
+                        to="mods.mod",
+                    ),
+                ),
+                (
+                    "ref",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="required_by",
+                        to="mods.mod",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ModFileGroup',
+            name="ModFileGroup",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(blank=True, max_length=255, null=True)),
-                ('order', models.PositiveIntegerField(default=0)),
-                ('description', models.TextField(blank=True, null=True)),
-                ('mod', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='file_groups', to='mods.mod')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(blank=True, max_length=255, null=True)),
+                ("order", models.PositiveIntegerField(default=0)),
+                ("description", models.TextField(blank=True, null=True)),
+                (
+                    "mod",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="file_groups",
+                        to="mods.mod",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order'],
+                "ordering": ["order"],
             },
         ),
         migrations.CreateModel(
-            name='ModFile',
+            name="ModFile",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('status', models.CharField(choices=[('pending', 'Pending'), ('processing', 'Processing'), ('approved', 'Approved'), ('failed', 'Failed')], db_index=True, default='pending', max_length=20)),
-                ('moderated_at', models.DateTimeField(blank=True, null=True)),
-                ('moderation_notes', models.TextField(blank=True)),
-                ('order', models.PositiveIntegerField(default=0)),
-                ('staged_file', models.FileField(blank=True, null=True, upload_to=berryllium.mods.models.staged_path)),
-                ('url', models.URLField(blank=True, null=True)),
-                ('file_hash', models.CharField(blank=True, max_length=64)),
-                ('uploaded_at', models.DateTimeField(auto_now_add=True)),
-                ('published_at', models.DateTimeField(blank=True, null=True)),
-                ('size', models.BigIntegerField(blank=True, null=True)),
-                ('filename', models.CharField(blank=True, max_length=255)),
-                ('description', models.TextField(blank=True)),
-                ('title', models.CharField(blank=True, max_length=255, null=True)),
-                ('version', models.CharField(blank=True, max_length=100)),
-                ('filegroup', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='files', to='mods.modfilegroup')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("pending", "Pending"),
+                            ("processing", "Processing"),
+                            ("approved", "Approved"),
+                            ("failed", "Failed"),
+                        ],
+                        db_index=True,
+                        default="pending",
+                        max_length=20,
+                    ),
+                ),
+                ("moderated_at", models.DateTimeField(blank=True, null=True)),
+                ("moderation_notes", models.TextField(blank=True)),
+                ("order", models.PositiveIntegerField(default=0)),
+                (
+                    "staged_file",
+                    models.FileField(
+                        blank=True,
+                        null=True,
+                        upload_to=berryllium.mods.models.staged_path,
+                    ),
+                ),
+                ("url", models.URLField(blank=True, null=True)),
+                ("file_hash", models.CharField(blank=True, max_length=64)),
+                ("uploaded_at", models.DateTimeField(auto_now_add=True)),
+                ("published_at", models.DateTimeField(blank=True, null=True)),
+                ("size", models.BigIntegerField(blank=True, null=True)),
+                ("filename", models.CharField(blank=True, max_length=255)),
+                ("description", models.TextField(blank=True)),
+                ("title", models.CharField(blank=True, max_length=255, null=True)),
+                ("version", models.CharField(blank=True, max_length=100)),
+                (
+                    "filegroup",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="files",
+                        to="mods.modfilegroup",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order', 'id'],
+                "ordering": ["order", "id"],
             },
         ),
     ]

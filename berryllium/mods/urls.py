@@ -8,7 +8,11 @@ urlpatterns = [
     path("mods/create/s1", create.ModCreateStep1.as_view(), name="mod_create_step1"),
     path("mods/create/s2", create.ModCreateFiles.as_view(), name="mod_create_files"),
     path("mods/create/s3", create.ModCreateImages.as_view(), name="mod_create_images"),
-    path("mods/create/s4", create.ModCreateDescription.as_view(), name="mod_create_description"),
+    path(
+        "mods/create/s4",
+        create.ModCreateDescription.as_view(),
+        name="mod_create_description",
+    ),
     path("mods/create/s6", create.upload_step3, name="upload_step3"),
     # ---------------------------------------------- File management
     path(
@@ -21,7 +25,11 @@ urlpatterns = [
     # ---------------------------------------------- Session management
     path("mods/create/cancel/", create.cancel_mod_upload, name="cancel_mod_upload"),
     # ---------------------------------------------- HTMX endpoints
-    path("mods/validate-url/", validations.hx_process_url_field, name="hx_process_url_field"),
+    path(
+        "mods/validate-url/",
+        validations.hx_process_url_field,
+        name="hx_process_url_field",
+    ),
     path(
         "mods/toggle-group-manager/",
         validations.hx_toggle_group_manager,

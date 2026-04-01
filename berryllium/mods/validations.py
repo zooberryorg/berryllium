@@ -13,6 +13,7 @@ from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 
+
 @require_POST
 def hx_process_url_field(request):
     """HTMX endpoint to validate file URL field."""
@@ -68,7 +69,9 @@ def hx_toggle_group_manager(request):
 def hx_validate_filegroup_name(request, fg_id):
     """HTMX endpoint to validate filegroup name field."""
     groupname = request.POST.get("form-" + str(fg_id) + "-name", "").strip()
-    print("Received group name for validation:", groupname, "for ModFileGroup ID:", fg_id)
+    print(
+        "Received group name for validation:", groupname, "for ModFileGroup ID:", fg_id
+    )
 
     form = ModFileGroupForm(data={"name": groupname}, instance=ModFileGroup(id=fg_id))
     form.is_valid()
@@ -349,6 +352,7 @@ def hx_move_filegroup_down(request, current_index):
 
     return redirect("mod_create_files")
 
+
 @require_POST
 def hx_upload_images(request):
     """HTMX endpoint to handle image uploads from the dropzone."""
@@ -365,6 +369,7 @@ def hx_upload_images(request):
         print("Processing image:", image.name)
 
     return HttpResponse(status=204)
+
 
 @require_GET
 def hx_remove_temp_image(request, image_id):
@@ -391,6 +396,7 @@ def hx_remove_temp_image(request, image_id):
 
     return HttpResponse("")
 
+
 @require_POST
 def hx_update_image_title(request, image_id):
     """HTMX endpoint to update the title of an uploaded image."""
@@ -408,6 +414,7 @@ def hx_update_image_title(request, image_id):
 
     return HttpResponse(status=204)
 
+
 @require_POST
 def hx_update_image_caption(request, image_id):
     """HTMX endpoint to update the caption of an uploaded image."""
@@ -424,6 +431,7 @@ def hx_update_image_caption(request, image_id):
     print(f"Updated caption for image ID: {image_id} to '{image.caption}'")
 
     return HttpResponse(status=204)
+
 
 @require_GET
 def hx_set_cover_image(request, image_id):
