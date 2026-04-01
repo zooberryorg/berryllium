@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "berryllium.shared",
     "berryllium.landings",
     "berryllium.mods",
+    "berryllium.organizations",
 ]
 
 MIDDLEWARE = [
