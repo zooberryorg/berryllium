@@ -52,12 +52,33 @@ class ModCreateGeneralInfo(CreateView):
     template_name = "mods/create/general/base.html"
     success_url = lazy_reverse("mod_create_categorization")
 
+    def form_valid(self, form):
+        """
+        Validate form and save draft mod, then store mod ID in session for later steps.
+        """
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        return response
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
         return context | progress_bar
+    
+    def get_form_kwargs(self):
+        """
+        Re-hydrate form with existing draft data if session exists.
+        """
+        kwargs = super().get_form_kwargs()
+        session_id = self.request.session.get("session_id")
+        if session_id:
+            try:
+                kwargs["instance"] = Mod.objects.get(id=session_id)
+            except Mod.DoesNotExist:
+                pass
+        return kwargs
 
-class ModCreateCategorization(CreateView):
+class ModCreateCategorization(UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
