@@ -37,6 +37,18 @@ class ModGeneralInfoForm(forms.ModelForm):
     Handles the general information about the mod like title, summary, ownership, publication date, etc.
     """
 
+    title = forms.CharField(
+        required=True,
+        widget=TextInput(
+            attrs={
+                "placeholder": "Enter mod title...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
+    )
+
     summary = forms.CharField(
         required=True,
         widget=Textarea(
@@ -44,6 +56,18 @@ class ModGeneralInfoForm(forms.ModelForm):
                 "placeholder": "Enter a brief summary...",
                 "class": "zb-textarea text-sm resize-none",
                 "rows": 4,
+            }
+        ),
+    )
+
+    owner = forms.CharField(
+        required=False,
+        widget=TextInput(
+            attrs={
+                "placeholder": "Enter mod owner (optional)...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
             }
         ),
     )
@@ -85,6 +109,7 @@ class ModGeneralInfoForm(forms.ModelForm):
         summary = summary.strip()
         return summary
 
+
 class ModCategorizationForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -110,39 +135,6 @@ class ModCategorizationForm(forms.ModelForm):
     class Meta:
         model = Mod
         fields = ["title", "summary", "category", "game", "expansions"]
-        widgets = {
-            "title": TextInput(
-                attrs={
-                    "placeholder": "Group name (e.g., Main Files)",
-                    "class": "zb-input text-sm",
-                    "autocomplete": "off",
-                    **DISABLE_SUBMIT_BUTTON_ATTRS,
-                },
-            ),
-        }
-
-    def clean_title(self):
-        title = self.cleaned_data.get("title")
-        if any(char in title for char in ILLEGAL_CHARACTERS):
-            raise forms.ValidationError(
-                f"Title contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
-            )
-        return title
-
-    def clean_summary(self):
-        summary = self.cleaned_data.get("summary")
-        if len(summary) < MIN_TEXTFIELD_LENGTH:
-            raise forms.ValidationError(
-                f"Summary must be at least {MIN_TEXTFIELD_LENGTH} characters long."
-            )
-        if len(summary) > MAX_SUMMARY_LENGTH:
-            raise forms.ValidationError(
-                f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
-            )
-
-        # clean summary of leading/trailing whitespace and null characters
-        summary = summary.strip()
-        return summary
 
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
