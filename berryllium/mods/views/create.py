@@ -29,7 +29,7 @@ class ModCreateLanding(TemplateView):
     """
 
     template_name = "mods/create/base.html"
-    success_url = "/mods/create/categorization"
+    success_url = "/mods/create/general"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -85,7 +85,7 @@ class ModCreateCategorization(UpdateView):
 
     model = Mod
     form_class = ModCategorizationForm
-    template_name = "mods/create/step/1.html"
+    template_name = "mods/create/categorization/base.html"
     success_url = lazy_reverse("mod_create_files")
 
     def form_valid(self, form):
@@ -95,13 +95,17 @@ class ModCreateCategorization(UpdateView):
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
         return response
+    
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
 
     def get_context_data(self, **kwargs):
         """
         Get context data for rendering the form, including progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=0)
+        progress_bar = init_context(current_index=1)
         return context | progress_bar
 
     def get_form_kwargs(self):
@@ -132,7 +136,7 @@ class ModCreateFiles(FormView):
         Get context data for rendering the form, including existing uploaded files and progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=1)
+        progress_bar = init_context(current_index=2)
 
         mod_id = self.request.session.get("session_id")
         existing_files = []
@@ -215,7 +219,7 @@ class ModCreateImages(FormView):
         Get context data for rendering the form, including progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=2)
+        progress_bar = init_context(current_index=3)
 
         # get images for current mod from session
         mod_id = self.request.session.get("session_id")
@@ -264,7 +268,7 @@ class ModCreateDescription(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=3)
+        progress_bar = init_context(current_index=4)
 
         return context | progress_bar
 
