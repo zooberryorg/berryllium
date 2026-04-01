@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
-from django.views.generic import CreateView, TemplateView, FormView
+from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
@@ -197,7 +197,7 @@ class ModCreateImages(FormView):
 
         return super().form_valid(form)
     
-class ModCreateDescription(CreateView):
+class ModCreateDescription(UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
     """
@@ -206,6 +206,10 @@ class ModCreateDescription(CreateView):
     template_name = "mods/create/description/base.html"
     success_url = "/mods/create/s4"
 
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)

@@ -31,7 +31,6 @@ from berryllium.mods.settings import (
 from markdownx.fields import MarkdownxFormField
 from markdownx.widgets import MarkdownxWidget
 
-
 class ModCategoriesForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -471,12 +470,12 @@ class ModDescriptionForm(forms.ModelForm):
     """
 
     description = MarkdownxFormField(
-        required=True,
+        required=False,
         widget=MarkdownxWidget(
             attrs={
-                "placeholder": "Enter a detailed description of your mod...",
-                "class": "markdownx-textarea w-1/2 h-64 p-2 rounded bg-gray-700 text-white focus:outline-none hover:shadow-lg transition-shadow duration-200 hover:bg-gray-600",
-                "rows": 10,
+                "placeholder": "Enter detailed description...",
+                "class": "zb-textarea text-sm resize-none",
+                "rows": 6,
             }
         ),
     )

@@ -19,11 +19,13 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from markdownx import urls as markdownx_urls
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("berryllium.landings.urls")),
     path("", include("berryllium.mods.urls")),
+    path("markdownx/", include(markdownx_urls)),
 ]
 
 

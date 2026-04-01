@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.forms",
     "widget_tweaks",
     "markdownx",
     "berryllium.shared",
@@ -121,10 +122,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
 ]
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -141,19 +142,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10MB
 
-MARKDOWNX_MARKDOWN_EXTENSIONS = [
-    "markdown.extensions.extra",
-    "markdown.extensions.nl2br",
-    "markdown.extensions.smarty",
-    "codehilite",
-]
-
-MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
-    "markdown.extensions.codehilite": {
-        "css_class": "highlight",
-        "linenums": True,
-    }
-}
+# for custom widgets
+FORM_RENDERER = 'django.forms.renderers.TemplatesSetting'
 
 # Session configuration
 SESSION_ENGINE = "django.contrib.sessions.backends.db"  # or 'cache' for Redis
@@ -161,3 +151,17 @@ SESSION_COOKIE_AGE = 86400 * 7  # 7 days
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SECURE = True  # In production with HTTPS
+
+MARKDOWNX_MARKDOWN_EXTENSIONS = [
+    'markdown.extensions.extra',
+    'markdown.extensions.nl2br',
+    'markdown.extensions.smarty',
+    'codehilite',
+]
+
+MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
+    'markdown.extensions.codehilite': {
+        'css_class': 'highlight',
+        'linenums': True,
+    }
+}

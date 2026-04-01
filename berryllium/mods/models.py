@@ -1,7 +1,6 @@
 from django.db import models
 from markdownx.models import MarkdownxField
 # from users.models import User
-# from markdownx.models import MarkdownxField
 # from tags.models import Tag
 
 

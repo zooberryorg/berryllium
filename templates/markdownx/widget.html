@@ -1,0 +1,82 @@
+{% load static %}
+<div class="markdownx row" x-data="{ showPreview: false }">
+    <div id="editor-actions" class="flex items-center gap-4 mt-6 mb-1" >
+        <button type="button"
+                class="zb-action rounded-xl items-center gap-1"
+                @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
+                                         
+                >
+            <ion-icon :name="showPreview ? 'eye-off' : 'eye'" class="text-sm text-granite-100"></ion-icon>
+            <span class="text-sm" x-text="showPreview ? 'Hide Preview' : 'Show Preview'"></span>
+        </button>
+    </div>
+    <div class="col-md-6" x-show="!showPreview">
+        {% include 'django/forms/widgets/textarea.html' %}
+    </div>
+    <div class="col-md-6" x-show="showPreview" >
+        <div class="markdownx-preview zb-textarea"></div>
+    </div>
+</div>
+<style>
+    .markdownx-preview h1 {
+        font-size: 2em;
+        margin-bottom: 0.2rem;
+        padding: 0;
+    }
+    .markdownx-preview h2 {
+        font-size: 1.5em;
+        margin-bottom: 0.2rem;
+    }
+    .markdownx-preview h3 {
+        font-size: 1.17em;
+        margin-bottom: 0.2rem;
+    }
+    .markdownx-preview p {
+        padding: 1.5rem 0 0 0;
+        line-height: 1.6;
+    }
+    .markdownx-preview code {
+        background-color: #2d2d2d;
+        padding: 2px 4px;
+        border-radius: 4px;
+        font-family: 'Courier New', Courier, monospace;
+    }
+
+    .markdownx-preview pre {
+        background-color: #18202bff;
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+    }
+
+    .markdownx-preview blockquote {
+        border-left: 4px solid #4b5563;
+        padding-left: 1rem;
+        color: #9ca3af;
+        margin: 1rem 0;
+    }
+
+    .markdownx-preview blockquote p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .markdownx-preview pre code {
+        background-color: transparent;
+        padding: 0;
+    }
+
+    .markdownx-preview ul {
+        list-style-type: disc;
+        padding-left: 1.5rem;
+    }
+
+    .markdownx-preview ol {
+        list-style-type: decimal;
+        padding-left: 1.5rem;
+    }
+
+    .markdownx-preview li {
+        margin-bottom: 0.5rem;
+    }
+</style>
