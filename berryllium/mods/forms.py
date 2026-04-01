@@ -32,7 +32,7 @@ from markdownx.fields import MarkdownxFormField
 from markdownx.widgets import MarkdownxWidget
 
 
-class ModCategoriesForm(forms.ModelForm):
+class ModCategorizationForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
     fields like title and summary.

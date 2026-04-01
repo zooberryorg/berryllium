@@ -8,7 +8,7 @@ from django.urls import reverse_lazy as lazy_reverse
 from berryllium.mods.forms import (
     ModFileForm,
     ModFileUploadForm,
-    ModCategoriesForm,
+    ModCategorizationForm,
     ModFileGroupForm,
     ModImageUploadForm,
     ModDescriptionForm,
@@ -50,7 +50,7 @@ class ModCreateStep1(CreateView):
     """
 
     model = Mod
-    form_class = ModCategoriesForm
+    form_class = ModCategorizationForm
     template_name = "mods/create/step/1.html"
     success_url = lazy_reverse("mod_create_files")
 
