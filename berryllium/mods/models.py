@@ -1,5 +1,7 @@
 from django.db import models
 from markdownx.models import MarkdownxField
+
+from berryllium.shared.models import Tag
 # from users.models import User
 # from tags.models import Tag
 
@@ -59,7 +61,7 @@ class Mod(models.Model):
     # )
 
     draft = models.BooleanField(default=True)
-    # tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True, through="ModTag", related_name="mods")
     version = models.CharField(max_length=100)
     description = MarkdownxField(blank=True)
     prlicense = models.CharField(max_length=100, blank=True)
