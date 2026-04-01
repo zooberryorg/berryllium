@@ -32,10 +32,9 @@ from markdownx.fields import MarkdownxFormField
 from markdownx.widgets import MarkdownxWidget
 
 
-class ModCategorizationForm(forms.ModelForm):
+class ModGeneralInfoForm(forms.ModelForm):
     """
-    This is Step 1 of the file upload form and has simple meta data
-    fields like title and summary.
+    Handles the general information about the mod like title, summary, ownership, publication date, etc.
     """
 
     summary = forms.CharField(
@@ -48,6 +47,49 @@ class ModCategorizationForm(forms.ModelForm):
             }
         ),
     )
+
+    class Meta:
+        model = Mod
+        fields = ["title", "summary"]
+        widgets = {
+            "title": TextInput(
+                attrs={
+                    "placeholder": "Group name (e.g., Main Files)",
+                    "class": "zb-input text-sm",
+                    "autocomplete": "off",
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                },
+            ),
+        }
+
+    def clean_title(self):
+        title = self.cleaned_data.get("title")
+        if any(char in title for char in ILLEGAL_CHARACTERS):
+            raise forms.ValidationError(
+                f"Title contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
+            )
+        return title
+
+    def clean_summary(self):
+        summary = self.cleaned_data.get("summary")
+        if len(summary) < MIN_TEXTFIELD_LENGTH:
+            raise forms.ValidationError(
+                f"Summary must be at least {MIN_TEXTFIELD_LENGTH} characters long."
+            )
+        if len(summary) > MAX_SUMMARY_LENGTH:
+            raise forms.ValidationError(
+                f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
+            )
+
+        # clean summary of leading/trailing whitespace and null characters
+        summary = summary.strip()
+        return summary
+
+class ModCategorizationForm(forms.ModelForm):
+    """
+    This is Step 1 of the file upload form and has simple meta data
+    fields like title and summary.
+    """
 
     def multiple_choice_attributes(choices, widget_class):
         return forms.MultipleChoiceField(
