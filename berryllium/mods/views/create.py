@@ -174,7 +174,7 @@ class ModCreateImages(FormView):
         ModImageUploadForm  # Placeholder, replace with actual picture upload form
     )
     template_name = "mods/create/pictures/base.html"
-    success_url = "/mods/create/s3"
+    success_url = "/mods/create/images"
 
     def get_context_data(self, **kwargs):
         """

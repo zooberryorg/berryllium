@@ -7,7 +7,7 @@ urlpatterns = [
     path("mods/create/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
     path("mods/create/categorization", create.ModCreateCategorization.as_view(), name="mod_create_categorization"),
     path("mods/create/files", create.ModCreateFiles.as_view(), name="mod_create_files"),
-    path("mods/create/s3", create.ModCreateImages.as_view(), name="mod_create_images"),
+    path("mods/create/images", create.ModCreateImages.as_view(), name="mod_create_images"),
     path(
         "mods/create/s4",
         create.ModCreateDescription.as_view(),
