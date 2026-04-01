@@ -70,7 +70,6 @@ class Mod(models.Model):
     submission_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
 
-    # images = models.ManyToManyField(UploadedImage, blank=True)
     contents = models.TextField(blank=True)
 
     # archival info
