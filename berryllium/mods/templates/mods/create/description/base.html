@@ -5,10 +5,10 @@
 </div>
 {% include "mods/create/description/blurb.html" %}
 <form hx-post="{% url 'mod_create_description' %}"
-        hx-target="#upload-frame"
-        hx-swap="innerHTML"
-        enctype="multipart/form-data"
-        hx-encoding="multipart/form-data">
+      hx-target="#upload-frame"
+      hx-swap="innerHTML"
+      enctype="multipart/form-data"
+      hx-encoding="multipart/form-data">
     {% csrf_token %}
     <!-- non-field errors -->
     {% if form.non_field_errors %}
@@ -21,11 +21,7 @@
     {% endif %}
     {% comment %} <div x-data="{ showPreview: false }" class="flex flex-col" data-htmx-target="description">
         <div id="editor-actions" class="flex items-center gap-4 px-6 mt-6" x-init="console.log('Description Editor Initialized')">
-            <button type="button"
-                    class="zb-action rounded-xl"
-                    @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }"
-                                         
-                    >
+            <button type="button" class="zb-action rounded-xl" @click="() => { showPreview = !showPreview; console.log('Toggled Preview:', showPreview); }">
                 <ion-icon :name="showPreview ? 'eye-off' : 'eye'" class="text-sm text-granite-100"></ion-icon>
                 <span class="text-sm" x-text="showPreview ? 'Hide Preview' : 'Show Preview'"></span>
             </button>
@@ -39,11 +35,9 @@
             </div>
         </div>
     </div> {% endcomment %}
-    
-    <div id="description" class="px-6 mb-6 mt-6" data-htmx-target="description">
-        {{ form.description }}
-    </div>
-
+    <div id="description"
+         class="px-6 mb-6 mt-6"
+         data-htmx-target="description">{{ form.description }}</div>
     <!-- Action Buttons -->
     {% include "mods/create/actions.html" %}
 </form>

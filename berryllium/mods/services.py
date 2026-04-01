@@ -93,6 +93,7 @@ def upload_file(uploaded_file, mod_id=None):
 
     return {"filename": basename, "size": uploaded_file.size, "id": uf.id}
 
+
 def upload_image(uploaded_image, mod_id=None):
     """
     Handles image upload and validation.
@@ -119,7 +120,12 @@ def upload_image(uploaded_image, mod_id=None):
         order=ModImage.objects.filter(mod_id=mod_id).count(),
     )
 
-    return {"name": basename, "size": uploaded_image.size, "temp_path": temp_path, "id": img.id}
+    return {
+        "name": basename,
+        "size": uploaded_image.size,
+        "temp_path": temp_path,
+        "id": img.id,
+    }
 
 
 def create_filegroup_formsets(extra=0):

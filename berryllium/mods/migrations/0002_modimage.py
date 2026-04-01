@@ -5,25 +5,39 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('mods', '0001_initial'),
+        ("mods", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='ModImage',
+            name="ModImage",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(upload_to='mod_images/')),
-                ('title', models.CharField(blank=True, max_length=255, null=True)),
-                ('caption', models.CharField(blank=True, max_length=255)),
-                ('order', models.PositiveIntegerField(default=0)),
-                ('uploaded_by', models.CharField(blank=True, max_length=255)),
-                ('mod', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='images', to='mods.mod')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("image", models.ImageField(upload_to="mod_images/")),
+                ("title", models.CharField(blank=True, max_length=255, null=True)),
+                ("caption", models.CharField(blank=True, max_length=255)),
+                ("order", models.PositiveIntegerField(default=0)),
+                ("uploaded_by", models.CharField(blank=True, max_length=255)),
+                (
+                    "mod",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="images",
+                        to="mods.mod",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['order', 'id'],
+                "ordering": ["order", "id"],
             },
         ),
     ]

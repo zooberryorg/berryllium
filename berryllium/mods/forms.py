@@ -25,11 +25,12 @@ from berryllium.mods.settings import (
     MOD_CATEGORIES,
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
-    MAX_IMAGE_SIZE
+    MAX_IMAGE_SIZE,
 )
 
 from markdownx.fields import MarkdownxFormField
 from markdownx.widgets import MarkdownxWidget
+
 
 class ModCategoriesForm(forms.ModelForm):
     """
@@ -117,6 +118,7 @@ class ModCategoriesForm(forms.ModelForm):
 
     def clean_expansions(self):
         return self.multiple_choice_clean("expansions")
+
 
 class ModFileGroupForm(forms.ModelForm):
     """
@@ -291,7 +293,8 @@ class ModFileForm(forms.Form):
             )
 
         return description
-    
+
+
 class ModFileUploadForm(forms.Form):
     """
     This is Step 2 of the file upload form, which handles
@@ -349,12 +352,14 @@ class ModFileUploadForm(forms.Form):
 
         return cleaned_file
 
+
 class MultipleFileInput(forms.FileInput):
     """
     Custom widget to allow multiple file uploads.
     """
 
     allow_multiple_selected = True
+
 
 class MultipleImageInputField(forms.ImageField):
     """
@@ -370,6 +375,7 @@ class MultipleImageInputField(forms.ImageField):
         if isinstance(data, (list, tuple)):
             return [single_file(d, initial) for d in data]
         return single_file(data, initial)
+
 
 class ModImageUploadForm(forms.Form):
     """
@@ -390,7 +396,7 @@ class ModImageUploadForm(forms.Form):
         print("Validating uploaded images:", [img.name for img in images])
         if not images:
             return None
-        
+
         # ------------------ clean each image and validate
         cleaned_images = []
 
@@ -400,7 +406,7 @@ class ModImageUploadForm(forms.Form):
                 raise forms.ValidationError(
                     f"Image size exceeds the maximum limit of {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
                 )
-            
+
             if img.size == 0:
                 raise forms.ValidationError("The uploaded image is empty.")
 
@@ -409,18 +415,20 @@ class ModImageUploadForm(forms.Form):
                 raise forms.ValidationError(
                     f"Filename contains illegal characters: {', '.join(ILLEGAL_CHARACTERS)}"
                 )
-            
-            if img.name in [img['filename'] for img in self.existing_images]:
+
+            if img.name in [img["filename"] for img in self.existing_images]:
                 # rename file by appending a number to the end of the filename
                 base_name, extension = img.name.rsplit(".", 1)
                 counter = 1
-                while f"{base_name}_{counter}.{extension}" in [img['filename'] for img in self.existing_images]:
+                while f"{base_name}_{counter}.{extension}" in [
+                    img["filename"] for img in self.existing_images
+                ]:
                     counter += 1
-            
+
             cleaned_images.append(img)
-            
 
         return cleaned_images
+
 
 class ModImageForm(forms.Form):
     """
@@ -462,7 +470,8 @@ class ModImageForm(forms.Form):
             raise forms.ValidationError("Image caption cannot contain null characters.")
 
         return caption
-    
+
+
 class ModDescriptionForm(forms.ModelForm):
     """
     This is Step 4 of the mod creation form, which handles the detailed
@@ -483,5 +492,6 @@ class ModDescriptionForm(forms.ModelForm):
     class Meta:
         model = Mod
         fields = ["description"]
+
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
