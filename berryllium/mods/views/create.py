@@ -30,7 +30,7 @@ class ModCreateLanding(TemplateView):
     """
 
     template_name = "mods/create/base.html"
-    success_url = "/mods/create/s1"
+    success_url = "/mods/create/categorization"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
