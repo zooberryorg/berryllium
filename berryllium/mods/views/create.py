@@ -6,12 +6,11 @@ from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
-    ModFileForm,
     ModFileUploadForm,
     ModCategorizationForm,
-    ModFileGroupForm,
     ModImageUploadForm,
     ModDescriptionForm,
+    ModGeneralInfoForm,
 )
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
@@ -43,6 +42,20 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
+class ModCreateGeneralInfo(CreateView):
+    """
+    Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
+    """
+
+    model = Mod
+    form_class = ModGeneralInfoForm
+    template_name = "mods/create/general/base.html"
+    success_url = lazy_reverse("mod_create_categorization")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=0)
+        return context | progress_bar
 
 class ModCreateCategorization(CreateView):
     """
