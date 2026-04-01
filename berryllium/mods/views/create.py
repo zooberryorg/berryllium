@@ -6,12 +6,11 @@ from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
-    ModFileForm,
     ModFileUploadForm,
-    ModCategoriesForm,
-    ModFileGroupForm,
+    ModCategorizationForm,
     ModImageUploadForm,
     ModDescriptionForm,
+    ModGeneralInfoForm,
 )
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
@@ -30,7 +29,7 @@ class ModCreateLanding(TemplateView):
     """
 
     template_name = "mods/create/base.html"
-    success_url = "/mods/create/s1"
+    success_url = "/mods/create/general"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -41,18 +40,17 @@ class ModCreateLanding(TemplateView):
     #     # Clear session later to start new
     #     # request.session.pop("session_id", None)
     #     # request.session.pop("group_manager_toggled", None)
-    #     return redirect("mod_create_step1")
+    #     return redirect("mod_create_categorization")
 
-
-class ModCreateStep1(CreateView):
+class ModCreateGeneralInfo(CreateView):
     """
-    Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
+    Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
 
     model = Mod
-    form_class = ModCategoriesForm
-    template_name = "mods/create/step/1.html"
-    success_url = lazy_reverse("mod_create_files")
+    form_class = ModGeneralInfoForm
+    template_name = "mods/create/general/base.html"
+    success_url = lazy_reverse("mod_create_categorization")
 
     def form_valid(self, form):
         """
@@ -63,11 +61,51 @@ class ModCreateStep1(CreateView):
         return response
 
     def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        progress_bar = init_context(current_index=0)
+        return context | progress_bar
+    
+    def get_form_kwargs(self):
+        """
+        Re-hydrate form with existing draft data if session exists.
+        """
+        kwargs = super().get_form_kwargs()
+        session_id = self.request.session.get("session_id")
+        if session_id:
+            try:
+                kwargs["instance"] = Mod.objects.get(id=session_id)
+            except Mod.DoesNotExist:
+                pass
+        return kwargs
+
+class ModCreateCategorization(UpdateView):
+    """
+    Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
+    """
+
+    model = Mod
+    form_class = ModCategorizationForm
+    template_name = "mods/create/categorization/base.html"
+    success_url = lazy_reverse("mod_create_files")
+
+    def form_valid(self, form):
+        """
+        Validate form and save draft mod, then store mod ID in session for later steps.
+        """
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        return response
+    
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
+
+    def get_context_data(self, **kwargs):
         """
         Get context data for rendering the form, including progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=0)
+        progress_bar = init_context(current_index=1)
         return context | progress_bar
 
     def get_form_kwargs(self):
@@ -98,7 +136,7 @@ class ModCreateFiles(FormView):
         Get context data for rendering the form, including existing uploaded files and progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=1)
+        progress_bar = init_context(current_index=2)
 
         mod_id = self.request.session.get("session_id")
         existing_files = []
@@ -159,7 +197,7 @@ class ModCreateFiles(FormView):
         """
         action = self.request.POST.get("action") == "previous"
         if action == "previous":
-            return lazy_reverse("mod_create_step1")
+            return lazy_reverse("mod_create_categorization")
         elif action == "uploaded_file":
             return self.request.path
         return super().get_success_url()
@@ -174,14 +212,14 @@ class ModCreateImages(FormView):
         ModImageUploadForm  # Placeholder, replace with actual picture upload form
     )
     template_name = "mods/create/pictures/base.html"
-    success_url = "/mods/create/s3"
+    success_url = "/mods/create/images"
 
     def get_context_data(self, **kwargs):
         """
         Get context data for rendering the form, including progress bar information.
         """
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=2)
+        progress_bar = init_context(current_index=3)
 
         # get images for current mod from session
         mod_id = self.request.session.get("session_id")
@@ -230,7 +268,7 @@ class ModCreateDescription(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        progress_bar = init_context(current_index=3)
+        progress_bar = init_context(current_index=4)
 
         return context | progress_bar
 

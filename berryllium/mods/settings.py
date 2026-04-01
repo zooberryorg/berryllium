@@ -3,7 +3,8 @@
 #     url: Endpoint
 #     icon: Icon name. See: https://icons.getbootstrap.com/
 UPLOAD_NAVIGATION = [
-    {"name": "General", "url": "mod_create_step1", "icon": "info-circle"},
+    {"name": "General", "url": "mod_create_general", "icon": "info-circle"},
+    {"name": "Categorization", "url": "mod_create_categorization", "icon": "tags"},
     {"name": "Upload Files", "url": "mod_create_files", "icon": "upload"},
     {"name": "Upload Images", "url": "mod_create_images", "icon": "image"},
     {"name": "Description", "url": "mod_create_description", "icon": "file-text"},

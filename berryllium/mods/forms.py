@@ -32,11 +32,22 @@ from markdownx.fields import MarkdownxFormField
 from markdownx.widgets import MarkdownxWidget
 
 
-class ModCategoriesForm(forms.ModelForm):
+class ModGeneralInfoForm(forms.ModelForm):
     """
-    This is Step 1 of the file upload form and has simple meta data
-    fields like title and summary.
+    Handles the general information about the mod like title, summary, ownership, publication date, etc.
     """
+
+    title = forms.CharField(
+        required=True,
+        widget=TextInput(
+            attrs={
+                "placeholder": "Enter mod title...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
+    )
 
     summary = forms.CharField(
         required=True,
@@ -49,25 +60,21 @@ class ModCategoriesForm(forms.ModelForm):
         ),
     )
 
-    def multiple_choice_attributes(choices, widget_class):
-        return forms.MultipleChoiceField(
-            choices=choices,
-            widget=widget_class(
-                attrs={
-                    **DISABLE_SUBMIT_BUTTON_ATTRS,
-                }
-            ),
-        )
-
-    category = multiple_choice_attributes(MOD_CATEGORIES, PillCheckboxSelectMultiple)
-    game = multiple_choice_attributes(GAME_OPTIONS, PillCheckboxSelectMultiple)
-    expansions = multiple_choice_attributes(
-        EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
+    owner = forms.CharField(
+        required=False,
+        widget=TextInput(
+            attrs={
+                "placeholder": "Enter mod owner (optional)...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                **DISABLE_SUBMIT_BUTTON_ATTRS,
+            }
+        ),
     )
 
     class Meta:
         model = Mod
-        fields = ["title", "summary", "category", "game", "expansions"]
+        fields = ["title", "summary", "owner"]
         widgets = {
             "title": TextInput(
                 attrs={
@@ -101,6 +108,33 @@ class ModCategoriesForm(forms.ModelForm):
         # clean summary of leading/trailing whitespace and null characters
         summary = summary.strip()
         return summary
+
+
+class ModCategorizationForm(forms.ModelForm):
+    """
+    This is Step 1 of the file upload form and has simple meta data
+    fields like title and summary.
+    """
+
+    def multiple_choice_attributes(choices, widget_class):
+        return forms.MultipleChoiceField(
+            choices=choices,
+            widget=widget_class(
+                attrs={
+                    **DISABLE_SUBMIT_BUTTON_ATTRS,
+                }
+            ),
+        )
+
+    category = multiple_choice_attributes(MOD_CATEGORIES, PillCheckboxSelectMultiple)
+    game = multiple_choice_attributes(GAME_OPTIONS, PillCheckboxSelectMultiple)
+    expansions = multiple_choice_attributes(
+        EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
+    )
+
+    class Meta:
+        model = Mod
+        fields = ["category", "game", "expansions"]
 
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
