@@ -127,6 +127,27 @@ class ModDependency(models.Model):
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
 
+class ModTag(models.Model):
+    """
+    Through model for Mod tags.
+
+    Definitions:
+    - mod: the mod being tagged
+    - tag: the tag being applied
+    - created_at: when the tag was applied
+    - created_by: who applied the tag
+    - upvotes: number of upvotes for the tag on the mod (too few upvotes may indicate 
+    the tag is not relevant to the mod and should be removed)
+    """
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE)
+    tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.CharField(max_length=255, blank=True)  # change to user later
+    upvotes = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        unique_together = ("mod", "tag")
+
 
 class ModFileGroup(models.Model):
     """
