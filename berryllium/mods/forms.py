@@ -74,7 +74,7 @@ class ModGeneralInfoForm(forms.ModelForm):
 
     class Meta:
         model = Mod
-        fields = ["title", "summary"]
+        fields = ["title", "summary", "owner"]
         widgets = {
             "title": TextInput(
                 attrs={
@@ -134,7 +134,7 @@ class ModCategorizationForm(forms.ModelForm):
 
     class Meta:
         model = Mod
-        fields = ["title", "summary", "category", "game", "expansions"]
+        fields = ["category", "game", "expansions"]
 
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
