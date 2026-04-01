@@ -25,6 +25,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("berryllium.landings.urls")),
     path("", include("berryllium.mods.urls")),
+    path("", include("berryllium.organizations.urls")),
     path("markdownx/", include(markdownx_urls)),
 ]
 
