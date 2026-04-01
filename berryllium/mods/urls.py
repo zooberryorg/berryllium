@@ -8,6 +8,7 @@ urlpatterns = [
     path("mods/create/categorization", create.ModCreateCategorization.as_view(), name="mod_create_categorization"),
     path("mods/create/files", create.ModCreateFiles.as_view(), name="mod_create_files"),
     path("mods/create/images", create.ModCreateImages.as_view(), name="mod_create_images"),
+    path("mods/create/general", create.ModCreateGeneralInfo.as_view(), name="mod_create_general"),
     path(
         "mods/create/s4",
         create.ModCreateDescription.as_view(),
