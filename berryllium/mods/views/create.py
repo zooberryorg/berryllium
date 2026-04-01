@@ -44,7 +44,7 @@ class ModCreateLanding(TemplateView):
     #     return redirect("mod_create_step1")
 
 
-class ModCreateStep1(CreateView):
+class ModCreateCategorization(CreateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
