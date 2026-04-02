@@ -3,7 +3,7 @@
 <div class="px-6 pt-6">
     {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
-<form hx-post="{% url 'mod_create_general' %}"
+<form hx-post="{% url 'mod_create_general' mod_id=mod_id %}"
       hx-target="#upload-frame"
       hx-swap="innerHTML"
       hx-encoding="multipart/form-data">

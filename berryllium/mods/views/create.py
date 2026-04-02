@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.generic import CreateView, TemplateView, FormView, UpdateView
-from django.urls import reverse_lazy as lazy_reverse
+from django.urls import reverse, reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -22,6 +22,30 @@ from berryllium.mods.services import (
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
+class ModDraftView(CreateView):
+    """
+    HTMX Endpoint: Create a draft mod and return its ID for session management.
+    """
+
+    model = Mod
+    form_class = ModGeneralInfoForm
+    template_name = "mods/create/draft.html"
+
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_landing", kwargs={"mod_id": self.object.id})
+
+    def form_valid(self, form):
+        """
+        Create a new draft mod and return its ID in the response for session management.
+        """
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        response = HttpResponse()
+        response["HX-Redirect"] = self.get_success_url()
+        return response
 
 class ModCreateLanding(TemplateView):
     """
@@ -29,11 +53,17 @@ class ModCreateLanding(TemplateView):
     """
 
     template_name = "mods/create/base.html"
-    success_url = "/mods/create/general"
+
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mod_navigation"] = UPLOAD_NAVIGATION
+        context["mod_id"] = self.kwargs["mod_id"]
         return context
 
     # def get(self, request, *args, **kwargs):
@@ -42,7 +72,7 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
-class ModCreateGeneralInfo(CreateView):
+class ModCreateGeneralInfo(UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
@@ -50,19 +80,29 @@ class ModCreateGeneralInfo(CreateView):
     model = Mod
     form_class = ModGeneralInfoForm
     template_name = "mods/create/general/base.html"
-    success_url = lazy_reverse("mod_create_categorization")
 
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
+    
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
+    
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
-        self.request.session["session_id"] = self.object.id
         return response
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
+        mod_id = self.request.session.get("session_id")
+        context["mod_id"] = mod_id
         return context | progress_bar
     
     def get_form_kwargs(self):

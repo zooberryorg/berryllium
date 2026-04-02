@@ -1,9 +1,9 @@
 <aside class="space-y-1 text-sm">
     {% for link in mod_navigation %}
-        <a href="{% url link.url %}"
+        <a href="{% url link.url mod_id=mod_id %}"
            data-nav-link="{{ forloop.counter0 }}"
            class="relative group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white border border-transparent hover:border-gold-300/30 transition-colors duration-200 before:absolute before:inset-0 before:rounded-xl before:bg-gradient-to-r before:from-gold-500/50 before:to-gold-300/50 before:opacity-0 hover:before:opacity-100 before:transition-opacity before:duration-200 before:-z-10"
-           hx-get="{% url link.url %}"
+           hx-get="{% url link.url mod_id=mod_id %}"
            hx-target="#upload-frame"
            hx-swap="innerHTML">
             <div class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-gold-400/20 transition-colors">

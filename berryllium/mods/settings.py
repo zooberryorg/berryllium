@@ -4,12 +4,12 @@
 #     icon: Icon name. See: https://icons.getbootstrap.com/
 UPLOAD_NAVIGATION = [
     {"name": "General", "url": "mod_create_general", "icon": "info-circle"},
-    {"name": "Categorization", "url": "mod_create_categorization", "icon": "tags"},
+    {"name": "Categorization", "url": "mod_create_categorization", "payload": "mod_id", "icon": "tags"},
     {"name": "Upload Files", "url": "mod_create_files", "icon": "upload"},
     {"name": "Upload Images", "url": "mod_create_images", "icon": "image"},
     {"name": "Description", "url": "mod_create_description", "icon": "file-text"},
-    {"name": "Details & Settings", "url": "upload_step3", "icon": "gear"},
-    {"name": "Review & Submit", "url": "upload_step3", "icon": "check-circle"},
+    {"name": "Details & Settings", "url": "mod_create_description", "icon": "gear"},
+    {"name": "Review & Submit", "url": "mod_create_description", "icon": "check-circle"},
 ]
 
 MIN_TEXTFIELD_LENGTH = 4

@@ -1,0 +1,29 @@
+<form hx-post="{% url 'mod_create_draft' %}"
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    <div class="space-y-4 p-6">
+        <div>
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-white">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% include "mods/create/field_errors.html" with field=field %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
+        <button type="button"
+                class="zb-controls flex-1 items-center justify-center"
+                @click="closeModal()"
+                >Cancel</button>
+        <button type="submit"
+                class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors"
+                name="create_draft">
+            <span>Create Draft <ion-icon name="checkmark" class="align-middle"></ion-icon></span>
+        </button>
+    </div>
+</form>

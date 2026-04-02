@@ -10,6 +10,7 @@
                 maxWidth: event.detail.maxWidth || 'max-w-2xl', 
                 hideHeader: event.detail.hideHeader || false, 
                 focusAfterRender: event.detail.focusAfterRender || null,
+                closeOnBgClick: event.detail.closeOnBgClick || true,
             }); 
         }"
     {# djlint:on #}
@@ -20,7 +21,7 @@
          class="fixed inset-0 z-50 flex items-center justify-center p-4"
          @keydown.escape.window="closeModal()">
         <!-- Backdrop -->
-        <div class="glass absolute inset-0 bg-black/50" @click="closeModal()"></div>
+        <div class="glass absolute inset-0 bg-black/50" @click="if (closeOnBgClick) closeModal()"></div>
         <!-- Modal panel -->
         <div class="relative w-full rounded-2xl bg-pine-700 border-4 border-pine-100/10 shadow-2xl"
              :class="maxWidth"
