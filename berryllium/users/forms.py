@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm, TextInput, PasswordInput
 
 from berryllium.mods.settings import DISABLE_SUBMIT_BUTTON_ATTRS
 from berryllium.users.models import Member
@@ -36,19 +36,19 @@ class MemberRegistrationForm(ModelForm):
 
     password = forms.CharField(
         required=True,
-        widget=TextInput(
+        widget=PasswordInput(
             attrs={
                 "placeholder": "Enter password...",
                 "class": "zb-input text-sm",
                 "autocomplete": "off",
                 **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
+            },
         ),
     )
 
     confirm_password = forms.CharField(
         required=True,
-        widget=TextInput(
+        widget=PasswordInput(
             attrs={
                 "placeholder": "Confirm password...",
                 "class": "zb-input text-sm",
@@ -78,7 +78,7 @@ class MemberLoginForm(ModelForm):
 
     password = forms.CharField(
         required=True,
-        widget=TextInput(
+        widget=PasswordInput(
             attrs={
                 "placeholder": "Enter password...",
                 "class": "zb-input text-sm",
