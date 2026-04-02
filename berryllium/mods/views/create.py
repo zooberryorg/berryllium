@@ -43,6 +43,8 @@ class ModDraftView(CreateView):
         """
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
+        response = HttpResponse()
+        response["HX-Redirect"] = self.get_success_url()
         return response
 
 class ModCreateLanding(TemplateView):
