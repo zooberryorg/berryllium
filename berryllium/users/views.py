@@ -38,5 +38,5 @@ class MemberLogin(FormView):
     
     def form_invalid(self, form):
         if self.request.headers.get("HX-Request"):
-            return render(self.request, "users/login_fields.html", {"form": form}, status=200)
-        return render(self.request, "users/login_fields.html", {"form": form}, status=200)
+            return render(self.request, "users/fields.html", {"form": form}, status=200)
+        return render(self.request, "users/fields.html", {"form": form}, status=200)

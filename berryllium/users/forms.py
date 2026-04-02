@@ -65,6 +65,12 @@ class MemberRegistrationForm(ModelForm):
 
         if password and confirm_password and password != confirm_password:
             self.add_error("confirm_password", "Passwords do not match.")
+
+        if Member.objects.filter(username=cleaned_data.get("username")).exists():
+            self.add_error("username", "Username already exists. Use a different username.")
+        
+        if Member.objects.filter(email=cleaned_data.get("email")).exists():
+            self.add_error("email", "Email already exists. Use a different email.")
         
         return cleaned_data
 

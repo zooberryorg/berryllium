@@ -17,18 +17,8 @@
         <form hx-post="{% url 'register' %}"
             hx-encoding="multipart/form-data">
             {% csrf_token %}
-            <div class="space-y-4 p-6">
-                <div>
-                    {% for field in form %}
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium mb-1 text-white">
-                                {{ field.label }}
-                                {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                            </label>
-                            {{ field }}
-                        </div>
-                    {% endfor %}
-                </div>
+            <div class="space-y-4 p-6" id="login-frame">
+                {% include "users/fields.html" %}
             </div>
             <div class="px-6">
                 <button type="submit"
