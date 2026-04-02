@@ -13,8 +13,8 @@
          class="absolute pt-2 z-50 right-0">
         <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[280px]">
             <a @click="$dispatch('open-modal', { 
-                    endpoint: '{% url 'hx_upload_file' %}', 
-                    modalTitle: 'Upload a File', 
+                    endpoint: '{% url 'hx_mod_draft' %}', 
+                    modalTitle: 'Create Mod Draft', 
                     icon: 'upload', 
                     maxWidth: 'max-w-lg',
                     focusAfterRender: document.getElementById('upload-frame'),
