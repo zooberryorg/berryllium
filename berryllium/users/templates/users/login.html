@@ -1,0 +1,23 @@
+<!-- scrollable form -->
+<!-- progress bar -->
+<div class="px-6 pt-6">
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+</div>
+<form hx-post="{% url 'login' %}"
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    <div class="space-y-4 p-6">
+        <div>
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-white">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% include "mods/create/actions.html" %}
+</form>
