@@ -1,6 +1,6 @@
 <!-- non-field errors -->
 {% if form.non_field_errors %}
-    <div class="text-red-500 text-sm mt-1">
+    <div class="text-red-500 text-sm mt-1 bg-red-500/50 border border-red-500/30 rounded-lg mb-4 p-4">
         {{ form.non_field_errors.0 }}
     </div>
 {% endif %}
@@ -13,7 +13,7 @@
             </label>
             {{ field }}
             {% if field.errors %}
-                <div class="text-red-500 text-sm mt-1">
+                <div class="text-red-500 text-sm mt-1 bg-red-500/20 border border-red-500/30 rounded-lg mb-4 p-4">
                     {{ field.errors.0 }}
                 </div>
             {% endif %}
