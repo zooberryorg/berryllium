@@ -22,6 +22,23 @@ from berryllium.mods.services import (
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
+class ModDraftView(CreateView):
+    """
+    HTMX Endpoint: Create a draft mod and return its ID for session management.
+    """
+
+    model = Mod
+    form_class = ModGeneralInfoForm
+    template_name = "mods/create/draft.html"
+    success_url = lazy_reverse("mod_create_categorization")
+
+    def form_valid(self, form):
+        """
+        Create a new draft mod and return its ID in the response for session management.
+        """
+        response = super().form_valid(form)
+        self.request.session["session_id"] = self.object.id
+        return response
 
 class ModCreateLanding(TemplateView):
     """
@@ -42,7 +59,7 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
-class ModCreateGeneralInfo(CreateView):
+class ModCreateGeneralInfo(UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
@@ -57,7 +74,6 @@ class ModCreateGeneralInfo(CreateView):
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
-        self.request.session["session_id"] = self.object.id
         return response
 
     def get_context_data(self, **kwargs):
