@@ -36,14 +36,14 @@
              {% endcomment %}
              x-transition>
             <!-- Header -->
-            <div class="border-b px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white"
+            <div class="border-b border-pine-100/10 px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white"
                  x-show="!hideHeader"
                  x-transition>
                 <span class="flex items-center gap-3">
                     <ion-icon :name="icon" size="large"></ion-icon>
                     <h2 class="text-xl font-semibold" x-text="modalTitle">Modal Title</h2>
                 </span>
-                <button @click="closeModal()" class="text-gray-400 hover:text-gray-600">
+                <button @click="closeModal()" class="hover:bg-red-400 rounded-full p-1 text-gray-400 hover:text-white cursor-pointer transition-colors ">
                     <ion-icon name="close" size="large"></ion-icon>
                 </button>
             </div>
