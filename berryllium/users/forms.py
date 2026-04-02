@@ -100,3 +100,5 @@ class MemberLoginForm(ModelForm):
                     raise forms.ValidationError("Invalid username or password.")
             except Member.DoesNotExist:
                 raise forms.ValidationError("Invalid username or password.")
+            
+        return cleaned_data
