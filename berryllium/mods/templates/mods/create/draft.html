@@ -1,0 +1,21 @@
+<form hx-post="{% url 'mod_create_categorization' %}"
+      hx-target="#upload-frame"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    <div class="space-y-4 p-6">
+        <div>
+            {% for field in form %}
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-1 text-white">
+                        {{ field.label }}
+                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                    </label>
+                    {{ field }}
+                    {% include "mods/create/field_errors.html" with field=field %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% include "mods/create/actions.html" %}
+</form>

@@ -4,7 +4,7 @@ import berryllium.mods.validations as validations
 
 urlpatterns = [
     # Upload form (CREATE)
-    path("mods/create/draft/", create.ModDraftView.as_view(), name="mod_draft"),
+    path("mods/create/draft/", create.ModDraftView.as_view(), name="mod_create_draft"),
     path("mods/create/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
     path("mods/create/categorization", create.ModCreateCategorization.as_view(), name="mod_create_categorization"),
     path("mods/create/files", create.ModCreateFiles.as_view(), name="mod_create_files"),
