@@ -11,7 +11,7 @@ urlpatterns = [
     path("mods/edit/<int:mod_id>/images", create.ModCreateImages.as_view(), name="mod_create_images"),
     path("mods/edit/<int:mod_id>/general", create.ModCreateGeneralInfo.as_view(), name="mod_create_general"),
     path(
-        "mods/edit/<int:mod_id>/s4",
+        "mods/edit/<int:mod_id>/description",
         create.ModCreateDescription.as_view(),
         name="mod_create_description",
     ),

@@ -3,7 +3,7 @@ from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
 from django.http import HttpResponse
 from django.views.generic import CreateView, TemplateView, FormView, UpdateView
-from django.urls import reverse_lazy as lazy_reverse
+from django.urls import reverse, reverse_lazy as lazy_reverse
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -30,7 +30,12 @@ class ModDraftView(CreateView):
     model = Mod
     form_class = ModGeneralInfoForm
     template_name = "mods/create/draft.html"
-    success_url = lazy_reverse("mod_create_landing")
+
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_landing", kwargs={"mod_id": self.object.id})
 
     def form_valid(self, form):
         """
@@ -38,8 +43,6 @@ class ModDraftView(CreateView):
         """
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
-        response = HttpResponse()
-        response["HX-Redirect"] = lazy_reverse("mod_create_landing", kwargs={"pk": self.object.id})
         return response
 
 class ModCreateLanding(TemplateView):
