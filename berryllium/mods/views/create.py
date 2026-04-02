@@ -30,7 +30,7 @@ class ModDraftView(CreateView):
     model = Mod
     form_class = ModGeneralInfoForm
     template_name = "mods/create/draft.html"
-    success_url = lazy_reverse("mod_create_categorization")
+    success_url = lazy_reverse("mod_create_landing")
 
     def form_valid(self, form):
         """
@@ -38,6 +38,8 @@ class ModDraftView(CreateView):
         """
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
+        response = HttpResponse()
+        response["HX-Redirect"] = lazy_reverse("mod_create_landing", kwargs={"pk": self.object.id})
         return response
 
 class ModCreateLanding(TemplateView):

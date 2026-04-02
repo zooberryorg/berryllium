@@ -4,18 +4,18 @@ import berryllium.mods.validations as validations
 
 urlpatterns = [
     # Upload form (CREATE)
-    path("mods/create/draft/", create.ModDraftView.as_view(), name="mod_create_draft"),
-    path("mods/create/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
-    path("mods/create/categorization", create.ModCreateCategorization.as_view(), name="mod_create_categorization"),
-    path("mods/create/files", create.ModCreateFiles.as_view(), name="mod_create_files"),
-    path("mods/create/images", create.ModCreateImages.as_view(), name="mod_create_images"),
-    path("mods/create/general", create.ModCreateGeneralInfo.as_view(), name="mod_create_general"),
+    path("mods/draft/", create.ModDraftView.as_view(), name="mod_create_draft"),
+    path("mods/edit/<int:mod_id>/", create.ModCreateLanding.as_view(), name="mod_create_landing"),
+    path("mods/edit/<int:mod_id>/categorization", create.ModCreateCategorization.as_view(), name="mod_create_categorization"),
+    path("mods/edit/<int:mod_id>/files", create.ModCreateFiles.as_view(), name="mod_create_files"),
+    path("mods/edit/<int:mod_id>/images", create.ModCreateImages.as_view(), name="mod_create_images"),
+    path("mods/edit/<int:mod_id>/general", create.ModCreateGeneralInfo.as_view(), name="mod_create_general"),
     path(
-        "mods/create/s4",
+        "mods/edit/<int:mod_id>/s4",
         create.ModCreateDescription.as_view(),
         name="mod_create_description",
     ),
-    path("mods/create/s6", create.upload_step3, name="upload_step3"),
+    path("mods/edit/s6", create.upload_step3, name="upload_step3"),
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
