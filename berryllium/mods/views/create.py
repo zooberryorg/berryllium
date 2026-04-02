@@ -51,7 +51,12 @@ class ModCreateLanding(TemplateView):
     """
 
     template_name = "mods/create/base.html"
-    success_url = "/mods/create/general"
+
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,8 +78,13 @@ class ModCreateGeneralInfo(UpdateView):
     model = Mod
     form_class = ModGeneralInfoForm
     template_name = "mods/create/general/base.html"
-    success_url = lazy_reverse("mod_create_categorization")
 
+    def get_success_url(self):
+        """
+        Override to prevent redirect since we handle navigation with HTMX.
+        """
+        return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
+    
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
