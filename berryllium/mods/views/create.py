@@ -85,6 +85,10 @@ class ModCreateGeneralInfo(UpdateView):
         """
         return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
     
+    def get_object(self, queryset=None):
+        mod_id = self.request.session.get("session_id")
+        return Mod.objects.get(id=mod_id)
+    
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
@@ -95,6 +99,8 @@ class ModCreateGeneralInfo(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
+        mod_id = self.request.session.get("session_id")
+        context["mod_id"] = mod_id
         return context | progress_bar
     
     def get_form_kwargs(self):
