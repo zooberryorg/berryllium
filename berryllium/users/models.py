@@ -17,3 +17,14 @@ class Member(AbstractUser):
     """
     biography = models.TextField(blank=True, max_length=500)
     is_archived = models.BooleanField(default=False)
+
+    groups = models.ManyToManyField(
+        "auth.Group",
+        related_name="members",
+        blank=True,
+    )
+    user_permissions = models.ManyToManyField(
+        "auth.Permission",
+        related_name="members",
+        blank=True,
+    )
