@@ -4,26 +4,34 @@
  {% load static %}
  {% block title %}Login{% endblock %}
  {% block content %}
-<div class="max-w-screen-md max-w-md mx-auto flex flex-col mt-6 gap-8 px-4 pb-8 rounded-2xl bg-pine-700 border-4 border-pine-100/10 shadow-2xl">
-    <h1 class="text-xl font-semibold border-b border-pine-100/10 px-6 py-4 flex items-center justify-between bg-pine-800/40 text-white">Login</h1>
-    <p class="text-lg text-gray-300">Welcome back! Please enter your credentials to log in.</p>
-    <form hx-post="{% url 'login' %}"
-        hx-encoding="multipart/form-data">
-        {% csrf_token %}
-        <div class="space-y-4 p-6">
-            <div>
-                {% for field in form %}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium mb-1 text-white">
-                            {{ field.label }}
-                            {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                        </label>
-                        {{ field }}
-                    </div>
-                {% endfor %}
+<div class="max-w-md mx-auto flex flex-col mt-6 gap-1 pb-8 rounded-2xl bg-pine-700 border-4 border-pine-100/10 shadow-2xl">
+    <h1 class="text-xl font-semibold border-b border-pine-100/10 px-6 py-4 flex mb-1 items-center justify-between bg-pine-800/40 text-white">Login</h1>
+    <div class="p-4">
+        <div class="flex gap-4 bg-pine-info-200 border border-pine-info-100 rounded-xl p-4">
+            <p class="text-granite-200">
+                Welcome back! Please enter your credentials to access your account. If you don't have an account yet, you can <a href="{% url 'register' %}" class="text-gold-400 hover:underline bg-pine-600/50 px-2 pb-1 rounded-lg">register here</a>.
+            </p>
+        </div>  
+    </div> 
+    <div class="px-6 pt-2"> 
+        <form hx-post="{% url 'login' %}"
+            hx-encoding="multipart/form-data">
+            {% csrf_token %}
+            <div class="space-y-4 p-6">
+                <div>
+                    {% for field in form %}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium mb-1 text-white">
+                                {{ field.label }}
+                                {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
+                            </label>
+                            {{ field }}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 {% endblock %}
