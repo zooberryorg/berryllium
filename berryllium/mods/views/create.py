@@ -56,6 +56,7 @@ class ModCreateLanding(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mod_navigation"] = UPLOAD_NAVIGATION
+        context["mod_id"] = self.kwargs["mod_id"]
         return context
 
     # def get(self, request, *args, **kwargs):
