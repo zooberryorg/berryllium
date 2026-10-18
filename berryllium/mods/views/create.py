@@ -126,7 +126,6 @@ class ModCreateCategorization(UpdateView):
     model = Mod
     form_class = ModCategorizationForm
     template_name = "mods/create/categorization/base.html"
-    success_url = lazy_reverse("mod_create_files")
 
     def form_valid(self, form):
         """
@@ -135,6 +134,9 @@ class ModCreateCategorization(UpdateView):
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
         return response
+    
+    def get_success_url(self):
+        return reverse("mod_create_files", kwargs={"mod_id": self.object.id})
     
     def get_object(self, queryset=None):
         mod_id = self.request.session.get("session_id")
