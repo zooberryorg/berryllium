@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 
 # Create your models here.
 class Organization(models.Model):
@@ -9,8 +10,7 @@ class Organization(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    members = models.ManyToManyField("auth.User", related_name="organizations", through="OrganizationMembership")
-
+    members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="organizations", through="OrganizationMembership")
     def __str__(self):
         return self.name
     
@@ -25,7 +25,7 @@ class OrganizationMembership(models.Model):
     - joined_at: when the user joined the organization
     """
 
-    user = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     role = models.CharField(max_length=50, default="contributor")
     joined_at = models.DateTimeField(auto_now_add=True)
