@@ -89,7 +89,7 @@ class ModDraftView(CreateView):
         response["HX-Redirect"] = self.get_success_url()
         return response
 
-class ModCreateLanding(DraftModMixin, TemplateView):
+class ModCreateLanding(UploadStepMixin, TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
@@ -113,7 +113,7 @@ class ModCreateLanding(DraftModMixin, TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
-class ModCreateGeneralInfo(DraftModMixin, UpdateView):
+class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
@@ -140,7 +140,7 @@ class ModCreateGeneralInfo(DraftModMixin, UpdateView):
         progress_bar = init_context(current_index=0)
         return context | progress_bar
     
-class ModCreateCategorization(DraftModMixin, UpdateView):
+class ModCreateCategorization(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
@@ -167,7 +167,7 @@ class ModCreateCategorization(DraftModMixin, UpdateView):
         progress_bar = init_context(current_index=1)
         return context | progress_bar
 
-class ModCreateFiles(DraftModMixin, FormView):
+class ModCreateFiles(UploadStepMixin, FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
@@ -244,7 +244,7 @@ class ModCreateFiles(DraftModMixin, FormView):
 
         return super().form_valid(form)
 
-class ModCreateImages(DraftModMixin, FormView):
+class ModCreateImages(UploadStepMixin, FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
@@ -295,7 +295,7 @@ class ModCreateImages(DraftModMixin, FormView):
         return super().form_valid(form)
 
 
-class ModCreateDescription(DraftModMixin, UpdateView):
+class ModCreateDescription(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
     """
