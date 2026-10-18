@@ -171,7 +171,15 @@ class ModCreateFiles(FormView):
 
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
-    success_url = lazy_reverse("mod_create_images")
+
+    def get_success_url(self):
+        mod_id = self.kwargs["mod_id"]
+        action = self.request.POST.get("action")
+        if action == "previous":
+            return reverse("mod_create_categorization", kwargs={"mod_id": mod_id})
+        elif action == "uploaded_file":
+            return self.request.path
+        return reverse("mod_create_images", kwargs={"mod_id": mod_id})
 
     def get_context_data(self, **kwargs):
         """
