@@ -140,10 +140,6 @@ class ModCreateCategorization(DraftModMixin, UpdateView):
     
     def get_success_url(self):
         return reverse("mod_create_files", kwargs={"mod_id": self.object.id})
-    
-    def get_object(self, queryset=None):
-        mod_id = self.request.session.get("session_id")
-        return Mod.objects.get(id=mod_id)
 
     def get_context_data(self, **kwargs):
         """
