@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse, reverse_lazy as lazy_reverse
+from django.shortcuts import get_object_or_404
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -394,3 +395,23 @@ def cancel_mod_upload(request):
     response = HttpResponse()
     response["HX-Redirect"] = redirect("home").url
     return response
+
+class DraftModMixin:
+    """Loads the mod from the URL's mod_id and checks this session created it."""
+
+    def get_mod(self):
+        if not hasattr(self, "_mod"):
+            mod_id = self.kwargs["mod_id"]
+            if mod_id not in self.request.session.get("draft_ids", []):
+                raise Http404("Draft not found.")
+            self._mod = get_object_or_404(Mod, id=mod_id)
+        return self._mod
+
+    def get_object(self, queryset=None):
+        return self.get_mod()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod"] = self.get_mod()
+        context["mod_id"] = self.kwargs["mod_id"]
+        return context
