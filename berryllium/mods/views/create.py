@@ -126,7 +126,6 @@ class ModCreateCategorization(UpdateView):
     model = Mod
     form_class = ModCategorizationForm
     template_name = "mods/create/categorization/base.html"
-    success_url = lazy_reverse("mod_create_files")
 
     def form_valid(self, form):
         """
@@ -135,6 +134,9 @@ class ModCreateCategorization(UpdateView):
         response = super().form_valid(form)
         self.request.session["session_id"] = self.object.id
         return response
+    
+    def get_success_url(self):
+        return reverse("mod_create_files", kwargs={"mod_id": self.object.id})
     
     def get_object(self, queryset=None):
         mod_id = self.request.session.get("session_id")
@@ -169,7 +171,15 @@ class ModCreateFiles(FormView):
 
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
-    success_url = lazy_reverse("mod_create_images")
+
+    def get_success_url(self):
+        mod_id = self.kwargs["mod_id"]
+        action = self.request.POST.get("action")
+        if action == "previous":
+            return reverse("mod_create_categorization", kwargs={"mod_id": mod_id})
+        elif action == "uploaded_file":
+            return self.request.path
+        return reverse("mod_create_images", kwargs={"mod_id": mod_id})
 
     def get_context_data(self, **kwargs):
         """
@@ -252,7 +262,9 @@ class ModCreateImages(FormView):
         ModImageUploadForm  # Placeholder, replace with actual picture upload form
     )
     template_name = "mods/create/pictures/base.html"
-    success_url = "/mods/create/images"
+
+    def get_success_url(self):
+        return reverse("mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
         """
@@ -300,7 +312,9 @@ class ModCreateDescription(UpdateView):
     model = Mod
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
-    success_url = "/mods/create/s4"
+
+    def get_success_url(self):
+        return reverse("mod_create_description", kwargs={"mod_id": self.object.id})
 
     def get_object(self, queryset=None):
         mod_id = self.request.session.get("session_id")

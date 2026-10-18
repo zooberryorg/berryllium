@@ -4,7 +4,7 @@
     {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 {% include "mods/create/description/blurb.html" %}
-<form hx-post="{% url 'mod_create_description' %}"
+<form hx-post="{% url 'mod_create_description' mod_id=view.kwargs.mod_id %}"
       hx-target="#upload-frame"
       hx-swap="innerHTML"
       enctype="multipart/form-data"

@@ -209,7 +209,7 @@ def hx_add_filegroup_form(request):
     )
 
     # ------------ Re-render
-    return redirect("mod_create_files")
+    return redirect("mod_create_files", mod_id=request.session.get("session_id"))
 
 
 @require_POST
@@ -218,7 +218,7 @@ def hx_remove_filegroup_form(request, fg_id):
     print("Attempting to delete ModFileGroup with ID:", fg_id)
     ModFileGroup.objects.filter(id=fg_id).delete()
     update_filegroup_order(request.session.get("session_id"))
-    return redirect("mod_create_files")
+    return redirect("mod_create_files", mod_id=request.session.get("session_id"))
 
 
 @require_POST
@@ -320,7 +320,7 @@ def hx_remove_empty_filegroups(request):
     # update order
     update_filegroup_order(mod_id)
 
-    return redirect("mod_create_files")
+    return redirect("mod_create_files", mod_id=request.session.get("session_id"))
 
 
 @require_POST
@@ -335,7 +335,7 @@ def hx_move_filegroup_up(request, current_index):
     # swap order with the previous group
     swap_order(groups, current_index, "up")
 
-    return redirect("mod_create_files")
+    return redirect("mod_create_files", mod_id=request.session.get("session_id"))
 
 
 @require_POST
@@ -350,7 +350,7 @@ def hx_move_filegroup_down(request, current_index):
     # swap order with the next group
     swap_order(groups, current_index, "down")
 
-    return redirect("mod_create_files")
+    return redirect("mod_create_files", mod_id=request.session.get("session_id"))
 
 
 @require_POST
