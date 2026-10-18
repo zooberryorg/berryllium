@@ -87,7 +87,6 @@ class ModCreateLanding(DraftModMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mod_navigation"] = UPLOAD_NAVIGATION
-        context["mod_id"] = self.kwargs["mod_id"]
         return context
 
     # def get(self, request, *args, **kwargs):
@@ -111,10 +110,6 @@ class ModCreateGeneralInfo(DraftModMixin, UpdateView):
         """
         return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
     
-    def get_object(self, queryset=None):
-        mod_id = self.request.session.get("session_id")
-        return Mod.objects.get(id=mod_id)
-    
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
@@ -125,23 +120,8 @@ class ModCreateGeneralInfo(DraftModMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
-        mod_id = self.request.session.get("session_id")
-        context["mod_id"] = mod_id
         return context | progress_bar
     
-    def get_form_kwargs(self):
-        """
-        Re-hydrate form with existing draft data if session exists.
-        """
-        kwargs = super().get_form_kwargs()
-        session_id = self.request.session.get("session_id")
-        if session_id:
-            try:
-                kwargs["instance"] = Mod.objects.get(id=session_id)
-            except Mod.DoesNotExist:
-                pass
-        return kwargs
-
 class ModCreateCategorization(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
