@@ -43,6 +43,9 @@ class ModDraftView(CreateView):
         Create a new draft mod and return its ID in the response for session management.
         """
         response = super().form_valid(form)
+        draft_ids = self.request.session.get("draft_ids", [])
+        draft_ids.append(self.object.id)
+        self.request.session["draft_ids"] = draft_ids
         self.request.session["session_id"] = self.object.id
         response = HttpResponse()
         response["HX-Redirect"] = self.get_success_url()
