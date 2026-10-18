@@ -82,11 +82,7 @@ class MemberRegistrationForm(ModelForm):
         return user
 
 
-class MemberLoginForm(ModelForm):
-    class Meta:
-        model = Member
-        fields = ["username", "password"]
-
+class MemberLoginForm(forms.Form):
     username = forms.CharField(
         required=True,
         widget=TextInput(
@@ -110,18 +106,3 @@ class MemberLoginForm(ModelForm):
             }
         ),
     )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        username = cleaned_data.get("username")
-        password = cleaned_data.get("password")
-
-        if username and password:
-            try:
-                member = Member.objects.get(username=username)
-                if not member.check_password(password):
-                    raise forms.ValidationError("Invalid username or password.")
-            except Member.DoesNotExist:
-                raise forms.ValidationError("Invalid username or password.")
-            
-        return cleaned_data
