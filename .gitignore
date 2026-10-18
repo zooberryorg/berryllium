@@ -219,3 +219,5 @@ package.json
 /uploads/
 /staticfiles/
 /static/
+
+*.zip
