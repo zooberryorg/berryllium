@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
 from django.core.files.storage import default_storage
 from django.views.decorators.http import require_http_methods
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse, reverse_lazy as lazy_reverse
+from django.shortcuts import get_object_or_404
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -21,6 +22,26 @@ from berryllium.mods.services import (
     upload_image,
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
+
+class DraftModMixin:
+    """Loads the mod from the URL's mod_id and checks this session created it."""
+
+    def get_mod(self):
+        if not hasattr(self, "_mod"):
+            mod_id = self.kwargs["mod_id"]
+            if mod_id not in self.request.session.get("draft_ids", []):
+                raise Http404("Draft not found.")
+            self._mod = get_object_or_404(Mod, id=mod_id)
+        return self._mod
+
+    def get_object(self, queryset=None):
+        return self.get_mod()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod"] = self.get_mod()
+        context["mod_id"] = self.kwargs["mod_id"]
+        return context
 
 class ModDraftView(CreateView):
     """
@@ -42,12 +63,15 @@ class ModDraftView(CreateView):
         Create a new draft mod and return its ID in the response for session management.
         """
         response = super().form_valid(form)
+        draft_ids = self.request.session.get("draft_ids", [])
+        draft_ids.append(self.object.id)
+        self.request.session["draft_ids"] = draft_ids
         self.request.session["session_id"] = self.object.id
         response = HttpResponse()
         response["HX-Redirect"] = self.get_success_url()
         return response
 
-class ModCreateLanding(TemplateView):
+class ModCreateLanding(DraftModMixin, TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
@@ -63,7 +87,6 @@ class ModCreateLanding(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mod_navigation"] = UPLOAD_NAVIGATION
-        context["mod_id"] = self.kwargs["mod_id"]
         return context
 
     # def get(self, request, *args, **kwargs):
@@ -72,7 +95,7 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
-class ModCreateGeneralInfo(UpdateView):
+class ModCreateGeneralInfo(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
@@ -87,10 +110,6 @@ class ModCreateGeneralInfo(UpdateView):
         """
         return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
     
-    def get_object(self, queryset=None):
-        mod_id = self.request.session.get("session_id")
-        return Mod.objects.get(id=mod_id)
-    
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
@@ -101,24 +120,9 @@ class ModCreateGeneralInfo(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
-        mod_id = self.request.session.get("session_id")
-        context["mod_id"] = mod_id
         return context | progress_bar
     
-    def get_form_kwargs(self):
-        """
-        Re-hydrate form with existing draft data if session exists.
-        """
-        kwargs = super().get_form_kwargs()
-        session_id = self.request.session.get("session_id")
-        if session_id:
-            try:
-                kwargs["instance"] = Mod.objects.get(id=session_id)
-            except Mod.DoesNotExist:
-                pass
-        return kwargs
-
-class ModCreateCategorization(UpdateView):
+class ModCreateCategorization(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
@@ -132,15 +136,10 @@ class ModCreateCategorization(UpdateView):
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
-        self.request.session["session_id"] = self.object.id
         return response
     
     def get_success_url(self):
         return reverse("mod_create_files", kwargs={"mod_id": self.object.id})
-    
-    def get_object(self, queryset=None):
-        mod_id = self.request.session.get("session_id")
-        return Mod.objects.get(id=mod_id)
 
     def get_context_data(self, **kwargs):
         """
@@ -150,21 +149,7 @@ class ModCreateCategorization(UpdateView):
         progress_bar = init_context(current_index=1)
         return context | progress_bar
 
-    def get_form_kwargs(self):
-        """
-        Re-hydrate form with existing draft data if session exists.
-        """
-        kwargs = super().get_form_kwargs()
-        session_id = self.request.session.get("session_id")
-        if session_id:
-            try:
-                kwargs["instance"] = Mod.objects.get(id=session_id)
-            except Mod.DoesNotExist:
-                pass
-        return kwargs
-
-
-class ModCreateFiles(FormView):
+class ModCreateFiles(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
@@ -188,12 +173,12 @@ class ModCreateFiles(FormView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=2)
 
-        mod_id = self.request.session.get("session_id")
+        mod = self.get_mod()
+        mod_id = mod.id
         existing_files = []
         existing_filegroups = []
 
         if mod_id:
-            mod = Mod.objects.get(id=mod_id)
             files = mod.files.all()
 
             # make formsets for existing file groups to render in template
@@ -217,7 +202,7 @@ class ModCreateFiles(FormView):
         Handle file upload, save to storage, and re-render form with updated file list.
         """
         clean_file = form.cleaned_data["file"]
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         print(
             "form_valid called with file:",
             clean_file and clean_file.name,
@@ -241,19 +226,7 @@ class ModCreateFiles(FormView):
 
         return super().form_valid(form)
 
-    def get_success_url(self):
-        """
-        Handle navigation based on which button was clicked (Next vs Previous).
-        """
-        action = self.request.POST.get("action") == "previous"
-        if action == "previous":
-            return lazy_reverse("mod_create_categorization")
-        elif action == "uploaded_file":
-            return self.request.path
-        return super().get_success_url()
-
-
-class ModCreateImages(FormView):
+class ModCreateImages(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
@@ -274,7 +247,7 @@ class ModCreateImages(FormView):
         progress_bar = init_context(current_index=3)
 
         # get images for current mod from session
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         if mod_id:
             context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
                 "id", "caption", "title", "image", "is_cover"
@@ -288,7 +261,7 @@ class ModCreateImages(FormView):
         """
         # get images from form and save to storage, associate with mod, etc.
         uploaded_images = form.cleaned_data.get("image")
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)
         if uploaded_images:
             for img in uploaded_images:
@@ -304,7 +277,7 @@ class ModCreateImages(FormView):
         return super().form_valid(form)
 
 
-class ModCreateDescription(UpdateView):
+class ModCreateDescription(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
     """
@@ -315,10 +288,6 @@ class ModCreateDescription(UpdateView):
 
     def get_success_url(self):
         return reverse("mod_create_description", kwargs={"mod_id": self.object.id})
-
-    def get_object(self, queryset=None):
-        mod_id = self.request.session.get("session_id")
-        return Mod.objects.get(id=mod_id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -394,3 +363,4 @@ def cancel_mod_upload(request):
     response = HttpResponse()
     response["HX-Redirect"] = redirect("home").url
     return response
+
