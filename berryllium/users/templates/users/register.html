@@ -15,6 +15,8 @@
     </div> 
     <div class="pt-2"> 
         <form hx-post="{% url 'register' %}"
+            hx-target="#login-frame"
+            hx-swap="innerHTML"
             hx-encoding="multipart/form-data">
             {% csrf_token %}
             <div class="space-y-4 p-6" id="login-frame">

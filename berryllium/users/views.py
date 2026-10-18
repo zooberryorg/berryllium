@@ -14,7 +14,16 @@ class MemberRegistration(CreateView):
     success_url = "/"
 
     def form_valid(self, form):
-        return super().form_valid(form)
+        self.object = form.save()
+        login(self.request, self.object)
+        if self.request.headers.get("HX-Request"):
+            response = HttpResponse()
+            response["HX-Redirect"] = reverse("home")
+            return response
+        return HttpResponseRedirect(self.get_success_url())
+
+    def form_invalid(self, form):
+        return render(self.request, "users/fields.html", {"form": form})
     
 class MemberLogin(FormView):
     form_class = MemberLoginForm
