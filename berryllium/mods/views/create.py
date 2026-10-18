@@ -261,7 +261,7 @@ class ModCreateImages(DraftModMixin, FormView):
         progress_bar = init_context(current_index=3)
 
         # get images for current mod from session
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         if mod_id:
             context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
                 "id", "caption", "title", "image", "is_cover"
@@ -275,7 +275,7 @@ class ModCreateImages(DraftModMixin, FormView):
         """
         # get images from form and save to storage, associate with mod, etc.
         uploaded_images = form.cleaned_data.get("image")
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)
         if uploaded_images:
             for img in uploaded_images:
