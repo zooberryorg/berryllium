@@ -262,7 +262,9 @@ class ModCreateImages(FormView):
         ModImageUploadForm  # Placeholder, replace with actual picture upload form
     )
     template_name = "mods/create/pictures/base.html"
-    success_url = "/mods/create/images"
+
+    def get_success_url(self):
+        return reverse("mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
         """
@@ -310,7 +312,9 @@ class ModCreateDescription(UpdateView):
     model = Mod
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
-    success_url = "/mods/create/s4"
+
+    def get_success_url(self):
+        return reverse("mod_create_description", kwargs={"mod_id": self.object.id})
 
     def get_object(self, queryset=None):
         mod_id = self.request.session.get("session_id")
