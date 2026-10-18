@@ -96,6 +96,12 @@ class ModCreateLanding(UploadStepMixin, TemplateView):
 
     template_name = "mods/create/base.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod_navigation"] = UPLOAD_NAVIGATION
+        context["initial_step_url"] = reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
+        return context
+
     def get_success_url(self):
         """
         Override to prevent redirect since we handle navigation with HTMX.
