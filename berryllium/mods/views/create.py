@@ -23,6 +23,26 @@ from berryllium.mods.services import (
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
+class DraftModMixin:
+    """Loads the mod from the URL's mod_id and checks this session created it."""
+
+    def get_mod(self):
+        if not hasattr(self, "_mod"):
+            mod_id = self.kwargs["mod_id"]
+            if mod_id not in self.request.session.get("draft_ids", []):
+                raise Http404("Draft not found.")
+            self._mod = get_object_or_404(Mod, id=mod_id)
+        return self._mod
+
+    def get_object(self, queryset=None):
+        return self.get_mod()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["mod"] = self.get_mod()
+        context["mod_id"] = self.kwargs["mod_id"]
+        return context
+
 class ModDraftView(CreateView):
     """
     HTMX Endpoint: Create a draft mod and return its ID for session management.
@@ -51,7 +71,7 @@ class ModDraftView(CreateView):
         response["HX-Redirect"] = self.get_success_url()
         return response
 
-class ModCreateLanding(TemplateView):
+class ModCreateLanding(DraftModMixin, TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
@@ -76,7 +96,7 @@ class ModCreateLanding(TemplateView):
     #     # request.session.pop("group_manager_toggled", None)
     #     return redirect("mod_create_categorization")
 
-class ModCreateGeneralInfo(UpdateView):
+class ModCreateGeneralInfo(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
     """
@@ -122,7 +142,7 @@ class ModCreateGeneralInfo(UpdateView):
                 pass
         return kwargs
 
-class ModCreateCategorization(UpdateView):
+class ModCreateCategorization(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
     """
@@ -168,7 +188,7 @@ class ModCreateCategorization(UpdateView):
         return kwargs
 
 
-class ModCreateFiles(FormView):
+class ModCreateFiles(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
     """
@@ -257,7 +277,7 @@ class ModCreateFiles(FormView):
         return super().get_success_url()
 
 
-class ModCreateImages(FormView):
+class ModCreateImages(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
@@ -308,7 +328,7 @@ class ModCreateImages(FormView):
         return super().form_valid(form)
 
 
-class ModCreateDescription(UpdateView):
+class ModCreateDescription(DraftModMixin, UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
     """
@@ -399,22 +419,3 @@ def cancel_mod_upload(request):
     response["HX-Redirect"] = redirect("home").url
     return response
 
-class DraftModMixin:
-    """Loads the mod from the URL's mod_id and checks this session created it."""
-
-    def get_mod(self):
-        if not hasattr(self, "_mod"):
-            mod_id = self.kwargs["mod_id"]
-            if mod_id not in self.request.session.get("draft_ids", []):
-                raise Http404("Draft not found.")
-            self._mod = get_object_or_404(Mod, id=mod_id)
-        return self._mod
-
-    def get_object(self, queryset=None):
-        return self.get_mod()
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["mod"] = self.get_mod()
-        context["mod_id"] = self.kwargs["mod_id"]
-        return context
