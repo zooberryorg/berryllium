@@ -149,20 +149,6 @@ class ModCreateCategorization(DraftModMixin, UpdateView):
         progress_bar = init_context(current_index=1)
         return context | progress_bar
 
-    def get_form_kwargs(self):
-        """
-        Re-hydrate form with existing draft data if session exists.
-        """
-        kwargs = super().get_form_kwargs()
-        session_id = self.request.session.get("session_id")
-        if session_id:
-            try:
-                kwargs["instance"] = Mod.objects.get(id=session_id)
-            except Mod.DoesNotExist:
-                pass
-        return kwargs
-
-
 class ModCreateFiles(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 2: Upload Files and Organize into File Groups
