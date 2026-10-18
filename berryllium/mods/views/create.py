@@ -245,18 +245,6 @@ class ModCreateFiles(DraftModMixin, FormView):
 
         return super().form_valid(form)
 
-    def get_success_url(self):
-        """
-        Handle navigation based on which button was clicked (Next vs Previous).
-        """
-        action = self.request.POST.get("action") == "previous"
-        if action == "previous":
-            return lazy_reverse("mod_create_categorization")
-        elif action == "uploaded_file":
-            return self.request.path
-        return super().get_success_url()
-
-
 class ModCreateImages(DraftModMixin, FormView):
     """
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
