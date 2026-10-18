@@ -136,7 +136,6 @@ class ModCreateCategorization(DraftModMixin, UpdateView):
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
-        self.request.session["session_id"] = self.object.id
         return response
     
     def get_success_url(self):
@@ -192,12 +191,12 @@ class ModCreateFiles(DraftModMixin, FormView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=2)
 
-        mod_id = self.request.session.get("session_id")
+        mod = self.get_mod()
+        mod_id = mod.id
         existing_files = []
         existing_filegroups = []
 
         if mod_id:
-            mod = Mod.objects.get(id=mod_id)
             files = mod.files.all()
 
             # make formsets for existing file groups to render in template
@@ -221,7 +220,7 @@ class ModCreateFiles(DraftModMixin, FormView):
         Handle file upload, save to storage, and re-render form with updated file list.
         """
         clean_file = form.cleaned_data["file"]
-        mod_id = self.request.session.get("session_id")
+        mod_id = self.get_mod().id
         print(
             "form_valid called with file:",
             clean_file and clean_file.name,
