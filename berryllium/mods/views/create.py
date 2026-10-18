@@ -43,6 +43,24 @@ class DraftModMixin:
         context["mod_id"] = self.kwargs["mod_id"]
         return context
 
+class UploadStepMixin(DraftModMixin):
+    def render_to_response(self, context, **response_kwargs):
+        is_htmx = self.request.headers.get("HX-Request")
+        is_history_restore = self.request.headers.get("HX-History-Restore-Request")
+
+        # if htmx request then update url in browser hist to current step
+        if is_htmx and not is_history_restore:
+            response = super().render_to_response(context, **response_kwargs)
+            response["HX-Push-Url"] = self.request.path
+            return response
+
+        # if normal refresh then render base template with current step as initial step
+        return render(self.request, "mods/create/base.html", {
+            "mod_id": self.kwargs["mod_id"],
+            "mod_navigation": UPLOAD_NAVIGATION,
+            "initial_step_url": self.request.path,
+        })
+
 class ModDraftView(CreateView):
     """
     HTMX Endpoint: Create a draft mod and return its ID for session management.
