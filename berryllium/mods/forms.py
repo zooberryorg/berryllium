@@ -310,7 +310,6 @@ class ModCategorizationForm(forms.ModelForm):
         self.user = user
 
     def clean_tags(self):
-        # -> (existing Tag list, new names list)
         return resolve_tags(self.cleaned_data.get("tags", []))
 
     def save_relations(self):
