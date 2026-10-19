@@ -1,3 +1,5 @@
+import os
+import uuid
 from django.db import models
 from markdownx.models import MarkdownxField
 
@@ -266,3 +268,7 @@ class ModImage(models.Model):
 
     def __str__(self):
         return f"{self.mod.title} - Image {self.order}"
+
+def description_image_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"mod_description/{instance.mod_id}/{uuid.uuid4().hex}{ext}"
