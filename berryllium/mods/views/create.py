@@ -158,6 +158,7 @@ class ModCreateCategorization(UploadStepMixin, UpdateView):
     model = Mod
     form_class = ModCategorizationForm
     template_name = "mods/create/categorization/base.html"
+    previous_step = "mod_create_general"
 
     def form_valid(self, form):
         """
@@ -184,6 +185,7 @@ class ModCreateFiles(UploadStepMixin, FormView):
 
     form_class = ModFileUploadForm
     template_name = "mods/create/filemanager/base.html"
+    previous_step = "mod_create_categorization"
 
     def get_success_url(self):
         mod_id = self.kwargs["mod_id"]
@@ -259,6 +261,8 @@ class ModCreateImages(UploadStepMixin, FormView):
     Mod Creation Multi-Step 3: Upload Pictures for the Mod
     """
 
+    previous_step = "mod_create_files"
+
     form_class = (
         ModImageUploadForm  # Placeholder, replace with actual picture upload form
     )
@@ -313,6 +317,7 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
     model = Mod
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
+    previous_step = "mod_create_images"
 
     def get_success_url(self):
         return reverse("mod_create_description", kwargs={"mod_id": self.object.id})
