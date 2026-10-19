@@ -62,5 +62,21 @@ function markdownEditor({ uploadUrl, previewUrl }) {
       this.insert(before + inner + after, before.length, before.length + inner.length);
     },
 
+    // Headings, lists, quotes: add a prefix to every selected line.
+    prefixLines(prefix) {
+      const ta = this.textarea;
+      const value = ta.value;
+      const lineStart = value.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+      let lineEnd = value.indexOf('\n', ta.selectionEnd);
+      if (lineEnd === -1) lineEnd = value.length;
+
+      const numbered = prefix === '1. ';
+      const lines = value.slice(lineStart, lineEnd).split('\n');
+      const result = lines.map((line, i) => (numbered ? `${i + 1}. ` : prefix) + line).join('\n');
+
+      ta.setSelectionRange(lineStart, lineEnd);
+      this.insert(result, 0, result.length);
+    },
+
   };
 }
