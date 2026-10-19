@@ -224,3 +224,25 @@ def save_tags(mod, existing, new_names, user=None):
         mod.pending_tags = new_names
         mod.save(update_fields=["pending_tags"])
 
+def publish_mod(mod):
+    """
+    This saves everythingn to the database when a mod is published. It creates any new authors and tags, etc that
+    were waiting on the publish step.
+    """
+    with transaction.atomic():
+        for credit in mod.credits.filter(member__isnull=True, author__isnull=True).exclude(pending_name=""):
+            author = (
+                Author.objects.filter(name__iexact=credit.pending_name, member__isnull=True).first()
+                or Author.objects.create(name=credit.pending_name)
+            )
+            credit.author = author
+            credit.pending_name = ""
+            credit.save(update_fields=["author", "pending_name"])
+
+        for name in mod.pending_tags:
+            tag = Tag.objects.filter(name__iexact=name).first() or Tag.objects.create(name=name)
+            ModTag.objects.get_or_create(mod=mod, tag=tag)
+        mod.pending_tags = []
+
+        mod.draft = False
+        mod.save(update_fields=["pending_tags", "draft"])
