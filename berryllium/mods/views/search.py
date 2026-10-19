@@ -42,3 +42,14 @@ def search_websites(request):
         websites = websites.filter(Q(name__icontains=q) | Q(aliases__icontains=q))
     return JsonResponse({"results": [website_item(w) for w in websites.order_by("name")[:20]]})
 
+@login_required
+@require_GET
+def search_tags(request):
+    """Tags matching the query; with no query, the 20 most used tags."""
+    q = _query(request)
+    tags = Tag.objects.annotate(uses=Count("mods"))
+    if q:
+        tags = tags.filter(name__icontains=q).order_by("-uses", "name")
+    else:
+        tags = tags.order_by("-uses", "name")
+    return JsonResponse({"results": [tag_item(t) for t in tags[:20]]})
