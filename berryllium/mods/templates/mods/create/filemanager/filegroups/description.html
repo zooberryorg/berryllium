@@ -3,7 +3,6 @@
     <textarea 
         type="text"
         name="form-{{ group.instance.id }}-description"
-        {% if group.instance.description != None %}value="{{ group.instance.description }}"{% endif %}
         class="px-2 py-1 text-sm text-granite-200 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
         placeholder="Group Description"
 
@@ -23,6 +22,7 @@
         hx-trigger="input delay:500ms"
         hx-target="#group-description-errors-{{ group.instance.id }}"
         hx-swap="innerHTML"
-        hx-on::after-swap="htmx.process(this)"></textarea>
+        hx-on::after-swap="htmx.process(this)">{{ group.instance.description|default_if_none:"" }}
+    </textarea>
 </div>
 {# djlint:on #}
