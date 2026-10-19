@@ -15,6 +15,7 @@ from django.core.files.storage import default_storage
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from berryllium.mods.services import collapse_file_groups
+from django.db import transaction
 
 
 @require_POST
@@ -461,20 +462,18 @@ def hx_set_cover_image(request, image_id):
     """HTMX endpoint to set an image as the cover image."""
     mod_id = request.session.get("session_id")
     if not mod_id:
-        print("No mod_id in session when attempting to set cover image.")
         return HttpResponse(status=400)
 
     image = ModImage.objects.filter(id=image_id, mod_id=mod_id).first()
     if not image:
-        print(f"No image found with ID: {image_id} for setting cover.")
         return HttpResponse(status=404)
 
-    # unset previous cover
-    ModImage.objects.filter(mod_id=mod_id, is_cover=True).update(is_cover=False)
+    with transaction.atomic():
+        if image.is_cover:
+            image.is_cover = False
+        else:
+            ModImage.objects.filter(mod_id=mod_id, is_cover=True).update(is_cover=False)
+            image.is_cover = True
+        image.save(update_fields=["is_cover"])
 
-    # set new cover
-    image.is_cover = True
-    image.save()
-    print(f"Set image ID: {image_id} as cover for Mod ID: {mod_id}")
-
-    return HttpResponse(status=204)
+    return render(request, "mods/create/pictures/images.html", image_gallery_context(mod_id))
