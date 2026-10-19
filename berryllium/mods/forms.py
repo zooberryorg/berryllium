@@ -69,6 +69,55 @@ class ModGeneralInfoForm(forms.ModelForm):
         ),
     )
 
+    thumbnail = forms.ImageField(
+        required=True,
+        label="Thumbnail / Logo",
+        help_text=(
+            f"Square (1:1), {MOD_THUMBNAIL_RECOMMENDED_SIZE} recommended, "
+            f"at least {MOD_THUMBNAIL_MIN_SIZE}px. JPG, PNG or WEBP."
+        ),
+        widget=forms.FileInput(
+            attrs={
+                "accept": ".jpg,.jpeg,.png,.webp",
+                "class": "hidden",
+                "x-ref": "thumbInput",
+                "@change": "preview($event)",
+            }
+        ),
+    )
+
+    publish_date = forms.DateTimeField(required=True, widget=forms.HiddenInput)
+
+    is_archived_file = forms.BooleanField(
+        required=False,
+        label="Is this an archived mod?",
+        widget=forms.CheckboxInput(attrs={"class": "sr-only peer", "x-model": "archived"}),
+    )
+
+    original_release_date = forms.DateField(
+        required=False,
+        label="Original release date",
+        widget=forms.DateInput(
+            format="%Y-%m-%d",
+            attrs={"type": "date", "class": "zb-input text-sm", ":disabled": "!archived"},
+        ),
+    )
+
+    former_hosts = forms.URLField(
+        required=False,
+        max_length=200,
+        label="Original website",
+        assume_scheme="https",
+        widget=forms.URLInput(
+            attrs={
+                "placeholder": "https://...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                ":disabled": "!archived",
+            }
+        ),
+    )
+
     class Meta:
         model = Mod
         fields = ["title", "summary", "owner"]
