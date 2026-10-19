@@ -23,6 +23,11 @@ ILLEGAL_CHARACTERS = ["/", "\\", ":", "*", "?", '"', "<", ">", "|"]
 MAX_FILE_SIZE = 100 * 1024 * 1024  # 100 MB
 MAX_IMAGE_SIZE = 10 * 1024 * 1024  # 10 MB
 
+THUMBNAIL_RATIO = "16 / 9"
+THUMBNAIL_RECOMMENDED_SIZE = "1920 × 1080"
+COVER_RATIO = "3 / 1"
+COVER_RECOMMENDED_SIZE = "1500 × 500"
+
 COLLAPSIBLE_WIDGET_ATTRS = {
     "@focus": "expand()",
     # if click away from field, collapse

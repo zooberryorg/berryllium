@@ -22,6 +22,7 @@ from berryllium.mods.services import (
     create_file_group,
     create_filegroup_formsets,
     upload_image,
+    image_gallery_context,
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
@@ -269,43 +270,26 @@ class ModCreateImages(UploadStepMixin, FormView):
         return reverse("mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data for rendering the form, including progress bar information.
-        """
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)
-
-        # get images for current mod from session
-        mod_id = self.get_mod().id
-        if mod_id:
-            context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
-                "id", "caption", "title", "image", "is_cover"
-            )
-
-        return context | progress_bar
-
+        return context | progress_bar | image_gallery_context(self.get_mod().id)
+    
     def form_valid(self, form):
         """
-        Handle uploads and other validations
+        Upload: save the images and re-render this step.
+        Next (no images in the POST): continue to the description step.
         """
-        # get images from form and save to storage, associate with mod, etc.
         uploaded_images = form.cleaned_data.get("image")
+        if not uploaded_images:
+            return super().form_valid(form)
+
         mod_id = self.get_mod().id
-        print("form_valid called with images:", uploaded_images, "and mod_id:", mod_id)
-        if uploaded_images:
-            for img in uploaded_images:
-                file = upload_image(img, mod_id=mod_id)
-                if file:
-                    print("Image uploaded successfully:", file["name"])
+        for img in uploaded_images:
+            upload_image(img, mod_id=mod_id)
 
-        context = self.get_context_data()
-        context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
-            "id", "title", "caption", "image"
-        )
-
-        return super().form_valid(form)
-
-
+        # empty form when re-rendering this step after successful upload
+        return self.render_to_response(self.get_context_data(form=self.get_form_class()()))
+    
 class ModCreateDescription(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.

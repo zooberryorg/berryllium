@@ -1,0 +1,72 @@
+<div id="image-{{ image.id }}"
+     x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|default_if_none:''|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
+     class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if is_cover %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
+     {% if not is_cover %}x-sort:item{% endif %}>
+    <!-- top right controls -->
+    <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-2 z-10">
+        <button type="button"
+                x-sort:ignore
+                class="zb-action {% if is_cover %}bg-gold-400 text-pine-600{% else %}bg-pine-draggable-200{% endif %}"
+                title="{% if is_cover %}Remove as cover image{% else %}Set as cover image{% endif %}"
+                hx-get="{% url 'hx_set_cover_image' image.id %}"
+                hx-target="#image-gallery"
+                hx-swap="outerHTML">
+            <ion-icon name="star" class="text-sm"></ion-icon>
+        </button>
+        <button type="button"
+                x-sort:ignore
+                class="zb-action bg-pine-draggable-200"
+                hx-get="{% url 'hx_remove_temp_image' image.id %}"
+                hx-target="#image-{{ image.id }}"
+                hx-swap="outerHTML">
+            <ion-icon name="trash" class="text-sm"></ion-icon>
+        </button>
+    </div>
+    <div class="relative overflow-hidden rounded-tl-lg rounded-tr-lg hover:cursor-pointer"
+         style="aspect-ratio: {{ ratio }};">
+        {% if is_cover %}
+            <span class="absolute bottom-2 left-2 text-xs px-2 py-1 bg-gold-400 rounded-full text-pine-600 z-10">Cover Image</span>
+        {% endif %}
+        <img src="/uploads/{{ image.image }}"
+             alt="{{ image.title|default_if_none:'Mod image' }}"
+             class="w-full h-full object-cover hover:brightness-110 transition-all">
+    </div>
+    <textarea x-show="editTitle || title"
+              type="text"
+              rows="1"
+              hx-post="{% url 'hx_update_image_title' image.id %}"
+              hx-trigger="input delay:500ms"
+              hx-swap="none"
+              name="title"
+              class="px-3 mt-2 mb-2 w-full text-md text-granite-200 focus:outline-none text-wrap resize-none font-bold hover:text-white"
+              x-ref="titleInput"
+              @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+              x-sort:ignore
+              @blur="() => { if ($event.target.value.trim() === '') { editTitle = false; title = ''; return; } }"
+              @keydown.enter.prevent="$event.target.blur()">{{ image.title|default_if_none:"" }}</textarea>
+    <span @click="editTitle = true; $nextTick(() => { $refs.titleInput.focus(); })"
+          x-show="!editTitle && !title"
+          class="mx-2 mt-2 mb-2 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
+          x-sort:ignore>
+        Add Title <ion-icon name="create" class="text-xs"></ion-icon>
+    </span>
+    <textarea x-show="editCaption || caption"
+              type="text"
+              rows="1"
+              hx-post="{% url 'hx_update_image_caption' image.id %}"
+              hx-trigger="input delay:500ms"
+              hx-swap="none"
+              name="caption"
+              class="px-3 mt-1 mb-3 w-full text-sm text-granite-200 focus:outline-none text-wrap resize-none hover:text-white"
+              x-ref="captionInput"
+              @input="$el.style.height = 'auto'; $el.style.height = $el.scrollHeight + 'px'"
+              x-sort:ignore
+              @blur="() => { if ($event.target.value.trim() === '') { editCaption = false; caption = ''; return; } }"
+              @keydown.enter.prevent="$event.target.blur()">{{ image.caption }}</textarea>
+    <span @click="editCaption = true; $nextTick(() => { $refs.captionInput.focus(); })"
+          x-show="!editCaption && !caption"
+          class="mx-2 mb-3 text-granite-200 px-3 py-1 bg-pine-600/50 max-w-max rounded-full text-sm cursor-pointer hover:brightness-110"
+          x-sort:ignore>
+        Add caption <ion-icon name="create" class="text-xs"></ion-icon>
+    </span>
+</div>

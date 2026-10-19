@@ -5,6 +5,12 @@ from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.utils import calculate_file_hash
 from berryllium.mods.models import ModFileGroup, ModFile, ModImage
 from berryllium.mods.forms import ModFileGroupForm
+from berryllium.mods.settings import (
+    THUMBNAIL_RATIO, 
+    COVER_RATIO, 
+    THUMBNAIL_RECOMMENDED_SIZE, 
+    COVER_RECOMMENDED_SIZE
+)
 
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory, inlineformset_factory
@@ -234,3 +240,17 @@ def collapse_file_groups(mod):
 
         mod.use_file_groups = False
         mod.save(update_fields=["use_file_groups"])
+
+def image_gallery_context(mod_id):
+    """Images for the gallery. It is split into the cover (pinned on top) and the rest."""
+    images = list(
+        ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image", "is_cover")
+    )
+    return {
+        "cover_image": next((img for img in images if img["is_cover"]), None),
+        "images": [img for img in images if not img["is_cover"]],
+        "thumbnail_ratio": THUMBNAIL_RATIO,
+        "cover_ratio": COVER_RATIO,
+        "thumbnail_size": THUMBNAIL_RECOMMENDED_SIZE,
+        "cover_size": COVER_RECOMMENDED_SIZE,
+    }

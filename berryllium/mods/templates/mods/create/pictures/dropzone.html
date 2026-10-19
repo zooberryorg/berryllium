@@ -1,7 +1,7 @@
 <div @dragenter.prevent="isDragging = true"
      @dragover.prevent="isDragging = true"
      @dragleave.prevent="isDragging = false"
-     @drop.prevent="handleDrop($event)"
+     @drop.prevent="isDragging = false; $refs.imageInput.files = $event.dataTransfer.files; $refs.imgSubmitBtn.click()"
      x-ref="dropzoneBlock"
      @click="$refs.imageInput.click()"
      :class="isDragging ? 'border-gold-400 bg-gold-400' : 'border-white/20 hover:brightness-110'"
@@ -18,6 +18,7 @@
                 Uploading...
             </p>
             <p class="text-white/50 text-sm mt-1">JPG, JPEG, PNG, WEBP files only (Max 10MB each)</p>
+            <p class="text-white/50 text-xs mt-1">Gallery: 16:9 ({{ thumbnail_size }}) · Cover: 3:1 ({{ cover_size }})</p>
         </div>
     </div>
     <input type="file"
