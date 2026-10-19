@@ -91,3 +91,27 @@ def person_item(kind, obj, locked=False):
     if kind == "author":
         return {"value": f"a:{obj.pk}", "label": obj.name, "sublabel": "Not a member"}
     return {"value": f"{NEW_PREFIX}{obj}", "label": obj, "sublabel": NEW_PERSON_SUBLABEL, "isNew": True}
+
+def resolve_people(values, strict=True):
+    """
+    ["m:3", "a:7", "new:Jane"] -> [("member", Member), ("author", Author), ("new", "Jane")], in order.
+    """
+    User = get_user_model()
+    member_ids = [int(v[2:]) for v in values if v.startswith("m:") and v[2:].isdigit()]
+    author_ids = [int(v[2:]) for v in values if v.startswith("a:") and v[2:].isdigit()]
+    members = User.objects.filter(is_active=True).in_bulk(member_ids)
+    authors = Author.objects.in_bulk(author_ids)
+
+    resolved = []
+    for value in values:
+        if value.startswith("m:") and value[2:].isdigit() and int(value[2:]) in members:
+            resolved.append(("member", members[int(value[2:])]))
+        elif value.startswith("a:") and value[2:].isdigit() and int(value[2:]) in authors:
+            resolved.append(("author", authors[int(value[2:])]))
+        elif value.startswith(NEW_PREFIX):
+            name = " ".join(value[len(NEW_PREFIX):].split())[:MAX_NAME_LENGTH]
+            resolved.append(("new", name))
+        elif strict:
+            raise ValidationError("One of the selected people no longer exists. Remove it and try again.")
+    return resolved
+
