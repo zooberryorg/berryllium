@@ -207,19 +207,27 @@ class ModGeneralInfoForm(forms.ModelForm):
             raise forms.ValidationError("The original release date can't be in the future.")
         return value
 
+    def clean_collaborators(self):
+        return resolve_people(self.cleaned_data.get("collaborators", []))
+
+    def clean_original_authors(self):
+        return resolve_people(self.cleaned_data.get("original_authors", []))
+
     def clean(self):
         cleaned = super().clean()
         if cleaned.get("is_archived_file"):
             if not cleaned.get("original_release_date"):
                 self.add_error("original_release_date", "Required for archived mods.")
-            if not cleaned.get("former_hosts"):
-                self.add_error("former_hosts", "Required for archived mods.")
+            if not cleaned.get("original_websites"):
+                self.add_error("original_websites", "Pick at least one website.")
+            if not cleaned.get("original_authors"):
+                self.add_error("original_authors", "Add at least one original author.")
         else:
-            # toggle off: don't keep stale archive info
+            # don't keep stale archive info
             cleaned["original_release_date"] = None
-            cleaned["former_hosts"] = ""
+            cleaned["original_websites"] = ArchivedWebsite.objects.none()
+            cleaned["original_authors"] = []
         return cleaned
-
 
 class ModCategorizationForm(forms.ModelForm):
     """
