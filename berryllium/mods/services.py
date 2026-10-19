@@ -8,6 +8,7 @@ from berryllium.mods.forms import ModFileGroupForm
 
 from django.core.files.storage import default_storage
 from django.forms import modelformset_factory, inlineformset_factory
+from django.db import transaction
 
 
 def init_context(current_index, form=None):
@@ -202,3 +203,34 @@ def swap_order(models, current_index, direction):
     for index, fg in enumerate(models):
         fg.order = index
         fg.save()
+
+def collapse_file_groups(mod):
+    """
+    Turns the file manager off: moves every file into the first group,
+    renames it "Files", deletes the other groups.
+    """
+    with transaction.atomic():
+        groups = list(ModFileGroup.objects.filter(mod=mod).order_by("order", "id"))
+        if groups:
+            keep = groups[0]
+
+            # maintain visual order of files
+            files = list(
+                ModFile.objects.filter(filegroup__mod=mod)
+                .order_by("filegroup__order", "filegroup__id", "order", "id")
+            )
+            for index, f in enumerate(files):
+                f.filegroup = keep
+                f.order = index
+                f.save(update_fields=["filegroup", "order"])
+
+            # safe now: no files point at these groups anymore
+            ModFileGroup.objects.filter(mod=mod).exclude(id=keep.id).delete()
+
+            keep.name = "Files"
+            keep.description = ""
+            keep.order = 0
+            keep.save(update_fields=["name", "description", "order"])
+
+        mod.use_file_groups = False
+        mod.save(update_fields=["use_file_groups"])
