@@ -1,0 +1,65 @@
+{% if form.non_field_errors %}
+    <p class="text-red-400 text-sm mb-4">{{ form.non_field_errors.0 }}</p>
+{% endif %}
+
+<div class="mb-4"
+     x-data="thumbnailPicker($el.dataset)"
+     data-initial-url="{% if form.instance.thumbnail %}{{ form.instance.thumbnail.url }}{% endif %}">
+    <label class="block text-sm font-medium mb-1 text-white">
+        Thumbnail / Logo <span class="text-red-500">*</span>
+    </label>
+    <div class="flex items-center gap-4">
+        <button type="button"
+                class="w-24 h-24 shrink-0 rounded-xl overflow-hidden border-2 border-dashed border-white/20 hover:border-gold-400/60 bg-pine-800/40 flex items-center justify-center cursor-pointer transition-colors"
+                @click="$refs.thumbInput.click()">
+            <img x-show="previewUrl" :src="previewUrl" alt="Thumbnail preview" class="w-full h-full object-cover" x-cloak>
+            <i class="bi bi-image text-2xl text-white/40" x-show="!previewUrl"></i>
+        </button>
+        <div class="flex flex-col gap-1 text-sm">
+            <button type="button" class="zb-action rounded-xl max-w-max" @click="$refs.thumbInput.click()">
+                <span x-text="previewUrl ? 'Change image' : 'Choose image'"></span>
+            </button>
+            <span class="text-white/50 text-xs">{{ form.thumbnail.help_text }}</span>
+        </div>
+    </div>
+    {{ form.thumbnail }}
+    {% include "mods/create/field_errors.html" with field=form.thumbnail %}
+</div>
+
+{% include "mods/create/general/field.html" with field=form.title %}
+{% include "mods/create/general/field.html" with field=form.summary %}
+{% include "mods/create/general/field.html" with field=form.owner %}
+
+<!-- publication date -->
+<div class="mb-4" x-data="publishDatePicker()">
+    <label for="publish-date-picker" class="block text-sm font-medium mb-1 text-white">
+        Publication date <span class="text-red-500">*</span>
+    </label>
+    <div class="flex items-center gap-2">
+        <input type="datetime-local"
+               id="publish-date-picker"
+               class="zb-input text-sm"
+               x-model="local"
+               @change="sync()"
+               required>
+        <button type="button" class="zb-action rounded-xl shrink-0" @click="setNow()">Now</button>
+    </div>
+    <input type="hidden" name="publish_date" x-ref="publishValue" value="{{ form.publish_date_iso }}">
+    <p class="text-white/50 text-xs mt-1">Shown in your time zone (<span x-text="timeZone"></span>). Pick a future time to schedule it.</p>
+    {% include "mods/create/field_errors.html" with field=form.publish_date %}
+</div>
+
+<!-- archived mod -->
+<div class="mt-6 pt-4 border-t border-white/10"
+     x-data="{ archived: {{ form.is_archived_file.value|yesno:'true,false' }} }">
+    <label class="inline-flex cursor-pointer items-center gap-2.5 mb-2">
+        {{ form.is_archived_file }}
+        <div class="shrink-0 relative w-9 h-5 rounded-full bg-pine-400/30 peer-checked:bg-gold-400 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:h-4 after:w-4 after:rounded-full after:bg-pine-info-200 after:transition-all peer-checked:after:translate-x-full"></div>
+        <span class="text-sm text-white/80 select-none">{{ form.is_archived_file.label }}</span>
+    </label>
+    <p class="text-white/50 text-xs mb-3">Turn this on if the mod was released somewhere else first.</p>
+    <div x-show="archived" x-collapse x-cloak>
+        {% include "mods/create/general/field.html" with field=form.original_release_date %}
+        {% include "mods/create/general/field.html" with field=form.former_hosts %}
+    </div>
+</div>
