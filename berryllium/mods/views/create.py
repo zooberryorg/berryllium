@@ -5,6 +5,8 @@ from django.http import HttpResponse, Http404
 from django.views.generic import CreateView, TemplateView, FormView, UpdateView
 from django.urls import reverse, reverse_lazy as lazy_reverse
 from django.shortcuts import get_object_or_404
+from django.views import View
+from urllib.parse import urlparse
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -51,7 +53,9 @@ class UploadStepMixin(DraftModMixin):
         # if htmx request then update url in browser hist to current step
         if is_htmx and not is_history_restore:
             response = super().render_to_response(context, **response_kwargs)
-            response["HX-Push-Url"] = self.request.path
+            current_path = urlparse(self.request.headers.get("HX-Current-URL", "")).path
+            if current_path != self.request.path:
+                response["HX-Push-Url"] = self.request.path
             return response
 
         # if normal refresh then render base template with current step as initial step
@@ -89,7 +93,7 @@ class ModDraftView(CreateView):
         response["HX-Redirect"] = self.get_success_url()
         return response
 
-class ModCreateLanding(UploadStepMixin, TemplateView):
+class ModCreateLanding(DraftModMixin, TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
     """
