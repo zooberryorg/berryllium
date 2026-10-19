@@ -28,9 +28,6 @@ from berryllium.mods.settings import (
     MAX_IMAGE_SIZE,
 )
 
-from markdownx.fields import MarkdownxFormField
-from markdownx.widgets import MarkdownxWidget
-
 
 class ModGeneralInfoForm(forms.ModelForm):
     """
