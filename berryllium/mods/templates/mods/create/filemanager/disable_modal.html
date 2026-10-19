@@ -1,0 +1,29 @@
+<div class="flex flex-col items-center justify-center p-6 space-y-6 text-white">
+    <ion-icon name="warning" class="size-[4rem]"></ion-icon>
+    <h2 class="text-2xl font-bold">Turn off the file manager?</h2>
+    <p class="bg-pine-600 border border-white/10 rounded-xl p-4">
+        You will lose your file management if you toggle the file manager off. Proceed?
+    </p>
+    <div class="flex flex-row gap-4">
+        <button type="button"
+                class="zb-controls items-center justify-center"
+                @click="$dispatch('close-modal')">
+            <i class="bi bi-x-lg mr-3"></i> Cancel
+        </button>
+        <button type="button"
+                class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
+                {# djlint:off #}
+                @click="
+                    htmx.ajax('POST', '{% url 'hx_toggle_file_manager' mod_id=mod.id %}', {
+                        values: { enabled: 'false' },
+                        headers: { 'X-CSRFToken': '{{ csrf_token }}' },
+                        target: '#upload-frame',
+                        swap: 'innerHTML',
+                    });
+                    $dispatch('close-modal');
+                ">
+                {# djlint:on #}
+            <i class="bi bi-check-lg mr-3"></i> Proceed
+        </button>
+    </div>
+</div>
