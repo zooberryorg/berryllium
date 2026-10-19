@@ -304,6 +304,36 @@ class ModCategorizationForm(forms.ModelForm):
         model = Mod
         fields = ["category", "game", "expansions"]
 
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_tags(self):
+        # -> (existing Tag list, new names list)
+        return resolve_tags(self.cleaned_data.get("tags", []))
+
+    def save_relations(self):
+        existing, new_names = self.cleaned_data["tags"]
+        save_tags(self.instance, existing, new_names, user=self.user)
+
+    def tags_picker(self):
+        if self.is_bound:
+            existing, new_names = resolve_tags(
+                [v for v in self.data.getlist(self.add_prefix("tags")) if v], strict=False
+            )
+        else:
+            existing = list(self.instance.tags.all()) if self.instance.pk else []
+            new_names = list(self.instance.pending_tags or [])
+        return picker_config(
+            name=self.add_prefix("tags"),
+            search_url=reverse("search_tags"),
+            items=tag_items(existing, new_names),
+            title="Add tags",
+            placeholder="Search tags...",
+            allow_new=True,
+        )
+
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
         if not choices:
