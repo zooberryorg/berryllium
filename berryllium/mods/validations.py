@@ -1,10 +1,11 @@
 from berryllium.mods.models import Mod, ModFile, ModFileGroup, ModImage
 from berryllium.mods.forms import ModFileGroupForm, ModFileForm
 from berryllium.mods.services import (
-    create_file_group,
     update_file_order,
     update_filegroup_order,
     swap_order,
+    image_gallery_context,
+    collapse_file_groups
 )
 
 from django.shortcuts import render, HttpResponse, redirect
@@ -14,7 +15,6 @@ from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from berryllium.mods.services import collapse_file_groups
 from django.db import transaction
 
 
