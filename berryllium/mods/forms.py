@@ -28,9 +28,6 @@ from berryllium.mods.settings import (
     MAX_IMAGE_SIZE,
 )
 
-from markdownx.fields import MarkdownxFormField
-from markdownx.widgets import MarkdownxWidget
-
 
 class ModGeneralInfoForm(forms.ModelForm):
     """
@@ -512,13 +509,13 @@ class ModDescriptionForm(forms.ModelForm):
     description and other metadata.
     """
 
-    description = MarkdownxFormField(
+    description = forms.CharField(
         required=False,
-        widget=MarkdownxWidget(
+        widget=forms.Textarea(
             attrs={
                 "placeholder": "Enter detailed description...",
-                "class": "zb-textarea text-sm resize-none",
-                "rows": 6,
+                "class": "zb-textarea text-sm resize-y w-full font-mono",
+                "rows": 14,
             }
         ),
     )
