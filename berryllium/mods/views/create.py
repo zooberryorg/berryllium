@@ -7,6 +7,7 @@ from django.urls import reverse, reverse_lazy as lazy_reverse
 from django.shortcuts import get_object_or_404
 from django.views import View
 from urllib.parse import urlparse
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -73,7 +74,7 @@ class UploadStepMixin(DraftModMixin):
             "initial_step_url": self.request.path,
         })
 
-class ModDraftView(CreateView):
+class ModDraftView(LoginRequiredMixin, CreateView):
     """
     HTMX Endpoint: Create a draft mod and return its ID for session management.
     """
@@ -92,6 +93,7 @@ class ModDraftView(CreateView):
         """
         Create a new draft mod and return its ID in the response for session management.
         """
+        form.instance.uploaded_by = self.request.user
         response = super().form_valid(form)
         draft_ids = self.request.session.get("draft_ids", [])
         draft_ids.append(self.object.id)
