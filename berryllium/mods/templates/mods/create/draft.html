@@ -1,18 +1,11 @@
 <form hx-post="{% url 'mod_create_draft' %}"
-      hx-encoding="multipart/form-data">
-    {% csrf_token %}
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data">    
+      {% csrf_token %}
     <div class="space-y-4 p-6">
         <div>
-            {% for field in form %}
-                <div class="mb-4">
-                    <label class="block text-sm font-medium mb-1 text-white">
-                        {{ field.label }}
-                        {% if field.field.required %}<span class="text-red-500">*</span>{% endif %}
-                    </label>
-                    {{ field }}
-                    {% include "mods/create/field_errors.html" with field=field %}
-                </div>
-            {% endfor %}
+            {% include "mods/create/general/fields.html" %}        
         </div>
     </div>
     <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
