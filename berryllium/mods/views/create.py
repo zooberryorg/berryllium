@@ -188,14 +188,10 @@ class ModCreateFiles(UploadStepMixin, FormView):
     previous_step = "mod_create_categorization"
 
     def get_success_url(self):
-        mod_id = self.kwargs["mod_id"]
-        action = self.request.POST.get("action")
-        if action == "previous":
-            return reverse("mod_create_categorization", kwargs={"mod_id": mod_id})
-        elif action == "uploaded_file":
+        if self.request.POST.get("action") == "uploaded_file":
             return self.request.path
-        return reverse("mod_create_images", kwargs={"mod_id": mod_id})
-
+        return reverse("mod_create_images", kwargs={"mod_id": self.kwargs["mod_id"]})
+    
     def get_context_data(self, **kwargs):
         """
         Get context data for rendering the form, including existing uploaded files and progress bar information.
