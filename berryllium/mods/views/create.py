@@ -89,12 +89,18 @@ class ModDraftView(LoginRequiredMixin, CreateView):
         """
         return reverse("mod_create_general", kwargs={"mod_id": self.object.id})
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["uploader"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         """
         Create a new draft mod and return its ID in the response for session management.
         """
         form.instance.uploaded_by = self.request.user
         response = super().form_valid(form)
+        form.save_relations()
         draft_ids = self.request.session.get("draft_ids", [])
         draft_ids.append(self.object.id)
         self.request.session["draft_ids"] = draft_ids
@@ -146,6 +152,7 @@ class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
+        form.save_relations()
         return response
 
     def get_context_data(self, **kwargs):
@@ -163,11 +170,17 @@ class ModCreateCategorization(UploadStepMixin, UpdateView):
     template_name = "mods/create/categorization/base.html"
     previous_step = "mod_create_general"
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["user"] = self.request.user
+        return kwargs
+
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
         """
         response = super().form_valid(form)
+        form.save_relations()
         return response
     
     def get_success_url(self):

@@ -9,8 +9,23 @@ from django.core.validators import (
     ProhibitNullCharactersValidator,
 )
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
-# from django.core.exceptions import ValidationError
+from berryllium.mods.models import ModCredit
+from berryllium.mods.pickers import (
+    PickerField,
+    picker_config,
+    resolve_people,
+    people_items,
+    credits_as_resolved,
+    save_credits,
+    website_items_from_values,
+    website_item,
+    resolve_tags,
+    tag_items,
+    save_tags,
+)
+from berryllium.shared.models import ArchivedWebsite
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import ModFile, ModFileGroup
 from berryllium.mods.models import Mod
@@ -61,16 +76,25 @@ class ModGeneralInfoForm(forms.ModelForm):
         ),
     )
 
-    owner = forms.CharField(
+    collaborators = PickerField(
         required=False,
-        widget=TextInput(
-            attrs={
-                "placeholder": "Enter mod owner (optional)...",
-                "class": "zb-input text-sm",
-                "autocomplete": "off",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
+        allow_new=True,
+        label="Collaborators",
+        help_text="People who made this mod with you.",
+    )
+
+    original_authors = PickerField(
+        required=False,
+        allow_new=True,
+        label="Original Authors",
+        help_text="Who made the mod originally.",
+    )
+
+    original_websites = forms.ModelMultipleChoiceField(
+        queryset=ArchivedWebsite.objects.filter(is_enabled=True),
+        required=False,
+        label="Original Websites",
+        widget=forms.MultipleHiddenInput,
     )
 
     thumbnail = forms.ImageField(
@@ -107,26 +131,11 @@ class ModGeneralInfoForm(forms.ModelForm):
         ),
     )
 
-    former_hosts = forms.URLField(
-        required=False,
-        max_length=200,
-        label="Original website",
-        assume_scheme="https",
-        widget=forms.URLInput(
-            attrs={
-                "placeholder": "https://...",
-                "class": "zb-input text-sm",
-                "autocomplete": "off",
-                ":disabled": "!archived",
-            }
-        ),
-    )
-
     class Meta:
         model = Mod
         fields = [
-            "title", "summary", "owner", "thumbnail", "publish_date",
-            "is_archived_file", "original_release_date", "former_hosts",
+            "title", "summary", "thumbnail", "publish_date",
+            "is_archived_file", "original_release_date", "original_websites",
         ]
         widgets = {
             "title": TextInput(
@@ -161,8 +170,10 @@ class ModGeneralInfoForm(forms.ModelForm):
         summary = summary.strip()
         return summary
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, uploader=None, **kwargs):
         super().__init__(*args, **kwargs)
+        # the uploader is always the first, locked collaborator
+        self.uploader = uploader or self.instance.uploaded_by        
         # the date picker can't go past today
         self.fields["original_release_date"].widget.attrs["max"] = date.today().isoformat()
 
@@ -196,19 +207,75 @@ class ModGeneralInfoForm(forms.ModelForm):
             raise forms.ValidationError("The original release date can't be in the future.")
         return value
 
+    def clean_collaborators(self):
+        return resolve_people(self.cleaned_data.get("collaborators", []))
+
+    def clean_original_authors(self):
+        return resolve_people(self.cleaned_data.get("original_authors", []))
+
     def clean(self):
         cleaned = super().clean()
         if cleaned.get("is_archived_file"):
             if not cleaned.get("original_release_date"):
                 self.add_error("original_release_date", "Required for archived mods.")
-            if not cleaned.get("former_hosts"):
-                self.add_error("former_hosts", "Required for archived mods.")
+            if not cleaned.get("original_websites"):
+                self.add_error("original_websites", "Pick at least one website.")
+            if not cleaned.get("original_authors"):
+                self.add_error("original_authors", "Add at least one original author.")
         else:
-            # toggle off: don't keep stale archive info
+            # don't keep stale archive info
             cleaned["original_release_date"] = None
-            cleaned["former_hosts"] = ""
+            cleaned["original_websites"] = ArchivedWebsite.objects.none()
+            cleaned["original_authors"] = []
         return cleaned
 
+    # -------- picker pills: after data is submitted after an error comes up
+
+    def _submitted(self, name):
+        return [v for v in self.data.getlist(self.add_prefix(name)) if v]
+
+    def _people(self, name, role):
+        if self.is_bound:
+            return resolve_people(self._submitted(name), strict=False)
+        if self.instance.pk:
+            return credits_as_resolved(self.instance, role)
+        return []
+
+    def collaborators_picker(self):
+        return picker_config(
+            name=self.add_prefix("collaborators"),
+            search_url=reverse("search_people"),
+            items=people_items(self._people("collaborators", ModCredit.Role.COLLABORATOR), uploader=self.uploader),
+            title="Add collaborators",
+            placeholder="Search members by name...",
+            allow_new=True,
+        )
+
+    def original_authors_picker(self):
+        return picker_config(
+            name=self.add_prefix("original_authors"),
+            search_url=reverse("search_people"),
+            items=people_items(self._people("original_authors", ModCredit.Role.ORIGINAL_AUTHOR)),
+            title="Add original authors",
+            placeholder="Search authors by name...",
+            allow_new=True,
+        )
+
+    def original_websites_picker(self):
+        if self.is_bound:
+            items = website_items_from_values(self._submitted("original_websites"))
+        elif self.instance.pk:
+            items = [website_item(w) for w in self.instance.original_websites.all()]
+        else:
+            items = []
+        return picker_config(
+            name=self.add_prefix("original_websites"),
+            search_url=reverse("search_websites"),
+            items=items,
+            title="Add original websites",
+            placeholder="Search archived websites...",
+            empty_text="No matching websites. Ask staff to add it if it's missing.",
+        )
 
 class ModCategorizationForm(forms.ModelForm):
     """
@@ -231,10 +298,40 @@ class ModCategorizationForm(forms.ModelForm):
     expansions = multiple_choice_attributes(
         EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
     )
+    tags = PickerField(required=False, allow_new=True, max_items=20, label="Tags")
 
     class Meta:
         model = Mod
         fields = ["category", "game", "expansions"]
+
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user = user
+
+    def clean_tags(self):
+        return resolve_tags(self.cleaned_data.get("tags", []))
+
+    def save_relations(self):
+        existing, new_names = self.cleaned_data["tags"]
+        save_tags(self.instance, existing, new_names, user=self.user)
+
+    def tags_picker(self):
+        if self.is_bound:
+            existing, new_names = resolve_tags(
+                [v for v in self.data.getlist(self.add_prefix("tags")) if v], strict=False
+            )
+        else:
+            existing = list(self.instance.tags.all()) if self.instance.pk else []
+            new_names = list(self.instance.pending_tags or [])
+        return picker_config(
+            name=self.add_prefix("tags"),
+            search_url=reverse("search_tags"),
+            items=tag_items(existing, new_names),
+            title="Add tags",
+            placeholder="Search tags...",
+            allow_new=True,
+        )
 
     def multiple_choice_clean(self, field_name):
         choices = self.cleaned_data.get(field_name)
