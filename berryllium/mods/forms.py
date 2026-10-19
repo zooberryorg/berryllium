@@ -136,7 +136,7 @@ class ModGeneralInfoForm(forms.ModelForm):
         fields = [
             "title", "summary", "thumbnail", "publish_date",
             "is_archived_file", "original_release_date", "original_websites",
-    ]
+        ]
         widgets = {
             "title": TextInput(
                 attrs={
@@ -275,6 +275,7 @@ class ModGeneralInfoForm(forms.ModelForm):
             title="Add original websites",
             placeholder="Search archived websites...",
             empty_text="No matching websites. Ask staff to add it if it's missing.",
+        )
 
 class ModCategorizationForm(forms.ModelForm):
     """
@@ -297,6 +298,7 @@ class ModCategorizationForm(forms.ModelForm):
     expansions = multiple_choice_attributes(
         EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
     )
+    tags = PickerField(required=False, allow_new=True, max_items=20, label="Tags")
 
     class Meta:
         model = Mod
