@@ -21,16 +21,25 @@
             value="next"
             {# djlint:off #}
             {% if current_index == 2 %}
-                :type="$store.dnd.numEmptyGroups > 0 ? 'button' : 'submit'"
-                @click="$store.dnd.numEmptyGroups > 0 ? 
-                $dispatch('open-modal', { 
-                    endpoint: '{% url 'hx_empty_filegroups_warning' %}',
-                    modalTitle: 'Empty File Groups Detected',
-                    icon: 'warning',
-                    maxWidth: 'max-w-md',
-                    hideHeader: true,
-                    focusAfterRender: document.getElementById('upload-frame'),
-                }) : $el.closest('form').submit()"
+                type="button"
+                @click="
+                    fetch('{% url 'hx_empty_filegroups_warning' %}', { headers: { 'HX-Request': 'true' } })
+                        .then(response => {
+                            if (response.status === 204) {
+                                $el.closest('form').requestSubmit();
+                            } else if (response.ok) {
+                                $dispatch('open-modal', {
+                                    endpoint: '{% url 'hx_empty_filegroups_warning' %}',
+                                    modalTitle: 'Empty File Groups Detected',
+                                    icon: 'warning',
+                                    maxWidth: 'max-w-md',
+                                    hideHeader: true,
+                                    focusAfterRender: document.getElementById('upload-frame'),
+                                });
+                            } else {
+                                console.error('Empty group check failed:', response.status);
+                            }
+                        })"
             {% else %}
                 type="submit"
             {% endif %}

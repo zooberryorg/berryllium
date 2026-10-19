@@ -29,8 +29,8 @@
     </p>
     <div class="flex flex-row gap-4">
         <button class="zb-controls items-center justify-center"
-                @click="$dispatch('close-modal'); $refs.uploadForm.submit()">
-            <i class="bi bi-x-lg mr-3"></i> Cancel
+                @click="$dispatch('close-modal')">
+            <i class="bi bi-x-lg mr-3"></i> Go Back
         </button>
         <button type="button"
                 class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors items-center justify-center"
@@ -53,7 +53,7 @@
                     }
                 }">
                 
-            <i class="bi bi-trash-fill mr-3"></i> Discard Empties
+            <i class="bi bi-trash-fill mr-3"></i> Discard empty groups
         </button>
     </div>
 </div>
