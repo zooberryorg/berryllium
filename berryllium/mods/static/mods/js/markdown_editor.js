@@ -95,5 +95,37 @@ function markdownEditor({ uploadUrl, previewUrl }) {
       this.$refs.imageInput.click();
     },
 
+    async uploadImage(event) {
+      const file = event.target.files[0];
+      event.target.value = ''; // duplicate files should be allowed
+      if (!file) return;
+
+      // remember the cursor pos
+      const ta = this.textarea;
+      const cursor = { start: ta.selectionStart, end: ta.selectionEnd };
+
+      this.uploading = true;
+      this.uploadError = '';
+      try {
+        const body = new FormData();
+        body.append('image', file);
+        const response = await fetch(uploadUrl, {
+          method: 'POST',
+          body,
+          headers: { 'X-CSRFToken': this.csrfToken() },
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(data.error || 'Upload failed.');
+
+        const alt = file.name.replace(/\.[^.]+$/, '').replace(/[\[\]]/g, '');
+        ta.setSelectionRange(cursor.start, cursor.end);
+        this.insert(`![${alt}](${data.url})`);
+      } catch (err) {
+        this.uploadError = err.message;
+      } finally {
+        this.uploading = false;
+      }
+    },
+
   };
 }
