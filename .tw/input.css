@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@source inline("max-w-sm max-w-md max-w-lg max-w-xl max-w-2xl");
 
 @theme {
   /* Breakpoint overrides */
@@ -49,6 +50,7 @@
 .test {
   color: #263621;
 }
+/* explicitly build these classes */
 /* Layers */
 @layer components {
   /* Input */

@@ -1,7 +1,9 @@
+{# Shared by the Create Draft modal (draft.html) and the General step (general/base.html). #}
 {% if form.non_field_errors %}
     <p class="text-red-400 text-sm mb-4">{{ form.non_field_errors.0 }}</p>
 {% endif %}
 
+<!-- thumbnail / logo (1:1) -->
 <div class="mb-4"
      x-data="thumbnailPicker($el.dataset)"
      data-initial-url="{% if form.instance.thumbnail %}{{ form.instance.thumbnail.url }}{% endif %}">
@@ -9,16 +11,28 @@
         Thumbnail / Logo <span class="text-red-500">*</span>
     </label>
     <div class="flex items-center gap-4">
+        {# square frame: the placeholder is always there, the preview image sits on top of it #}
         <button type="button"
-                class="w-24 h-24 shrink-0 rounded-xl overflow-hidden border-2 border-dashed border-white/20 hover:border-gold-400/60 bg-pine-800/40 flex items-center justify-center cursor-pointer transition-colors"
+                class="relative w-24 h-24 shrink-0 rounded-xl overflow-hidden border-2 border-dashed border-white/20 hover:border-gold-400/60 bg-pine-800/40 cursor-pointer transition-colors"
+                :class="previewUrl ? 'border-solid border-gold-400/60' : ''"
                 @click="$refs.thumbInput.click()">
-            <img x-show="previewUrl" :src="previewUrl" alt="Thumbnail preview" class="w-full h-full object-cover" x-cloak>
-            <i class="bi bi-image text-2xl text-white/40" x-show="!previewUrl"></i>
+            <span class="absolute inset-0 flex flex-col items-center justify-center gap-1 text-white/40">
+                <i class="bi bi-image text-2xl"></i>
+                <span class="text-[10px] uppercase tracking-wide">1:1</span>
+            </span>
+            <img x-show="previewUrl"
+                 :src="previewUrl"
+                 alt="Thumbnail preview"
+                 class="absolute inset-0 w-full h-full object-cover"
+                 x-cloak>
         </button>
-        <div class="flex flex-col gap-1 text-sm">
+        <div class="flex flex-col gap-1 text-sm min-w-0">
             <button type="button" class="zb-action rounded-xl max-w-max" @click="$refs.thumbInput.click()">
-                <span x-text="previewUrl ? 'Change image' : 'Choose image'"></span>
+                <span x-text="previewUrl ? 'Change image' : 'Choose image'">Choose image</span>
             </button>
+            <span class="text-gold-300 text-xs truncate" x-show="fileName" x-cloak>
+                <i class="bi bi-check-circle-fill"></i> <span x-text="fileName"></span>
+            </span>
             <span class="text-white/50 text-xs">{{ form.thumbnail.help_text }}</span>
         </div>
     </div>
@@ -44,18 +58,22 @@
                required>
         <button type="button" class="zb-action rounded-xl shrink-0" @click="setNow()">Now</button>
     </div>
+    {# the value actually submitted: an ISO 8601 timestamp with timezone, set by publishDatePicker #}
     <input type="hidden" name="publish_date" x-ref="publishValue" value="{{ form.publish_date_iso }}">
-    <p class="text-white/50 text-xs mt-1">Shown in your time zone (<span x-text="timeZone"></span>). Pick a future time to schedule it.</p>
+    <p class="text-white/50 text-xs mt-1">Shown in your time zone: <span class="text-white/70" x-text="timeZone"></span>. Pick a future time to schedule it.</p>
     {% include "mods/create/field_errors.html" with field=form.publish_date %}
 </div>
 
 <!-- archived mod -->
 <div class="mt-6 pt-4 border-t border-white/10"
      x-data="{ archived: {{ form.is_archived_file.value|yesno:'true,false' }} }">
-    <label class="inline-flex cursor-pointer items-center gap-2.5 mb-2">
+    {# same pill toggle as the file manager toggle on the Upload Files step #}
+    <label class="inline-flex cursor-pointer pl-4 py-1 pr-4 max-w-max bg-pine-special-200 border border-pine-special-100 rounded-full shadow-xs mb-2 items-center hover:brightness-110 transition-all">
         {{ form.is_archived_file }}
-        <div class="shrink-0 relative w-9 h-5 rounded-full bg-pine-400/30 peer-checked:bg-gold-400 after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:h-4 after:w-4 after:rounded-full after:bg-pine-info-200 after:transition-all peer-checked:after:translate-x-full"></div>
-        <span class="text-sm text-white/80 select-none">{{ form.is_archived_file.label }}</span>
+        <div class="shrink-0 relative w-9 h-5 rounded-full bg-pine-400/30 after:bg-pine-info-200 peer-checked:bg-gold-400 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:scale-100 peer-hover:after:scale-110 peer-active:after:scale-140 after:absolute after:top-[2px] after:start-[2px] after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+        <div class="ms-2.5 select-none text-white/80">
+            <p class="text-xs text-heading flex">{{ form.is_archived_file.label }}</p>
+        </div>
     </label>
     <p class="text-white/50 text-xs mb-3">Turn this on if the mod was released somewhere else first.</p>
     <div x-show="archived" x-collapse x-cloak>
