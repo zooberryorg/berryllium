@@ -12,6 +12,9 @@ from django.views.decorators.http import require_POST, require_GET
 from django.core.validators import URLValidator
 from django.core.exceptions import ValidationError
 from django.core.files.storage import default_storage
+from django.http import Http404
+from django.shortcuts import get_object_or_404
+from berryllium.mods.services import collapse_file_groups
 
 
 @require_POST
@@ -57,12 +60,29 @@ def hx_process_url_field(request):
     return HttpResponse()
 
 
+def get_draft_mod(request, mod_id):
+    if mod_id not in request.session.get("draft_ids", []):
+        raise Http404("Draft not found.")
+    return get_object_or_404(Mod, id=mod_id)
+
+
 @require_POST
-def hx_toggle_group_manager(request):
-    """HTMX endpoint to toggle file group manager visibility."""
-    isToggled = "group_manager_toggle" in request.POST
-    request.session["group_manager_toggled"] = isToggled
-    return HttpResponse()
+def hx_toggle_file_manager(request, mod_id):
+    """Turn the file manager on, or off and merges all files into a single group."""
+    mod = get_draft_mod(request, mod_id)
+    if request.POST.get("enabled") == "true":
+        mod.use_file_groups = True
+        mod.save(update_fields=["use_file_groups"])
+    else:
+        collapse_file_groups(mod)
+    return redirect("mod_create_files", mod_id=mod.id)
+
+
+@require_GET
+def hx_file_manager_disable_confirm(request, mod_id):
+    """Popup modal to confirm toggle off file manager."""
+    mod = get_draft_mod(request, mod_id)
+    return render(request, "mods/create/filemanager/disable_modal.html", {"mod": mod})
 
 
 @require_POST
