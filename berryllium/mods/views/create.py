@@ -246,7 +246,8 @@ class ModCreateFiles(UploadStepMixin, FormView):
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
             else:
-                print("Failed to upload file:", clean_file.name)
+                form.add_error("file", f'"{clean_file.name}" has already been uploaded to this mod.')
+                return self.form_invalid(form)
         else:
             print("No file uploaded or file failed validation.")
 
