@@ -31,3 +31,14 @@ def search_people(request):
     authors = Author.objects.filter(member__isnull=True, name__icontains=q).order_by("name")[:10]
     results = [person_item("member", m) for m in members] + [person_item("author", a) for a in authors]
     return JsonResponse({"results": results})
+
+@login_required
+@require_GET
+def search_websites(request):
+    """Enabled archived websites; with no query, the first 20 alphabetically."""
+    q = _query(request)
+    websites = ArchivedWebsite.objects.filter(is_enabled=True)
+    if q:
+        websites = websites.filter(Q(name__icontains=q) | Q(aliases__icontains=q))
+    return JsonResponse({"results": [website_item(w) for w in websites.order_by("name")[:20]]})
+
