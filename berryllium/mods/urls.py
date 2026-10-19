@@ -1,5 +1,5 @@
 from django.urls import path
-from berryllium.mods.views import create, explore
+from berryllium.mods.views import create, explore, search
 import berryllium.mods.validations as validations
 
 urlpatterns = [
@@ -16,6 +16,10 @@ urlpatterns = [
         name="mod_create_description",
     ),
     path("mods/edit/s6", create.upload_step3, name="upload_step3"),
+    # ---------------------------------------------- Search endpoints
+    path("search/people/", search.search_people, name="search_people"),
+    path("search/websites/", search.search_websites, name="search_websites"),
+    path("search/tags/", search.search_tags, name="search_tags"),
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
