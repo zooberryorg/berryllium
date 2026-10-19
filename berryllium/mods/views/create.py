@@ -112,17 +112,10 @@ class ModCreateLanding(DraftModMixin, TemplateView):
         """
         return reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["mod_navigation"] = UPLOAD_NAVIGATION
-        return context
-
-    # def get(self, request, *args, **kwargs):
-    #     # Clear session later to start new
-    #     # request.session.pop("session_id", None)
-    #     # request.session.pop("group_manager_toggled", None)
-    #     return redirect("mod_create_categorization")
-
+    def get(self, request, *args, **kwargs):
+        self.get_mod() # if draft doesnt exist or not in session, ret 404
+        return redirect("mod_create_general", mod_id=self.kwargs["mod_id"])
+    
 class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
