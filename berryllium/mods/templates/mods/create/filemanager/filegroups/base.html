@@ -28,21 +28,23 @@
     {% for group, files in file_groups %}
         {% include "mods/create/filemanager/filegroups/filegroup.html" with group=group files=files %}
     {% endfor %}
-    <div class="flex justify-end w-full px-6 mb-4">
-        <button class="zb-action flex items-center justify-center"
-            type="button"
-            hx-post="{% url 'hx_add_filegroup_form' %}"
-            hx-target="#upload-frame"
-            hx-swap="innerHTML"
-            {# djlint:off #}
-            {# refreshes alpine state after swap #}
-            hx-on:htmx:after-swap="() => { 
-                Alpine.initTree(event.detail.elt); 
-            }"
-            @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
-            {# djlint:on #}
-            <ion-icon name="add-circle" class="pr-2">
-            </ion-icon> Add Group
-        </button>
-    </div>
+    {% if mod.use_file_groups %}
+        <div class="flex justify-end w-full px-6 mb-4">
+            <button class="zb-action flex items-center justify-center"
+                type="button"
+                hx-post="{% url 'hx_add_filegroup_form' %}"
+                hx-target="#upload-frame"
+                hx-swap="innerHTML"
+                {# djlint:off #}
+                {# refreshes alpine state after swap #}
+                hx-on:htmx:after-swap="() => { 
+                    Alpine.initTree(event.detail.elt); 
+                }"
+                @click="$nextTick(() => { $refs.fileGroups.lastElementChild.scrollIntoView({ behavior: 'smooth' }) })">
+                {# djlint:on #}
+                <ion-icon name="add-circle" class="pr-2">
+                </ion-icon> Add Group
+            </button>
+        </div>
+    {% endif %}
 </div>

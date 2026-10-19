@@ -12,7 +12,9 @@
             <div class="relative flex flex-col gap-1 w-full">
                 <div class="absolute top-0 right-0 flex items-center gap-1">
                     <div class="flex items-center gap-1">
-                        {% include "mods/create/filemanager/filegroups/actions.html" with group_id=group.instance.id %}
+                        {% if mod.use_file_groups %}
+                            {% include "mods/create/filemanager/filegroups/actions.html" with group_id=group.instance.id %}
+                        {% endif %}                    
                     </div>
                     <div class="h-full"></div>
                 </div>
