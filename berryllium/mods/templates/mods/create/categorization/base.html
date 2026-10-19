@@ -10,7 +10,7 @@
     {% csrf_token %}
     <div class="space-y-4 p-6">
         <div>
-            {% for field in form %}
+            {% for field in form %}{% if field.name != "tags" %}
                 <div class="mb-4">
                     <label class="block text-sm font-medium mb-1 text-white">
                         {{ field.label }}
@@ -19,8 +19,13 @@
                     {{ field }}
                     {% include "mods/create/field_errors.html" with field=field %}
                 </div>
-            {% endfor %}
+            {% endif %}{% endfor %}
         </div>
+        <!-- tags -->
+        <div class="pt-4 border-t border-white/10">
+            {% include "shared/widgets/search_picker.html" with field=form.tags config=form.tags_picker %}
+            <p class="text-white/50 text-xs -mt-2">Can't find a tag? Type it and choose "Create".</p>
+        </div>    
     </div>
     {% include "mods/create/actions.html" %}
 </form>

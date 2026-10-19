@@ -229,6 +229,19 @@ class ModGeneralInfoForm(forms.ModelForm):
             cleaned["original_authors"] = []
         return cleaned
 
+
+    def save_relations(self):
+        """Save credits. Call after the mod itself has been saved."""
+        mod = self.instance
+        if not self.cleaned_data.get("is_archived_file"):
+            save_credits(
+                mod, ModCredit.Role.COLLABORATOR, self.cleaned_data["collaborators"], uploader=self.uploader
+            )
+        elif self.uploader and not mod.credits.filter(role=ModCredit.Role.COLLABORATOR).exists():
+
+            save_credits(mod, ModCredit.Role.COLLABORATOR, [], uploader=self.uploader)
+        save_credits(mod, ModCredit.Role.ORIGINAL_AUTHOR, self.cleaned_data["original_authors"])
+
     # -------- picker pills: after data is submitted after an error comes up
 
     def _submitted(self, name):
