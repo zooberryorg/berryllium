@@ -78,5 +78,22 @@ function markdownEditor({ uploadUrl, previewUrl }) {
       this.insert(result, 0, result.length);
     },
 
+    link() {
+      const ta = this.textarea;
+      const label = ta.value.slice(ta.selectionStart, ta.selectionEnd) || 'link text';
+      const text = `[${label}](https://)`;
+      // select "https://" so typing replaces it with the real URL
+      this.insert(text, label.length + 3, text.length - 1);
+    },
+
+    codeBlock() {
+      this.wrap('\n```\n', '\n```\n', 'code');
+    },
+
+    pickImage() {
+      this.uploadError = '';
+      this.$refs.imageInput.click();
+    },
+
   };
 }
