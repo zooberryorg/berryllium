@@ -179,3 +179,30 @@ def tag_item(tag):
 
 def new_tag_item(name):
     return {"value": f"{NEW_PREFIX}{name}", "label": name, "sublabel": NEW_TAG_SUBLABEL, "isNew": True}
+
+def resolve_tags(values, strict=True):
+    """
+    When given a list of tag values (IDs or new tag names), return a tuple of
+    (existing Tag list, new names list). A "new" name that matches an existing
+    tag (ignoring case) is treated as that tag instead.
+    """
+    ids = [int(v) for v in values if str(v).isdigit()]
+    tags_by_id = Tag.objects.in_bulk(ids)
+    existing, new_names = [], []
+    for value in values:
+        if str(value).isdigit():
+            tag = tags_by_id.get(int(value))
+            if tag:
+                existing.append(tag)
+            elif strict:
+                raise ValidationError("One of the selected tags no longer exists. Remove it and try again.")
+        elif value.startswith(NEW_PREFIX):
+            name = normalize_tag(value[len(NEW_PREFIX):])
+            if not name:
+                continue
+            match = Tag.objects.filter(name__iexact=name).first()
+            if match:
+                existing.append(match)
+            elif name not in new_names:
+                new_names.append(name)
+    return existing, new_names
