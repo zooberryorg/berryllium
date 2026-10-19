@@ -2,6 +2,8 @@ import os
 import uuid
 from django.db import models
 from markdownx.models import MarkdownxField
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 
 from berryllium.shared.models import Tag
 # from users.models import User
@@ -278,3 +280,8 @@ class ModDescriptionImage(models.Model):
     mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="description_images")
     image = models.ImageField(upload_to=description_image_path)
     uploaded_at = models.DateTimeField(auto_now_add=True)
+
+@receiver(post_delete, sender=ModDescriptionImage)
+def delete_description_image_file(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(save=False)
