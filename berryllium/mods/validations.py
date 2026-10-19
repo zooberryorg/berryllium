@@ -477,3 +477,19 @@ def hx_set_cover_image(request, image_id):
         image.save(update_fields=["is_cover"])
 
     return render(request, "mods/create/pictures/images.html", image_gallery_context(mod_id))
+
+@require_POST
+def hx_reorder_images(request, mod_id):
+    """Save the gallery order after a drag. Receives every grid image id in its new order."""
+    mod = get_draft_mod(request, mod_id)
+    ids = [int(i) for i in request.POST.get("ids", "").split(",") if i.isdigit()]
+
+    images = {img.id: img for img in ModImage.objects.filter(mod=mod, id__in=ids)}
+    with transaction.atomic():
+        for index, image_id in enumerate(ids):
+            img = images.get(image_id)
+            if img and img.order != index:
+                img.order = index
+                img.save(update_fields=["order"])
+
+    return HttpResponse(status=204)
