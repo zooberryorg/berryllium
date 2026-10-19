@@ -10,6 +10,7 @@
        hx-target="#group-name-errors-{{ group.instance.id }}"
        hx-swap="innerHTML"
        autocomplete="off"
+       {% if not mod.use_file_groups %}readonly{% endif %}
        @keydown.escape="$el.blur()"
        @keydown.enter.prevent="$el.blur()"
        hx-on::after-swap="htmx.process(this)">
