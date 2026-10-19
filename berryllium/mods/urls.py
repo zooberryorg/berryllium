@@ -33,9 +33,14 @@ urlpatterns = [
         name="hx_process_url_field",
     ),
     path(
-        "mods/toggle-group-manager/",
-        validations.hx_toggle_group_manager,
-        name="hx_toggle_group_manager",
+        "mods/edit/<int:mod_id>/file-manager/",
+        validations.hx_toggle_file_manager,
+        name="hx_toggle_file_manager",
+    ),
+    path(
+        "mods/edit/<int:mod_id>/file-manager/confirm-disable/",
+        validations.hx_file_manager_disable_confirm,
+        name="hx_file_manager_disable_confirm",
     ),
     path(
         "mods/update-file-name/<int:fg_id>/",
