@@ -38,3 +38,12 @@ ALLOWED_CLASSES = {
     "td": {"linenos", "code"},
     "span": PYGMENTS_CLASSES | {"normal", "special"},
 }
+
+# Only images uploaded from our own site are allowed. Blocks tracking pixels and hotlinked images.
+# NOTE: Remove this function to allow external images.
+def _filter_attribute(tag, attribute, value):
+    if tag == "img" and attribute == "src" and not value.startswith(settings.MEDIA_URL):
+        return None
+    
+    return value
+
