@@ -1,5 +1,7 @@
 from django import forms
 from django.forms import formset_factory, Textarea, TextInput
+from datetime import date
+from django.utils import timezone
 from django.core.validators import (
     MaxLengthValidator,
     MinLengthValidator,
@@ -26,6 +28,8 @@ from berryllium.mods.settings import (
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
     MAX_IMAGE_SIZE,
+    MOD_THUMBNAIL_MIN_SIZE,
+    MOD_THUMBNAIL_RECOMMENDED_SIZE,
 )
 
 
@@ -69,9 +73,61 @@ class ModGeneralInfoForm(forms.ModelForm):
         ),
     )
 
+    thumbnail = forms.ImageField(
+        required=True,
+        label="Thumbnail / Logo",
+        help_text=(
+            f"Square (1:1), {MOD_THUMBNAIL_RECOMMENDED_SIZE} recommended, "
+            f"at least {MOD_THUMBNAIL_MIN_SIZE}px. JPG, PNG or WEBP."
+        ),
+        widget=forms.FileInput(
+            attrs={
+                "accept": ".jpg,.jpeg,.png,.webp",
+                "class": "hidden",
+                "x-ref": "thumbInput",
+                "@change": "preview($event)",
+            }
+        ),
+    )
+
+    publish_date = forms.DateTimeField(required=True, widget=forms.HiddenInput)
+
+    is_archived_file = forms.BooleanField(
+        required=False,
+        label="Is this an archived mod?",
+        widget=forms.CheckboxInput(attrs={"class": "sr-only peer", "x-model": "archived"}),
+    )
+
+    original_release_date = forms.DateField(
+        required=False,
+        label="Original release date",
+        widget=forms.DateInput(
+            format="%Y-%m-%d",
+            attrs={"type": "date", "class": "zb-input text-sm", ":disabled": "!archived"},
+        ),
+    )
+
+    former_hosts = forms.URLField(
+        required=False,
+        max_length=200,
+        label="Original website",
+        assume_scheme="https",
+        widget=forms.URLInput(
+            attrs={
+                "placeholder": "https://...",
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                ":disabled": "!archived",
+            }
+        ),
+    )
+
     class Meta:
         model = Mod
-        fields = ["title", "summary", "owner"]
+        fields = [
+            "title", "summary", "owner", "thumbnail", "publish_date",
+            "is_archived_file", "original_release_date", "former_hosts",
+        ]
         widgets = {
             "title": TextInput(
                 attrs={
@@ -102,9 +158,56 @@ class ModGeneralInfoForm(forms.ModelForm):
                 f"Summary cannot exceed {MAX_SUMMARY_LENGTH} characters."
             )
 
-        # clean summary of leading/trailing whitespace and null characters
         summary = summary.strip()
         return summary
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # the date picker can't go past today
+        self.fields["original_release_date"].widget.attrs["max"] = date.today().isoformat()
+
+    def publish_date_iso(self):
+        """Publication date as ISO 8601 with timezone, for the date picker script."""
+        if self.is_bound:
+            return self.data.get("publish_date", "")
+        value = self.initial.get("publish_date") or self.instance.publish_date or timezone.now()
+        return value.isoformat()
+
+    def clean_thumbnail(self):
+        thumb = self.cleaned_data.get("thumbnail")
+        # editing without choosing a new file: keep the existing one
+        if not thumb or not hasattr(thumb, "image"):
+            return thumb
+        if thumb.size > MAX_IMAGE_SIZE:
+            raise forms.ValidationError(f"Thumbnail must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
+        if thumb.image.format not in ("JPEG", "PNG", "WEBP"):
+            raise forms.ValidationError("Thumbnail must be a JPG, PNG or WEBP image.")
+        width, height = thumb.image.size
+        if width < MOD_THUMBNAIL_MIN_SIZE or height < MOD_THUMBNAIL_MIN_SIZE:
+            raise forms.ValidationError(
+                f"Thumbnail must be at least {MOD_THUMBNAIL_MIN_SIZE}×{MOD_THUMBNAIL_MIN_SIZE}px "
+                f"(yours is {width}×{height})."
+            )
+        return thumb
+
+    def clean_original_release_date(self):
+        value = self.cleaned_data.get("original_release_date")
+        if value and value > date.today():
+            raise forms.ValidationError("The original release date can't be in the future.")
+        return value
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("is_archived_file"):
+            if not cleaned.get("original_release_date"):
+                self.add_error("original_release_date", "Required for archived mods.")
+            if not cleaned.get("former_hosts"):
+                self.add_error("former_hosts", "Required for archived mods.")
+        else:
+            # toggle off: don't keep stale archive info
+            cleaned["original_release_date"] = None
+            cleaned["former_hosts"] = ""
+        return cleaned
 
 
 class ModCategorizationForm(forms.ModelForm):

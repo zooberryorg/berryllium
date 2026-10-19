@@ -1,10 +1,12 @@
 import os
 import uuid
 from django.db import models
+from django.utils import timezone
 from markdownx.models import MarkdownxField
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
+from berryllium import settings
 from berryllium.shared.models import Tag
 # from users.models import User
 # from tags.models import Tag
@@ -13,6 +15,9 @@ from berryllium.shared.models import Tag
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
+def mod_thumbnail_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"mod_thumbnails/{uuid.uuid4().hex}{ext}"
 
 class Mod(models.Model):
     """
@@ -50,6 +55,7 @@ class Mod(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     category = models.CharField(max_length=100, blank=True, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
+    thumbnail = models.ImageField(upload_to=mod_thumbnail_path, blank=True)
 
     # is mod a directory link instead of a file upload?
     is_external = models.BooleanField(default=False, db_index=True)
@@ -61,10 +67,13 @@ class Mod(models.Model):
 
     # user relations
     # contributors = models.ManyToManyField(User, through='users.Contributor', related_name='contributed_mods', blank=True)
-    # uploaded_by = models.ForeignKey(
-    #     User, on_delete=models.SET_NULL, blank=True, null=True, related_name="uploaded_mods"
-    # )
-
+    uploaded_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="uploaded_mods",
+    )
     draft = models.BooleanField(default=True)
     tags = models.ManyToManyField(Tag, blank=True, through="ModTag", related_name="mods")
     version = models.CharField(max_length=100)
@@ -74,6 +83,7 @@ class Mod(models.Model):
     # dates
     submission_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
+    publish_date = models.DateTimeField(default=timezone.now)
 
     contents = models.TextField(blank=True)
 
