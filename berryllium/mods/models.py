@@ -116,6 +116,54 @@ class Mod(models.Model):
     def file_groups(self):
         return ModFileGroup.objects.filter(mod=self)
 
+class ModCredit(models.Model):
+    """
+    A person credited on a mod, in order.
+
+    Definitions:
+    - member: a site account
+    - author: an Author without an account (e.g. original creator of an archived mod)
+    - pending_name: a new author typed into the upload form; turned into an Author
+      when the mod is published
+    """
+
+    class Role(models.TextChoices):
+        COLLABORATOR = "collaborator", "Collaborator"
+        ORIGINAL_AUTHOR = "original_author", "Original author"
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="credits")
+    role = models.CharField(max_length=20, choices=Role.choices)
+    member = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="mod_credits",
+    )
+    author = models.ForeignKey(
+        "users.Author",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="mod_credits",
+    )
+    pending_name = models.CharField(max_length=150, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["role", "order", "id"]
+
+    def __str__(self):
+        return f"{self.display_name} ({self.get_role_display()}) on {self.mod_id}"
+
+    @property
+    def display_name(self):
+        if self.member_id:
+            return self.member.username
+        if self.author_id:
+            return self.author.name
+        return self.pending_name
+
 
 class ModDependency(models.Model):
     """
