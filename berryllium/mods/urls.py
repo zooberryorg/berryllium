@@ -132,4 +132,6 @@ urlpatterns = [
         validations.hx_reorder_images,
         name="hx_reorder_images",
     ),
+    path("mods/edit/<int:mod_id>/description/preview/", validations.hx_preview_description, name="hx_preview_description"),
+    path("mods/edit/<int:mod_id>/description/image/", validations.hx_upload_description_image, name="hx_upload_description_image"),
 ]
