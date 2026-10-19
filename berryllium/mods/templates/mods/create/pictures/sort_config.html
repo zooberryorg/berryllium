@@ -1,40 +1,17 @@
 {# djlint:off #}
-x-sort:config="{ 
-    forceFallback: true, 
-    dragClass: 'file-draggable', 
-    chosenClass: 'file-chosen', 
-    ghostClass: 'file-ghost', 
-    onChoose: (event) => { 
-        $store.dnd.isDragging = true; 
-        $store.dnd.draggedFileId = event.item.dataset.fileId; 
-        $store.dnd.draggedFromGroupId = event.from.dataset.groupId;
-    }, 
-    onUnchoose: (event) => { 
-        $store.dnd.isDragging = false; 
-    }, 
-    onAdd: (event) => {
-        $dispatch('files-state-changed');
-        const fgId = event.to.dataset.groupId; 
-
-        htmx.ajax('POST', '', { 
-            values: { 
-                dragged_id: $store.dnd.draggedFileId, 
-                fg_id: fgId, 
-                new_index: event.newIndex,
-            },
-        }); 
-    }, 
+x-sort:config="{
+    forceFallback: true,
+    dragClass: 'file-draggable',
+    chosenClass: 'file-chosen',
+    ghostClass: 'file-ghost',
+    onChoose: () => { $store.dnd.isDragging = true; },
+    onUnchoose: () => { $store.dnd.isDragging = false; },
     onUpdate: (event) => {
-        $dispatch('files-state-changed');
-        const fgId = event.to.dataset.groupId; 
-
-        htmx.ajax('POST', '', { 
-            values: { 
-                fg_id: fgId, 
-                old_index: event.oldIndex, 
-                new_index: event.newIndex,
-            },
-        }); 
+        const ids = [...event.to.querySelectorAll('[data-image-id]')].map(el => el.dataset.imageId);
+        htmx.ajax('POST', '{% url 'hx_reorder_images' mod_id=mod_id %}', {
+            values: { ids: ids.join(',') },
+            swap: 'none',
+        });
     },
 }"
 {# djlint:on #}
