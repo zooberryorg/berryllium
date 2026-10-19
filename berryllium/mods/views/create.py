@@ -309,6 +309,12 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
 
         return context | progress_bar
 
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for img in self.object.description_images.all():
+            if img.image.url not in (self.object.description or ""):
+                img.delete()
+        return response
 
 def upload_step3(request):
 

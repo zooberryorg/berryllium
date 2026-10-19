@@ -1,5 +1,6 @@
-from berryllium.mods.models import Mod, ModFile, ModFileGroup, ModImage
-from berryllium.mods.forms import ModFileGroupForm, ModFileForm
+from berryllium.mods.models import Mod, ModFile, ModFileGroup, ModImage, ModDescriptionImage
+from berryllium.mods.forms import ModFileGroupForm, ModFileForm, DescriptionImageForm
+from berryllium.shared.markdown_render import render_markdown
 from berryllium.mods.services import (
     update_file_order,
     update_filegroup_order,
@@ -16,6 +17,7 @@ from django.core.files.storage import default_storage
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.http import JsonResponse
 
 
 @require_POST
@@ -493,3 +495,19 @@ def hx_reorder_images(request, mod_id):
                 img.save(update_fields=["order"])
 
     return HttpResponse(status=204)
+
+@require_POST
+def hx_upload_description_image(request, mod_id):
+    mod = get_draft_mod(request, mod_id)
+    form = DescriptionImageForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return JsonResponse({"error": form.errors["image"][0]}, status=400)
+    img = ModDescriptionImage.objects.create(mod=mod, image=form.cleaned_data["image"])
+    return JsonResponse({"url": img.image.url})
+
+
+@require_POST
+def hx_preview_description(request, mod_id):
+    get_draft_mod(request, mod_id)
+    html = render_markdown(request.POST.get("description", ""))
+    return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')

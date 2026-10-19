@@ -524,5 +524,16 @@ class ModDescriptionForm(forms.ModelForm):
         model = Mod
         fields = ["description"]
 
+class DescriptionImageForm(forms.Form):
+    image = forms.ImageField()
+
+    def clean_image(self):
+        img = self.cleaned_data["image"]
+        if img.size > MAX_IMAGE_SIZE:
+            raise forms.ValidationError(f"Images must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
+        if img.image.format not in ("JPEG", "PNG", "WEBP", "GIF"):
+            raise forms.ValidationError("Only JPG, PNG, WEBP or GIF images are allowed.")
+        return img
+
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
