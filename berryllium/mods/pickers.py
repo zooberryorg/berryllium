@@ -115,3 +115,13 @@ def resolve_people(values, strict=True):
             raise ValidationError("One of the selected people no longer exists. Remove it and try again.")
     return resolved
 
+def people_items(resolved, uploader=None):
+    """Pills for resolved people; the uploader (if given) comes first and is locked."""
+    items = []
+    if uploader is not None:
+        items.append(person_item("member", uploader, locked=True))
+    for kind, obj in resolved:
+        if kind == "member" and uploader is not None and obj.pk == uploader.pk:
+            continue
+        items.append(person_item(kind, obj))
+    return items
