@@ -1,4 +1,5 @@
 <div id="image-{{ image.id }}"
+     data-image-id="{{ image.id }}"
      x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|default_if_none:''|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
      class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if is_cover %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
      {% if not is_cover %}x-sort:item{% endif %}>
