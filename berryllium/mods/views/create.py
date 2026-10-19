@@ -22,6 +22,7 @@ from berryllium.mods.services import (
     create_file_group,
     create_filegroup_formsets,
     upload_image,
+    image_gallery_context,
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
@@ -269,21 +270,10 @@ class ModCreateImages(UploadStepMixin, FormView):
         return reverse("mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get_context_data(self, **kwargs):
-        """
-        Get context data for rendering the form, including progress bar information.
-        """
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)
-
-        # get images for current mod from session
-        mod_id = self.get_mod().id
-        if mod_id:
-            context["images"] = ModImage.objects.filter(mod_id=mod_id).values(
-                "id", "caption", "title", "image", "is_cover"
-            )
-
-        return context | progress_bar
-
+        return context | progress_bar | image_gallery_context(self.get_mod().id)
+    
     def form_valid(self, form):
         """
         Handle uploads and other validations
