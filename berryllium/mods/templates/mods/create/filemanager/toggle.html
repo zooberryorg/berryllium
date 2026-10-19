@@ -1,28 +1,25 @@
-<label
-    {# djlint:off #}
-    x-init="$watch('toggled', value => {
-        if (!value) {
-            $refs.fileGroups.classList.add('disabled');
-        } else {
-            $refs.fileGroups.classList.remove('disabled');
-        }
-    })"
-    class="
-    inline-flex cursor-pointer pl-4 py-1 pr-4 max-w-max bg-pine-special-200 
-    border border-pine-special-100 rounded-full shadow-xs mb-4 mt-6 
-    items-center hover:brightness-110 transition-all 
-    transition-duration-300">
-    {# djlint:on #}
+<label class="inline-flex cursor-pointer pl-4 py-1 pr-4 max-w-max bg-pine-special-200 border border-pine-special-100 rounded-full shadow-xs mb-4 mt-6 items-center hover:brightness-110 transition-all transition-duration-300">
     <input type="checkbox"
-           x-model="toggled"
-           value="{{ group_manager_toggled|yesno:'true,false' }}"
            id="group_manager_toggle"
-           name="group_manager_toggle"
            class="sr-only peer"
-           hx-post="{% url 'hx_toggle_group_manager' %}"
-           hx-trigger="change"
-           hx-include="[name='group_manager_toggle']"
-           hx-swap="none">
+           {# djlint:off #}
+           {% if mod.use_file_groups %}
+               checked
+               @click.prevent="$dispatch('open-modal', {
+                   endpoint: '{% url 'hx_file_manager_disable_confirm' mod_id=mod.id %}',
+                   modalTitle: 'Turn off file manager?',
+                   icon: 'warning',
+                   maxWidth: 'max-w-md',
+                   hideHeader: true,
+               })"
+           {% else %}
+               hx-post="{% url 'hx_toggle_file_manager' mod_id=mod.id %}"
+               hx-vals='{"enabled": "true"}'
+               hx-trigger="change"
+               hx-target="#upload-frame"
+               hx-swap="innerHTML"
+           {% endif %}
+           {# djlint:on #}>
     {# djlint:off #}
     <div class="
         shrink-0 relative peer w-9 h-5 rounded-full
