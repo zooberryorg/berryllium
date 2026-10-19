@@ -127,5 +127,29 @@ function markdownEditor({ uploadUrl, previewUrl }) {
       }
     },
 
+    async togglePreview() {
+      this.showPreview = !this.showPreview;
+      if (!this.showPreview) {
+        this.$nextTick(() => this.textarea.focus());
+        return;
+      }
+
+      const preview = this.$refs.preview;
+      preview.innerHTML = '<p class="opacity-60">Loading preview…</p>';
+      try {
+        const body = new FormData();
+        body.append('description', this.textarea.value);
+        const response = await fetch(previewUrl, {
+          method: 'POST',
+          body,
+          headers: { 'X-CSRFToken': this.csrfToken() },
+        });
+        if (!response.ok) throw new Error();
+        // safe: the server returns HTML that has already been sanitized
+        preview.innerHTML = await response.text();
+      } catch {
+        preview.innerHTML = '<p class="text-red-400">Could not load the preview.</p>';
+      }
+    },
   };
 }
