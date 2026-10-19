@@ -167,3 +167,15 @@ def website_items_from_values(values):
     ids = [int(v) for v in values if str(v).isdigit()]
     websites = ArchivedWebsite.objects.in_bulk(ids)
     return [website_item(websites[i]) for i in ids if i in websites]
+
+def normalize_tag(name):
+    """ "  Big   Cats " -> "big cats" """
+    return " ".join(name.split()).lower()[:MAX_TAG_LENGTH]
+
+
+def tag_item(tag):
+    return {"value": str(tag.pk), "label": tag.name}
+
+
+def new_tag_item(name):
+    return {"value": f"{NEW_PREFIX}{name}", "label": name, "sublabel": NEW_TAG_SUBLABEL, "isNew": True}
