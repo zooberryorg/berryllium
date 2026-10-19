@@ -229,6 +229,8 @@ class ModGeneralInfoForm(forms.ModelForm):
             cleaned["original_authors"] = []
         return cleaned
 
+    # -------- picker pills: after data is submitted after an error comes up
+
     def _submitted(self, name):
         return [v for v in self.data.getlist(self.add_prefix(name)) if v]
 
@@ -248,6 +250,31 @@ class ModGeneralInfoForm(forms.ModelForm):
             placeholder="Search members by name...",
             allow_new=True,
         )
+
+    def original_authors_picker(self):
+        return picker_config(
+            name=self.add_prefix("original_authors"),
+            search_url=reverse("search_people"),
+            items=people_items(self._people("original_authors", ModCredit.Role.ORIGINAL_AUTHOR)),
+            title="Add original authors",
+            placeholder="Search authors by name...",
+            allow_new=True,
+        )
+
+    def original_websites_picker(self):
+        if self.is_bound:
+            items = website_items_from_values(self._submitted("original_websites"))
+        elif self.instance.pk:
+            items = [website_item(w) for w in self.instance.original_websites.all()]
+        else:
+            items = []
+        return picker_config(
+            name=self.add_prefix("original_websites"),
+            search_url=reverse("search_websites"),
+            items=items,
+            title="Add original websites",
+            placeholder="Search archived websites...",
+            empty_text="No matching websites. Ask staff to add it if it's missing.",
 
 class ModCategorizationForm(forms.ModelForm):
     """
