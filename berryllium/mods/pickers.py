@@ -125,3 +125,14 @@ def people_items(resolved, uploader=None):
             continue
         items.append(person_item(kind, obj))
     return items
+
+def credits_as_resolved(mod, role):
+    resolved = []
+    for credit in mod.credits.filter(role=role).select_related("member", "author"):
+        if credit.member_id:
+            resolved.append(("member", credit.member))
+        elif credit.author_id:
+            resolved.append(("author", credit.author))
+        elif credit.pending_name:
+            resolved.append(("new", credit.pending_name))
+    return resolved
