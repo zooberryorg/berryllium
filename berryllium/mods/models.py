@@ -272,3 +272,9 @@ class ModImage(models.Model):
 def description_image_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"mod_description/{instance.mod_id}/{uuid.uuid4().hex}{ext}"
+
+class ModDescriptionImage(models.Model):
+    """An image inserted into a mod's markdown description."""
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="description_images")
+    image = models.ImageField(upload_to=description_image_path)
+    uploaded_at = models.DateTimeField(auto_now_add=True)
