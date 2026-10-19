@@ -253,4 +253,5 @@ def image_gallery_context(mod_id):
         "cover_ratio": COVER_RATIO,
         "thumbnail_size": THUMBNAIL_RECOMMENDED_SIZE,
         "cover_size": COVER_RECOMMENDED_SIZE,
+        "mod_id": mod_id,
     }
