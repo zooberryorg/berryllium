@@ -1,7 +1,7 @@
 <div @dragenter.prevent="isDragging = true"
      @dragover.prevent="isDragging = true"
      @dragleave.prevent="isDragging = false"
-     @drop.prevent="handleDrop($event)"
+     @drop.prevent="isDragging = false; $refs.imageInput.files = $event.dataTransfer.files; $refs.imgSubmitBtn.click()"
      x-ref="dropzoneBlock"
      @click="$refs.imageInput.click()"
      :class="isDragging ? 'border-gold-400 bg-gold-400' : 'border-white/20 hover:brightness-110'"
