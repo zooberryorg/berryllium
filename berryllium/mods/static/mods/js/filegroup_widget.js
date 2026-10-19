@@ -13,12 +13,6 @@ function textFieldExpand({ref = null }) {
     }
 }
 
-function toggleGroupManager({ toggled = false }) {
-    return {
-        toggled,
-    }
-}
-
 function fileDragAndDrop() {
     return {
         updateCurrentElementVisibility(event, el = null) {
