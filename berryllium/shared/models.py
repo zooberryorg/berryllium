@@ -72,3 +72,20 @@ class ArchivedWebsite(models.Model):
         if start:
             return f"{start}–"
         return ""
+
+class ArchivedWebsiteLink(models.Model):
+    """An address related to an archived website."""
+
+    class Kind(models.TextChoices):
+        ORIGINAL = "original", "Original address"
+        WAYBACK = "wayback", "Wayback Machine snapshot"
+        MIRROR = "mirror", "Mirror / backup"
+        OTHER = "other", "Other"
+
+    website = models.ForeignKey(ArchivedWebsite, on_delete=models.CASCADE, related_name="links")
+    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.OTHER)
+    label = models.CharField(max_length=100, blank=True)
+    url = models.URLField()
+
+    def __str__(self):
+        return self.label or self.url
