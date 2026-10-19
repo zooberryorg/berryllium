@@ -170,8 +170,10 @@ class ModGeneralInfoForm(forms.ModelForm):
         summary = summary.strip()
         return summary
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, uploader=None, **kwargs):
         super().__init__(*args, **kwargs)
+        # the uploader is always the first, locked collaborator
+        self.uploader = uploader or self.instance.uploaded_by        
         # the date picker can't go past today
         self.fields["original_release_date"].widget.attrs["max"] = date.today().isoformat()
 
