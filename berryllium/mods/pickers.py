@@ -206,3 +206,21 @@ def resolve_tags(values, strict=True):
             elif name not in new_names:
                 new_names.append(name)
     return existing, new_names
+
+def tag_items(existing, new_names):
+    return [tag_item(t) for t in existing] + [new_tag_item(n) for n in new_names]
+
+
+def save_tags(mod, existing, new_names, user=None):
+    """Sync the mod's tags; new names wait on mod.pending_tags until publish."""
+    with transaction.atomic():
+        keep_ids = {t.pk for t in existing}
+        ModTag.objects.filter(mod=mod).exclude(tag_id__in=keep_ids).delete()
+        current = set(ModTag.objects.filter(mod=mod).values_list("tag_id", flat=True))
+        created_by = user.get_username() if user is not None else ""
+        for tag in existing:
+            if tag.pk not in current:
+                ModTag.objects.create(mod=mod, tag=tag, created_by=created_by)
+        mod.pending_tags = new_names
+        mod.save(update_fields=["pending_tags"])
+
