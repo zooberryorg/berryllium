@@ -6,7 +6,6 @@
                 x-sort:ignore
 
                 name="fileform-{{ file.instance.id }}-description"
-                {% if file.instance.description != None %}value="{{ file.instance.description }}"{% endif %}
                 class="px-2 py-1 text-sm text-white/50 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
                 placeholder="File Description"
 
@@ -23,7 +22,7 @@
                 hx-trigger="input delay:500ms"
                 hx-target="#file-description-errors-{{ file.instance.id }}"
                 hx-swap="innerHTML"
-                hx-on::after-swap="htmx.process(this)">
+                hx-on::after-swap="htmx.process(this)">{{ file.instance.description|default_if_none:"" }}
             </textarea>
     {# djlint:on #}
     <div class="text-red-500 text-sm"
