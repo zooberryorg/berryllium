@@ -134,9 +134,9 @@ class ModGeneralInfoForm(forms.ModelForm):
     class Meta:
         model = Mod
         fields = [
-            "title", "summary", "owner", "thumbnail", "publish_date",
-            "is_archived_file", "original_release_date", "former_hosts",
-        ]
+            "title", "summary", "thumbnail", "publish_date",
+            "is_archived_file", "original_release_date", "original_websites",
+    ]
         widgets = {
             "title": TextInput(
                 attrs={
