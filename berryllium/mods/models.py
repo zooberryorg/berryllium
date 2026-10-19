@@ -34,6 +34,7 @@ class Mod(models.Model):
     - download_count: number of times the mod has been downloaded
     - like_count: number of likes the mod has received
     - allow_fan_images: whether to allow fan images to be attached to the mod page
+    - use_file_groups: whether to use file groups for the mod (for multiple files with metadata)
 
     Examples:
     - Mod.objects.filter(game='zt2', category='animals') -> all animal mods for Zoo Tycoon 2
@@ -84,6 +85,9 @@ class Mod(models.Model):
 
     # permissions
     allow_fan_images = models.BooleanField(default=False)
+
+    # form data
+    use_file_groups = models.BooleanField(default=False)
 
     @property
     def files(self):
