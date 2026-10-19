@@ -127,4 +127,9 @@ urlpatterns = [
         validations.hx_set_cover_image,
         name="hx_set_cover_image",
     ),
+    path(
+        "mods/edit/<int:mod_id>/images/reorder/",
+        validations.hx_reorder_images,
+        name="hx_reorder_images",
+    ),
 ]
