@@ -37,13 +37,15 @@ class Mod(models.Model):
     - submission_date: date the mod was submitted
     - last_updated: date the mod was last updated
     - contents: itemized list of mod contents, used for search indexing
-    - former_hosts: any former hosting sites for archival mods
+    - original_websites: archived websites the mod was originally published on (archival mods)
     - is_archived_file: whether the mod is an archived file (e.g. from a dead hosting site)
     - original_release_date: original release date of the mod, used for archival mods
     - download_count: number of times the mod has been downloaded
     - like_count: number of likes the mod has received
     - allow_fan_images: whether to allow fan images to be attached to the mod page
     - use_file_groups: whether to use file groups for the mod (for multiple files with metadata)
+    - pending_tags: new tag names typed in the upload form; created when the mod is published
+    - credits: collaborators and original authors, see ModCredit
 
     Examples:
     - Mod.objects.filter(game='zt2', category='animals') -> all animal mods for Zoo Tycoon 2
@@ -88,7 +90,9 @@ class Mod(models.Model):
     contents = models.TextField(blank=True)
 
     # archival info
-    former_hosts = models.CharField(max_length=200, blank=True)
+    original_websites = models.ManyToManyField(
+        "shared.ArchivedWebsite", blank=True, related_name="archived_mods"
+    )
     is_archived_file = models.BooleanField(default=False)
     original_release_date = models.DateField(null=True, blank=True)
 
@@ -102,6 +106,7 @@ class Mod(models.Model):
 
     # form data
     use_file_groups = models.BooleanField(default=False)
+    pending_tags = models.JSONField(default=list, blank=True)
 
     @property
     def files(self):
@@ -110,6 +115,54 @@ class Mod(models.Model):
     @property
     def file_groups(self):
         return ModFileGroup.objects.filter(mod=self)
+
+class ModCredit(models.Model):
+    """
+    A person credited on a mod, in order.
+
+    Definitions:
+    - member: a site account
+    - author: an Author without an account (e.g. original creator of an archived mod)
+    - pending_name: a new author typed into the upload form; turned into an Author
+      when the mod is published
+    """
+
+    class Role(models.TextChoices):
+        COLLABORATOR = "collaborator", "Collaborator"
+        ORIGINAL_AUTHOR = "original_author", "Original author"
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="credits")
+    role = models.CharField(max_length=20, choices=Role.choices)
+    member = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="mod_credits",
+    )
+    author = models.ForeignKey(
+        "users.Author",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="mod_credits",
+    )
+    pending_name = models.CharField(max_length=150, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["role", "order", "id"]
+
+    def __str__(self):
+        return f"{self.display_name} ({self.get_role_display()}) on {self.mod_id}"
+
+    @property
+    def display_name(self):
+        if self.member_id:
+            return self.member.username
+        if self.author_id:
+            return self.author.name
+        return self.pending_name
 
 
 class ModDependency(models.Model):

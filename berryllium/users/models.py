@@ -28,3 +28,24 @@ class Member(AbstractUser):
         related_name="members",
         blank=True,
     )
+
+class Author(models.Model):
+    """
+    A person credited on mods who is not (or not yet) linked to a site account
+    """
+
+    name = models.CharField(max_length=150, db_index=True)
+    member = models.OneToOneField(
+        "users.Member",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="author_profile",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
