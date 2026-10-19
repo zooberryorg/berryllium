@@ -229,6 +229,26 @@ class ModGeneralInfoForm(forms.ModelForm):
             cleaned["original_authors"] = []
         return cleaned
 
+    def _submitted(self, name):
+        return [v for v in self.data.getlist(self.add_prefix(name)) if v]
+
+    def _people(self, name, role):
+        if self.is_bound:
+            return resolve_people(self._submitted(name), strict=False)
+        if self.instance.pk:
+            return credits_as_resolved(self.instance, role)
+        return []
+
+    def collaborators_picker(self):
+        return picker_config(
+            name=self.add_prefix("collaborators"),
+            search_url=reverse("search_people"),
+            items=people_items(self._people("collaborators", ModCredit.Role.COLLABORATOR), uploader=self.uploader),
+            title="Add collaborators",
+            placeholder="Search members by name...",
+            allow_new=True,
+        )
+
 class ModCategorizationForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
