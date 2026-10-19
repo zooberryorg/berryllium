@@ -46,6 +46,13 @@ class DraftModMixin:
         return context
 
 class UploadStepMixin(DraftModMixin):
+    previous_step = None 
+
+    def post(self, request, *args, **kwargs):
+        if request.POST.get("action") == "previous" and self.previous_step:
+            return redirect(self.previous_step, mod_id=self.kwargs["mod_id"])
+        return super().post(request, *args, **kwargs)
+    
     def render_to_response(self, context, **response_kwargs):
         is_htmx = self.request.headers.get("HX-Request")
         is_history_restore = self.request.headers.get("HX-History-Restore-Request")
