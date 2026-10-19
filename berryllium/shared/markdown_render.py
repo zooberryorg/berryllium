@@ -47,3 +47,22 @@ def _filter_attribute(tag, attribute, value):
     
     return value
 
+
+
+def render_markdown(text):
+    html = markdown.markdown(
+        text or "",
+        extensions=getattr(settings, "MARKDOWNX_MARKDOWN_EXTENSIONS", []),
+        extension_configs=getattr(settings, "MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS", {}),
+    )
+
+    return nh3.clean(
+        html,
+        tags=ALLOWED_TAGS,
+        attributes=ALLOWED_ATTRIBUTES,
+        allowed_classes=ALLOWED_CLASSES,
+        attribute_filter=_filter_attribute,
+        url_schemes={"http", "https", "mailto"},
+        link_rel="noopener noreferrer nofollow",
+    )
+
