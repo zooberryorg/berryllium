@@ -3,7 +3,8 @@
            id="group_manager_toggle"
            class="sr-only peer"
            {# djlint:off #}
-           {% if mod.use_file_groups %}
+           {% if mod.use_file_groups and existing_files %}
+               {# on, with files: ask first #}
                checked
                @click.prevent="$dispatch('open-modal', {
                    endpoint: '{% url 'hx_file_manager_disable_confirm' mod_id=mod.id %}',
@@ -12,7 +13,16 @@
                    maxWidth: 'max-w-md',
                    hideHeader: true,
                })"
+           {% elif mod.use_file_groups %}
+               {# on, no files yet: nothing to lose, turn off directly #}
+               checked
+               hx-post="{% url 'hx_toggle_file_manager' mod_id=mod.id %}"
+               hx-vals='{"enabled": "false"}'
+               hx-trigger="change"
+               hx-target="#upload-frame"
+               hx-swap="innerHTML"
            {% else %}
+               {# off: turn on directly #}
                hx-post="{% url 'hx_toggle_file_manager' mod_id=mod.id %}"
                hx-vals='{"enabled": "true"}'
                hx-trigger="change"
@@ -20,7 +30,6 @@
                hx-swap="innerHTML"
            {% endif %}
            {# djlint:on #}>
-    {# djlint:off #}
     <div class="
         shrink-0 relative peer w-9 h-5 rounded-full
         bg-pine-400/30 after:bg-pine-info-200 peer-checked:bg-gold-400
