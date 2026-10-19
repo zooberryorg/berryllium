@@ -136,3 +136,24 @@ def credits_as_resolved(mod, role):
         elif credit.pending_name:
             resolved.append(("new", credit.pending_name))
     return resolved
+
+def save_credits(mod, role, resolved, uploader=None):
+    """Replace this mod's credits for `role`. The uploader (if given) is always first."""
+    with transaction.atomic():
+        mod.credits.filter(role=role).delete()
+        order = 0
+        if uploader is not None:
+            ModCredit.objects.create(mod=mod, role=role, member=uploader, order=order)
+            order += 1
+        for kind, obj in resolved:
+            if kind == "member" and uploader is not None and obj.pk == uploader.pk:
+                continue
+            ModCredit.objects.create(
+                mod=mod,
+                role=role,
+                member=obj if kind == "member" else None,
+                author=obj if kind == "author" else None,
+                pending_name=obj if kind == "new" else "",
+                order=order,
+            )
+            order += 1
