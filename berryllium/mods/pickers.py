@@ -157,3 +157,13 @@ def save_credits(mod, role, resolved, uploader=None):
                 order=order,
             )
             order += 1
+
+def website_item(website):
+    details = [part for part in (website.years_active, "Offline" if website.is_offline else "") if part]
+    return {"value": str(website.pk), "label": website.name, "sublabel": " · ".join(details)}
+
+
+def website_items_from_values(values):
+    ids = [int(v) for v in values if str(v).isdigit()]
+    websites = ArchivedWebsite.objects.in_bulk(ids)
+    return [website_item(websites[i]) for i in ids if i in websites]
