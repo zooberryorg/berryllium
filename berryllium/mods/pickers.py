@@ -78,3 +78,16 @@ def picker_config(*, name, search_url, items, title, placeholder, allow_new=Fals
             "emptyText": empty_text,
         }
     )
+
+def person_item(kind, obj, locked=False):
+    """Pill/search-result dict for a member, an author or a new name."""
+    if kind == "member":
+        return {
+            "value": f"m:{obj.pk}",
+            "label": obj.username,
+            "sublabel": "You (uploader)" if locked else obj.get_full_name(),
+            "locked": locked,
+        }
+    if kind == "author":
+        return {"value": f"a:{obj.pk}", "label": obj.name, "sublabel": "Not a member"}
+    return {"value": f"{NEW_PREFIX}{obj}", "label": obj, "sublabel": NEW_PERSON_SUBLABEL, "isNew": True}
