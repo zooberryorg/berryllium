@@ -13,6 +13,9 @@ from berryllium.shared.models import Tag
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
+def mod_thumbnail_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"mod_thumbnails/{uuid.uuid4().hex}{ext}"
 
 class Mod(models.Model):
     """
