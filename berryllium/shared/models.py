@@ -13,6 +13,10 @@ class Tag(models.Model):
     def __str__(self):
         return self.name
 
+def archived_website_image_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"archived_websites/{uuid.uuid4().hex}{ext}"
+
 class ArchivedWebsite(models.Model):
     """
     A site that used to host ZT mods.
