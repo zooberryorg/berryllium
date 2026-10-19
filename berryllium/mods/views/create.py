@@ -78,7 +78,7 @@ class ModDraftView(CreateView):
         """
         Override to prevent redirect since we handle navigation with HTMX.
         """
-        return reverse("mod_create_landing", kwargs={"mod_id": self.object.id})
+        return reverse("mod_create_general", kwargs={"mod_id": self.object.id})
 
     def form_valid(self, form):
         """
