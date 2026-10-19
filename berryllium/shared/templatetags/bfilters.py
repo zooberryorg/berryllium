@@ -1,5 +1,6 @@
 from django import template
 from django.utils.safestring import mark_safe
+from berryllium.shared.markdown_render import render_markdown
 
 register = template.Library()
 
@@ -13,6 +14,10 @@ def get_item(list_obj, index):
     except (IndexError, ValueError, TypeError):
         return None
 
+@register.filter
+def markdown(value):
+    """Usage: {{ mod.description|markdown }}"""
+    return mark_safe(render_markdown(value))
 
 # --------------------------- template tags
 

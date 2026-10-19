@@ -167,3 +167,6 @@ MARKDOWNX_MARKDOWN_EXTENSION_CONFIGS = {
         "linenums": True,
     }
 }
+
+MARKDOWNX_MARKDOWNIFY_FUNCTION = "berryllium.shared.markdown_render.render_markdown"
+MARKDOWNX_UPLOAD_CONTENT_TYPES = ["image/jpeg", "image/png", "image/webp"] # no svg for security reasons
