@@ -41,4 +41,26 @@ function markdownEditor({ uploadUrl, previewUrl }) {
       }
     },
 
+    wrap(before, after = before, placeholder = 'text') {
+      const ta = this.textarea;
+      const s = ta.selectionStart;
+      const e = ta.selectionEnd;
+      const selected = ta.value.slice(s, e);
+
+      const alreadyWrapped =
+        selected &&
+        ta.value.slice(s - before.length, s) === before &&
+        ta.value.slice(e, e + after.length) === after;
+
+      if (alreadyWrapped) {
+        ta.setSelectionRange(s - before.length, e + after.length);
+        this.insert(selected, 0, selected.length);
+        return;
+      }
+
+      const inner = selected || placeholder;
+      this.insert(before + inner + after, before.length, before.length + inner.length);
+    },
+
+  };
 }
