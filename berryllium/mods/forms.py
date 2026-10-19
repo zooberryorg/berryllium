@@ -96,7 +96,7 @@ class ModGeneralInfoForm(forms.ModelForm):
         label="Original Websites",
         widget=forms.MultipleHiddenInput,
     )
-    
+
     thumbnail = forms.ImageField(
         required=True,
         label="Thumbnail / Logo",
@@ -128,21 +128,6 @@ class ModGeneralInfoForm(forms.ModelForm):
         widget=forms.DateInput(
             format="%Y-%m-%d",
             attrs={"type": "date", "class": "zb-input text-sm", ":disabled": "!archived"},
-        ),
-    )
-
-    former_hosts = forms.URLField(
-        required=False,
-        max_length=200,
-        label="Original website",
-        assume_scheme="https",
-        widget=forms.URLInput(
-            attrs={
-                "placeholder": "https://...",
-                "class": "zb-input text-sm",
-                "autocomplete": "off",
-                ":disabled": "!archived",
-            }
         ),
     )
 
