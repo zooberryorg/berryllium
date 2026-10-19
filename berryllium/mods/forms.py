@@ -9,8 +9,23 @@ from django.core.validators import (
     ProhibitNullCharactersValidator,
 )
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
-# from django.core.exceptions import ValidationError
+from berryllium.mods.models import ModCredit
+from berryllium.mods.pickers import (
+    PickerField,
+    picker_config,
+    resolve_people,
+    people_items,
+    credits_as_resolved,
+    save_credits,
+    website_items_from_values,
+    website_item,
+    resolve_tags,
+    tag_items,
+    save_tags,
+)
+from berryllium.shared.models import ArchivedWebsite
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import ModFile, ModFileGroup
 from berryllium.mods.models import Mod
@@ -61,18 +76,27 @@ class ModGeneralInfoForm(forms.ModelForm):
         ),
     )
 
-    owner = forms.CharField(
+    collaborators = PickerField(
         required=False,
-        widget=TextInput(
-            attrs={
-                "placeholder": "Enter mod owner (optional)...",
-                "class": "zb-input text-sm",
-                "autocomplete": "off",
-                **DISABLE_SUBMIT_BUTTON_ATTRS,
-            }
-        ),
+        allow_new=True,
+        label="Collaborators",
+        help_text="People who made this mod with you.",
     )
 
+    original_authors = PickerField(
+        required=False,
+        allow_new=True,
+        label="Original Authors",
+        help_text="Who made the mod originally.",
+    )
+
+    original_websites = forms.ModelMultipleChoiceField(
+        queryset=ArchivedWebsite.objects.filter(is_enabled=True),
+        required=False,
+        label="Original Websites",
+        widget=forms.MultipleHiddenInput,
+    )
+    
     thumbnail = forms.ImageField(
         required=True,
         label="Thumbnail / Logo",
