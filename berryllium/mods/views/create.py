@@ -383,13 +383,40 @@ class ModCreateResources(UploadStepMixin, UpdateView):
         return context | init_context(current_index=5)
 
 
-def upload_step3(request):
+class ModCreateReview(UploadStepMixin, TemplateView):
+    """
+    Mod Creation Multi-Step 6: review everything, then publish.
+    """
 
-    return render(
-        request,
-        "mods/create/step/3.html",
-        context=init_context(current_index=3, form=None),
-    )
+    template_name = "mods/create/review/base.html"
+    previous_step = "mod_create_resources"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context | init_context(current_index=6) | review_context(self.get_mod())
+
+    def post(self, request, *args, **kwargs):
+        mod = self.get_mod()
+        if request.POST.get("action") == "previous":
+            return redirect(self.previous_step, mod_id=mod.id)
+
+        context = self.get_context_data()
+        if context["problems"]:
+            context["submit_error"] = "Fix the items below before publishing."
+            return self.render_to_response(context)
+
+        publish_mod(mod)
+
+        # the mod is no longer a draft: stop treating it as one in this session
+        draft_ids = [i for i in request.session.get("draft_ids", []) if i != mod.id]
+        request.session["draft_ids"] = draft_ids
+        if request.session.get("session_id") == mod.id:
+            request.session.pop("session_id")
+
+        # TODO: redirect to the mod's page once it exists
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("home")
+        return response
 
 
 # TODO: Fix latency issues with HX requests (takes forever between initial upload and response)
