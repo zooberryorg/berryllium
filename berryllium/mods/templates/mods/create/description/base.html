@@ -4,7 +4,8 @@
     {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 {% include "mods/create/description/blurb.html" %}
-<form hx-post="{% url 'mod_create_description' mod_id=view.kwargs.mod_id %}"
+   <form x-data="autosaveForm()"
+      hx-post="{% url 'mod_create_description' mod_id=view.kwargs.mod_id %}"      
       hx-target="#upload-frame"
       hx-swap="innerHTML"
       enctype="multipart/form-data"
@@ -74,6 +75,8 @@
         </div>
     </div>
     <!-- Action Buttons -->
+    <!-- autosave status -->
+    <p class="px-6 pb-2 text-xs text-right" :class="statusClass" x-text="statusText" aria-live="polite"></p>
     {% include "mods/create/actions.html" %}
 </form>
 <style>
