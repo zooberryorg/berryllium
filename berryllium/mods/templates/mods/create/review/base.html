@@ -1,6 +1,6 @@
 {% load static bfilters %}
 <!-- progress bar -->
-<div class="px-6 pt-6">
+<div class="px-4 sm:px-6 pt-6">
     {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
 </div>
 
@@ -8,7 +8,7 @@
       hx-target="#upload-frame"
       hx-swap="innerHTML">
     {% csrf_token %}
-    <div class="p-6 space-y-6">
+    <div class="p-4 sm:p-6 space-y-6">
 
         <!-- checklist -->
         {% if problems %}
@@ -32,7 +32,7 @@
                 <p>
                     Everything required is filled in.
                     {% if is_scheduled %}
-                        Your mod will go live on <strong class="text-white">{{ mod.publish_date|date:"M j, Y, g:i A T" }}</strong>.
+                        Your mod will go live on <strong class="text-white">{{ mod.publish_date|date:date_prefs.datetime }} {{ mod.publish_date|date:"T" }}</strong>.
                     {% else %}
                         Your mod will go live as soon as you click <strong class="text-white">Finish</strong>.
                     {% endif %}
@@ -58,7 +58,7 @@
         <!-- general -->
         <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
             {% include "mods/create/review/section_header.html" with title="General" step="mod_create_general" %}
-            <div class="flex gap-4">
+            <div class="flex flex-col sm:flex-row gap-4">
                 {% if mod.thumbnail %}
                     <img src="{{ mod.thumbnail.url }}" alt="Thumbnail" class="w-24 h-24 rounded-xl object-cover shrink-0">
                 {% else %}
@@ -69,7 +69,7 @@
                 <div class="min-w-0 space-y-1">
                     <p class="text-white text-lg font-semibold">{{ mod.title|default:"Untitled mod" }}</p>
                     <p class="text-granite-200 text-sm">{{ mod.summary }}</p>
-                    <p class="text-white/50 text-xs">Publishes {{ mod.publish_date|date:"M j, Y, g:i A T" }}</p>
+                    <p class="text-white/50 text-xs">Publishes {{ mod.publish_date|date:date_prefs.datetime }} {{ mod.publish_date|date:"T" }}</p>
                 </div>
             </div>
             <dl class="mt-4 grid gap-2 text-sm sm:grid-cols-[10rem_1fr]">
@@ -79,7 +79,7 @@
                     <dt class="text-white/50">Original authors</dt>
                     <dd class="text-white/90">{% for credit in original_authors %}{{ credit.display_name }}{% if credit.pending_name %} <span class="text-gold-300 text-xs">(new)</span>{% endif %}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
                     <dt class="text-white/50">Originally released</dt>
-                    <dd class="text-white/90">{{ mod.original_release_date|date:"M j, Y"|default:"—" }}</dd>
+                    <dd class="text-white/90">{{ mod.original_release_date|date:date_prefs.date|default:"—" }}</dd>
                     <dt class="text-white/50">Original websites</dt>
                     <dd class="text-white/90">{% for site in original_websites %}{{ site.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
                 {% endif %}
@@ -143,7 +143,7 @@
                      class="w-full rounded-lg object-cover mb-3" style="aspect-ratio: 3 / 1;">
             {% endif %}
             {% if gallery_images %}
-                <div class="grid grid-cols-3 gap-2">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {% for image in gallery_images %}
                         <img src="{{ image.image.url }}" alt="{{ image.title|default:'Mod image' }}"
                              class="w-full rounded-lg object-cover" style="aspect-ratio: 16 / 9;">
