@@ -1,0 +1,11 @@
+{# djlint:off #}
+x-sort="moveRow($item, $position)"
+x-sort:config="{
+    forceFallback: true,
+    dragClass: 'file-draggable',
+    chosenClass: 'file-chosen',
+    ghostClass: 'file-ghost',
+    onChoose: () => { dragging = true },
+    onUnchoose: () => { dragging = false },
+}"
+{# djlint:on #}
