@@ -1,0 +1,215 @@
+<!-- progress bar -->
+<div class="px-6 pt-6">
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+</div>
+
+<form hx-post="{% url 'mod_create_review' mod_id=mod.id %}"
+      hx-target="#upload-frame"
+      hx-swap="innerHTML">
+    {% csrf_token %}
+    <div class="p-6 space-y-6">
+
+        <!-- checklist -->
+        {% if problems %}
+            <div class="bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                <p class="text-red-300 font-semibold flex items-center gap-2 mb-2">
+                    <ion-icon name="alert-circle" class="text-xl"></ion-icon>
+                    {% if submit_error %}{{ submit_error }}{% else %}Fix these before publishing{% endif %}
+                </p>
+                <ul class="space-y-1 text-sm">
+                    {% for issue in problems %}
+                        <li>
+                            <a href="{{ issue.url }}" hx-get="{{ issue.url }}" hx-target="#upload-frame" hx-swap="innerHTML"
+                               class="text-red-200 hover:text-white underline underline-offset-2">{{ issue.message }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="bg-pine-info-200 border border-pine-info-100 rounded-xl p-4 text-granite-200 flex items-center gap-3">
+                <ion-icon name="checkmark-circle" class="text-gold-400 text-2xl shrink-0"></ion-icon>
+                <p>
+                    Everything required is filled in.
+                    {% if is_scheduled %}
+                        Your mod will go live on <strong class="text-white">{{ mod.publish_date|date:"M j, Y, g:i A T" }}</strong>.
+                    {% else %}
+                        Your mod will go live as soon as you click <strong class="text-white">Finish</strong>.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+        {% if suggestions %}
+            <div class="bg-pine-800/40 border border-white/10 rounded-xl p-4">
+                <p class="text-white/80 font-semibold flex items-center gap-2 mb-2">
+                    <ion-icon name="bulb" class="text-gold-300 text-xl"></ion-icon> Recommended
+                </p>
+                <ul class="space-y-1 text-sm">
+                    {% for issue in suggestions %}
+                        <li>
+                            <a href="{{ issue.url }}" hx-get="{{ issue.url }}" hx-target="#upload-frame" hx-swap="innerHTML"
+                               class="text-white/60 hover:text-white underline underline-offset-2">{{ issue.message }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+
+        <!-- general -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="General" step="mod_create_general" %}
+            <div class="flex gap-4">
+                {% if mod.thumbnail %}
+                    <img src="{{ mod.thumbnail.url }}" alt="Thumbnail" class="w-24 h-24 rounded-xl object-cover shrink-0">
+                {% else %}
+                    <div class="w-24 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 shrink-0">
+                        <i class="bi bi-image text-2xl"></i>
+                    </div>
+                {% endif %}
+                <div class="min-w-0 space-y-1">
+                    <p class="text-white text-lg font-semibold">{{ mod.title|default:"Untitled mod" }}</p>
+                    <p class="text-granite-200 text-sm">{{ mod.summary }}</p>
+                    <p class="text-white/50 text-xs">Publishes {{ mod.publish_date|date:"M j, Y, g:i A T" }}</p>
+                </div>
+            </div>
+            <dl class="mt-4 grid gap-2 text-sm sm:grid-cols-[10rem_1fr]">
+                <dt class="text-white/50">Collaborators</dt>
+                <dd class="text-white/90">{% for credit in collaborators %}{{ credit.display_name }}{% if credit.pending_name %} <span class="text-gold-300 text-xs">(new)</span>{% endif %}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+                {% if mod.is_archived_file %}
+                    <dt class="text-white/50">Original authors</dt>
+                    <dd class="text-white/90">{% for credit in original_authors %}{{ credit.display_name }}{% if credit.pending_name %} <span class="text-gold-300 text-xs">(new)</span>{% endif %}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+                    <dt class="text-white/50">Originally released</dt>
+                    <dd class="text-white/90">{{ mod.original_release_date|date:"M j, Y"|default:"—" }}</dd>
+                    <dt class="text-white/50">Original websites</dt>
+                    <dd class="text-white/90">{% for site in original_websites %}{{ site.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+                {% endif %}
+            </dl>
+        </section>
+
+        <!-- categorization -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="Categorization" step="mod_create_categorization" %}
+            <dl class="grid gap-2 text-sm sm:grid-cols-[10rem_1fr]">
+                <dt class="text-white/50">Categories</dt>
+                <dd class="text-white/90">{{ category_labels|join:", "|default:"—" }}</dd>
+                <dt class="text-white/50">Games</dt>
+                <dd class="text-white/90">{{ game_labels|join:", "|default:"—" }}</dd>
+                <dt class="text-white/50">Expansions</dt>
+                <dd class="text-white/90">{{ expansion_labels|join:", "|default:"—" }}</dd>
+                <dt class="text-white/50">Tags</dt>
+                <dd class="flex flex-wrap gap-1">
+                    {% for tag in tags %}
+                        <span class="text-xs py-1 px-2 bg-white/5 border border-white/15 rounded-full text-white/90">{{ tag.name }}</span>
+                    {% endfor %}
+                    {% for name in pending_tags %}
+                        <span class="text-xs py-1 px-2 bg-gold-400/10 border border-dashed border-gold-400/60 rounded-full text-gold-200">{{ name }}</span>
+                    {% endfor %}
+                    {% if not tags and not pending_tags %}<span class="text-white/90">—</span>{% endif %}
+                </dd>
+            </dl>
+        </section>
+
+        <!-- files -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="Files" step="mod_create_files" %}
+            {% if mod.is_external and mod.external_url %}
+                <p class="text-sm text-white/90 mb-2">External download: <a href="{{ mod.external_url }}" target="_blank" rel="noopener noreferrer" class="text-gold-300 underline">{{ mod.external_url }}</a></p>
+            {% endif %}
+            {% for group, files in file_groups %}
+                <div class="mb-3 last:mb-0">
+                    {% if mod.use_file_groups %}<p class="text-white/80 text-sm font-medium mb-1">{{ group.name|default:"Files" }}</p>{% endif %}
+                    <ul class="space-y-1">
+                        {% for file in files %}
+                            <li class="flex items-center gap-3 bg-pine-draggable-200 border-1 border-pine-draggable-100 rounded-lg px-3 py-2 text-sm text-granite-200">
+                                <i class="bi bi-file-earmark-zip text-gold-300"></i>
+                                <span class="truncate flex-1">{{ file.title|default:file.filename }}</span>
+                                <span class="text-xs py-1 px-2 bg-pine-400/80 text-granite-200/50 rounded-full shrink-0">{{ file.size|filesizeformat }}</span>
+                            </li>
+                        {% empty %}
+                            <li class="text-sm text-white/40">Empty group.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% empty %}
+                {% if not mod.is_external %}<p class="text-sm text-white/40">No files uploaded.</p>{% endif %}
+            {% endfor %}
+        </section>
+
+        <!-- images -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="Images" step="mod_create_images" %}
+            {% if cover_image %}
+                <img src="{{ cover_image.image.url }}" alt="{{ cover_image.title|default:'Cover image' }}"
+                     class="w-full rounded-lg object-cover mb-3" style="aspect-ratio: 3 / 1;">
+            {% endif %}
+            {% if gallery_images %}
+                <div class="grid grid-cols-3 gap-2">
+                    {% for image in gallery_images %}
+                        <img src="{{ image.image.url }}" alt="{{ image.title|default:'Mod image' }}"
+                             class="w-full rounded-lg object-cover" style="aspect-ratio: 16 / 9;">
+                    {% endfor %}
+                </div>
+            {% elif not cover_image %}
+                <p class="text-sm text-white/40">No images.</p>
+            {% endif %}
+        </section>
+
+        <!-- description -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="Description" step="mod_create_description" %}
+            {% if mod.description %}
+                <div class="md-preview text-granite-200 text-sm">{{ mod.description|markdown }}</div>
+            {% else %}
+                <p class="text-sm text-white/40">No description.</p>
+            {% endif %}
+        </section>
+
+        <!-- resources & credits -->
+        <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
+            {% include "mods/create/review/section_header.html" with title="Resources & Credits" step="mod_create_resources" %}
+            <dl class="grid gap-3 text-sm sm:grid-cols-[10rem_1fr]">
+                <dt class="text-white/50">Dependencies</dt>
+                <dd class="text-white/90">
+                    {% for dep in dependencies %}
+                        <p>
+                            {% if dep.is_external %}<a href="{{ dep.external_url }}" target="_blank" rel="noopener noreferrer" class="text-gold-300 underline">{{ dep.display_title }}</a>{% else %}{{ dep.display_title }}{% endif %}
+                            {% if dep.version %}<span class="text-white/50">({{ dep.version }})</span>{% endif %}
+                            {% if dep.notes %}<span class="text-white/50">— {{ dep.notes }}</span>{% endif %}
+                        </p>
+                    {% empty %}—{% endfor %}
+                </dd>
+                <dt class="text-white/50">Licenses</dt>
+                <dd class="text-white/90">
+                    {% for item in mod_licenses %}
+                        <p>{{ item.license.name }}{% if item.context %} <span class="text-white/50">— {{ item.context }}</span>{% endif %}</p>
+                    {% empty %}—{% endfor %}
+                </dd>
+                <dt class="text-white/50">Languages</dt>
+                <dd class="text-white/90">{% for lang in languages %}{{ lang.name }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+                <dt class="text-white/50">Additional credits</dt>
+                <dd class="text-white/90">
+                    {% for credit in attributions %}
+                        <p>
+                            {% if credit.url %}<a href="{{ credit.url }}" target="_blank" rel="noopener noreferrer" class="text-gold-300 underline">{{ credit.title }}</a>{% else %}{{ credit.title }}{% endif %}
+                            by {{ credit.authors }}{% if credit.note %} <span class="text-white/50">— {{ credit.note }}</span>{% endif %}
+                        </p>
+                    {% empty %}—{% endfor %}
+                </dd>
+                <dt class="text-white/50">Links</dt>
+                <dd>{% if links %}{% include "shared/links/link_list.html" with links=links %}{% else %}<span class="text-white/90">—</span>{% endif %}</dd>
+            </dl>
+        </section>
+    </div>
+    {% include "mods/create/actions.html" %}
+</form>
+<style>
+    [x-cloak] { display: none !important; }
+    .md-preview > * + * { margin-top: 0.75rem; }
+    .md-preview h1 { font-size: 1.5rem; font-weight: 700; color: white; }
+    .md-preview h2 { font-size: 1.25rem; font-weight: 700; color: white; }
+    .md-preview h3 { font-size: 1.1rem; font-weight: 600; color: white; }
+    .md-preview a { color: var(--color-gold-400); text-decoration: underline; }
+    .md-preview ul { list-style: disc; padding-left: 1.5rem; }
+    .md-preview ol { list-style: decimal; padding-left: 1.5rem; }
+    .md-preview blockquote { border-left: 3px solid var(--color-gold-400); padding-left: 0.75rem; opacity: 0.85; }
+    .md-preview img { max-width: 100%; border-radius: 0.5rem; }
+</style>
