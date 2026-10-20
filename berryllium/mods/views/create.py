@@ -371,8 +371,7 @@ class ModCreateResources(UploadStepMixin, UpdateView):
     previous_step = "mod_create_description"
 
     def get_success_url(self):
-        # TODO: point at the Review & Submit step once it exists
-        return reverse("mod_create_resources", kwargs={"mod_id": self.object.id})
+        return reverse("mod_create_review", kwargs={"mod_id": self.object.id})
 
     def form_valid(self, form):
         response = super().form_valid(form)
