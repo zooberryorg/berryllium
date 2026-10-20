@@ -68,3 +68,56 @@ function detailPicker(config) {
     },
   });
 }
+
+// config for a table of rows, each with a uid. The rows can be added/removed and serialized to JSON.
+function rowTable(config) {
+  return {
+    name: config.name,
+    rows: (config.rows || []).map((row) => ({ uid: nextRowUid(), ...row })),
+    blank: config.blank || {},
+    columns: config.columns || [],
+    presets: config.presets || {},
+    addLabel: config.addLabel || 'Add row',
+    emptyText: config.emptyText || 'Nothing added yet.',
+    maxRows: config.maxRows || 30,
+
+    add() {
+      if (this.rows.length >= this.maxRows) return;
+      this.rows.push({ uid: nextRowUid(), ...this.blank });
+      this.$nextTick(() => {
+        const lastRow = this.$root.querySelector('tbody tr:last-child');
+        lastRow?.querySelector('input, select')?.focus();
+      });
+    },
+
+    remove(uid) {
+      this.rows = this.rows.filter((row) => row.uid !== uid);
+    },
+
+    serialized() {
+      return JSON.stringify(withoutUid(this.rows));
+    },
+
+    presetIcon(kind) {
+      return (this.presets[kind] || this.presets.other || {}).icon || 'bi-link-45deg';
+    },
+
+    // after url is entered, try to guess the preset kind based on the domain
+    guessPreset(row) {
+      if (!row.url || !('kind' in row)) return;
+      if (row.kind && !['website', 'other'].includes(row.kind)) return;
+      let host;
+      try {
+        host = new URL(row.url.includes('://') ? row.url : `https://${row.url}`).hostname.replace(/^www\./, '');
+      } catch {
+        return;
+      }
+      for (const [key, preset] of Object.entries(this.presets)) {
+        if ((preset.domains || []).some((domain) => host === domain || host.endsWith(`.${domain}`))) {
+          row.kind = key;
+          return;
+        }
+      }
+    },
+  };
+}
