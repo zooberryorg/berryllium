@@ -15,6 +15,7 @@ from berryllium.mods.forms import (
     ModImageUploadForm,
     ModDescriptionForm,
     ModGeneralInfoForm,
+    ModResourcesForm,
 )
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.services import (
@@ -316,7 +317,7 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
     previous_step = "mod_create_images"
 
     def get_success_url(self):
-        return reverse("mod_create_description", kwargs={"mod_id": self.object.id})
+        return reverse("mod_create_resources", kwargs={"mod_id": self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -330,6 +331,29 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
             if img.image.url not in (self.object.description or ""):
                 img.delete()
         return response
+
+class ModCreateResources(UploadStepMixin, UpdateView):
+    """
+    Mod Creation Multi-Step 5: dependencies, licenses, languages, additional credits and links.
+    """
+
+    model = Mod
+    form_class = ModResourcesForm
+    template_name = "mods/create/resources/base.html"
+    previous_step = "mod_create_description"
+
+    def get_success_url(self):
+        # TODO: point at the Review & Submit step once it exists
+        return reverse("mod_create_resources", kwargs={"mod_id": self.object.id})
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        form.save_relations()
+        return response
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context | init_context(current_index=5)
 
 def upload_step3(request):
 
