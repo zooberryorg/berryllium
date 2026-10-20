@@ -42,25 +42,48 @@
     {% include "mods/create/general/field.html" with field=form.summary %}
     {% include "shared/widgets/search_picker.html" with field=form.collaborators config=form.collaborators_picker disabled_expr="archived" %}
 
-    <!-- publication date -->
+    <!-- publication: live on Finish, or scheduled -->
     <div class="mb-4" x-data="publishDatePicker()">
-        <label for="publish-date-picker" class="block text-sm font-medium mb-1 text-white">
-            Publication date <span class="text-red-500">*</span>
-        </label>
-        <div class="flex items-center gap-2">
-            <input type="datetime-local"
-                id="publish-date-picker"
-                class="zb-input text-sm"
-                x-model="local"
-                @change="sync()"
-                required>
-            <button type="button" class="zb-action rounded-xl shrink-0" @click="setNow()">Now</button>
+        <span class="block text-sm font-medium mb-1 text-white">
+            Publication <span class="text-red-500">*</span>
+        </span>
+        <div class="grid grid-cols-2 gap-1 p-1 rounded-xl border border-white/10 bg-pine-800/40 max-w-md" role="radiogroup" aria-label="When to publish">
+            <button type="button" role="radio"
+                    :aria-checked="mode === 'now'"
+                    @click="publishOnFinish()"
+                    class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer"
+                    :class="mode === 'now' ? 'bg-gold-400 text-pine-600 font-medium' : 'text-white/70 hover:text-white hover:bg-white/5'">
+                <i class="bi bi-lightning-charge"></i> When I finish
+            </button>
+            <button type="button" role="radio"
+                    :aria-checked="mode === 'schedule'"
+                    @click="schedule()"
+                    class="flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors cursor-pointer"
+                    :class="mode === 'schedule' ? 'bg-gold-400 text-pine-600 font-medium' : 'text-white/70 hover:text-white hover:bg-white/5'">
+                <i class="bi bi-calendar-event"></i> Schedule
+            </button>
         </div>
-        <input type="hidden" name="publish_date" x-ref="publishValue" value="{{ form.publish_date_iso }}">
-        <p class="text-white/50 text-xs mt-1">Shown in your time zone: <span class="text-white/70" x-text="timeZone"></span>. Pick a future time to schedule it.</p>
-        {% include "mods/create/field_errors.html" with field=form.publish_date %}
-    </div>
 
+        <p class="text-white/50 text-xs mt-2" x-show="mode === 'now'">
+            Your mod goes live as soon as you click Finish on the last step.
+        </p>
+        <div class="mt-2 max-w-md" x-show="mode === 'schedule'" x-cloak>
+            <input type="text"
+                   id="publish-date-picker"
+                   class="zb-input text-sm w-full"
+                   x-ref="display"
+                   aria-label="Publication date and time"
+                   autocomplete="off">
+            <p class="text-white/50 text-xs mt-1">
+                Shown in your time zone: <span class="text-white/70" x-text="timeZone"></span>.
+            </p>
+        </div>
+
+        {# submitted value: an ISO 8601 timestamp, kept up to date by publishDatePicker #}
+        <input type="hidden" name="publish_date" x-ref="publishValue" value="{{ form.publish_date_iso }}">
+        {% include "mods/create/field_errors.html" with field=form.publish_date %}
+    </div>    
+    
     <!-- archived mod -->
     <div class="mt-6 pt-4 border-t border-white/10">    
         <label class="inline-flex cursor-pointer pl-4 py-1 pr-4 max-w-max bg-pine-special-200 border border-pine-special-100 rounded-full shadow-xs mb-2 items-center hover:brightness-110 transition-all">
