@@ -1,5 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from berryllium.shared.dates import (
+    DATE_FORMAT_CHOICES,
+    DEFAULT_DATE_FORMAT,
+    DEFAULT_TIME_FORMAT,
+    TIME_FORMAT_CHOICES,
+)
 
 # Create your models here.
 class Member(AbstractUser):
@@ -17,7 +23,9 @@ class Member(AbstractUser):
     """
     biography = models.TextField(blank=True, max_length=500)
     is_archived = models.BooleanField(default=False)
-
+    date_format = models.CharField(max_length=10, choices=DATE_FORMAT_CHOICES, default=DEFAULT_DATE_FORMAT)
+    time_format = models.CharField(max_length=10, choices=TIME_FORMAT_CHOICES, default=DEFAULT_TIME_FORMAT)
+    
     groups = models.ManyToManyField(
         "auth.Group",
         related_name="members",
