@@ -7,7 +7,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from berryllium import settings
-from berryllium.shared.models import Tag
+from berryllium.shared.models import Tag, BaseLink
 # from users.models import User
 # from tags.models import Tag
 
@@ -107,6 +107,7 @@ class Mod(models.Model):
     # form data
     use_file_groups = models.BooleanField(default=False)
     pending_tags = models.JSONField(default=list, blank=True)
+    languages = models.ManyToManyField("shared.Language", blank=True, related_name="mods")
 
     @property
     def files(self):
