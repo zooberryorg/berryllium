@@ -65,3 +65,25 @@ def _read_filters(params):
         "tags": [tag for tag in params.getlist("tag") if tag][:MAX_TAGS],
         "sort": sort if sort in SORTS else DEFAULT_SORT,
     }
+
+def _apply_filters(queryset, filters):
+    if filters["q"]:
+        q = filters["q"]
+        queryset = queryset.filter(
+            Q(title__icontains=q)
+            | Q(summary__icontains=q)
+            | Q(uploaded_by__username__icontains=q)
+            | Q(credits__member__username__icontains=q)
+            | Q(credits__author__name__icontains=q)
+            | Q(tags__name__icontains=q)
+        ).distinct()
+    if filters["category"]:
+        queryset = queryset.filter(_csv_has("category", filters["category"]))
+    if filters["game"]:
+        queryset = queryset.filter(_csv_has("game", filters["game"]))
+    if filters["period"]:
+        days = PERIODS[filters["period"]][1]
+        queryset = queryset.filter(publish_date__gte=timezone.now() - timedelta(days=days))
+    for tag in filters["tags"]:
+        queryset = queryset.filter(tags__name=tag)
+    return queryset.order_by(*SORTS[filters["sort"]][1])
