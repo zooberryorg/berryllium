@@ -55,7 +55,7 @@
                     </div>
                 {% endif %}
 
-                <button type="button" class="zb-action-delete hidden p-2 mr-2 group-hover/file:flex" x-sort:ignore
+                <button type="button" class="zb-action-delete flex p-2 mr-2 sm:opacity-0 sm:group-hover/file:opacity-100 transition-opacity" x-sort:ignore
                         @click="remove(row.uid)" aria-label="Remove row">
                     <ion-icon name="trash"></ion-icon>
                 </button>
