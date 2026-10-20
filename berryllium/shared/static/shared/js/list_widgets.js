@@ -92,11 +92,10 @@ function detailPicker(config) {
 
 // config for a table of rows, each with a uid. The rows can be added/removed and serialized to JSON.
 function rowTable(config) {
-  return {
+  return extendComponent(sortableList('rows', !!config.sortable), {
     name: config.name,
     rows: (config.rows || []).map((row) => ({ uid: nextRowUid(), ...row })),
     blank: config.blank || {},
-    columns: config.columns || [],
     presets: config.presets || {},
     addLabel: config.addLabel || 'Add row',
     emptyText: config.emptyText || 'Nothing added yet.',
@@ -106,8 +105,8 @@ function rowTable(config) {
       if (this.rows.length >= this.maxRows) return;
       this.rows.push({ uid: nextRowUid(), ...this.blank });
       this.$nextTick(() => {
-        const lastRow = this.$root.querySelector('tbody tr:last-child');
-        lastRow?.querySelector('input, select')?.focus();
+        const inputs = this.$root.querySelectorAll('[data-first-input]');
+        inputs[inputs.length - 1]?.focus();
       });
     },
 
@@ -123,7 +122,7 @@ function rowTable(config) {
       return (this.presets[kind] || this.presets.other || {}).icon || 'bi-link-45deg';
     },
 
-    // after url is entered, try to guess the preset kind based on the domain
+    /** After a URL is typed, pick the matching preset (e.g. discord.gg -> Discord) if none was chosen. */
     guessPreset(row) {
       if (!row.url || !('kind' in row)) return;
       if (row.kind && !['website', 'other'].includes(row.kind)) return;
@@ -140,5 +139,5 @@ function rowTable(config) {
         }
       }
     },
-  };
+  });
 }
