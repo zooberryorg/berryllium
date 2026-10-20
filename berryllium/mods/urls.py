@@ -17,7 +17,6 @@ urlpatterns = [
     ),
     path("mods/edit/<int:mod_id>/resources", create.ModCreateResources.as_view(), name="mod_create_resources"),
     path("mods/edit/<int:mod_id>/review", create.ModCreateReview.as_view(), name="mod_create_review"),
-    path("mods/edit/s6", create.upload_step3, name="upload_step3"),
     # ---------------------------------------------- Search endpoints
     path("search/people/", search.search_people, name="search_people"),
     path("search/websites/", search.search_websites, name="search_websites"),
