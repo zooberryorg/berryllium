@@ -141,7 +141,12 @@ class ModGeneralInfoForm(forms.ModelForm):
         label="Original release date",
         widget=forms.DateInput(
             format="%Y-%m-%d",
-            attrs={"type": "date", "class": "zb-input text-sm", ":disabled": "!archived"},
+            attrs={
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                ":disabled": "!archived",
+                "x-data": "datePicker({ max: $el.getAttribute('max') })",
+            },
         ),
     )
 
