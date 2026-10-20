@@ -1,7 +1,7 @@
 import os
 import uuid
 from django.db import models
-
+from berryllium.shared.links import DEFAULT_LINK_PRESET, LINK_PRESET_CHOICES, link_preset
 
 class Tag(models.Model):
     """
@@ -93,3 +93,20 @@ class ArchivedWebsiteLink(models.Model):
 
     def __str__(self):
         return self.label or self.url
+
+class License(models.Model):
+    """
+    Model for licenses that can be applied to mods and tutorials.
+    """
+
+    name = models.CharField(max_length=150, unique=True)
+    short_name = models.CharField(max_length=50, blank=True, help_text='e.g. "CC BY 4.0"')
+    description = models.TextField(blank=True)
+    url = models.URLField(blank=True, help_text="Where to read the full license.")
+    is_enabled = models.BooleanField(default=True, help_text="Show in the upload form's license picker.")
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.short_name or self.name
