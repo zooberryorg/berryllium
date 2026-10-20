@@ -9,7 +9,8 @@
         Everything on this page is optional.
     </p>
 </div>
-<form hx-post="{% url 'mod_create_resources' mod_id=view.kwargs.mod_id %}"
+   <form x-data="autosaveForm()"
+      hx-post="{% url 'mod_create_resources' mod_id=view.kwargs.mod_id %}"      
       hx-target="#upload-frame"
       hx-swap="innerHTML"
       hx-encoding="multipart/form-data">
@@ -48,6 +49,8 @@
             {% include "shared/widgets/row_table.html" with field=form.links config=form.links_widget layout="link" sortable=True %}
         </section>
     </div>
+    <!-- autosave status -->
+    <p class="px-6 pb-2 text-xs text-right" :class="statusClass" x-text="statusText" aria-live="polite"></p>
     {% include "mods/create/actions.html" %}
 </form>
 {% include "shared/widgets/sort_styles.html" %}

@@ -8,6 +8,7 @@ from django.shortcuts import get_object_or_404
 from django.views import View
 from urllib.parse import urlparse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import HttpResponse, HttpResponseRedirect, Http404, JsonResponse
 
 from berryllium.mods.forms import (
     ModFileUploadForm,
@@ -54,11 +55,30 @@ class DraftModMixin:
 
 class UploadStepMixin(DraftModMixin):
     previous_step = None
+    autosave = False
 
     def post(self, request, *args, **kwargs):
-        if request.POST.get("action") == "previous" and self.previous_step:
+        action = request.POST.get("action")
+        if self.autosave and action in ("autosave", "previous"):
+            saved, errors = self.save_draft()
+            if action == "autosave":
+                return JsonResponse({"saved": saved, "errors": errors})
+        if action == "previous" and self.previous_step:
             return redirect(self.previous_step, mod_id=self.kwargs["mod_id"])
         return super().post(request, *args, **kwargs)
+
+    def save_draft(self):
+        """save the form if it's valid without moving on"""
+        self.object = self.get_object()
+        form = self.get_form()
+        if form.is_valid():
+            self.save_form(form, final=False)
+            return True, []
+        errors = [message for messages in form.errors.values() for message in messages]
+        return False, errors[:3]
+
+    def save_form(self, form, final=True):
+        self.object = form.save()
 
     def render_to_response(self, context, **response_kwargs):
         is_htmx = self.request.headers.get("HX-Request")
@@ -342,6 +362,7 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
     previous_step = "mod_create_images"
+    autosave = True
 
     def get_success_url(self):
         return reverse("mod_create_resources", kwargs={"mod_id": self.object.id})
@@ -352,13 +373,16 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
 
         return context | progress_bar
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        for img in self.object.description_images.all():
-            if img.image.url not in (self.object.description or ""):
-                img.delete()
-        return response
+    def save_form(self, form, final=True):
+        self.object = form.save()
+        if final:
+            for img in self.object.description_images.all():
+                if img.image.url not in (self.object.description or ""):
+                    img.delete()
 
+    def form_valid(self, form):
+        self.save_form(form, final=True)
+        return HttpResponseRedirect(self.get_success_url())
 
 class ModCreateResources(UploadStepMixin, UpdateView):
     """
@@ -369,15 +393,19 @@ class ModCreateResources(UploadStepMixin, UpdateView):
     form_class = ModResourcesForm
     template_name = "mods/create/resources/base.html"
     previous_step = "mod_create_description"
+    autosave = True
 
     def get_success_url(self):
         return reverse("mod_create_review", kwargs={"mod_id": self.object.id})
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
+    def save_form(self, form, final=True):
+        self.object = form.save()
         form.save_relations()
-        return response
 
+    def form_valid(self, form):
+        self.save_form(form, final=True)
+        return HttpResponseRedirect(self.get_success_url())
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context | init_context(current_index=5)
