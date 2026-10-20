@@ -112,3 +112,11 @@ def _category_counts(base):
          "count": base.filter(_csv_has("category", key)).count()}
         for key, label in MOD_CATEGORIES
     ]
+
+def _popular_tags(limit=15):
+    now = timezone.now()
+    return (
+        Tag.objects.annotate(uses=Count("mods", filter=Q(mods__draft=False, mods__publish_date__lte=now)))
+        .filter(uses__gt=0)
+        .order_by("-uses", "name")[:limit]
+    )
