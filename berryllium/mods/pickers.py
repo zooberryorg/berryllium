@@ -18,6 +18,7 @@ from django import forms
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import transaction
+from django.utils import timezone
 
 from berryllium.mods.models import ModCredit, ModTag
 from berryllium.shared.models import ArchivedWebsite, Tag
@@ -244,5 +245,8 @@ def publish_mod(mod):
             ModTag.objects.get_or_create(mod=mod, tag=tag)
         mod.pending_tags = []
 
+        if mod.publish_date is None or mod.publish_date <= timezone.now():
+            mod.publish_date = timezone.now()
+
         mod.draft = False
-        mod.save(update_fields=["pending_tags", "draft"])
+        mod.save(update_fields=["pending_tags", "draft", "publish_date"])

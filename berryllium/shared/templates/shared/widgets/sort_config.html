@@ -5,7 +5,7 @@ x-sort:config="{
     dragClass: 'file-draggable',
     chosenClass: 'file-chosen',
     ghostClass: 'file-ghost',
-    onChoose: () => { dragging = true },
-    onUnchoose: () => { dragging = false },
+    onChoose: (event) => { startDragPreview(event.item); dragging = true },
+    onUnchoose: (event) => { endDragPreview(event.item); dragging = false },
 }"
 {# djlint:on #}
