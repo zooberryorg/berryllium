@@ -15,11 +15,15 @@ urlpatterns = [
         create.ModCreateDescription.as_view(),
         name="mod_create_description",
     ),
+    path("mods/edit/<int:mod_id>/resources", create.ModCreateResources.as_view(), name="mod_create_resources"),
     path("mods/edit/s6", create.upload_step3, name="upload_step3"),
     # ---------------------------------------------- Search endpoints
     path("search/people/", search.search_people, name="search_people"),
     path("search/websites/", search.search_websites, name="search_websites"),
     path("search/tags/", search.search_tags, name="search_tags"),
+    path("search/mods/", search.search_mods, name="search_mods"),
+    path("search/licenses/", search.search_licenses, name="search_licenses"),
+    path("search/languages/", search.search_languages, name="search_languages"),
     # ---------------------------------------------- File management
     path(
         "mods/remove/<int:file_id>/",
