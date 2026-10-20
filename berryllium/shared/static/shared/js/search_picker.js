@@ -36,7 +36,8 @@ function searchPicker(config) {
       this.loading = true;
       this.error = '';
       try {
-        const url = `${this.searchUrl}?q=${encodeURIComponent(this.query.trim())}`;
+        const separator = this.searchUrl.includes('?') ? '&' : '?';
+        const url = `${this.searchUrl}${separator}q=${encodeURIComponent(this.query.trim())}`;
         const response = await fetch(url, { headers: { Accept: 'application/json' } });
         if (!response.ok) throw new Error();
         const data = await response.json();

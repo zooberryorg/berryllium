@@ -8,7 +8,7 @@ UPLOAD_NAVIGATION = [
     {"name": "Upload Files", "url": "mod_create_files", "icon": "upload"},
     {"name": "Upload Images", "url": "mod_create_images", "icon": "image"},
     {"name": "Description", "url": "mod_create_description", "icon": "file-text"},
-    {"name": "Details & Settings", "url": "mod_create_description", "icon": "gear"},
+    {"name": "Resources & Credits", "url": "mod_create_resources", "icon": "diagram-3"},
     {"name": "Review & Submit", "url": "mod_create_description", "icon": "check-circle"},
 ]
 
