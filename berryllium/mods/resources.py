@@ -63,3 +63,54 @@ def clean_link_row(row):
         "url": clean_url(row.get("url"), label="Link"),
         "label": clean_text(row.get("label"), 100, label="Label"),
     }
+
+# --------------------------------------------------------------------------- display rows (for the widgets)
+
+
+def mod_result(mod):
+    """Search result / dependency row label for a mod in the database."""
+    details = [part for part in (mod.game.upper() if mod.game else "", f"by {mod.uploaded_by}" if mod.uploaded_by else "") if part]
+    return {"value": str(mod.pk), "label": mod.title, "sublabel": " · ".join(details)}
+
+
+def license_result(license_obj):
+    return {
+        "value": str(license_obj.pk),
+        "label": license_obj.name,
+        "sublabel": license_obj.short_name,
+        "url": license_obj.url,
+    }
+
+
+def dependency_rows(mod):
+    rows = []
+    for dep in mod.dependencies.select_related("ref", "ref__uploaded_by"):
+        if dep.ref_id and not dep.is_external:
+            rows.append({**mod_result(dep.ref), "kind": "internal", "mod": dep.ref_id,
+                         "context": dep.notes, "version": dep.version})
+        else:
+            rows.append({"kind": "external", "value": "", "title": dep.title, "url": dep.external_url,
+                         "context": dep.notes, "version": dep.version})
+    return rows
+
+
+def license_rows(mod):
+    return [
+        {**license_result(item.license), "context": item.context}
+        for item in mod.licenses.select_related("license")
+    ]
+
+
+def attribution_rows(mod):
+    return [
+        {"title": a.title, "url": a.url, "authors": a.authors, "note": a.note}
+        for a in mod.attributions.all()
+    ]
+
+
+def link_rows(mod):
+    return [{"kind": link.kind, "url": link.url, "label": link.label} for link in mod.links.all()]
+
+
+def widget_config(**config):
+    return json.dumps(config)
