@@ -114,3 +114,34 @@ def link_rows(mod):
 
 def widget_config(**config):
     return json.dumps(config)
+
+# --------------------------------------------------------------------------- saving
+
+
+@transaction.atomic
+def save_resources(mod, *, dependencies, licenses, attributions, links):
+    """Replace all four lists for this mod. Rows must already be cleaned/resolved."""
+    mod.dependencies.all().delete()
+    for order, row in enumerate(dependencies):
+        if row["kind"] == "internal":
+            ModDependency.objects.create(
+                parent=mod, ref=row["mod_obj"], is_external=False,
+                notes=row["context"], version=row["version"], order=order,
+            )
+        else:
+            ModDependency.objects.create(
+                parent=mod, is_external=True, title=row["title"], external_url=row["url"],
+                notes=row["context"], version=row["version"], order=order,
+            )
+
+    mod.licenses.all().delete()
+    for order, row in enumerate(licenses):
+        ModLicense.objects.create(mod=mod, license=row["license_obj"], context=row["context"], order=order)
+
+    mod.attributions.all().delete()
+    for order, row in enumerate(attributions):
+        ModAttribution.objects.create(mod=mod, order=order, **row)
+
+    mod.links.all().delete()
+    for order, row in enumerate(links):
+        ModLink.objects.create(mod=mod, order=order, **row)
