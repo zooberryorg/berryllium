@@ -35,3 +35,7 @@ PERIODS = {
 def published_mods():
     """Mods anyone can see: not drafts, and their publish date has arrived."""
     return Mod.objects.filter(draft=False, publish_date__lte=timezone.now())
+
+def _csv_has(field, key):
+    """Match one key in a comma-separated field like category="animals, scripts"."""
+    return Q(**{f"{field}__regex": rf"(^|,\s*){re.escape(key)}(\s*,|$)"})
