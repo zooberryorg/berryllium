@@ -25,7 +25,21 @@ from berryllium.mods.pickers import (
     tag_items,
     save_tags,
 )
-from berryllium.shared.models import ArchivedWebsite
+from berryllium.shared.models import ArchivedWebsite, Language, License
+from berryllium.shared.fields import JSONRowsField, raw_rows
+from berryllium.shared.links import LINK_PRESETS, DEFAULT_LINK_PRESET
+from berryllium.mods.resources import (
+    clean_dependency_row,
+    clean_license_row,
+    clean_attribution_row,
+    clean_link_row,
+    dependency_rows,
+    license_rows,
+    attribution_rows,
+    link_rows,
+    widget_config,
+    save_resources,
+)
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 from berryllium.mods.models import ModFile, ModFileGroup
 from berryllium.mods.models import Mod
@@ -750,3 +764,143 @@ class DescriptionImageForm(forms.Form):
 
 
 ModFileGroupFormSet = formset_factory(ModFileGroupForm, extra=0, can_delete=True)
+
+class ModResourcesForm(forms.ModelForm):
+    """
+    Step 5 of the upload form: dependencies, licenses, languages, additional credits and links.
+    """
+
+    dependencies = JSONRowsField(row_cleaner=clean_dependency_row, required=False, label="Dependencies")
+    licenses = JSONRowsField(row_cleaner=clean_license_row, required=False, max_rows=10, label="Licenses")
+    attributions = JSONRowsField(row_cleaner=clean_attribution_row, required=False, label="Additional credits")
+    links = JSONRowsField(row_cleaner=clean_link_row, required=False, max_rows=20, label="Links")
+    languages = forms.ModelMultipleChoiceField(
+        queryset=Language.objects.all(),
+        required=False,
+        label="Languages",
+        widget=forms.MultipleHiddenInput,
+    )
+
+    class Meta:
+        model = Mod
+        fields = ["languages"]
+
+    def clean_dependencies(self):
+        rows = self.cleaned_data["dependencies"]
+        ids = [row["mod"] for row in rows if row["kind"] == "internal"]
+        mods = Mod.objects.exclude(pk=self.instance.pk).in_bulk(ids)
+        cleaned, seen = [], set()
+        for row in rows:
+            if row["kind"] == "internal":
+                if row["mod"] not in mods:
+                    raise forms.ValidationError("One of the selected mods no longer exists. Remove it and try again.")
+                if row["mod"] in seen:
+                    continue
+                seen.add(row["mod"])
+                row["mod_obj"] = mods[row["mod"]]
+            cleaned.append(row)
+        return cleaned
+
+    def clean_licenses(self):
+        rows = self.cleaned_data["licenses"]
+        licenses = License.objects.filter(is_enabled=True).in_bulk([row["license"] for row in rows])
+        for row in rows:
+            if row["license"] not in licenses:
+                raise forms.ValidationError("One of the selected licenses is no longer available. Remove it and try again.")
+            row["license_obj"] = licenses[row["license"]]
+        return rows
+
+    def save_relations(self):
+        save_resources(
+            self.instance,
+            dependencies=self.cleaned_data["dependencies"],
+            licenses=self.cleaned_data["licenses"],
+            attributions=self.cleaned_data["attributions"],
+            links=self.cleaned_data["links"],
+        )
+
+    # ---- widget configs: submitted rows after an error, otherwise from the database
+
+    def _rows(self, name, from_db):
+        if self.is_bound:
+            return raw_rows(self.data, self.add_prefix(name))
+        return from_db(self.instance) if self.instance.pk else []
+
+    def dependencies_widget(self):
+        search_url = reverse("search_mods")
+        if self.instance.pk:
+            search_url += f"?exclude={self.instance.pk}"
+        return widget_config(
+            name=self.add_prefix("dependencies"),
+            searchUrl=search_url,
+            items=self._rows("dependencies", dependency_rows),
+            title="Add dependencies",
+            placeholder="Search mods...",
+            emptyText="No matching mods. Add it as an external dependency instead.",
+            insertKind="internal",
+            newRow={"context": "", "version": ""},
+            allowExternal=True,
+            externalLabel="Add external dependency",
+            contextLabel="Why it's needed",
+            contextPlaceholder="e.g. Required for the new animal behaviors",
+            showVersion=True,
+        )
+
+    def licenses_widget(self):
+        return widget_config(
+            name=self.add_prefix("licenses"),
+            searchUrl=reverse("search_licenses"),
+            items=self._rows("licenses", license_rows),
+            title="Add licenses",
+            placeholder="Search licenses...",
+            emptyText="No matching licenses. Ask staff if one is missing.",
+            newRow={"context": ""},
+            contextLabel="What it covers",
+            contextPlaceholder='e.g. "Only the dinosaur texture" (leave empty if it covers everything)',
+            showVersion=False,
+        )
+
+    def attributions_widget(self):
+        return widget_config(
+            name=self.add_prefix("attributions"),
+            rows=self._rows("attributions", attribution_rows),
+            blank={"title": "", "url": "", "authors": "", "note": ""},
+            addLabel="Add credit",
+            emptyText="No additional credits yet.",
+            columns=[
+                {"key": "title", "label": "Title", "type": "text", "required": True, "placeholder": "Ford F-150 model"},
+                {"key": "authors", "label": "Original author(s)", "type": "text", "required": True, "placeholder": "Jane Doe"},
+                {"key": "url", "label": "Link", "type": "url", "placeholder": "https://..."},
+                {"key": "note", "label": "Note", "type": "text", "placeholder": "Used with permission"},
+            ],
+        )
+
+    def links_widget(self):
+        return widget_config(
+            name=self.add_prefix("links"),
+            rows=self._rows("links", link_rows),
+            blank={"kind": DEFAULT_LINK_PRESET, "url": "", "label": ""},
+            addLabel="Add link",
+            emptyText="No links yet.",
+            presets=LINK_PRESETS,
+            columns=[
+                {"key": "kind", "label": "Type", "type": "preset"},
+                {"key": "url", "label": "Link", "type": "url", "required": True, "placeholder": "https://..."},
+                {"key": "label", "label": "Label", "type": "text", "placeholder": "Optional"},
+            ],
+        )
+
+    def languages_picker(self):
+        if self.is_bound:
+            ids = [v for v in self.data.getlist(self.add_prefix("languages")) if str(v).isdigit()]
+            languages = Language.objects.filter(pk__in=ids)
+        else:
+            languages = self.instance.languages.all() if self.instance.pk else Language.objects.none()
+        return picker_config(
+            name=self.add_prefix("languages"),
+            search_url=reverse("search_languages"),
+            items=[{"value": str(lang.pk), "label": lang.name, "sublabel": lang.code} for lang in languages],
+            title="Add languages",
+            placeholder="Search languages...",
+            empty_text="No matching languages. Ask staff if one is missing.",
+        )
