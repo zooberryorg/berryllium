@@ -31,7 +31,7 @@
                 </div>
             </div>
             <!-- results -->
-            <div class="flex-1 overflow-y-auto px-4 pb-2 space-y-1">
+            <div class="flex-1 overflow-y-auto px-4 pb-2 space-y-1" style="min-height: 0;">
                 <!-- staged new entries -->
                 <template x-for="item in staged.filter(i => i.isNew)" :key="item.value">
                     <button type="button"
