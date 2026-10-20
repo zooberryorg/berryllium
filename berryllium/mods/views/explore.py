@@ -120,3 +120,51 @@ def _popular_tags(limit=15):
         .filter(uses__gt=0)
         .order_by("-uses", "name")[:limit]
     )
+
+def mods(request):
+    """Explore > Mods."""
+    params = request.GET
+    filters = _read_filters(params)
+    base = published_mods()
+
+    results = (
+        _apply_filters(base, filters)
+        .select_related("uploaded_by")
+        .prefetch_related(
+            "tags",
+            Prefetch("images", queryset=ModImage.objects.filter(is_cover=True), to_attr="cover_images"),
+        )
+    )
+    page = Paginator(results, PAGE_SIZE).get_page(params.get("page"))
+    for mod in page.object_list:
+        mod.category_labels = _labels(mod.category, MOD_CATEGORIES)
+        mod.game_labels = _labels(mod.game, GAME_OPTIONS)
+        mod.cover = mod.cover_images[0] if mod.cover_images else None
+
+    page_range = list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1))
+
+    page_query = params.copy()
+    page_query.pop("page", None)
+
+    context = {
+        "page": page,
+        "page_range": page_range,
+        "page_query": page_query.urlencode(),
+        "filters": filters,
+        "active_filters": _active_filters(params, filters),
+        "has_any_mods": base.exists(),
+        "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
+        "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
+        "game_options": [option for option in GAME_OPTIONS if option[0] != "na"],
+    }
+
+    is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
+    if is_htmx:
+        return render(request, "mods/explore/results.html", context)
+
+    context["categories"] = _category_counts(base)
+    context["total_published"] = base.count()
+    context["popular_tags"] = list(_popular_tags())
+    context["popular_tag_names"] = {tag.name for tag in context["popular_tags"]}
+    context["explore_tab"] = "mods"
+    return render(request, "mods/explore/base.html", context)
