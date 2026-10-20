@@ -362,6 +362,7 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
     form_class = ModDescriptionForm
     template_name = "mods/create/description/base.html"
     previous_step = "mod_create_images"
+    autosave = True
 
     def get_success_url(self):
         return reverse("mod_create_resources", kwargs={"mod_id": self.object.id})
@@ -372,13 +373,18 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
 
         return context | progress_bar
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        for img in self.object.description_images.all():
-            if img.image.url not in (self.object.description or ""):
-                img.delete()
-        return response
+    def save_form(self, form, final=True):
+        self.object = form.save()
+        # only clean up unused images on Next: while autosaving, an image that was just
+        # cut may be about to be pasted back
+        if final:
+            for img in self.object.description_images.all():
+                if img.image.url not in (self.object.description or ""):
+                    img.delete()
 
+    def form_valid(self, form):
+        self.save_form(form, final=True)
+        return HttpResponseRedirect(self.get_success_url())
 
 class ModCreateResources(UploadStepMixin, UpdateView):
     """
