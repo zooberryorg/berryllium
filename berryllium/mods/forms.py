@@ -852,12 +852,14 @@ class ModResourcesForm(forms.ModelForm):
             searchUrl=reverse("search_licenses"),
             items=self._rows("licenses", license_rows),
             title="Add licenses",
+            searchLabel="Search licenses",
             placeholder="Search licenses...",
             emptyText="No matching licenses. Ask staff if one is missing.",
+            emptyListText="No license chosen.",
             newRow={"context": ""},
-            contextLabel="What it covers",
-            contextPlaceholder='e.g. "Only the dinosaur texture" (leave empty if it covers everything)',
+            contextPlaceholder='What it covers, e.g. "only the dinosaur texture" (leave empty if it covers everything)',
             showVersion=False,
+            sortable=False,
         )
 
     def attributions_widget(self):
@@ -866,13 +868,8 @@ class ModResourcesForm(forms.ModelForm):
             rows=self._rows("attributions", attribution_rows),
             blank={"title": "", "url": "", "authors": "", "note": ""},
             addLabel="Add credit",
-            emptyText="No additional credits yet.",
-            columns=[
-                {"key": "title", "label": "Title", "type": "text", "required": True, "placeholder": "Ford F-150 model"},
-                {"key": "authors", "label": "Original author(s)", "type": "text", "required": True, "placeholder": "Jane Doe"},
-                {"key": "url", "label": "Link", "type": "url", "placeholder": "https://..."},
-                {"key": "note", "label": "Note", "type": "text", "placeholder": "Used with permission"},
-            ],
+            emptyText="No additional credits.",
+            sortable=True,
         )
 
     def links_widget(self):
@@ -881,13 +878,9 @@ class ModResourcesForm(forms.ModelForm):
             rows=self._rows("links", link_rows),
             blank={"kind": DEFAULT_LINK_PRESET, "url": "", "label": ""},
             addLabel="Add link",
-            emptyText="No links yet.",
+            emptyText="No links.",
             presets=LINK_PRESETS,
-            columns=[
-                {"key": "kind", "label": "Type", "type": "preset"},
-                {"key": "url", "label": "Link", "type": "url", "required": True, "placeholder": "https://..."},
-                {"key": "label", "label": "Label", "type": "text", "placeholder": "Optional"},
-            ],
+            sortable=True,
         )
 
     def languages_picker(self):

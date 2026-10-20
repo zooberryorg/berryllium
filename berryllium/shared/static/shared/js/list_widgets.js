@@ -16,66 +16,86 @@ function withoutUid(rows) {
   return rows.map(({ uid, ...rest }) => rest);
 }
 
+// shared sortable behavior
+function sortableList(listKey, sortable) {
+  return {
+    sortable,
+    dragging: false,
+    renderVersion: 0,
+
+    rowKey(row) {
+      return `${row.uid}:${this.renderVersion}`;
+    },
+
+    moveRow(uid, position) {
+      const rows = [...this[listKey]];
+      const from = rows.findIndex((row) => row.uid === uid);
+      if (from === -1 || from === position) return;
+      const [moved] = rows.splice(from, 1);
+      rows.splice(position, 0, moved);
+      this[listKey] = rows;
+      this.renderVersion += 1;
+    },
+  };
+}
+
+
 // config ontop of searchPicker. What this does is
 // it adds a context field for each inserted search result and lets
 // user add a new row not in db
 function detailPicker(config) {
-  return extendComponent(searchPicker(config), {
-    newRow: config.newRow || {},
-    insertKind: config.insertKind || null,
-    allowExternal: !!config.allowExternal,
-    externalLabel: config.externalLabel || 'Add manually',
-    contextLabel: config.contextLabel || 'Context',
-    contextPlaceholder: config.contextPlaceholder || '',
-    showVersion: !!config.showVersion,
+  return extendComponent(
+    extendComponent(searchPicker(config), sortableList('items', !!config.sortable)),
+    {
+      newRow: config.newRow || {},
+      insertKind: config.insertKind || null,
+      allowExternal: !!config.allowExternal,
+      externalLabel: config.externalLabel || 'Add manually',
+      searchLabel: config.searchLabel || config.title || 'Search',
+      contextPlaceholder: config.contextPlaceholder || 'Context',
+      showVersion: !!config.showVersion,
+      emptyListText: config.emptyListText || 'Nothing added yet.',
 
-    init() {
-      this.items = (this.items || []).map((row) => ({ uid: nextRowUid(), ...row }));
-    },
+      init() {
+        this.items = (this.items || []).map((row) => ({ uid: nextRowUid(), ...row }));
+      },
 
-    insert() {
-      for (const result of this.staged) {
-        if (this.isInserted(result.value)) continue;
-        const row = { uid: nextRowUid(), ...this.newRow, ...result };
-        if (this.insertKind) row.kind = this.insertKind;
-        this.items.push(row);
-      }
-      this.staged = [];
-      this.close();
-    },
+      insert() {
+        for (const result of this.staged) {
+          if (this.isInserted(result.value)) continue;
+          const row = { uid: nextRowUid(), ...this.newRow, ...result };
+          if (this.insertKind) row.kind = this.insertKind;
+          this.items.push(row);
+        }
+        this.staged = [];
+        this.close();
+      },
 
-    addExternal() {
-      this.items.push({
-        uid: nextRowUid(),
-        kind: 'external',
-        value: '',
-        title: '',
-        url: '',
-        ...this.newRow,
-      });
-      this.$nextTick(() => {
-        const inputs = this.$root.querySelectorAll('[data-external-title]');
-        inputs[inputs.length - 1]?.focus();
-      });
-    },
+      addExternal() {
+        this.items.push({ uid: nextRowUid(), kind: 'external', value: '', title: '', url: '', ...this.newRow });
+        this.$nextTick(() => {
+          const inputs = this.$root.querySelectorAll('[data-first-input]');
+          inputs[inputs.length - 1]?.focus();
+        });
+      },
 
-    removeRow(uid) {
-      this.items = this.items.filter((row) => row.uid !== uid);
-    },
+      removeRow(uid) {
+        this.items = this.items.filter((row) => row.uid !== uid);
+      },
 
-    serialized() {
-      return JSON.stringify(withoutUid(this.items));
-    },
-  });
+      serialized() {
+        return JSON.stringify(withoutUid(this.items));
+      },
+    }
+  );
 }
 
 // config for a table of rows, each with a uid. The rows can be added/removed and serialized to JSON.
 function rowTable(config) {
-  return {
+  return extendComponent(sortableList('rows', !!config.sortable), {
     name: config.name,
     rows: (config.rows || []).map((row) => ({ uid: nextRowUid(), ...row })),
     blank: config.blank || {},
-    columns: config.columns || [],
     presets: config.presets || {},
     addLabel: config.addLabel || 'Add row',
     emptyText: config.emptyText || 'Nothing added yet.',
@@ -85,8 +105,8 @@ function rowTable(config) {
       if (this.rows.length >= this.maxRows) return;
       this.rows.push({ uid: nextRowUid(), ...this.blank });
       this.$nextTick(() => {
-        const lastRow = this.$root.querySelector('tbody tr:last-child');
-        lastRow?.querySelector('input, select')?.focus();
+        const inputs = this.$root.querySelectorAll('[data-first-input]');
+        inputs[inputs.length - 1]?.focus();
       });
     },
 
@@ -102,7 +122,7 @@ function rowTable(config) {
       return (this.presets[kind] || this.presets.other || {}).icon || 'bi-link-45deg';
     },
 
-    // after url is entered, try to guess the preset kind based on the domain
+    /** After a URL is typed, pick the matching preset (e.g. discord.gg -> Discord) if none was chosen. */
     guessPreset(row) {
       if (!row.url || !('kind' in row)) return;
       if (row.kind && !['website', 'other'].includes(row.kind)) return;
@@ -119,5 +139,5 @@ function rowTable(config) {
         }
       }
     },
-  };
+  });
 }

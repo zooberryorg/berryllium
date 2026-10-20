@@ -1,65 +1,91 @@
 {# searches db and returns results as a row of data #}
-<div class="mb-4"
+<div class="mb-2"
      x-data="detailPicker(JSON.parse($el.dataset.config))"
      data-config="{{ config }}">
-    <label class="block text-sm font-medium mb-1 text-white">{{ field.label }}</label>
-    {% if field.help_text %}<p class="text-white/50 text-xs mb-2">{{ field.help_text }}</p>{% endif %}
-
     <input type="hidden" name="{{ field.html_name }}" :value="serialized()">
 
-    <div class="space-y-2">
-        <template x-for="row in items" :key="row.uid">
-            <div class="rounded-xl border border-white/10 bg-pine-800/40 p-3 space-y-2">
-                <!-- the header has the database item, or manual title + link -->
-                <div class="flex items-start gap-3">
+    <div class="transition-all duration-200 space-y-3"
+         :class="dragging ? 'bg-pine-special-100/10 border-2 border-dashed border-gold-400 rounded-xl px-2 py-2' : 'border-transparent'"
+         {% if sortable %}{% include "shared/widgets/sort_config.html" %}{% endif %}>
+        <template x-for="row in items" :key="rowKey(row)">
+            <div class="flex items-start gap-3 w-full bg-pine-draggable-200 rounded-lg px-2 py-2 text-sm text-granite-200 border-1 border-pine-draggable-100 hover:brightness-110 shadow-md hover:shadow-lg group/file"
+                 {% if sortable %}x-sort:item="row.uid"{% endif %}>
+                {% if sortable %}
+                    <span class="text-pine-600 px-2 py-1 cursor-grab" x-sort:handle>
+                        <i class="bi bi-grip-vertical group-hover/file:text-gold-400 text-lg"></i>
+                    </span>
+                {% endif %}
+
+                <div class="flex flex-col w-full min-w-0 gap-1">
+                    <!-- database item: name, details pill, read-more link -->
                     <template x-if="row.kind !== 'external'">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2">
-                                <span class="text-white font-medium truncate" x-text="row.label"></span>
+                        <div class="flex flex-col">
+                            <div class="flex items-center gap-2 px-2 py-1">
+                                <span class="text-white truncate" x-text="row.label"></span>
                                 <a x-show="row.url" :href="row.url" target="_blank" rel="noopener noreferrer"
-                                   class="text-gold-300 hover:text-gold-200 text-xs shrink-0" title="Read more">
+                                   class="text-gold-300 hover:text-gold-200 text-xs shrink-0" title="Read more" x-sort:ignore>
                                     <i class="bi bi-box-arrow-up-right"></i>
                                 </a>
                             </div>
-                            <span class="text-xs text-white/50" x-show="row.sublabel" x-text="row.sublabel"></span>
+                            <div class="pl-2 flex flex-wrap gap-1">
+                                <p class="text-xs py-1 px-2 bg-pine-400/80 text-granite-200/50 max-w-max rounded-full"
+                                   x-show="insertKind">On site</p>
+                                <p class="text-xs py-1 px-2 bg-pine-400/80 text-granite-200/50 max-w-max rounded-full"
+                                   x-show="row.sublabel" x-text="row.sublabel"></p>
+                            </div>
                         </div>
                     </template>
+                    <!-- manual item: title + link -->
                     <template x-if="row.kind === 'external'">
-                        <div class="flex-1 grid gap-2 sm:grid-cols-2">
-                            <input type="text" class="zb-input text-sm" placeholder="Title *" maxlength="200"
-                                   x-model="row.title" data-external-title>
-                            <input type="url" class="zb-input text-sm" placeholder="https://... *" maxlength="500"
-                                   x-model="row.url">
+                        <div class="flex flex-col">
+                            <input type="text" maxlength="200" placeholder="Title *" data-first-input x-sort:ignore
+                                   class="px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl transition-all duration-200 hover:text-white focus:text-white text-white"
+                                   x-model="row.title"
+                                   @keydown.enter.prevent="$el.blur()">
+                            <input type="url" maxlength="500" placeholder="https://... *" x-sort:ignore
+                                   class="px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl transition-all duration-200 hover:text-white focus:text-white text-white/60"
+                                   x-model="row.url"
+                                   @keydown.enter.prevent="$el.blur()">
+                            <div class="pl-2">
+                                <p class="text-xs py-1 px-2 bg-pine-400/80 text-granite-200/50 max-w-max rounded-full">External</p>
+                            </div>
                         </div>
                     </template>
-                    <span class="shrink-0 text-[10px] uppercase tracking-wide px-2 py-0.5 rounded-full"
-                          :class="row.kind === 'external' ? 'bg-white/10 text-white/60' : 'bg-gold-400/15 text-gold-300'"
-                          x-show="insertKind || row.kind === 'external'"
-                          x-text="row.kind === 'external' ? 'External' : 'On site'"></span>
-                    <button type="button" class="text-white/50 hover:text-red-400 cursor-pointer shrink-0"
-                            @click="removeRow(row.uid)" :aria-label="'Remove ' + (row.label || row.title || 'row')">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
+                    <!-- version -->
+                    <input type="text" maxlength="100" placeholder="Version (optional)" x-show="showVersion" x-sort:ignore
+                           class="px-2 py-1 bg-transparent border-none focus:outline-none w-full rounded-xl transition-all duration-200 hover:text-white focus:text-white"
+                           x-model="row.version"
+                           @keydown.enter.prevent="$el.blur()">
                 </div>
-                <!-- details -->
-                <div class="grid gap-2" :class="showVersion ? 'sm:grid-cols-[1fr_10rem]' : ''">
-                    <input type="text" class="zb-input text-sm" maxlength="500"
-                           :placeholder="contextLabel + (contextPlaceholder ? ' — ' + contextPlaceholder : '')"
-                           x-model="row.context">
-                    <input type="text" class="zb-input text-sm" maxlength="100" placeholder="Version (optional)"
-                           x-show="showVersion" x-model="row.version">
+
+                <!-- context: collapsible like the file descriptions -->
+                <div class="flex flex-col w-full min-w-0" x-data="textFieldExpand({})">
+                    <textarea maxlength="500" x-sort:ignore
+                              class="px-2 py-1 text-sm text-white/50 focus:outline-none w-full rounded-xl hover:text-white focus:text-white transition-all duration-200 resize-none"
+                              :placeholder="contextPlaceholder"
+                              :rows="focused ? 4 : 1"
+                              :class="focused ? 'h-15' : 'h-11'"
+                              x-model="row.context"
+                              @focus="expand()"
+                              @blur="collapse()"
+                              @keydown.escape="$el.blur()"></textarea>
                 </div>
+
+                <button type="button" class="zb-action-delete hidden p-2 mr-2 group-hover/file:flex" x-sort:ignore
+                        @click="removeRow(row.uid)" :aria-label="'Remove ' + (row.label || row.title || 'row')">
+                    <ion-icon name="trash"></ion-icon>
+                </button>
             </div>
         </template>
-        <p class="text-sm text-white/40 px-1" x-show="!items.length">Nothing added yet.</p>
+        <p class="text-sm text-white/40 px-1" x-show="!items.length" x-text="emptyListText"></p>
     </div>
 
-    <div class="flex flex-wrap gap-2 mt-2">
-        <button type="button" class="zb-action rounded-xl" @click="openPicker()">
-            <i class="bi bi-search"></i> <span x-text="title"></span>
+    <div class="flex justify-end gap-2 w-full mt-3">
+        <button type="button" class="zb-action flex items-center justify-center" @click="openPicker()">
+            <ion-icon name="search" class="pr-2"></ion-icon> <span x-text="searchLabel"></span>
         </button>
-        <button type="button" class="zb-action rounded-xl" x-show="allowExternal" @click="addExternal()">
-            <i class="bi bi-plus-lg"></i> <span x-text="externalLabel"></span>
+        <button type="button" class="zb-action flex items-center justify-center" x-show="allowExternal" @click="addExternal()">
+            <ion-icon name="add-circle" class="pr-2"></ion-icon> <span x-text="externalLabel"></span>
         </button>
     </div>
 
