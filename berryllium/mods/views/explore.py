@@ -50,3 +50,18 @@ def _remove_url(params, key, value=None):
         query.setlist(key, [v for v in query.getlist(key) if v != value])
     encoded = query.urlencode()
     return f"?{encoded}" if encoded else "?"
+
+def _read_filters(params):
+    categories, games = dict(MOD_CATEGORIES), dict(GAME_OPTIONS)
+    category = params.get("category", "")
+    game = params.get("game", "")
+    period = params.get("period", "")
+    sort = params.get("sort", "")
+    return {
+        "q": params.get("q", "").strip()[:MAX_QUERY_LENGTH],
+        "category": category if category in categories else "",
+        "game": game if game in games else "",
+        "period": period if period in PERIODS else "",
+        "tags": [tag for tag in params.getlist("tag") if tag][:MAX_TAGS],
+        "sort": sort if sort in SORTS else DEFAULT_SORT,
+    }
