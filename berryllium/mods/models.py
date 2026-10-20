@@ -229,6 +229,25 @@ class ModLicense(models.Model):
     def __str__(self):
         return f"{self.license} on {self.mod_id}"
 
+class ModAttribution(models.Model):
+    """
+    Credit for work used in a mod by people who weren't involved in making it,
+    for example "models sourced from XYZ" or "original textures by ABC".
+    """
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="attributions")
+    title = models.CharField(max_length=200)
+    url = models.URLField(max_length=500, blank=True)
+    authors = models.CharField(max_length=300)
+    note = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.title} by {self.authors}"
+
 
 class ModTag(models.Model):
     """
