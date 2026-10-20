@@ -1,0 +1,65 @@
+<div class="mb-4"
+     x-data="rowTable(JSON.parse($el.dataset.config))"
+     data-config="{{ config }}">
+    <label class="block text-sm font-medium mb-1 text-white">{{ field.label }}</label>
+    {% if field.help_text %}<p class="text-white/50 text-xs mb-2">{{ field.help_text }}</p>{% endif %}
+
+    <input type="hidden" name="{{ field.html_name }}" :value="serialized()">
+
+    <div class="overflow-x-auto rounded-xl border border-white/10" x-show="rows.length">
+        <table class="w-full text-sm">
+            <thead class="bg-pine-800/60 text-white/60 text-xs uppercase tracking-wide">
+                <tr>
+                    <template x-for="column in columns" :key="column.key">
+                        <th class="text-left font-medium px-3 py-2 whitespace-nowrap">
+                            <span x-text="column.label"></span><span class="text-red-500" x-show="column.required"> *</span>
+                        </th>
+                    </template>
+                    <th class="w-10"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <template x-for="row in rows" :key="row.uid">
+                    <tr class="border-t border-white/5 align-top">
+                        <template x-for="column in columns" :key="column.key">
+                            <td class="px-2 py-2" :class="column.type === 'preset' ? 'w-48' : 'min-w-40'">
+                                <!-- preset select with its icon -->
+                                <template x-if="column.type === 'preset'">
+                                    <div class="flex items-center gap-2">
+                                        <i class="bi text-lg text-gold-300 w-5 text-center" :class="presetIcon(row[column.key])"></i>
+                                        <select class="zb-input text-sm" x-model="row[column.key]">
+                                            <template x-for="(preset, key) in presets" :key="key">
+                                                <option :value="key" x-text="preset.label" :selected="key === row[column.key]"></option>
+                                            </template>
+                                        </select>
+                                    </div>
+                                </template>
+                                <template x-if="column.type !== 'preset'">
+                                    <input class="zb-input text-sm w-full"
+                                           :type="column.type === 'url' ? 'url' : 'text'"
+                                           :placeholder="column.placeholder || ''"
+                                           :maxlength="column.type === 'url' ? 500 : 300"
+                                           x-model="row[column.key]"
+                                           @change="column.type === 'url' && guessPreset(row)">
+                                </template>
+                            </td>
+                        </template>
+                        <td class="px-2 py-2 text-right">
+                            <button type="button" class="text-white/50 hover:text-red-400 cursor-pointer mt-2"
+                                    @click="remove(row.uid)" aria-label="Remove row">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </div>
+    <p class="text-sm text-white/40 px-1" x-show="!rows.length" x-text="emptyText"></p>
+
+    <button type="button" class="zb-action rounded-xl mt-2" @click="add()" :disabled="rows.length >= maxRows">
+        <i class="bi bi-plus-lg"></i> <span x-text="addLabel"></span>
+    </button>
+
+    {% for error in field.errors %}<p class="text-red-400 text-sm mt-1">{{ error }}</p>{% endfor %}
+</div>
