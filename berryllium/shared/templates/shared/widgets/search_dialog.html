@@ -1,0 +1,93 @@
+<template x-teleport="body">
+    <div x-show="open"
+            x-transition.opacity
+            x-cloak
+            class="fixed inset-0 flex items-center justify-center p-4"
+            style="z-index: 70;"
+            @keydown.escape.stop.prevent="close()">
+        <div class="absolute inset-0 bg-black/60" @click="close()"></div>
+        <div class="relative w-full rounded-2xl bg-pine-700 border-4 border-pine-100/10 shadow-2xl flex flex-col"
+                style="max-width: 32rem; max-height: 85vh;">
+            <!-- header -->
+            <div class="flex items-center justify-between px-5 py-3 border-b border-pine-100/10 bg-pine-800/40 text-white rounded-t-xl">
+                <h2 class="text-lg font-semibold" x-text="title"></h2>
+                <button type="button" class="text-gray-400 hover:text-white cursor-pointer" @click="close()">
+                    <ion-icon name="close" size="large"></ion-icon>
+                </button>
+            </div>
+            <!-- search box -->
+            <div class="p-4 pb-2">
+                <div class="relative">
+                    <i class="bi bi-search absolute left-3 top-1/2 -translate-y-1/2 text-white/40"></i>
+                    <input type="search"
+                            x-ref="searchInput"
+                            x-model="query"
+                            @input.debounce.250ms="search()"
+                            @keydown.enter.prevent="onEnter()"
+                            :placeholder="placeholder"
+                            autocomplete="off"
+                            class="zb-input text-sm w-full pl-9">
+                    <ion-icon name="sync" class="animate-spin absolute right-3 top-1/2 -translate-y-1/2 text-white/40" x-show="loading"></ion-icon>
+                </div>
+            </div>
+            <!-- results -->
+            <div class="flex-1 overflow-y-auto px-4 pb-2 space-y-1">
+                <!-- staged new entries -->
+                <template x-for="item in staged.filter(i => i.isNew)" :key="item.value">
+                    <button type="button"
+                            class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left border border-dashed border-gold-400/60 bg-gold-400/10 cursor-pointer"
+                            @click="toggle(item)">
+                        <i class="bi bi-check-circle-fill text-gold-400"></i>
+                        <span class="flex flex-col min-w-0">
+                            <span class="text-white truncate" x-text="item.label"></span>
+                            <span class="text-xs text-gold-200" x-text="item.sublabel"></span>
+                        </span>
+                    </button>
+                </template>
+                <!-- create option -->
+                <button type="button"
+                        x-show="canCreate"
+                        class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left text-gold-300 hover:bg-gold-400/10 cursor-pointer"
+                        @click="stageNew()">
+                    <i class="bi bi-plus-circle"></i>
+                    <span>Create "<span x-text="query.trim()"></span>"</span>
+                </button>
+                <!-- search results -->
+                <template x-for="result in results" :key="result.value">
+                    <button type="button"
+                            class="w-full flex items-center gap-3 rounded-xl px-3 py-2 text-left transition-colors"
+                            :class="isInserted(result.value) ? 'opacity-50 cursor-default' : (isStaged(result.value) ? 'bg-gold-400/15 border border-gold-400/50 cursor-pointer' : 'hover:bg-white/5 border border-transparent cursor-pointer')"
+                            @click="toggle(result)">
+                        <i class="bi"
+                            :class="isInserted(result.value) || isStaged(result.value) ? 'bi-check-circle-fill text-gold-400' : 'bi-circle text-white/30'"></i>
+                        <span class="flex flex-col min-w-0 flex-1">
+                            <span class="text-white truncate" x-text="result.label"></span>
+                            <span class="text-xs text-white/50 truncate" x-show="result.sublabel" x-text="result.sublabel"></span>
+                        </span>
+                        <span class="text-xs text-white/50" x-show="isInserted(result.value)">Added</span>
+                    </button>
+                </template>
+                <!-- empty / error states -->
+                <p class="text-sm text-red-400 px-3 py-2" x-show="error" x-text="error"></p>
+                <p class="text-sm text-white/50 px-3 py-2"
+                    x-show="!loading && !error && !results.length && !canCreate && query.trim()"
+                    x-text="emptyText"></p>
+                <p class="text-sm text-white/50 px-3 py-2"
+                    x-show="!loading && !error && !results.length && !query.trim()">Start typing to search.</p>
+            </div>
+            <!-- footer -->
+            <div class="flex items-center justify-between gap-3 px-5 py-3 border-t border-white/10 bg-pine-600/50 rounded-b-xl">
+                <span class="text-sm text-white/60" x-text="staged.length ? staged.length + ' selected' : 'Nothing selected'"></span>
+                <div class="flex gap-2">
+                    <button type="button" class="zb-controls" @click="close()">Cancel</button>
+                    <button type="button"
+                            class="zb-controls text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors disabled:opacity-40"
+                            :disabled="!staged.length"
+                            @click="insert()">
+                        Insert<span x-show="staged.length" x-text="' (' + staged.length + ')'"></span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
