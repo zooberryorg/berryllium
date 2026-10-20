@@ -141,7 +141,12 @@ class ModGeneralInfoForm(forms.ModelForm):
         label="Original release date",
         widget=forms.DateInput(
             format="%Y-%m-%d",
-            attrs={"type": "date", "class": "zb-input text-sm", ":disabled": "!archived"},
+            attrs={
+                "class": "zb-input text-sm",
+                "autocomplete": "off",
+                ":disabled": "!archived",
+                "x-data": "datePicker({ max: $el.getAttribute('max') })",
+            },
         ),
     )
 
@@ -835,15 +840,18 @@ class ModResourcesForm(forms.ModelForm):
             searchUrl=search_url,
             items=self._rows("dependencies", dependency_rows),
             title="Add dependencies",
+            searchLabel="Search mods",
             placeholder="Search mods...",
             emptyText="No matching mods. Add it as an external dependency instead.",
+            emptyListText="No dependencies. Players can install this mod on its own.",
             insertKind="internal",
             newRow={"context": "", "version": ""},
             allowExternal=True,
-            externalLabel="Add external dependency",
-            contextLabel="Why it's needed",
+            externalLabel="Add external",
+            contextLabel="Why it's needed (optional)",
             contextPlaceholder="e.g. Required for the new animal behaviors",
             showVersion=True,
+            sortable=True,
         )
 
     def licenses_widget(self):

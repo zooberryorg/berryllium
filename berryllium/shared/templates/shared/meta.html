@@ -29,6 +29,11 @@
 <link rel="stylesheet" href="{% static 'codehilite.css' %}">
 <!-- markdownx -->
 <link rel="stylesheet" href="{% static 'admin/css/markdownx.css' %}">
+<!-- Date picker (formats follow the visitor's date preferences, see shared/dates.py) -->
+{{ date_prefs|json_script:"date-preferences" }}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/themes/dark.css">
+<script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.js"></script>
 <!-- AlpineJS -->
 <script defer
         src="https://cdn.jsdelivr.net/npm/@alpinejs/sort@3.x.x/dist/cdn.min.js"></script>
@@ -45,4 +50,5 @@
 <script src="{% static 'mods/js/general_fields.js' %}"></script>
 <script src="{% static 'shared/js/search_picker.js' %}"></script>
 <script src="{% static 'shared/js/list_widgets.js' %}"></script>
+<script src="{% static 'shared/js/autosave.js' %}"></script>
 {{ form.media }}
