@@ -375,8 +375,6 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
 
     def save_form(self, form, final=True):
         self.object = form.save()
-        # only clean up unused images on Next: while autosaving, an image that was just
-        # cut may be about to be pasted back
         if final:
             for img in self.object.description_images.all():
                 if img.image.url not in (self.object.description or ""):
@@ -395,15 +393,19 @@ class ModCreateResources(UploadStepMixin, UpdateView):
     form_class = ModResourcesForm
     template_name = "mods/create/resources/base.html"
     previous_step = "mod_create_description"
+    autosave = True
 
     def get_success_url(self):
         return reverse("mod_create_review", kwargs={"mod_id": self.object.id})
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
+    def save_form(self, form, final=True):
+        self.object = form.save()
         form.save_relations()
-        return response
 
+    def form_valid(self, form):
+        self.save_form(form, final=True)
+        return HttpResponseRedirect(self.get_success_url())
+    
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context | init_context(current_index=5)
