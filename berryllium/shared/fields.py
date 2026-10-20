@@ -73,3 +73,11 @@ class JSONRowsField(forms.Field):
         if errors:
             raise ValidationError(errors)
         return cleaned
+
+def raw_rows(data, name):
+    """Returns rows exactly as submitted, without cleaning or validation. Used by list_widgets.js."""
+    try:
+        rows = json.loads(data.get(name) or "[]")
+    except (TypeError, ValueError):
+        return []
+    return [row for row in rows if isinstance(row, dict)] if isinstance(rows, list) else []
