@@ -28,6 +28,7 @@ from berryllium.mods.services import (
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
 
+
 class DraftModMixin:
     """Loads the mod from the URL's mod_id and checks this session created it."""
 
@@ -48,14 +49,15 @@ class DraftModMixin:
         context["mod_id"] = self.kwargs["mod_id"]
         return context
 
+
 class UploadStepMixin(DraftModMixin):
-    previous_step = None 
+    previous_step = None
 
     def post(self, request, *args, **kwargs):
         if request.POST.get("action") == "previous" and self.previous_step:
             return redirect(self.previous_step, mod_id=self.kwargs["mod_id"])
         return super().post(request, *args, **kwargs)
-    
+
     def render_to_response(self, context, **response_kwargs):
         is_htmx = self.request.headers.get("HX-Request")
         is_history_restore = self.request.headers.get("HX-History-Restore-Request")
@@ -69,11 +71,16 @@ class UploadStepMixin(DraftModMixin):
             return response
 
         # if normal refresh then render base template with current step as initial step
-        return render(self.request, "mods/create/base.html", {
-            "mod_id": self.kwargs["mod_id"],
-            "mod_navigation": UPLOAD_NAVIGATION,
-            "initial_step_url": self.request.path,
-        })
+        return render(
+            self.request,
+            "mods/create/base.html",
+            {
+                "mod_id": self.kwargs["mod_id"],
+                "mod_navigation": UPLOAD_NAVIGATION,
+                "initial_step_url": self.request.path,
+            },
+        )
+
 
 class ModDraftView(LoginRequiredMixin, CreateView):
     """
@@ -110,6 +117,7 @@ class ModDraftView(LoginRequiredMixin, CreateView):
         response["HX-Redirect"] = self.get_success_url()
         return response
 
+
 class ModCreateLanding(DraftModMixin, TemplateView):
     """
     Mod Creation Landing Page: Serves as base template for multi-step mod creation process.
@@ -120,7 +128,9 @@ class ModCreateLanding(DraftModMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["mod_navigation"] = UPLOAD_NAVIGATION
-        context["initial_step_url"] = reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
+        context["initial_step_url"] = reverse(
+            "mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]}
+        )
         return context
 
     def get_success_url(self):
@@ -130,9 +140,10 @@ class ModCreateLanding(DraftModMixin, TemplateView):
         return reverse("mod_create_general", kwargs={"mod_id": self.kwargs["mod_id"]})
 
     def get(self, request, *args, **kwargs):
-        self.get_mod() # if draft doesnt exist or not in session, ret 404
+        self.get_mod()  # if draft doesnt exist or not in session, ret 404
         return redirect("mod_create_general", mod_id=self.kwargs["mod_id"])
-    
+
+
 class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 0: General Information (Title, Summary, etc.)
@@ -147,7 +158,7 @@ class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
         Override to prevent redirect since we handle navigation with HTMX.
         """
         return reverse("mod_create_categorization", kwargs={"mod_id": self.object.id})
-    
+
     def form_valid(self, form):
         """
         Validate form and save draft mod, then store mod ID in session for later steps.
@@ -160,7 +171,8 @@ class ModCreateGeneralInfo(UploadStepMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=0)
         return context | progress_bar
-    
+
+
 class ModCreateCategorization(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 1: Select Categories and Create Draft Mod
@@ -183,7 +195,7 @@ class ModCreateCategorization(UploadStepMixin, UpdateView):
         response = super().form_valid(form)
         form.save_relations()
         return response
-    
+
     def get_success_url(self):
         return reverse("mod_create_files", kwargs={"mod_id": self.object.id})
 
@@ -194,6 +206,7 @@ class ModCreateCategorization(UploadStepMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=1)
         return context | progress_bar
+
 
 class ModCreateFiles(UploadStepMixin, FormView):
     """
@@ -208,7 +221,7 @@ class ModCreateFiles(UploadStepMixin, FormView):
         if self.request.POST.get("action") == "uploaded_file":
             return self.request.path
         return reverse("mod_create_images", kwargs={"mod_id": self.kwargs["mod_id"]})
-    
+
     def get_context_data(self, **kwargs):
         """
         Get context data for rendering the form, including existing uploaded files and progress bar information.
@@ -263,12 +276,16 @@ class ModCreateFiles(UploadStepMixin, FormView):
                 context["existing_files"] = existing_files
                 return render(self.request, self.template_name, context)
             else:
-                form.add_error("file", f'"{clean_file.name}" has already been uploaded to this mod.')
+                form.add_error(
+                    "file",
+                    f'"{clean_file.name}" has already been uploaded to this mod.',
+                )
                 return self.form_invalid(form)
         else:
             print("No file uploaded or file failed validation.")
 
         return super().form_valid(form)
+
 
 class ModCreateImages(UploadStepMixin, FormView):
     """
@@ -283,13 +300,15 @@ class ModCreateImages(UploadStepMixin, FormView):
     template_name = "mods/create/pictures/base.html"
 
     def get_success_url(self):
-        return reverse("mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]})
+        return reverse(
+            "mod_create_description", kwargs={"mod_id": self.kwargs["mod_id"]}
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         progress_bar = init_context(current_index=3)
         return context | progress_bar | image_gallery_context(self.get_mod().id)
-    
+
     def form_valid(self, form):
         """
         Upload: save the images and re-render this step.
@@ -304,8 +323,11 @@ class ModCreateImages(UploadStepMixin, FormView):
             upload_image(img, mod_id=mod_id)
 
         # empty form when re-rendering this step after successful upload
-        return self.render_to_response(self.get_context_data(form=self.get_form_class()()))
-    
+        return self.render_to_response(
+            self.get_context_data(form=self.get_form_class()())
+        )
+
+
 class ModCreateDescription(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 4: Add Description.
@@ -332,6 +354,7 @@ class ModCreateDescription(UploadStepMixin, UpdateView):
                 img.delete()
         return response
 
+
 class ModCreateResources(UploadStepMixin, UpdateView):
     """
     Mod Creation Multi-Step 5: dependencies, licenses, languages, additional credits and links.
@@ -354,6 +377,7 @@ class ModCreateResources(UploadStepMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context | init_context(current_index=5)
+
 
 def upload_step3(request):
 
@@ -422,4 +446,3 @@ def cancel_mod_upload(request):
     response = HttpResponse()
     response["HX-Redirect"] = redirect("home").url
     return response
-
