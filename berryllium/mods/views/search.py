@@ -5,7 +5,9 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
 from berryllium.mods.pickers import person_item, tag_item, website_item
-from berryllium.shared.models import ArchivedWebsite, Tag
+from berryllium.mods.models import Mod
+from berryllium.mods.resources import license_result, mod_result
+from berryllium.shared.models import ArchivedWebsite, Language, License, Tag
 from berryllium.users.models import Author
 
 MAX_QUERY_LENGTH = 100
@@ -53,3 +55,42 @@ def search_tags(request):
     else:
         tags = tags.order_by("-uses", "name")
     return JsonResponse({"results": [tag_item(t) for t in tags[:20]]})
+
+@login_required
+@require_GET
+def search_mods(request):
+    """Published mods by title, for dependencies. With no query, returns nothing (to avoid sending a huge list)."""
+    q = _query(request)
+    if not q:
+        return JsonResponse({"results": []})
+    mods = Mod.objects.filter(draft=False, title__icontains=q).select_related("uploaded_by")
+    exclude = request.GET.get("exclude", "")
+    if exclude.isdigit():
+        mods = mods.exclude(pk=int(exclude))
+    return JsonResponse({"results": [mod_result(m) for m in mods.order_by("title")[:20]]})
+
+
+@login_required
+@require_GET
+def search_licenses(request):
+    """Enabled licenses; with no query, all of them."""
+    q = _query(request)
+    licenses = License.objects.filter(is_enabled=True)
+    if q:
+        licenses = licenses.filter(Q(name__icontains=q) | Q(short_name__icontains=q) | Q(description__icontains=q))
+    return JsonResponse({"results": [license_result(item) for item in licenses.order_by("name")[:30]]})
+
+
+@login_required
+@require_GET
+def search_languages(request):
+    """Languages by name or code; with no query, all of them."""
+    q = _query(request)
+    languages = Language.objects.all()
+    if q:
+        languages = languages.filter(Q(name__icontains=q) | Q(code__iexact=q))
+    results = [
+        {"value": str(lang.pk), "label": lang.name, "sublabel": lang.code}
+        for lang in languages.order_by("name")[:50]
+    ]
+    return JsonResponse({"results": results})
