@@ -58,3 +58,40 @@ def review_issues(mod):
         suggestions.append(_issue(mod, "mod_create_resources", "Pick a license so others know how they may use your work."))
 
     return problems, suggestions
+
+def review_context(mod):
+    """Show the mod's current state and any issues that need to be fixed before publishing."""
+    images = list(ModImage.objects.filter(mod=mod))
+    cover = next((image for image in images if image.is_cover), None)
+    credits = list(mod.credits.select_related("member", "author"))
+    problems, suggestions = review_issues(mod)
+
+    return {
+        "problems": problems,
+        "suggestions": suggestions,
+        "is_scheduled": mod.publish_date and mod.publish_date > timezone.now(),
+        # general
+        "collaborators": [c for c in credits if c.role == ModCredit.Role.COLLABORATOR],
+        "original_authors": [c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR],
+        "original_websites": list(mod.original_websites.all()),
+        # categorization
+        "category_labels": _labels(mod.category, MOD_CATEGORIES),
+        "game_labels": _labels(mod.game, GAME_OPTIONS),
+        "expansion_labels": _labels(mod.expansions, EXPANSION_REQUIREMENTS),
+        "tags": list(mod.tags.all()),
+        "pending_tags": mod.pending_tags or [],
+        # files
+        "file_groups": [
+            (group, list(ModFile.objects.filter(filegroup=group)))
+            for group in ModFileGroup.objects.filter(mod=mod)
+        ],
+        # images
+        "cover_image": cover,
+        "gallery_images": [image for image in images if not image.is_cover],
+        # resources
+        "dependencies": list(mod.dependencies.select_related("ref")),
+        "mod_licenses": list(mod.licenses.select_related("license")),
+        "languages": list(mod.languages.all()),
+        "attributions": list(mod.attributions.all()),
+        "links": list(mod.links.all()),
+    }
