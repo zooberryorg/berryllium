@@ -114,3 +114,16 @@ class License(models.Model):
 def language_icon_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"language_icons/{uuid.uuid4().hex}{ext}"
+
+class Language(models.Model):
+    """A language a mod is available in. Can only be edited by staff. Icon is just a ico graphic."""
+
+    name = models.CharField(max_length=100, unique=True)
+    code = models.CharField(max_length=10, unique=True, help_text='Language code, e.g. "en", "pt-BR".')
+    icon = models.ImageField(upload_to=language_icon_path, blank=True)
+
+    class Meta:
+        ordering = ["name"]
+
+    def __str__(self):
+        return self.name
