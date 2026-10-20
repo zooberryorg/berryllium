@@ -1,0 +1,10 @@
+<div class="flex items-center justify-between mb-3">
+    <h3 class="text-white font-semibold">{{ title }}</h3>
+    <button type="button"
+            class="zb-action flex items-center justify-center"
+            hx-get="{% url step mod_id=mod.id %}"
+            hx-target="#upload-frame"
+            hx-swap="innerHTML">
+        <ion-icon name="create" class="pr-2"></ion-icon> Edit
+    </button>
+</div>
