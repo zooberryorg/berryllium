@@ -127,3 +127,28 @@ class Language(models.Model):
 
     def __str__(self):
         return self.name
+
+class BaseLink(models.Model):
+    """
+    A labeled link preset for when users want to add a link to a mod, tutorial, or user profile.
+    """
+
+    kind = models.CharField(max_length=30, choices=LINK_PRESET_CHOICES, default=DEFAULT_LINK_PRESET)
+    url = models.URLField(max_length=500)
+    label = models.CharField(max_length=100, blank=True, help_text="Optional; defaults to the preset name.")
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        abstract = True
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.display_label}: {self.url}"
+
+    @property
+    def icon(self):
+        return link_preset(self.kind)["icon"]
+
+    @property
+    def display_label(self):
+        return self.label or link_preset(self.kind)["label"]
