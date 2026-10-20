@@ -248,6 +248,13 @@ class ModAttribution(models.Model):
     def __str__(self):
         return f"{self.title} by {self.authors}"
 
+class ModLink(BaseLink):
+    """A link shown on a mod page (mirror, Discord, donations...)."""
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="links")
+
+    class Meta(BaseLink.Meta):
+        pass
 
 class ModTag(models.Model):
     """
