@@ -18,41 +18,60 @@ function datePreferences() {
 
 function publishDatePicker() {
   return {
+    mode: 'now',
     timeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     picker: null,
 
     init() {
       const prefs = datePreferences();
       const iso = this.$refs.publishValue.value;
-      let initial = iso ? new Date(iso) : new Date();
-      if (isNaN(initial)) initial = new Date();
+      const saved = iso ? new Date(iso) : null;
+      const hasFutureDate = saved && !isNaN(saved) && saved.getTime() > Date.now() + 60 * 1000;
+      this.mode = hasFutureDate ? 'schedule' : 'now';
 
       this.$refs.display.placeholder = prefs.datetime_placeholder;
       this.picker = flatpickr(this.$refs.display, {
         enableTime: true,
         time_24hr: prefs.time_24hr,
         dateFormat: prefs.picker_datetime,
-        defaultDate: initial,
+        defaultDate: hasFutureDate ? saved : this.nextHour(),
+        minDate: 'today',
         allowInput: true,
         disableMobile: true, // keep the chosen format on phones too
         locale: { firstDayOfWeek: prefs.week_start },
-        onChange: (dates) => this.sync(dates[0]),
+        onChange: (dates) => {
+          if (this.mode === 'schedule' && dates[0]) this.sync(dates[0]);
+        },
       });
-      this.sync(initial);
+
+      this.sync(hasFutureDate ? saved : new Date());
     },
 
     destroy() {
       this.picker?.destroy();
     },
 
-    sync(date) {
-      if (date) this.$refs.publishValue.value = date.toISOString();
+    nextHour() {
+      const date = new Date();
+      date.setHours(date.getHours() + 1, 0, 0, 0);
+      return date;
     },
 
-    setNow() {
-      const now = new Date();
-      this.picker.setDate(now, false);
-      this.sync(now);
+    sync(date) {
+      this.$refs.publishValue.value = date.toISOString();
+    },
+
+    publishOnFinish() {
+      this.mode = 'now';
+      this.sync(new Date());
+    },
+
+    schedule() {
+      this.mode = 'schedule';
+      const date = this.picker.selectedDates[0] || this.nextHour();
+      this.picker.setDate(date, false);
+      this.sync(date);
+      this.$nextTick(() => this.picker.open());
     },
   };
 }
