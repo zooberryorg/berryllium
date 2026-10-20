@@ -213,6 +213,23 @@ class ModDependency(models.Model):
             return self.ref.title
         return self.title or self.external_url
 
+class ModLicense(models.Model):
+    """
+    A license applied to a mod.
+    """
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="licenses")
+    license = models.ForeignKey("shared.License", on_delete=models.PROTECT, related_name="mod_licenses")
+    context = models.CharField(max_length=300, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.license} on {self.mod_id}"
+
+
 class ModTag(models.Model):
     """
     Through model for Mod tags.
