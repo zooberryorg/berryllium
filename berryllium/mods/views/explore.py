@@ -105,3 +105,10 @@ def _active_filters(params, filters):
     for tag in filters["tags"]:
         active.append({"label": f"#{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
     return active
+
+def _category_counts(base):
+    return [
+        {"key": key, "label": label, "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder"),
+         "count": base.filter(_csv_has("category", key)).count()}
+        for key, label in MOD_CATEGORIES
+    ]
