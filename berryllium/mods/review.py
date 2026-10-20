@@ -47,11 +47,11 @@ def review_issues(mod):
 
     # Files
     if not (mod.files.exists() or (mod.is_external and mod.external_url)):
-        problems.append(_issue(mod, "mod_create_files", "Upload at least one file (or add an external download link)."))
-
-    # Recommended
+        problems.append(_issue(mod, "mod_create_files", "Upload at least one file."))
+    # Images
     if not mod.images.exists():
-        suggestions.append(_issue(mod, "mod_create_images", "Add screenshots so players can see what the mod does."))
+        problems.append(_issue(mod, "mod_create_images", "Upload at least one image."))
+    # Recommended    
     if not (mod.description or "").strip():
         suggestions.append(_issue(mod, "mod_create_description", "Add a description."))
     if not mod.licenses.exists():
