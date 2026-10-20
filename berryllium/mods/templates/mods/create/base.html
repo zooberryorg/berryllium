@@ -7,9 +7,12 @@
          hx-swap="innerHTML"
          hx-target="#upload-frame"
          hx-get="{{ initial_step_url }}"></div>
-    <div class="max-w-screen-xl mx-auto flex flex-row gap-8 px-4 py-8 items-start  max-h-max">
+    {# phones/tablets: scrollable row above the form #}
+    {# desktop: sidebar #}
+    <div class="max-w-screen-xl mx-auto flex flex-col lg:flex-row gap-4 lg:gap-8 px-2 sm:px-4 py-4 lg:py-8 items-stretch lg:items-start max-h-max">
         <div id="upload-sidebar"
-             class="rounded-2xl rounded-2xl bg-pine-600 backdrop-blur-sm px-4 py-6 border border-pine-300 min-w-[280px] flex-shrink-0  sticky top-25">
+             class="sticky top-25 rounded-2xl bg-pine-600 backdrop-blur-sm px-2 py-2 lg:px-4 lg:py-6 border border-pine-300 w-full lg:w-auto lg:min-w-[280px] flex-shrink-0"
+             style="z-index: 40;">
             {% include "mods/create/navigation.html" %}
         </div>
         <div id="upload-frame"

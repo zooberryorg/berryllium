@@ -2,11 +2,11 @@
 <div id="image-gallery">
     {% if cover_image %}
         <!-- cover image gets pinned above the gallery at the cover ratio -->
-        <div class="mx-6 mb-6">
+        <div class="mx-4 sm:mx-6 mb-6">
             {% include "mods/create/pictures/image_card.html" with image=cover_image ratio=cover_ratio is_cover=True %}
         </div>
     {% endif %}
-    <div class="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-6 mx-6 mb-6"
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mx-4 sm:mx-6 mb-6"
          {% include 'mods/create/pictures/sort_config.html' %}
          x-sort>
         {% for image in images %}
