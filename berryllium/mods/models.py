@@ -198,6 +198,20 @@ class ModDependency(models.Model):
     version = models.CharField(max_length=100, blank=True)
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
+    title = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.display_title
+
+    @property
+    def display_title(self):
+        if self.ref_id:
+            return self.ref.title
+        return self.title or self.external_url
 
 class ModTag(models.Model):
     """
