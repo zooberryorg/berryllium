@@ -114,10 +114,6 @@ class ModGeneralInfoForm(forms.ModelForm):
     thumbnail = forms.ImageField(
         required=True,
         label="Thumbnail / Logo",
-        help_text=(
-            f"Square (1:1), {MOD_THUMBNAIL_RECOMMENDED_SIZE} recommended, "
-            f"at least {MOD_THUMBNAIL_MIN_SIZE}px. JPG, PNG or WEBP."
-        ),
         widget=forms.FileInput(
             attrs={
                 "accept": ".jpg,.jpeg,.png,.webp",
