@@ -7,7 +7,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from berryllium import settings
-from berryllium.shared.models import Tag
+from berryllium.shared.models import Tag, BaseLink
 # from users.models import User
 # from tags.models import Tag
 
@@ -107,6 +107,7 @@ class Mod(models.Model):
     # form data
     use_file_groups = models.BooleanField(default=False)
     pending_tags = models.JSONField(default=list, blank=True)
+    languages = models.ManyToManyField("shared.Language", blank=True, related_name="mods")
 
     @property
     def files(self):
@@ -197,6 +198,63 @@ class ModDependency(models.Model):
     version = models.CharField(max_length=100, blank=True)
     is_external = models.BooleanField(default=False)
     external_url = models.URLField(blank=True)
+    title = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return self.display_title
+
+    @property
+    def display_title(self):
+        if self.ref_id:
+            return self.ref.title
+        return self.title or self.external_url
+
+class ModLicense(models.Model):
+    """
+    A license applied to a mod.
+    """
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="licenses")
+    license = models.ForeignKey("shared.License", on_delete=models.PROTECT, related_name="mod_licenses")
+    context = models.CharField(max_length=300, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.license} on {self.mod_id}"
+
+class ModAttribution(models.Model):
+    """
+    Credit for work used in a mod by people who weren't involved in making it,
+    for example "models sourced from XYZ" or "original textures by ABC".
+    """
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="attributions")
+    title = models.CharField(max_length=200)
+    url = models.URLField(max_length=500, blank=True)
+    authors = models.CharField(max_length=300)
+    note = models.TextField(blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:
+        ordering = ["order", "id"]
+
+    def __str__(self):
+        return f"{self.title} by {self.authors}"
+
+class ModLink(BaseLink):
+    """A link shown on a mod page (mirror, Discord, donations...)."""
+
+    mod = models.ForeignKey(Mod, on_delete=models.CASCADE, related_name="links")
+
+    class Meta(BaseLink.Meta):
+        pass
 
 class ModTag(models.Model):
     """

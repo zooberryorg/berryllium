@@ -1,0 +1,53 @@
+{% load static %}
+<!-- progress bar -->
+<div class="px-6 pt-6">
+    {% include "mods/create/progress_bar.html" with nav_item_count=nav_item_count current_nav_index=current_nav_index progress_range=progress_range remainder_range=remainder_range %}
+</div>
+<div class="flex gap-4 bg-pine-info-200 border border-pine-info-100 rounded-xl p-4 mx-6 mt-6">
+    <p class="p-3 text-granite-200">
+        Tell players what they need before installing, how your mod can be used, and who else deserves credit.
+        Everything on this page is optional.
+    </p>
+</div>
+<form hx-post="{% url 'mod_create_resources' mod_id=view.kwargs.mod_id %}"
+      hx-target="#upload-frame"
+      hx-swap="innerHTML"
+      hx-encoding="multipart/form-data">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <p class="text-red-400 text-sm px-6 pt-4">{{ form.non_field_errors.0 }}</p>
+    {% endif %}
+    <div class="p-6 space-y-6">
+        <section>
+            <h3 class="text-white font-semibold mb-1">Dependencies</h3>
+            <p class="text-white/50 text-xs mb-3">Mods or files players need to install first. Search mods on the site, or add one from elsewhere.</p>
+            {% include "shared/widgets/detail_picker.html" with field=form.dependencies config=form.dependencies_widget %}
+        </section>
+
+        <section class="pt-6 border-t border-white/10">
+            <h3 class="text-white font-semibold mb-1">Licenses</h3>
+            <p class="text-white/50 text-xs mb-3">How others may use your work. Add more than one if different parts are licensed differently.</p>
+            {% include "shared/widgets/detail_picker.html" with field=form.licenses config=form.licenses_widget %}
+        </section>
+
+        <section class="pt-6 border-t border-white/10">
+            <h3 class="text-white font-semibold mb-1">Languages</h3>
+            <p class="text-white/50 text-xs mb-3">Languages the mod's text is available in.</p>
+            {% include "shared/widgets/search_picker.html" with field=form.languages config=form.languages_picker %}
+        </section>
+
+        <section class="pt-6 border-t border-white/10">
+            <h3 class="text-white font-semibold mb-1">Additional credits</h3>
+            <p class="text-white/50 text-xs mb-3">Work you used from people who weren't involved in making the mod, e.g. a model or texture.</p>
+            {% include "shared/widgets/row_table.html" with field=form.attributions config=form.attributions_widget %}
+        </section>
+
+        <section class="pt-6 border-t border-white/10">
+            <h3 class="text-white font-semibold mb-1">Links</h3>
+            <p class="text-white/50 text-xs mb-3">Mirrors, community pages, donation pages. Paste a link and the type is filled in when it's recognised.</p>
+            {% include "shared/widgets/row_table.html" with field=form.links config=form.links_widget %}
+        </section>
+    </div>
+    {% include "mods/create/actions.html" %}
+</form>
+<style>[x-cloak] { display: none !important; }</style>
