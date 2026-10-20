@@ -1,130 +1,118 @@
 {% extends 'shared/explore/base.html' %}
 {% block explore_content %}
-    <div class="flex flex-row sm:flex-col lg:flex-row lg:items-start gap-6">
-        {# Sidebar #}
-        <aside class="lg:w-76 space-y-6 flex-shrink-0 self-start">
-            {# Categories card #}
-            {% include 'mods/explore/categories.html' %}
-            {% comment %} {# Tags card #}
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <div class="rounded-2xl px-4">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="flex items-center gap-3 mb-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                <h3 class="text-lg font-bold text-white">Tags</h3>
-                                                                                                                                                                                                                                                                                                                                                                                                                                    </div>
-            
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {# Tag search #}
-                                                                                                                                                                                                                                                                                                                                                                                                                                    {% url 'search' as search_url %}
-                                                                                                                                                                                                                                                                                                                                                                                                                                    <div class="relative mb-6">
-                                                                                                                                                                                                                                                                                                                                                                                                                                        <input type="text"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               name="tag_search"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               placeholder="Search tags..."
-                                                                                                                                                                                                                                                                                                                                                                                                                                               class="zb-input pl-12"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               hx-post="{{ search_url }}"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               hx-trigger="keyup changed delay:500ms"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               hx-target="#tag-results"
-                                                                                                                                                                                                                                                                                                                                                                                                                                               hx-include="this">
-                <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
-            </div>
-            
-            {# Tags display #}
-            <div id="tag-results">
-                {% include 'tags.html' with tags=all_tags %}
-            </div>
-</div> {% endcomment %}
-</aside>
-{# Main content area #}
-<main class="flex-1 min-w-0 space-y-6">
-    {# Search bar #}
-    <div class="rounded-2xl">
-        <div class="relative">
-            <input type="text"
-                   name="mod_search"
-                   placeholder="Search mods by name, author, or description..."
-                   class="zb-input pl-12 pr-12 text-sm"
-                   hx-post="{% url 'search_mods' %}"
-                   hx-trigger="keyup changed delay:500ms"
-                   hx-target="#mod-results"
-                   hx-include="this">
-            <i class="bi bi-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl"></i>
-            <button class="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors">
-                <i class="bi bi-x-lg text-xl"></i>
+    {% comment %}
+    one GET form holds every filter (sidebar, search, selects). Any change re-requests the results.
+    {% endcomment %}
+    <form id="explore-filters"
+          method="get"
+          action="{% url 'explore_mods' %}"
+          hx-get="{% url 'explore_mods' %}"
+          hx-target="#mod-results"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
+          x-data="{
+              showFilters: false,
+              q: '{{ filters.q|escapejs }}',
+              view: (() => { try { return localStorage.getItem('exploreView') || 'grid' } catch { return 'grid' } })(),
+              setView(value) { this.view = value; try { localStorage.setItem('exploreView', value) } catch {} },
+          }"
+          class="flex flex-col lg:flex-row lg:items-start gap-6">
+
+        {# ---------------- sidebar ---------------- #}
+        <div class="lg:w-72 flex-shrink-0">
+            <button type="button"
+                    class="lg:hidden w-full zb-action flex items-center justify-center gap-2 mb-3"
+                    @click="showFilters = !showFilters"
+                    :aria-expanded="showFilters">
+                <i class="bi bi-funnel"></i>
+                <span x-text="showFilters ? 'Hide categories & tags' : 'Categories & tags'"></span>
             </button>
+            <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
+                {% include 'mods/explore/categories.html' %}
+                {% include 'mods/explore/tags.html' %}
+            </aside>
         </div>
-    </div>
-    {# Filters Bar #}
-    {% include 'mods/explore/filters.html' %}
-    {# Results count and view toggle #}
-    <div class="flex items-center justify-between">
-        <div class="text-gray-400">
-            <span class="text-white font-semibold">1,247</span> mods found
-        </div>
-        <div class="flex items-center gap-2">
-            <button class="w-10 h-10 rounded-lg bg-pine-700 text-white flex items-center justify-center transition-all duration-200 hover:bg-pine-800">
-                <i class="bi bi-grid-3x3-gap-fill"></i>
-            </button>
-            <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 flex items-center justify-center transition-all duration-200 hover:bg-[#5a6a5b]/50 hover:text-white cursor-pointer">
-                <i class="bi bi-list-ul"></i>
-            </button>
-        </div>
-    </div>
-    {# Search results #}
-    <div id="mod-results">{% include 'search_results/mod_results.html' %}</div>
-    {# Pagination (hardcoded for now) #}
-    <div>
-        <div class="flex items-center justify-between">
-            <button class="px-6 py-3 rounded-full bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-medium transition-all duration-200 border border-[#5a6a5b]/50 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
-                    disabled>
-                <i class="bi bi-chevron-left mr-2"></i>
-                Previous
-            </button>
-            <div class="flex items-center gap-2">
-                <button class="w-10 h-10 rounded-lg bg-pine-700 text-white font-semibold transition-all duration-200">1</button>
-                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
-                    2
-                </button>
-                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
-                    3
-                </button>
-                <span class="text-gray-500 px-2">...</span>
-                <button class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-semibold transition-all duration-200 cursor-pointer">
-                    25
+
+        {# ---------------- main ---------------- #}
+        <div class="flex-1 min-w-0 space-y-4">
+            {# search #}
+            <div class="relative">
+                <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none"></i>
+                <input type="search"
+                       id="explore-search"
+                       name="q"
+                       value="{{ filters.q }}"
+                       placeholder="Search mods by name, author, tag or description..."
+                       autocomplete="off"
+                       x-model="q"
+                       class="zb-input pl-12 pr-12 text-sm w-full">
+                <button type="button"
+                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                        x-show="q"
+                        x-cloak
+                        aria-label="Clear search"
+                        @click="exploreClearFilter('q')">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
-            <button class="px-6 py-3 rounded-full bg-[#4a5a4b]/50 text-gray-400 hover:bg-[#5a6a5b]/50 hover:text-white font-medium transition-all duration-200 border border-[#5a6a5b]/50 flex items-center cursor-pointer">
-                Next
-                <i class="bi bi-chevron-right ml-2"></i>
-            </button>
+
+            {% include 'mods/explore/filters.html' %}
+
+            {# results: replaced by htmx on every filter change #}
+            <div id="mod-results" aria-live="polite">
+                {% include 'mods/explore/results.html' %}
+            </div>
         </div>
-    </div>
-</main>
-</div>
-<script>
-// View toggle functionality
-document.addEventListener('DOMContentLoaded', function() {
-    const gridView = document.querySelector('.bi-grid-3x3-gap-fill').closest('button');
-    const listView = document.querySelector('.bi-list-ul').closest('button');
-    const resultsContainer = document.getElementById('mod-results');
-    
-    gridView?.addEventListener('click', function() {
-        // Switch to grid view
-        gridView.classList.add('bg-amber-600', 'text-white');
-        gridView.classList.remove('bg-[#4a5a4b]/50', 'text-gray-400');
-        listView.classList.add('bg-[#4a5a4b]/50', 'text-gray-400');
-        listView.classList.remove('bg-amber-600', 'text-white');
-        
-        resultsContainer?.classList.add('grid-view');
-        resultsContainer?.classList.remove('list-view');
-    });
-    
-    listView?.addEventListener('click', function() {
-        // Switch to list view
-        listView.classList.add('bg-amber-600', 'text-white');
-        listView.classList.remove('bg-[#4a5a4b]/50', 'text-gray-400');
-        gridView.classList.add('bg-[#4a5a4b]/50', 'text-gray-400');
-        gridView.classList.remove('bg-amber-600', 'text-white');
-        
-        resultsContainer?.classList.add('list-view');
-        resultsContainer?.classList.remove('grid-view');
-    });
-});
-</script>
+    </form>
+
+    <script>
+        // clear a filter (search, select, checkbox, radio) and trigger the htmx request
+        function exploreClearFilter(name, value) {
+            const form = document.getElementById('explore-filters');
+            if (!form) return;
+            const controls = Array.from(form.elements).filter((el) => el.name && (!name || el.name === name));
+            for (const el of controls) {
+                if (el.type === 'radio') {
+                    if (el.value === '' && !el.checked) {
+                        el.checked = true;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } else if (el.type === 'checkbox') {
+                    if (el.checked && (value === undefined || value === '' || el.value === value)) {
+                        el.checked = false;
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } else if (el.tagName === 'SELECT') {
+                    if (el.name !== 'sort' && el.value !== '') {
+                        el.value = '';
+                        el.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                } else if (el.value !== '') {
+                    // text search: an input event updates x-model and the search trigger
+                    el.value = '';
+                    el.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* selected category / tag (the radio or checkbox inside is checked) */
+        .explore-option:has(input:checked) {
+            color: #fff;
+            border-color: color-mix(in oklab, var(--color-gold-300) 30%, transparent);
+            background-image: linear-gradient(to right,
+                color-mix(in oklab, var(--color-gold-500) 50%, transparent),
+                color-mix(in oklab, var(--color-gold-300) 50%, transparent));
+        }
+        .explore-option:has(input:checked) .explore-option-icon { color: var(--color-gold-300); }
+        .explore-tag:has(input:checked) {
+            color: var(--color-pine-500);
+            background-color: var(--color-gold-400);
+            border-color: var(--color-gold-400);
+        }
+        .explore-option:has(input:focus-visible),
+        .explore-tag:has(input:focus-visible) { outline: 2px solid var(--color-gold-400); outline-offset: 2px; }
+    </style>
 {% endblock %}
