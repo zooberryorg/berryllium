@@ -9,7 +9,7 @@ UPLOAD_NAVIGATION = [
     {"name": "Upload Images", "url": "mod_create_images", "icon": "image"},
     {"name": "Description", "url": "mod_create_description", "icon": "file-text"},
     {"name": "Resources & Credits", "url": "mod_create_resources", "icon": "diagram-3"},
-    {"name": "Review & Submit", "url": "mod_create_description", "icon": "check-circle"},
+    {"name": "Review & Submit", "url": "mod_create_review", "icon": "check-circle"},
 ]
 
 MIN_TEXTFIELD_LENGTH = 4
