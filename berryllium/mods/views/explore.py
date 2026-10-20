@@ -87,3 +87,21 @@ def _apply_filters(queryset, filters):
     for tag in filters["tags"]:
         queryset = queryset.filter(tags__name=tag)
     return queryset.order_by(*SORTS[filters["sort"]][1])
+
+def _active_filters(params, filters):
+    """Pills shown above the results, each with the URL that removes it."""
+    active = []
+    if filters["q"]:
+        active.append({"label": f'"{filters["q"]}"', "name": "q", "value": "", "url": _remove_url(params, "q")})
+    if filters["category"]:
+        active.append({"label": dict(MOD_CATEGORIES)[filters["category"]], "name": "category", "value": "",
+                       "url": _remove_url(params, "category")})
+    if filters["game"]:
+        active.append({"label": dict(GAME_OPTIONS)[filters["game"]], "name": "game", "value": "",
+                       "url": _remove_url(params, "game")})
+    if filters["period"]:
+        active.append({"label": PERIODS[filters["period"]][0], "name": "period", "value": "",
+                       "url": _remove_url(params, "period")})
+    for tag in filters["tags"]:
+        active.append({"label": f"#{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
+    return active
