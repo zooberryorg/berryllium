@@ -20,8 +20,8 @@
     <div class="p-6 space-y-6">
         <section>
             <h3 class="text-white font-semibold mb-1">Dependencies</h3>
-            <p class="text-white/50 text-xs mb-3">Mods or files players need to install first. Search mods on the site, or add one from elsewhere.</p>
-            {% include "shared/widgets/detail_picker.html" with field=form.dependencies config=form.dependencies_widget %}
+            <p class="text-white/50 text-xs mb-3">Mods or files players need to install first. Search mods on the site, or add one from elsewhere. Drag to reorder.</p>
+            {% include "shared/widgets/detail_picker.html" with field=form.dependencies config=form.dependencies_widget sortable=True %}
         </section>
 
         <section class="pt-6 border-t border-white/10">
@@ -38,16 +38,16 @@
 
         <section class="pt-6 border-t border-white/10">
             <h3 class="text-white font-semibold mb-1">Additional credits</h3>
-            <p class="text-white/50 text-xs mb-3">Work you used from people who weren't involved in making the mod, e.g. a model or texture.</p>
-            {% include "shared/widgets/row_table.html" with field=form.attributions config=form.attributions_widget %}
+            <p class="text-white/50 text-xs mb-3">Work you used from people who weren't involved in making the mod, e.g. a model or texture. Drag to reorder.</p>
+            {% include "shared/widgets/row_table.html" with field=form.attributions config=form.attributions_widget layout="attribution" sortable=True %}
         </section>
 
         <section class="pt-6 border-t border-white/10">
             <h3 class="text-white font-semibold mb-1">Links</h3>
-            <p class="text-white/50 text-xs mb-3">Mirrors, community pages, donation pages. Paste a link and the type is filled in when it's recognised.</p>
-            {% include "shared/widgets/row_table.html" with field=form.links config=form.links_widget %}
+            <p class="text-white/50 text-xs mb-3">Mirrors, community pages, donation pages. Paste a link and the type is filled in when it's recognised. Drag to reorder.</p>
+            {% include "shared/widgets/row_table.html" with field=form.links config=form.links_widget layout="link" sortable=True %}
         </section>
     </div>
     {% include "mods/create/actions.html" %}
 </form>
-<style>[x-cloak] { display: none !important; }</style>
+{% include "shared/widgets/sort_styles.html" %}
