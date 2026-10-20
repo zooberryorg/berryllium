@@ -27,7 +27,9 @@ from berryllium.mods.services import (
     image_gallery_context,
 )
 from berryllium.mods.settings import UPLOAD_NAVIGATION
-
+from berryllium.mods.pickers import publish_mod
+from berryllium.mods.review import review_context
+from berryllium.shared.models import Language
 
 class DraftModMixin:
     """Loads the mod from the URL's mod_id and checks this session created it."""
@@ -109,7 +111,10 @@ class ModDraftView(LoginRequiredMixin, CreateView):
         form.instance.uploaded_by = self.request.user
         response = super().form_valid(form)
         form.save_relations()
-        draft_ids = self.request.session.get("draft_ids", [])
+        english = Language.objects.filter(code="en").first()
+        if english:
+            self.object.languages.add(english)        
+            draft_ids = self.request.session.get("draft_ids", [])
         draft_ids.append(self.object.id)
         self.request.session["draft_ids"] = draft_ids
         self.request.session["session_id"] = self.object.id
