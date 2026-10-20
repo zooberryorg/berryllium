@@ -110,3 +110,7 @@ class License(models.Model):
 
     def __str__(self):
         return self.short_name or self.name
+
+def language_icon_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"language_icons/{uuid.uuid4().hex}{ext}"
