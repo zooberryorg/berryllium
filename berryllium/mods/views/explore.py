@@ -39,3 +39,14 @@ def published_mods():
 def _csv_has(field, key):
     """Match one key in a comma-separated field like category="animals, scripts"."""
     return Q(**{f"{field}__regex": rf"(^|,\s*){re.escape(key)}(\s*,|$)"})
+
+def _remove_url(params, key, value=None):
+    """The current query string without one filter (and without the page number)."""
+    query = params.copy()
+    query.pop("page", None)
+    if value is None:
+        query.pop(key, None)
+    else:
+        query.setlist(key, [v for v in query.getlist(key) if v != value])
+    encoded = query.urlencode()
+    return f"?{encoded}" if encoded else "?"
