@@ -106,3 +106,16 @@ class MemberLoginForm(forms.Form):
             }
         ),
     )
+
+
+
+class MemberPreferencesForm(forms.ModelForm):
+    """
+    Display preferences for the user settings page.
+    Usage: MemberPreferencesForm(request.POST or None, instance=request.user)
+    """
+
+    class Meta:
+        model = Member
+        fields = ["date_format", "time_format"]
+        labels = {"date_format": "Date format", "time_format": "Time format"}
