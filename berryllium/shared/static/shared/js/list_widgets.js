@@ -12,6 +12,16 @@ function extendComponent(base, extra) {
   return result;
 }
 
+function mirrorInputValues(element) {
+  element.querySelectorAll('input').forEach((input) => input.setAttribute('value', input.value));
+  element.querySelectorAll('textarea').forEach((textarea) => {
+    textarea.textContent = textarea.value;
+  });
+  element.querySelectorAll('select').forEach((select) => {
+    Array.from(select.options).forEach((option) => option.toggleAttribute('selected', option.selected));
+  });
+}
+
 function withoutUid(rows) {
   return rows.map(({ uid, ...rest }) => rest);
 }
