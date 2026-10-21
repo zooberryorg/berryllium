@@ -32,6 +32,8 @@ urlpatterns = [
     ),
     # ---------------------------------------------- Explore mods (READ)
     path("explore/mods/", explore.mods, name="explore_mods"),
+    path("explore/search/tags/", explore.search_tags, name="explore_search_tags"),
+    path("explore/search/dependencies/", explore.search_dependencies, name="explore_search_dependencies"),
     # ---------------------------------------------- Session management
     path("mods/create/cancel/", create.cancel_mod_upload, name="cancel_mod_upload"),
     # ---------------------------------------------- HTMX endpoints
