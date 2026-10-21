@@ -2,22 +2,22 @@
     <legend class="sr-only">Category</legend>
     <h3 class="text-lg font-bold text-white px-4 pt-2 mb-3">Categories</h3>
     <div class="space-y-1 text-sm">
-        <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-gold-500/50 hover:to-gold-300/50 transition-all duration-200 border border-transparent hover:border-gold-300/30 cursor-pointer">
+        <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-transparent transition-[color,background-color] duration-150 cursor-pointer">
             <input type="radio" name="category" value="" class="sr-only" {% if not filters.category %}checked{% endif %}>
-            <span class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-gold-400/20 transition-colors">
-                <i class="explore-option-icon bi bi-grid text-gray-400 text-sm group-hover:text-gold-300 transition-colors"></i>
+            <span class="w-8 h-8 rounded-lg flex items-center justify-center">
+                <i class="explore-option-icon bi bi-grid text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i>
             </span>
             <span class="flex-1">All categories</span>
-            <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full group-hover:bg-gold-400/20">{{ total_published }}</span>
+            <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ total_published }}</span>
         </label>
         {% for category in categories %}
-            <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-gradient-to-r hover:from-gold-500/50 hover:to-gold-300/50 transition-all duration-200 border border-transparent hover:border-gold-300/30 cursor-pointer">
+            <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-transparent transition-[color,background-color] duration-150 cursor-pointer">
                 <input type="radio" name="category" value="{{ category.key }}" class="sr-only" {% if filters.category == category.key %}checked{% endif %}>
-                <span class="w-8 h-8 rounded-lg flex items-center justify-center group-hover:bg-gold-400/20 transition-colors">
-                    <i class="explore-option-icon bi {{ category.icon }} text-gray-400 text-sm group-hover:text-gold-300 transition-colors"></i>
+                <span class="w-8 h-8 rounded-lg flex items-center justify-center">
+                    <i class="explore-option-icon bi {{ category.icon }} text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i>
                 </span>
                 <span class="flex-1">{{ category.label }}</span>
-                <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full group-hover:bg-gold-400/20">{{ category.count }}</span>
+                <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ category.count }}</span>
             </label>
         {% endfor %}
     </div>
