@@ -87,6 +87,7 @@ MOD_CATEGORY_ICONS = {
     "texture_variants": "bi-palette",
     "texture_replacements": "bi-image",
     "gameplay_tweaks": "bi-gear-fill",
+    "remakes": "bi-arrow-clockwise",
     "scripts": "bi-code-slash",
     "zoos_and_saves": "bi-map",
     "assets": "bi-archive",
