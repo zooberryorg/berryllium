@@ -1,0 +1,88 @@
+{# active filters #}
+{% if active_filters %}
+    <div class="flex items-center gap-2 flex-wrap mb-4 text-sm">
+        <span class="text-gray-400">Filters:</span>
+        {% for item in active_filters %}
+            <a href="{{ item.url }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-400/15 text-gold-200 border border-gold-400/30 hover:border-gold-400/60 transition-colors"
+               onclick="event.preventDefault(); exploreClearFilter('{{ item.name|escapejs }}', '{{ item.value|escapejs }}')"
+               aria-label="Remove filter {{ item.label }}">
+                {{ item.label }} <i class="bi bi-x"></i>
+            </a>
+        {% endfor %}
+        <button type="button" class="text-gray-400 hover:text-white underline underline-offset-2 cursor-pointer"
+                onclick="exploreClearFilter()">Clear all</button>
+    </div>
+{% endif %}
+
+{# count #}
+<p class="text-gray-400 text-sm mb-4">
+    <span class="text-white font-semibold">{{ page.paginator.count }}</span> mod{{ page.paginator.count|pluralize }} found
+</p>
+
+{% if page.object_list %}
+    <div :class="view === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'">
+        {% for mod in page.object_list %}
+            {% include 'mods/explore/mod_card.html' %}
+        {% endfor %}
+    </div>
+
+    {# pagination #}
+    {% if page.paginator.num_pages > 1 %}
+        <nav class="flex items-center justify-between gap-2 mt-6" aria-label="Pages">
+            {% if page.has_previous %}
+                <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}"
+                   hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}"
+                   hx-target="#mod-results" hx-push-url="true"
+                   class="px-5 py-2.5 rounded-full bg-[#4a5a4b]/50 text-gray-300 hover:text-white border border-[#5a6a5b]/50 flex items-center gap-2">
+                    <i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span>
+                </a>
+            {% else %}
+                <span class="px-5 py-2.5 rounded-full bg-[#4a5a4b]/30 text-gray-500 border border-[#5a6a5b]/30 flex items-center gap-2 cursor-not-allowed">
+                    <i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span>
+                </span>
+            {% endif %}
+
+            <div class="flex items-center gap-1">
+                {% for number in page_range %}
+                    {% if number == page.paginator.ELLIPSIS %}
+                        <span class="text-gray-500 px-2">…</span>
+                    {% elif number == page.number %}
+                        <span class="w-10 h-10 rounded-lg bg-gold-400 text-pine-500 font-semibold flex items-center justify-center" aria-current="page">{{ number }}</span>
+                    {% else %}
+                        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}"
+                           hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}"
+                           hx-target="#mod-results" hx-push-url="true"
+                           class="w-10 h-10 rounded-lg bg-[#4a5a4b]/50 text-gray-400 hover:text-white font-semibold flex items-center justify-center">{{ number }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            {% if page.has_next %}
+                <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}"
+                   hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}"
+                   hx-target="#mod-results" hx-push-url="true"
+                   class="px-5 py-2.5 rounded-full bg-[#4a5a4b]/50 text-gray-300 hover:text-white border border-[#5a6a5b]/50 flex items-center gap-2">
+                    <span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i>
+                </a>
+            {% else %}
+                <span class="px-5 py-2.5 rounded-full bg-[#4a5a4b]/30 text-gray-500 border border-[#5a6a5b]/30 flex items-center gap-2 cursor-not-allowed">
+                    <span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i>
+                </span>
+            {% endif %}
+        </nav>
+    {% endif %}
+{% else %}
+    {# empty states #}
+    <div class="rounded-2xl border border-white/10 bg-pine-700/60 p-10 text-center">
+        <i class="bi bi-search text-4xl text-white/30"></i>
+        {% if has_any_mods %}
+            <p class="text-white font-semibold mt-4">No mods match these filters.</p>
+            <p class="text-gray-400 text-sm mt-1">Try a different search or remove a filter.</p>
+            <button type="button" class="zb-action mt-4 cursor-pointer" onclick="exploreClearFilter()">Clear all filters</button>
+        {% else %}
+            <p class="text-white font-semibold mt-4">No mods have been published yet.</p>
+            <p class="text-gray-400 text-sm mt-1">Published mods will show up here.</p>
+        {% endif %}
+    </div>
+{% endif %}

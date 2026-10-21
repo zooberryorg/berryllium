@@ -1,0 +1,57 @@
+{% comment %}
+TODO: link the title to the mod page once it exists.
+{% endcomment %}
+<article class="group/card rounded-2xl border border-white/10 bg-pine-700 hover:border-gold-400/40 hover:shadow-lg transition-all duration-200 overflow-hidden"
+         :class="view === 'list' ? 'flex items-center gap-4 p-3' : 'flex flex-col'">
+
+    <div class="relative" x-show="view !== 'list'">
+        <div class="w-full bg-gradient-to-br from-pine-500 to-pine-800" style="aspect-ratio: 3 / 1;">
+            {% if mod.cover %}
+                <img src="{{ mod.cover.image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+            {% endif %}
+        </div>
+        <div class="absolute left-4 -bottom-8 w-16 h-16 rounded-xl overflow-hidden border-2 border-pine-700 bg-pine-800 shadow-lg">
+            {% if mod.thumbnail %}
+                <img src="{{ mod.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+            {% else %}
+                <span class="w-full h-full flex items-center justify-center text-white/30"><i class="bi bi-puzzle text-2xl"></i></span>
+            {% endif %}
+        </div>
+    </div>
+
+    {# list: small square thumbnail #}
+    <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-pine-800" x-show="view === 'list'" x-cloak>
+        {% if mod.thumbnail %}
+            <img src="{{ mod.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+        {% else %}
+            <span class="w-full h-full flex items-center justify-center text-white/30"><i class="bi bi-puzzle text-2xl"></i></span>
+        {% endif %}
+    </div>
+
+    {# text #}
+    <div class="flex-1 min-w-0" :class="view === 'list' ? '' : 'px-4 pt-10 pb-4'">
+        <h3 class="text-white font-semibold truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
+        <p class="text-xs text-gray-400 truncate">
+            {% if mod.uploaded_by %}by {{ mod.uploaded_by.username }}{% endif %}
+            {% if mod.is_archived_file %}<span class="ml-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60">Archived</span>{% endif %}
+        </p>
+        <p class="text-sm text-granite-200 mt-2" :class="view === 'list' ? 'truncate' : 'line-clamp-2'" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
+
+        <div class="flex flex-wrap gap-1 mt-3" x-show="view !== 'list'">
+            {% for label in mod.game_labels %}
+                <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
+            {% endfor %}
+            {% for label in mod.category_labels|slice:":2" %}
+                <span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">{{ label }}</span>
+            {% endfor %}
+        </div>
+    </div>
+
+    {# stats #}
+    <div class="flex items-center gap-4 text-xs text-gray-400"
+         :class="view === 'list' ? 'shrink-0 pr-2' : 'px-4 py-3 border-t border-white/5'">
+        <span title="Downloads"><i class="bi bi-download"></i> {{ mod.download_count }}</span>
+        <span title="Likes"><i class="bi bi-heart"></i> {{ mod.like_count }}</span>
+        <span class="ml-auto" title="Published">{{ mod.publish_date|date:date_prefs.date }}</span>
+    </div>
+</article>

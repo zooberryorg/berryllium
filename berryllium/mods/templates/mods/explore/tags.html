@@ -1,0 +1,24 @@
+<fieldset class="rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300">
+    <legend class="sr-only">Tags</legend>
+    <h3 class="text-lg font-bold text-white px-4 pt-2 mb-3">Popular tags</h3>
+    {% if popular_tags or filters.tags %}
+        <div class="flex flex-wrap gap-2 px-3 pb-3 text-sm">
+            {% for tag in popular_tags %}
+                <label class="explore-tag inline-flex items-center gap-1 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-white/80 hover:border-gold-400/50 hover:text-white cursor-pointer transition-colors">
+                    <input type="checkbox" name="tag" value="{{ tag.name }}" class="sr-only" {% if tag.name in filters.tags %}checked{% endif %}>
+                    {{ tag.name }} <span class="text-xs opacity-60">{{ tag.uses }}</span>
+                </label>
+            {% endfor %}
+            {% for name in filters.tags %}
+                {% if name not in popular_tag_names %}
+                    <label class="explore-tag inline-flex items-center gap-1 px-3 py-1 rounded-full border border-white/15 bg-white/5 text-white/80 cursor-pointer">
+                        <input type="checkbox" name="tag" value="{{ name }}" class="sr-only" checked>
+                        {{ name }}
+                    </label>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% else %}
+        <p class="text-sm text-white/40 px-4 pb-3">No tags yet.</p>
+    {% endif %}
+</fieldset>

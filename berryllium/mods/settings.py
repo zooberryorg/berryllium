@@ -77,3 +77,18 @@ EXPANSION_REQUIREMENTS = [
     ("mm2", "Marine Mania 2"),
     ("ea", "Extinct Animals"),
 ]
+
+MOD_CATEGORY_ICONS = {
+    "animals": "bi-emoji-smile",
+    "animal_needs": "bi-heart-fill",
+    "props_and_structures": "bi-building",
+    "packs": "bi-box-seam",
+    "utilities": "bi-tools",
+    "texture_variants": "bi-palette",
+    "texture_replacements": "bi-image",
+    "gameplay_tweaks": "bi-gear-fill",
+    "remakes": "bi-arrow-clockwise",
+    "scripts": "bi-code-slash",
+    "zoos_and_saves": "bi-map",
+    "assets": "bi-archive",
+}
