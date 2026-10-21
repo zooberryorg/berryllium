@@ -15,15 +15,14 @@
         {% endif %}
     </div>
 
-    <div class="flex gap-3 px-4 pt-4">
-        {% include 'mods/explore/mod_logo.html' with logo_class="w-14 h-14 rounded-xl" %}
-        <div class="min-w-0 flex-1">
-            <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
-            {% if mod.uploaded_by %}
-                <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
-            {% endif %}
-            <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
-        </div>
+    <div class="px-4 pt-4 min-w-0">
+        <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">
+            <a href="{% url 'mod_detail' mod.pk %}" class="hover:text-gold-200 focus-visible:outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline-2 focus-visible:after:outline-gold-400 focus-visible:after:outline-offset-2">{{ mod.title }}</a>
+        </h3>
+        {% if mod.uploaded_by %}
+            <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+        {% endif %}
+        <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
     </div>
 
     {# categorization #}
