@@ -149,7 +149,7 @@ def _license_counts():
             filter=Q(mod_licenses__mod__draft=False, mod_licenses__mod__publish_date__lte=now),
             distinct=True,
         )
-    ).filter(Q(is_enabled=True) | Q(count__gt=0))
+    ).filter(count__gt=0)
     return [
         {"key": str(item.pk), "label": item.short_name or item.name, "title": item.name, "count": item.count}
         for item in licenses.order_by("name")
