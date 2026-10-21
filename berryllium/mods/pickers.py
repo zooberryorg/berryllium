@@ -4,7 +4,7 @@ Backend for the search picker fields used in several fields.
 Each pill is submitted as one hidden input, so a picker field receives a list of
 string values:
 
-    people (collaborators / original authors)
+    collaborators / original authors:
         "m:<member id>"    a site member
         "a:<author id>"    an existing Author without an account
         "new:<name>"       a new author, created only when the mod is published
@@ -21,6 +21,7 @@ from django.db import transaction
 from django.utils import timezone
 
 from berryllium.mods.models import ModCredit, ModTag
+from berryllium.shared.fields import proper_case
 from berryllium.shared.models import ArchivedWebsite, Tag
 from berryllium.users.models import Author
 
@@ -170,8 +171,8 @@ def website_items_from_values(values):
     return [website_item(websites[i]) for i in ids if i in websites]
 
 def normalize_tag(name):
-    """ "  Big   Cats " -> "big cats" """
-    return " ".join(name.split()).lower()[:MAX_TAG_LENGTH]
+    """ "  Big   Cats " -> "Big Cats" """
+    return proper_case(name)[:MAX_TAG_LENGTH]
 
 
 def tag_item(tag):
@@ -241,6 +242,7 @@ def publish_mod(mod):
             credit.save(update_fields=["author", "pending_name"])
 
         for name in mod.pending_tags:
+            name = normalize_tag(name)
             tag = Tag.objects.filter(name__iexact=name).first() or Tag.objects.create(name=name)
             ModTag.objects.get_or_create(mod=mod, tag=tag)
         mod.pending_tags = []
