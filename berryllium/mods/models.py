@@ -15,9 +15,10 @@ from berryllium.shared.models import Tag, BaseLink
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
-def mod_thumbnail_path(instance, filename):
+def mod_logo_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
-    return f"mod_thumbnails/{uuid.uuid4().hex}{ext}"
+    return f"mod_logos/{uuid.uuid4().hex}{ext}"
+    mod_thumbnail_path = mod_logo_path
 
 class Mod(models.Model):
     """
@@ -27,6 +28,7 @@ class Mod(models.Model):
     - title: the name of the mod
     - category: mod category (e.g. animals, buildings, etc.)
     - summary: short summary of the mod
+    - logo: square (1:1) image that identifies the mod    
     - is_external: whether the mod is an external link instead of a file upload
     - external_url: if is_external is true, the url of the mod
     - game: the game the mod is for (zt1 or zt2 for now)
@@ -57,7 +59,7 @@ class Mod(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     category = models.CharField(max_length=100, blank=True, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
-    thumbnail = models.ImageField(upload_to=mod_thumbnail_path, blank=True)
+    logo = models.ImageField(upload_to=mod_logo_path, blank=True)
 
     # is mod a directory link instead of a file upload?
     is_external = models.BooleanField(default=False, db_index=True)
@@ -384,7 +386,7 @@ class ModImage(models.Model):
     caption = models.CharField(max_length=255, blank=True)
     order = models.PositiveIntegerField(default=0)
     uploaded_by = models.CharField(max_length=255, blank=True)  # change to user later
-    is_cover = models.BooleanField(default=False)
+    is_thumbnail = models.BooleanField(default=False)
 
     class Meta:
         ordering = ["order", "id"]
