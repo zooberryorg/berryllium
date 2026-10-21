@@ -99,7 +99,15 @@ def _apply_filters(queryset, filters):
         days = PERIODS[filters["period"]][1]
         queryset = queryset.filter(publish_date__gte=timezone.now() - timedelta(days=days))
     for tag in filters["tags"]:
-        queryset = queryset.filter(tags__name=tag)
+        queryset = queryset.filter(tags__name__iexact=tag)
+    for value in filters["depends"]:
+        if value.startswith(EXTERNAL_PREFIX):
+            deps = ModDependency.objects.filter(is_external=True, external_url=value[len(EXTERNAL_PREFIX):])
+        else:
+            deps = ModDependency.objects.filter(is_external=False, ref_id=int(value))
+        queryset = queryset.filter(pk__in=deps.values("parent_id"))
+    if filters["license"]:
+        queryset = queryset.filter(pk__in=ModLicense.objects.filter(license_id=int(filters["license"])).values("mod_id"))
     return queryset.order_by(*SORTS[filters["sort"]][1])
 
 def _active_filters(params, filters):
