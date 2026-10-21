@@ -46,10 +46,11 @@
                        value="{{ filters.q }}"
                        placeholder="Search mods by name, author, tag or description..."
                        autocomplete="off"
+                       aria-label="Search mods"
                        x-model="q"
                        class="zb-input pl-12 pr-12 text-sm w-full">
                 <button type="button"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                        class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
                         x-show="q"
                         x-cloak
                         aria-label="Clear search"
