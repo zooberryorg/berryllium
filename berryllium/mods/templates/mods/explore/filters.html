@@ -1,34 +1,14 @@
 <div class="flex flex-col sm:flex-row sm:items-center gap-3 text-sm">
     <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 flex-1">
-        <label class="relative group">
-            <span class="sr-only">Sort by</span>
-            <select name="sort" class="zb-input w-full sm:w-auto pr-10 cursor-pointer sm:min-w-[200px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/80">
-                {% for key, label in sort_options %}
-                    <option value="{{ key }}" {% if filters.sort == key %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <i class="bi bi-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors"></i>
-        </label>
-        <label class="relative group">
-            <span class="sr-only">Game</span>
-            <select name="game" class="zb-input w-full sm:w-auto pr-10 cursor-pointer sm:min-w-[180px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/80">
-                <option value="">Any game</option>
-                {% for key, label in game_options %}
-                    <option value="{{ key }}" {% if filters.game == key %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <i class="bi bi-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors"></i>
-        </label>
-        <label class="relative group">
-            <span class="sr-only">Published</span>
-            <select name="period" class="zb-input w-full sm:w-auto pr-10 cursor-pointer sm:min-w-[160px] bg-pine-700 hover:bg-pine-700/50 transition-all duration-200 appearance-none text-pine-100/80">
-                <option value="">All time</option>
-                {% for key, label in period_options %}
-                    <option value="{{ key }}" {% if filters.period == key %}selected{% endif %}>{{ label }}</option>
-                {% endfor %}
-            </select>
-            <i class="bi bi-chevron-down pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 group-hover:text-white transition-colors"></i>
-        </label>
+        <div class="sm:min-w-[200px]">
+            {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=filters.sort icon="bi-sort-down" %}
+        </div>
+        <div class="sm:min-w-[180px]">
+            {% include 'shared/widgets/dropdown.html' with name="game" label="Game" options=game_options selected=filters.game empty_label="Any game" icon="bi-controller" clearable="true" %}
+        </div>
+        <div class="sm:min-w-[160px]">
+            {% include 'shared/widgets/dropdown.html' with name="period" label="Published" options=period_options selected=filters.period empty_label="All time" icon="bi-calendar3" clearable="true" %}
+        </div>    
     </div>
 
     {# view toggle #}
