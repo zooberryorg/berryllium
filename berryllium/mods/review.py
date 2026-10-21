@@ -2,7 +2,7 @@ from django.urls import reverse
 from django.utils import timezone
 
 from berryllium.mods.models import ModCredit, ModFile, ModFileGroup, ModImage
-from berryllium.mods.settings import EXPANSION_REQUIREMENTS, GAME_OPTIONS, MOD_CATEGORIES
+from berryllium.mods.settings import EXPANSION_REQUIREMENTS, GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES
 
 
 def _labels(stored, choices):
@@ -27,8 +27,8 @@ def review_issues(mod):
         problems.append(_issue(mod, "mod_create_general", "Add a title."))
     if not mod.summary:
         problems.append(_issue(mod, "mod_create_general", "Add a summary."))
-    if not mod.thumbnail:
-        problems.append(_issue(mod, "mod_create_general", "Add a thumbnail / logo."))
+    if not mod.logo:
+        problems.append(_issue(mod, "mod_create_general", "Add a logo."))    
     if mod.is_archived_file:
         if not mod.original_release_date:
             problems.append(_issue(mod, "mod_create_general", "Archived mods need an original release date."))
@@ -62,7 +62,6 @@ def review_issues(mod):
 def review_context(mod):
     """Show the mod's current state and any issues that need to be fixed before publishing."""
     images = list(ModImage.objects.filter(mod=mod))
-    cover = next((image for image in images if image.is_cover), None)
     credits = list(mod.credits.select_related("member", "author"))
     problems, suggestions = review_issues(mod)
 
@@ -86,8 +85,8 @@ def review_context(mod):
             for group in ModFileGroup.objects.filter(mod=mod)
         ],
         # images
-        "cover_image": cover,
-        "gallery_images": [image for image in images if not image.is_cover],
+        "gallery_images": images,
+        "gallery_ratio": GALLERY_RATIO,        
         # resources
         "dependencies": list(mod.dependencies.select_related("ref")),
         "mod_licenses": list(mod.licenses.select_related("license")),
