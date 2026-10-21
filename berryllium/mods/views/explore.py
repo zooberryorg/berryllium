@@ -252,6 +252,13 @@ def mods(request):
     filters = _read_filters(params)
     base = published_mods()
 
+     # drop filter values that don't point at anything
+    license_obj = License.objects.filter(pk=filters["license"]).first() if filters["license"] else None
+    if not license_obj:
+        filters["license"] = ""
+    depends_items = _depends_items(filters["depends"])
+    filters["depends"] = [item["value"] for item in depends_items]
+
     results = (
         _apply_filters(base, filters)
         .select_related("uploaded_by")
