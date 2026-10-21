@@ -15,11 +15,10 @@ from berryllium.shared.models import Tag, BaseLink
 def staged_path(instance, filename):
     return f"uploads/staged/{instance.filegroup.mod_id}/{filename}"
 
-def mod_logo_path(instance, filename):
+def mod_thumbnail_path(instance, filename):
+    # no longer used, but kept for old migrations (for now)
     ext = os.path.splitext(filename)[1].lower()
     return f"mod_logos/{uuid.uuid4().hex}{ext}"
-
-mod_thumbnail_path = mod_logo_path
 
 class Mod(models.Model):
     """
