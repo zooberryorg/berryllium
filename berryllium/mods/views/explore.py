@@ -161,14 +161,6 @@ def _plural(count, word):
 def _host(url):
     return urlparse(url).netloc.removeprefix("www.") or url
 
-
-
-def _category_chips(stored):
-    """ Category chips for a mod's card, based on the stored CSV field. """
-    labels = dict(MOD_CATEGORIES)
-    keys = [key.strip() for key in (stored or "").split(",") if key.strip()]
-    return [{"label": labels.get(key, key), "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder")} for key in keys]
-
 def _card_image_path():
     """The image shown on a mod's card: the picked thumbnail, otherwise the first gallery image."""
     return Subquery(
@@ -207,6 +199,25 @@ def _depends_items(values):
             url = value[len(EXTERNAL_PREFIX):]
             items.append(_external_dependency_result(url, titles[url]))
     return items
+
+# picker search endpoints
+
+@require_GET
+def search_tags(request):
+    """Tags on published mods, most used first."""
+    q = request.GET.get("q", "").strip()[:MAX_QUERY_LENGTH]
+    now = timezone.now()
+    tags = Tag.objects.annotate(uses=Count("mods", filter=Q(mods__draft=False, mods__publish_date__lte=now), distinct=True))
+    tags = tags.filter(uses__gt=0)
+    if q:
+        tags = tags.filter(name__icontains=q)
+    return JsonResponse({"results": [_tag_result(t.name, t.uses) for t in tags.order_by("-uses", "name")[:20]]})
+
+def _category_chips(stored):
+    """ Category chips for a mod's card, based on the stored CSV field. """
+    labels = dict(MOD_CATEGORIES)
+    keys = [key.strip() for key in (stored or "").split(",") if key.strip()]
+    return [{"label": labels.get(key, key), "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder")} for key in keys]
 
 def mods(request):
     """Explore > Mods."""
