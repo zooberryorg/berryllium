@@ -71,7 +71,12 @@ def _read_filters(params):
         "category": category if category in categories else "",
         "game": game if game in games else "",
         "period": period if period in PERIODS else "",
-        "tags": [tag for tag in params.getlist("tag") if tag][:MAX_TAGS],
+        "tags": list(dict.fromkeys(proper_case(tag) for tag in params.getlist("tag") if tag.strip()))[:MAX_TAGS],
+        "depends": list(dict.fromkeys(
+            value.strip() for value in params.getlist("depends")
+            if value.strip().isdigit() or (value.startswith(EXTERNAL_PREFIX) and len(value) > len(EXTERNAL_PREFIX))
+        ))[:MAX_DEPENDS],
+        "license": params.get("license", "") if params.get("license", "").isdigit() else "",
         "sort": sort if sort in SORTS else DEFAULT_SORT,
     }
 
