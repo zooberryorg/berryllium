@@ -19,6 +19,19 @@ def clean_text(value, max_length, *, required=False, label="This field", multili
         raise ValidationError(f"{label} can be at most {max_length} characters.")
     return value
 
+def proper_case(value):
+    """
+    Makes words proper case.
+    """
+    raw = str(value or "").split()
+    shouting = len(raw) > 1 and all(word.isupper() for word in raw)
+    words = []
+    for word in raw:
+        if word.isupper() and len(word) <= 4 and not shouting:
+            words.append(word)
+        else:
+            words.append(word[:1].upper() + word[1:].lower())
+    return " ".join(words)
 
 def clean_url(value, *, required=True, label="URL"):
     value = str(value or "").strip()
