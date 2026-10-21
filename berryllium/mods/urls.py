@@ -131,9 +131,9 @@ urlpatterns = [
         name="hx_update_image_caption",
     ),
     path(
-        "mods/set-cover-image/<int:image_id>/",
-        validations.hx_set_cover_image,
-        name="hx_set_cover_image",
+        "mods/set-thumbnail-image/<int:image_id>/",
+        validations.hx_set_thumbnail_image,
+        name="hx_set_thumbnail_image",
     ),
     path(
         "mods/edit/<int:mod_id>/images/reorder/",
