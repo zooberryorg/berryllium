@@ -113,3 +113,19 @@ function searchPicker(config) {
   };
 }
 
+// used as a filter in a GET form. adding or removing a pill sends a change event to the form so it can be submitted.
+function filterPicker(config) {
+  const picker = searchPicker({ insertLabel: 'Apply', ...config });
+  picker.init = function () {
+    this.$watch('items', () => {
+      // wait for the hidden inputs to render before the form is serialized
+      this.$nextTick(() => this.$el.dispatchEvent(new Event('change', { bubbles: true })));
+    });
+  };
+  picker.clearFilter = function ({ name = '', value = '' } = {}) {
+    if (name && name !== this.name) return;
+    const kept = value ? this.items.filter((item) => item.value !== value) : [];
+    if (kept.length !== this.items.length) this.items = kept;
+  };
+  return picker;
+}  
