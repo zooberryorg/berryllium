@@ -59,9 +59,10 @@
         <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
             {% include "mods/create/review/section_header.html" with title="General" step="mod_create_general" %}
             <div class="flex flex-col sm:flex-row gap-4">
-                {% if mod.thumbnail %}
-                    <img src="{{ mod.thumbnail.url }}" alt="Thumbnail" class="w-24 h-24 rounded-xl object-cover shrink-0">
+                {% if mod.logo %}
+                    <img src="{{ mod.logo.url }}" alt="Logo" class="w-24 h-24 rounded-xl object-cover shrink-0">
                 {% else %}
+                    <div class="w-24 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 shrink-0">                {% else %}
                     <div class="w-24 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 shrink-0">
                         <i class="bi bi-image text-2xl"></i>
                     </div>
@@ -138,18 +139,19 @@
         <!-- images -->
         <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
             {% include "mods/create/review/section_header.html" with title="Images" step="mod_create_images" %}
-            {% if cover_image %}
-                <img src="{{ cover_image.image.url }}" alt="{{ cover_image.title|default:'Cover image' }}"
-                     class="w-full rounded-lg object-cover mb-3" style="aspect-ratio: 3 / 1;">
-            {% endif %}
             {% if gallery_images %}
                 <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {% for image in gallery_images %}
-                        <img src="{{ image.image.url }}" alt="{{ image.title|default:'Mod image' }}"
-                             class="w-full rounded-lg object-cover" style="aspect-ratio: 16 / 9;">
+                        <div class="relative">
+                            <img src="{{ image.image.url }}" alt="{{ image.title|default:'Mod image' }}"
+                                 class="w-full rounded-lg object-cover {% if image.is_thumbnail %}ring-2 ring-gold-400{% endif %}" style="aspect-ratio: {{ gallery_ratio }};">
+                            {% if image.is_thumbnail %}
+                                <span class="absolute bottom-1.5 left-1.5 text-[10px] px-2 py-0.5 bg-gold-400 rounded-full text-pine-600 font-medium">Thumbnail</span>
+                            {% endif %}
+                        </div>                    
                     {% endfor %}
                 </div>
-            {% elif not cover_image %}
+            {% else %}
                 <p class="text-sm text-white/40">No images.</p>
             {% endif %}
         </section>
