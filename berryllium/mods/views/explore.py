@@ -104,7 +104,7 @@ def _active_filters(params, filters):
         active.append({"label": PERIODS[filters["period"]][0], "name": "period", "value": "",
                        "url": _remove_url(params, "period")})
     for tag in filters["tags"]:
-        active.append({"label": f"#{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
+        active.append({"label": f"{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
     return active
 
 def _category_counts(base):

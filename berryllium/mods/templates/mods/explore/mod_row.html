@@ -33,11 +33,11 @@ TODO: link the title to the mod page once it exists.
             </div>
             <dl class="shrink-0 flex items-center gap-1.5 text-xs">
                 <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.download_count }} downloads">
-                    <dt><i class="bi bi-download text-gold-300"></i><span class="sr-only">Downloads</span></dt>
+                    <dt><i class="bi bi-download"></i><span class="sr-only">Downloads</span></dt>
                     <dd class="font-semibold tabular-nums">{{ mod.download_count|compact }}</dd>
                 </div>
                 <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.like_count }} likes">
-                    <dt><i class="bi bi-heart-fill text-red-300"></i><span class="sr-only">Likes</span></dt>
+                    <dt><i class="bi bi-heart-fill"></i><span class="sr-only">Likes</span></dt>
                     <dd class="font-semibold tabular-nums">{{ mod.like_count|compact }}</dd>
                 </div>
             </dl>
@@ -57,7 +57,7 @@ TODO: link the title to the mod page once it exists.
                 </span>
             {% endfor %}
             {% for tag in mod.tags.all|slice:":3" %}
-                <span class="text-xs px-1.5 py-0.5 text-white/45">#{{ tag.name }}</span>
+                <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">{{ tag.name }}</span>
             {% endfor %}
             <time class="ml-auto pl-2 text-xs text-gray-400 whitespace-nowrap" datetime="{{ mod.last_updated|date:'c' }}"
                   title="Last updated {{ mod.last_updated|date:date_prefs.datetime }}">
