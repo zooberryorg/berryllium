@@ -213,6 +213,33 @@ def search_tags(request):
         tags = tags.filter(name__icontains=q)
     return JsonResponse({"results": [_tag_result(t.name, t.uses) for t in tags.order_by("-uses", "name")[:20]]})
 
+
+@require_GET
+def search_dependencies(request):
+    """
+    Things that published mods depend on, most needed first.
+    """
+    q = request.GET.get("q", "").strip()[:MAX_QUERY_LENGTH]
+    now = timezone.now()
+    published_parent = Q(required_by__parent__draft=False, required_by__parent__publish_date__lte=now)
+    mods = published_mods().annotate(
+        dependents=Count("required_by__parent", filter=published_parent & Q(required_by__is_external=False), distinct=True)
+    ).filter(dependents__gt=0)
+    externals = ModDependency.objects.filter(
+        is_external=True, parent__draft=False, parent__publish_date__lte=now
+    ).exclude(external_url="")
+    if q:
+        mods = mods.filter(title__icontains=q)
+        externals = externals.filter(Q(title__icontains=q) | Q(external_url__icontains=q))
+    externals = externals.values("external_url").annotate(shown_title=Max("title"), dependents=Count("parent", distinct=True))
+    ranked = [(m.dependents, m.title.lower(), _mod_dependency_result(m, m.dependents))
+              for m in mods.order_by("-dependents", "title")[:15]]
+    ranked += [(e["dependents"], (e["shown_title"] or e["external_url"]).lower(),
+                _external_dependency_result(e["external_url"], e["shown_title"], e["dependents"]))
+               for e in externals.order_by("-dependents", "shown_title")[:10]]
+    ranked.sort(key=lambda row: (-row[0], row[1]))
+    return JsonResponse({"results": [row[2] for row in ranked[:20]]})
+
 def _category_chips(stored):
     """ Category chips for a mod's card, based on the stored CSV field. """
     labels = dict(MOD_CATEGORIES)
