@@ -283,7 +283,7 @@ def mods(request):
         "gallery_ratio": GALLERY_RATIO,
         "page_query": page_query.urlencode(),
         "filters": filters,
-        "active_filters": _active_filters(params, filters),
+        "active_filters": _active_filters(params, filters, depends_items, license_obj),
         "has_any_mods": base.exists(),
         "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
         "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
@@ -296,7 +296,22 @@ def mods(request):
 
     context["categories"] = _category_counts(base)
     context["total_published"] = base.count()
-    context["popular_tags"] = list(_popular_tags())
-    context["popular_tag_names"] = {tag.name for tag in context["popular_tags"]}
+    context["licenses"] = _license_counts()
+    context["tag_picker"] = picker_config(
+        name="tag",
+        search_url=reverse("explore_search_tags"),
+        items=[_tag_result(name) for name in filters["tags"]],
+        title="Filter by tags",
+        placeholder="Search tags...",
+        empty_text="No tags match.",
+    )
+    context["depends_picker"] = picker_config(
+        name="depends",
+        search_url=reverse("explore_search_dependencies"),
+        items=depends_items,
+        title="Mods that depend on...",
+        placeholder="Search mods or external downloads...",
+        empty_text="Nothing that other mods depend on matches.",
+    )    
     context["explore_tab"] = "mods"
     return render(request, "mods/explore/base.html", context)
