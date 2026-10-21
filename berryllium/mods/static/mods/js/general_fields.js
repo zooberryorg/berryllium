@@ -99,21 +99,3 @@ function datePicker({ max = null } = {}) {
     },
   };
 }
-
-//logo picker with a square, cropped live preview.
-function logoPicker({ initialUrl = '' }) {
-  return {
-    previewUrl: initialUrl,
-    fileName: '',
-
-    preview(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      this.fileName = file.name;
-      if (this.previewUrl && this.previewUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(this.previewUrl);
-      }
-      this.previewUrl = URL.createObjectURL(file);
-    },
-  };
-}
