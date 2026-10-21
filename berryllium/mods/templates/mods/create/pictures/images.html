@@ -1,23 +1,15 @@
 {% load static %}
 <div id="image-gallery">
-    {% if cover_image %}
-        <!-- cover image gets pinned above the gallery at the cover ratio -->
-        <div class="mx-4 sm:mx-6 mb-6">
-            {% include "mods/create/pictures/image_card.html" with image=cover_image ratio=cover_ratio is_cover=True %}
-        </div>
-    {% endif %}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mx-4 sm:mx-6 mb-6"
          {% include 'mods/create/pictures/sort_config.html' %}
          x-sort>
         {% for image in images %}
-            {% include "mods/create/pictures/image_card.html" with image=image ratio=thumbnail_ratio is_cover=False %}
+            {% include "mods/create/pictures/image_card.html" with image=image ratio=gallery_ratio is_thumbnail=image.is_thumbnail %}
         {% empty %}
-            {% if not cover_image %}
-                <div class="col-span-full text-center text-granite-400 py-12 rounded-lg border border-granite-200/10 bg-pine-600/50 p-6 w-full text-granite-200">
-                    <ion-icon name="images" class="text-4xl mb-4"></ion-icon>
-                    <p class="text-sm mx-auto">No images uploaded yet.</p>
-                </div>
-            {% endif %}
+            <div class="col-span-full text-center text-granite-400 py-12 rounded-lg border border-granite-200/10 bg-pine-600/50 p-6 w-full text-granite-200">
+                <ion-icon name="images" class="text-4xl mb-4"></ion-icon>
+                <p class="text-sm mx-auto">No images uploaded yet.</p>
+            </div>
         {% endfor %}
     </div>
 </div>
