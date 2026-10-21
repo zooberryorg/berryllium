@@ -110,7 +110,7 @@ def _apply_filters(queryset, filters):
         queryset = queryset.filter(pk__in=ModLicense.objects.filter(license_id=int(filters["license"])).values("mod_id"))
     return queryset.order_by(*SORTS[filters["sort"]][1])
 
-def _active_filters(params, filters):
+def _active_filters(params, filters, depends_items, license_obj):
     """Pills shown above the results, each with the URL that removes it."""
     active = []
     if filters["q"]:
@@ -126,6 +126,12 @@ def _active_filters(params, filters):
                        "url": _remove_url(params, "period")})
     for tag in filters["tags"]:
         active.append({"label": f"{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
+    for item in depends_items:
+        active.append({"label": f"Needs {item['label']}", "name": "depends", "value": item["value"],
+                       "url": _remove_url(params, "depends", item["value"])})
+    if license_obj:
+        active.append({"label": str(license_obj), "name": "license", "value": "",
+            "url": _remove_url(params, "license")})
     return active
 
 def _category_counts(base):
