@@ -460,8 +460,8 @@ def hx_update_image_caption(request, image_id):
 
 
 @require_GET
-def hx_set_cover_image(request, image_id):
-    """HTMX endpoint to set an image as the cover image."""
+def hx_set_thumbnail_image(request, image_id):
+    """HTMX endpoint to pick (or unpick) the gallery image shown on the mod's card."""
     mod_id = request.session.get("session_id")
     if not mod_id:
         return HttpResponse(status=400)
@@ -471,12 +471,12 @@ def hx_set_cover_image(request, image_id):
         return HttpResponse(status=404)
 
     with transaction.atomic():
-        if image.is_cover:
-            image.is_cover = False
+        if image.is_thumbnail:
+            image.is_thumbnail = False
         else:
-            ModImage.objects.filter(mod_id=mod_id, is_cover=True).update(is_cover=False)
-            image.is_cover = True
-        image.save(update_fields=["is_cover"])
+            ModImage.objects.filter(mod_id=mod_id, is_thumbnail=True).update(is_thumbnail=False)
+            image.is_thumbnail = True
+        image.save(update_fields=["is_thumbnail"])
 
     return render(request, "mods/create/pictures/images.html", image_gallery_context(mod_id))
 
