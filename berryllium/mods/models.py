@@ -18,7 +18,8 @@ def staged_path(instance, filename):
 def mod_logo_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"mod_logos/{uuid.uuid4().hex}{ext}"
-    mod_thumbnail_path = mod_logo_path
+
+mod_thumbnail_path = mod_logo_path
 
 class Mod(models.Model):
     """
