@@ -155,6 +155,12 @@ def _license_counts():
         for item in licenses.order_by("name")
     ]
 
+def _plural(count, word):
+    return f"{count} {word}{'' if count == 1 else 's'}"
+
+def _host(url):
+    return urlparse(url).netloc.removeprefix("www.") or url
+
 def _category_chips(stored):
     """ Category chips for a mod's card, based on the stored CSV field. """
     labels = dict(MOD_CATEGORIES)
