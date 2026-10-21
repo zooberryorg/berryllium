@@ -28,7 +28,6 @@ class Mod(models.Model):
     - title: the name of the mod
     - category: mod category (e.g. animals, buildings, etc.)
     - summary: short summary of the mod
-    - logo: square (1:1) image that identifies the mod    
     - is_external: whether the mod is an external link instead of a file upload
     - external_url: if is_external is true, the url of the mod
     - game: the game the mod is for (zt1 or zt2 for now)
@@ -59,7 +58,6 @@ class Mod(models.Model):
     title = models.CharField(max_length=200, db_index=True)
     category = models.CharField(max_length=100, blank=True, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
-    logo = models.ImageField(upload_to=mod_logo_path, blank=True)
 
     # is mod a directory link instead of a file upload?
     is_external = models.BooleanField(default=False, db_index=True)

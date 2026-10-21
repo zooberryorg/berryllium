@@ -221,3 +221,5 @@ package.json
 /static/
 
 *.zip
+
+0012_remove_mod_logo.py
