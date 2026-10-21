@@ -3,7 +3,6 @@
      x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|default_if_none:''|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
      class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if is_thumbnail %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
      x-sort:item>     
-     {% if not is_cover %}x-sort:item{% endif %}>
     <!-- top right controls -->
     <div class="absolute top-2 right-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex gap-2 z-10">
         <button type="button"
