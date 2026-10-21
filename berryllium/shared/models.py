@@ -1,6 +1,7 @@
 import os
 import uuid
 from django.db import models
+from berryllium.shared.fields import proper_case
 from berryllium.shared.links import DEFAULT_LINK_PRESET, LINK_PRESET_CHOICES, link_preset
 
 class Tag(models.Model):
@@ -12,6 +13,10 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        self.name = proper_case(self.name)[:50]
+        super().save(*args, **kwargs)
 
 def archived_website_image_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
