@@ -7,6 +7,7 @@ function searchPicker(config) {
     placeholder: config.placeholder || 'Search...',
     allowCreate: !!config.allowCreate,
     emptyText: config.emptyText || 'No results.',
+    insertLabel: config.insertLabel || 'Insert',
 
     open: false,
     query: '',
@@ -108,5 +109,7 @@ function searchPicker(config) {
     remove(value) {
       this.items = this.items.filter((item) => item.locked || item.value !== value);
     },
+
   };
 }
+
