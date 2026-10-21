@@ -57,8 +57,6 @@ from berryllium.mods.settings import (
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
     MAX_IMAGE_SIZE,
-    MOD_LOGO_MIN_SIZE,
-    MOD_LOGO_RECOMMENDED_SIZE,
 )
 
 
@@ -111,20 +109,6 @@ class ModGeneralInfoForm(forms.ModelForm):
         widget=forms.MultipleHiddenInput,
     )
 
-    logo = forms.ImageField(
-        required=True,
-        label="Logo",
-        help_text=f"Square image shown next to your mod's title. At least {MOD_LOGO_MIN_SIZE}×{MOD_LOGO_MIN_SIZE}px, {MOD_LOGO_RECOMMENDED_SIZE} recommended.",
-        widget=forms.FileInput(
-            attrs={
-                "accept": ".jpg,.jpeg,.png,.webp",
-                "class": "hidden",
-                "x-ref": "logoInput",
-                "@change": "preview($event)",
-            }
-        ),
-    )
-
     publish_date = forms.DateTimeField(required=True, widget=forms.HiddenInput)
 
     is_archived_file = forms.BooleanField(
@@ -150,7 +134,7 @@ class ModGeneralInfoForm(forms.ModelForm):
     class Meta:
         model = Mod
         fields = [
-            "title", "summary", "logo", "publish_date",
+            "title", "summary", "publish_date",
             "is_archived_file", "original_release_date", "original_websites",
         ]
         widgets = {
@@ -199,23 +183,6 @@ class ModGeneralInfoForm(forms.ModelForm):
             return self.data.get("publish_date", "")
         value = self.initial.get("publish_date") or self.instance.publish_date or timezone.now()
         return value.isoformat()
-
-    def clean_logo(self):
-        logo = self.cleaned_data.get("logo")
-        # editing without choosing a new file: keep the existing one
-        if not logo or not hasattr(logo, "image"):
-            return logo
-        if logo.size > MAX_IMAGE_SIZE:
-            raise forms.ValidationError(f"Logo must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
-        if logo.image.format not in ("JPEG", "PNG", "WEBP"):
-            raise forms.ValidationError("Logo must be a JPG, PNG or WEBP image.")
-        width, height = logo.image.size
-        if width < MOD_LOGO_MIN_SIZE or height < MOD_LOGO_MIN_SIZE:            
-            raise forms.ValidationError(
-                f"Logo must be at least {MOD_LOGO_MIN_SIZE}×{MOD_LOGO_MIN_SIZE}px "
-                f"(yours is {width}×{height})."
-            )
-        return logo
 
     def clean_original_release_date(self):
         value = self.cleaned_data.get("original_release_date")
