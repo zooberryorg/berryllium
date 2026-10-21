@@ -59,13 +59,6 @@
         <section class="bg-pine-800/40 rounded-lg border border-white/8 p-4">
             {% include "mods/create/review/section_header.html" with title="General" step="mod_create_general" %}
             <div class="flex flex-col sm:flex-row gap-4">
-                {% if mod.logo %}
-                    <img src="{{ mod.logo.url }}" alt="Logo" class="w-24 h-24 rounded-xl object-cover shrink-0">
-                {% else %}
-                    <div class="w-24 h-24 rounded-xl border-2 border-dashed border-white/20 flex items-center justify-center text-white/30 shrink-0">
-                        <i class="bi bi-image text-2xl"></i>
-                    </div>
-                {% endif %}
                 <div class="min-w-0 space-y-1">
                     <p class="text-white text-lg font-semibold">{{ mod.title|default:"Untitled mod" }}</p>
                     <p class="text-granite-200 text-sm">{{ mod.summary }}</p>

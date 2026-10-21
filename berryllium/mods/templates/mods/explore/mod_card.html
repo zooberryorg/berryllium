@@ -1,9 +1,5 @@
 {% load bfilters %}
-{% comment %}
-TODO: link the title to the mod page once it exists.
-{% endcomment %}
-<article class="group/card flex flex-col h-full rounded-2xl border border-white/10 bg-pine-700 overflow-hidden transition-all duration-200 hover:border-gold-400/40 hover:shadow-xl hover:shadow-black/20">
-
+<article class="group/card relative flex flex-col h-full rounded-2xl border border-white/10 bg-pine-700 overflow-hidden transition-all duration-200 hover:border-gold-400/40 hover:shadow-xl hover:shadow-black/20">
     {# thumbnail #}
     <div class="relative overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800" style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
         {% if mod.card_image_url %}
@@ -19,15 +15,14 @@ TODO: link the title to the mod page once it exists.
         {% endif %}
     </div>
 
-    <div class="flex gap-3 px-4 pt-4">
-        {% include 'mods/explore/mod_logo.html' with logo_class="w-14 h-14 rounded-xl" %}
-        <div class="min-w-0 flex-1">
-            <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
-            {% if mod.uploaded_by %}
-                <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
-            {% endif %}
-            <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
-        </div>
+    <div class="px-4 pt-4 min-w-0">
+        <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">
+            <a href="{% url 'mod_detail' mod.pk %}" class="hover:text-gold-200 focus-visible:outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline-2 focus-visible:after:outline-gold-400 focus-visible:after:outline-offset-2">{{ mod.title }}</a>
+        </h3>
+        {% if mod.uploaded_by %}
+            <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+        {% endif %}
+        <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
     </div>
 
     {# categorization #}

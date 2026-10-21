@@ -1,12 +1,7 @@
 {% load bfilters %}
-{% comment %}
-TODO: link the title to the mod page once it exists.
-{% endcomment %}
-<article class="group/row flex gap-4 p-3 rounded-2xl border border-white/10 bg-pine-700 transition-all duration-200 hover:border-gold-400/40 hover:shadow-lg hover:shadow-black/20">
-
+<article class="group/row relative flex gap-3 sm:gap-4 p-3 rounded-2xl border border-white/10 bg-pine-700 transition-all duration-200 hover:border-gold-400/40 hover:shadow-lg hover:shadow-black/20">
     {# thumbnail #}
-    <div class="hidden sm:block relative w-44 md:w-52 shrink-0 self-start rounded-xl overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800"
-         style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
+    <div class="relative w-28 sm:w-44 md:w-52 shrink-0 self-start rounded-xl overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800"         style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
         {% if mod.card_image_url %}
             <img src="{{ mod.card_image_url }}" alt="" loading="lazy"
                  class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/row:scale-[1.03]">
@@ -17,10 +12,11 @@ TODO: link the title to the mod page once it exists.
 
     <div class="flex-1 min-w-0 flex flex-col py-0.5">
         <div class="flex items-start gap-3">
-            {% include 'mods/explore/mod_logo.html' with logo_class="w-11 h-11 rounded-lg" %}
             <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2 min-w-0">
-                    <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
+                    <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">
+                        <a href="{% url 'mod_detail' mod.pk %}" class="hover:text-gold-200 focus-visible:outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline-2 focus-visible:after:outline-gold-400 focus-visible:after:outline-offset-2">{{ mod.title }}</a>
+                    </h3>                    
                     {% if mod.is_archived_file %}
                         <span class="shrink-0 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md bg-white/10 text-white/60" title="Archived mod">
                             <i class="bi bi-archive"></i><span class="sr-only sm:not-sr-only">Archived</span>

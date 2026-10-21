@@ -27,8 +27,6 @@ def review_issues(mod):
         problems.append(_issue(mod, "mod_create_general", "Add a title."))
     if not mod.summary:
         problems.append(_issue(mod, "mod_create_general", "Add a summary."))
-    if not mod.logo:
-        problems.append(_issue(mod, "mod_create_general", "Add a logo."))    
     if mod.is_archived_file:
         if not mod.original_release_date:
             problems.append(_issue(mod, "mod_create_general", "Archived mods need an original release date."))

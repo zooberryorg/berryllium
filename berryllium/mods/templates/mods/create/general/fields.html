@@ -3,41 +3,6 @@
         <p class="text-red-400 text-sm mb-4">{{ form.non_field_errors.0 }}</p>
     {% endif %}
 
-    <div class="mb-4 mt-4"
-        x-data="logoPicker($el.dataset)"
-        data-initial-url="{% if form.instance.logo %}{{ form.instance.logo.url }}{% endif %}">
-        <label class="block text-sm font-medium mb-1 text-white">
-            Logo <span class="text-red-500">*</span>
-        </label>
-        <button type="button"
-                class="mt-4 group relative w-32 h-32 rounded-xl overflow-hidden border-2 border-dashed border-white/20 hover:border-gold-400/60 bg-pine-800/40 cursor-pointer transition-colors"
-                :class="previewUrl ? 'border-solid border-gold-400/60' : ''"
-                :aria-label="previewUrl ? 'Change logo' : 'Upload logo'"
-                @click="$refs.logoInput.click()">
-            <!-- placeholder -->
-            <span class="absolute inset-0 flex flex-col items-center justify-center gap-1 text-white/40">
-                <i class="bi bi-image text-3xl"></i>
-                <span class="text-[10px] uppercase tracking-wide">1:1</span>
-            </span>
-            <img x-show="previewUrl"
-                 :src="previewUrl"
-                 alt="Logo preview"
-                 class="absolute inset-0 w-full h-full object-cover"
-                 x-cloak>
-            <!-- overlay label -->
-            <span class="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1 py-1.5 text-xs font-medium bg-pine-800/80 text-white group-hover:bg-gold-400 group-hover:text-pine-600 transition-colors">
-                <i class="bi" :class="previewUrl ? 'bi-pencil' : 'bi-upload'"></i>
-                <span x-text="previewUrl ? 'Edit' : 'Upload'">Upload</span>
-            </span>
-        </button>
-        <p class="text-white/50 text-xs mt-2">{{ form.logo.help_text }}</p>
-        <p class="text-gold-300 text-xs truncate mt-1" x-show="fileName" x-cloak>
-            <i class="bi bi-check-circle-fill"></i> <span x-text="fileName"></span>
-        </p>        
-        {{ form.logo }}
-        {% include "mods/create/field_errors.html" with field=form.logo %}
-    </div>
-
     {% include "mods/create/general/field.html" with field=form.title %}
     {% include "mods/create/general/field.html" with field=form.summary %}
     {% include "shared/widgets/search_picker.html" with field=form.collaborators config=form.collaborators_picker disabled_expr="archived" %}
