@@ -24,3 +24,23 @@ help      optional line under the heading
         <template x-for="item in items" :key="item.value">
             <span class="inline-flex items-center gap-1.5 max-w-full rounded-full border border-gold-400/50 bg-gold-400/15 text-gold-200 pl-3 pr-2 py-1"
                   :title="item.sublabel || item.label">
+                <span class="truncate" x-text="item.label"></span>
+                <button type="button"
+                        class="w-5 h-5 -my-0.5 rounded-full flex items-center justify-center text-gold-200/70 hover:text-white hover:bg-white/10 cursor-pointer"
+                        @click="remove(item.value)"
+                        :aria-label="'Remove ' + item.label">
+                    <i class="bi bi-x-lg text-[10px]"></i>
+                </button>
+                <input type="hidden" :name="name" :value="item.value">
+            </span>
+        </template>
+        <button type="button"
+                class="inline-flex items-center gap-2 rounded-full border border-dashed border-white/20 px-3 py-1 text-gray-300 hover:text-white hover:border-gold-400/60 hover:bg-gold-400/10 transition-colors cursor-pointer"
+                :class="items.length ? '' : 'w-full justify-center py-2'"
+                @click="openPicker()">
+            <i class="bi bi-search text-xs"></i>
+            <span x-text="items.length ? 'Add' : '{{ add_label|default:"Search"|escapejs }}'">{{ add_label|default:"Search" }}</span>
+        </button>
+    </div>
+    {% include "shared/widgets/search_dialog.html" %}
+</fieldset>
