@@ -26,29 +26,31 @@
                     @click="showFilters = !showFilters"
                     :aria-expanded="showFilters">
                 <i class="bi bi-funnel"></i>
-                <span x-text="showFilters ? 'Hide categories & tags' : 'Categories & tags'"></span>
+                <span x-text="showFilters ? 'Hide filters' : 'Filters'"></span>
             </button>
             <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
                 {% include 'mods/explore/categories.html' %}
-                {% include 'mods/explore/tags.html' %}
-            </aside>
+                {% include 'shared/widgets/filter_picker.html' with label="Tags" config=tag_picker add_label="Search tags" %}
+                {% include 'shared/widgets/filter_picker.html' with label="Depends on" config=depends_picker add_label="Find a dependency" help="Mods that need all of these to work." %}
+                {% include 'mods/explore/licenses.html' %}            </aside>
         </div>
 
         {# ---------------- main ---------------- #}
         <div class="flex-1 min-w-0 space-y-4">
             {# search #}
             <div class="relative">
-                <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none"></i>
+                <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none" aria-hidden="true"></i>
                 <input type="search"
                        id="explore-search"
                        name="q"
                        value="{{ filters.q }}"
                        placeholder="Search mods by name, author, tag or description..."
                        autocomplete="off"
+                       aria-label="Search mods"
                        x-model="q"
                        class="zb-input pl-12 pr-12 text-sm w-full">
                 <button type="button"
-                        class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                        class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
                         x-show="q"
                         x-cloak
                         aria-label="Clear search"
@@ -67,11 +69,15 @@
     </form>
 
     <script>
-        // clear a filter (search, select, checkbox, radio) and trigger the htmx request
+        // clear a filter (or all of them, without a name) and trigger the htmx request
         function exploreClearFilter(name, value) {
             const form = document.getElementById('explore-filters');
             if (!form) return;
-            const controls = Array.from(form.elements).filter((el) => el.name && (!name || el.name === name));
+            window.dispatchEvent(new CustomEvent('explore-clear', { detail: { name: name || '', value: value || '' } }));
+            // pickers and dropdowns (hidden inputs) clear themselves on this event
+            const controls = Array.from(form.elements).filter(
+                (el) => el.name && el.type !== 'hidden' && (!name || el.name === name)
+            );            
             for (const el of controls) {
                 if (el.type === 'radio') {
                     if (el.value === '' && !el.checked) {
@@ -81,11 +87,6 @@
                 } else if (el.type === 'checkbox') {
                     if (el.checked && (value === undefined || value === '' || el.value === value)) {
                         el.checked = false;
-                        el.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                } else if (el.tagName === 'SELECT') {
-                    if (el.name !== 'sort' && el.value !== '') {
-                        el.value = '';
                         el.dispatchEvent(new Event('change', { bubbles: true }));
                     }
                 } else if (el.value !== '') {
@@ -108,12 +109,7 @@
                 color-mix(in oklab, var(--color-gold-300) 50%, transparent));
         }
         .explore-option:has(input:checked) .explore-option-icon { color: var(--color-gold-300); }
-        .explore-tag:has(input:checked) {
-            color: var(--color-pine-500);
-            background-color: var(--color-gold-400);
-            border-color: var(--color-gold-400);
-        }
-        .explore-option:has(input:focus-visible),
-        .explore-tag:has(input:focus-visible) { outline: 2px solid var(--color-gold-400); outline-offset: 2px; }
+        .explore-option:has(input:focus-visible) { outline: 2px solid var(--color-gold-400); outline-offset: 2px; }
+        #explore-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }    
     </style>
 {% endblock %}
