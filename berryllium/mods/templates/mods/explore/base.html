@@ -26,12 +26,13 @@
                     @click="showFilters = !showFilters"
                     :aria-expanded="showFilters">
                 <i class="bi bi-funnel"></i>
-                <span x-text="showFilters ? 'Hide categories & tags' : 'Categories & tags'"></span>
+                <span x-text="showFilters ? 'Hide filters' : 'Filters'"></span>
             </button>
             <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
                 {% include 'mods/explore/categories.html' %}
-                {% include 'mods/explore/tags.html' %}
-            </aside>
+                {% include 'shared/widgets/filter_picker.html' with label="Tags" config=tag_picker add_label="Search tags" %}
+                {% include 'shared/widgets/filter_picker.html' with label="Depends on" config=depends_picker add_label="Find a dependency" help="Mods that need all of these to work." %}
+                {% include 'mods/explore/licenses.html' %}            </aside>
         </div>
 
         {# ---------------- main ---------------- #}
