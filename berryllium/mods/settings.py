@@ -27,9 +27,6 @@ GALLERY_RATIO = "16 / 9"
 GALLERY_RATIO_LABEL = "16:9"
 GALLERY_RECOMMENDED_SIZE = "1920 × 1280"
 
-MOD_LOGO_MIN_SIZE = 256
-MOD_LOGO_RECOMMENDED_SIZE = "512 × 512"
-
 COLLAPSIBLE_WIDGET_ATTRS = {
     "@focus": "expand()",
     # if click away from field, collapse
