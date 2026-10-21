@@ -1,0 +1,12 @@
+<li role="option"
+    :id="optionId({{ index }})"
+    data-value="{{ value }}"
+    data-label="{{ text }}"
+    :aria-selected="isSelected($el).toString()"
+    class="flex items-center justify-between gap-6 rounded-xl px-3 py-2 cursor-pointer transition-colors"
+    :class="active === {{ index }} ? 'bg-white/10 text-white' : (isSelected($el) ? 'text-gold-200' : 'text-gray-300')"
+    @mouseenter="active = {{ index }}"
+    @click="choose({{ index }})">
+    <span>{{ text }}</span>
+    <i class="bi bi-check2 text-gold-300" x-show="isSelected($el.parentElement)"></i>
+</li>
