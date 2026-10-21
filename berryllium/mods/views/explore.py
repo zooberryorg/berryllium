@@ -161,6 +161,8 @@ def _plural(count, word):
 def _host(url):
     return urlparse(url).netloc.removeprefix("www.") or url
 
+
+
 def _category_chips(stored):
     """ Category chips for a mod's card, based on the stored CSV field. """
     labels = dict(MOD_CATEGORIES)
@@ -174,6 +176,37 @@ def _card_image_path():
         .order_by("-is_thumbnail", "order", "id")
         .values("image")[:1]
     )
+
+# picker items
+
+def _tag_result(name, uses=None):
+    return {"value": name, "label": name, "sublabel": _plural(uses, "mod") if uses is not None else ""}
+
+def _mod_dependency_result(mod, dependents=None):
+    sublabel = "Mod" + (f" · needed by {_plural(dependents, 'mod')}" if dependents is not None else "")
+    return {"value": str(mod.pk), "label": mod.title, "sublabel": sublabel}
+
+def _external_dependency_result(url, title, dependents=None):
+    sublabel = f"External · {_host(url)}" + (f" · needed by {_plural(dependents, 'mod')}" if dependents is not None else "")
+    return {"value": f"{EXTERNAL_PREFIX}{url}", "label": title or _host(url), "sublabel": sublabel}
+
+def _depends_items(values):
+    """Pills for the "Depends on" values in the URL. Values that no longer match anything are dropped."""
+    mod_ids = [int(v) for v in values if v.isdigit()]
+    urls = [v[len(EXTERNAL_PREFIX):] for v in values if v.startswith(EXTERNAL_PREFIX)]
+    mods = published_mods().in_bulk(mod_ids)
+    titles = dict(
+        ModDependency.objects.filter(is_external=True, external_url__in=urls)
+        .values("external_url").annotate(shown_title=Max("title")).values_list("external_url", "shown_title")
+    )
+    items = []
+    for value in values:
+        if value.isdigit() and int(value) in mods:
+            items.append(_mod_dependency_result(mods[int(value)]))
+        elif value.startswith(EXTERNAL_PREFIX) and value[len(EXTERNAL_PREFIX):] in titles:
+            url = value[len(EXTERNAL_PREFIX):]
+            items.append(_external_dependency_result(url, titles[url]))
+    return items
 
 def mods(request):
     """Explore > Mods."""
