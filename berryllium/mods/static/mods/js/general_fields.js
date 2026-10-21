@@ -100,8 +100,8 @@ function datePicker({ max = null } = {}) {
   };
 }
 
-//thumbnail picker with a square, cropped live preview.
-function thumbnailPicker({ initialUrl = '' }) {
+//logo picker with a square, cropped live preview.
+function logoPicker({ initialUrl = '' }) {
   return {
     previewUrl: initialUrl,
     fileName: '',

@@ -6,10 +6,9 @@ from berryllium.mods.utils import calculate_file_hash
 from berryllium.mods.models import ModFileGroup, ModFile, ModImage
 from berryllium.mods.forms import ModFileGroupForm
 from berryllium.mods.settings import (
-    THUMBNAIL_RATIO, 
-    COVER_RATIO, 
-    THUMBNAIL_RECOMMENDED_SIZE, 
-    COVER_RECOMMENDED_SIZE
+    GALLERY_RATIO,
+    GALLERY_RATIO_LABEL,
+    GALLERY_RECOMMENDED_SIZE,
 )
 
 from django.core.files.storage import default_storage
@@ -242,16 +241,14 @@ def collapse_file_groups(mod):
         mod.save(update_fields=["use_file_groups"])
 
 def image_gallery_context(mod_id):
-    """Images for the gallery. It is split into the cover (pinned on top) and the rest."""
+    """Images for the gallery, in order. The picked thumbnail stays in place and is only highlighted."""
     images = list(
-        ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image", "is_cover")
+        ModImage.objects.filter(mod_id=mod_id).values("id", "title", "caption", "image", "is_thumbnail")
     )
     return {
-        "cover_image": next((img for img in images if img["is_cover"]), None),
-        "images": [img for img in images if not img["is_cover"]],
-        "thumbnail_ratio": THUMBNAIL_RATIO,
-        "cover_ratio": COVER_RATIO,
-        "thumbnail_size": THUMBNAIL_RECOMMENDED_SIZE,
-        "cover_size": COVER_RECOMMENDED_SIZE,
+        "images": images,
+        "gallery_ratio": GALLERY_RATIO,
+        "gallery_ratio_label": GALLERY_RATIO_LABEL,
+        "gallery_size": GALLERY_RECOMMENDED_SIZE,
         "mod_id": mod_id,
     }

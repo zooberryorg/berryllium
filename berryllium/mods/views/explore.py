@@ -2,13 +2,14 @@ import re
 from datetime import timedelta
 
 from django.core.paginator import Paginator
-from django.db.models import Count, Prefetch, Q
+from django.core.files.storage import default_storage
+from django.db.models import Count, OuterRef, Q, Subquery
 from django.shortcuts import render
 from django.utils import timezone
 
 from berryllium.mods.models import Mod, ModImage
 from berryllium.mods.review import _labels
-from berryllium.mods.settings import GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
+from berryllium.mods.settings import GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
 from berryllium.shared.models import Tag
 
 PAGE_SIZE = 24
@@ -103,7 +104,7 @@ def _active_filters(params, filters):
         active.append({"label": PERIODS[filters["period"]][0], "name": "period", "value": "",
                        "url": _remove_url(params, "period")})
     for tag in filters["tags"]:
-        active.append({"label": f"#{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
+        active.append({"label": f"{tag}", "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
     return active
 
 def _category_counts(base):
@@ -121,6 +122,20 @@ def _popular_tags(limit=15):
         .order_by("-uses", "name")[:limit]
     )
 
+def _category_chips(stored):
+    """ Category chips for a mod's card, based on the stored CSV field. """
+    labels = dict(MOD_CATEGORIES)
+    keys = [key.strip() for key in (stored or "").split(",") if key.strip()]
+    return [{"label": labels.get(key, key), "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder")} for key in keys]
+
+def _card_image_path():
+    """The image shown on a mod's card: the picked thumbnail, otherwise the first gallery image."""
+    return Subquery(
+        ModImage.objects.filter(mod=OuterRef("pk"))
+        .order_by("-is_thumbnail", "order", "id")
+        .values("image")[:1]
+    )
+
 def mods(request):
     """Explore > Mods."""
     params = request.GET
@@ -130,16 +145,15 @@ def mods(request):
     results = (
         _apply_filters(base, filters)
         .select_related("uploaded_by")
-        .prefetch_related(
-            "tags",
-            Prefetch("images", queryset=ModImage.objects.filter(is_cover=True), to_attr="cover_images"),
-        )
+        .prefetch_related("tags")
+        .annotate(card_image_path=_card_image_path())
     )
     page = Paginator(results, PAGE_SIZE).get_page(params.get("page"))
     for mod in page.object_list:
         mod.category_labels = _labels(mod.category, MOD_CATEGORIES)
+        mod.category_chips = _category_chips(mod.category)
         mod.game_labels = _labels(mod.game, GAME_OPTIONS)
-        mod.cover = mod.cover_images[0] if mod.cover_images else None
+        mod.card_image_url = default_storage.url(mod.card_image_path) if mod.card_image_path else None
 
     page_range = list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1))
 
@@ -149,6 +163,7 @@ def mods(request):
     context = {
         "page": page,
         "page_range": page_range,
+        "gallery_ratio": GALLERY_RATIO,
         "page_query": page_query.urlencode(),
         "filters": filters,
         "active_filters": _active_filters(params, filters),

@@ -1,15 +1,17 @@
 <div id="image-{{ image.id }}"
      data-image-id="{{ image.id }}"
      x-data="{ editTitle: false, editCaption: false, title: '{{ image.title|default_if_none:''|escapejs }}', caption: '{{ image.caption|escapejs }}' }"
-     class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if is_cover %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
-     {% if not is_cover %}x-sort:item{% endif %}>
+     class="bg-pine-draggable-200 rounded-lg flex flex-col shadow-lg hover:bg-pine-draggable-100 group relative {% if is_thumbnail %}border-gold-400/80 border-4{% else %}border-granite-200/10 border{% endif %}"
+     x-sort:item>     
     <!-- top right controls -->
     <div class="absolute top-2 right-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex gap-2 z-10">
         <button type="button"
                 x-sort:ignore
-                class="zb-action {% if is_cover %}bg-gold-400 text-pine-600{% else %}bg-pine-draggable-200{% endif %}"
-                title="{% if is_cover %}Remove as cover image{% else %}Set as cover image{% endif %}"
-                hx-get="{% url 'hx_set_cover_image' image.id %}"
+                class="zb-action {% if is_thumbnail %}bg-gold-400 text-pine-600{% else %}bg-pine-draggable-200{% endif %}"
+                title="{% if is_thumbnail %}Remove as thumbnail{% else %}Use as thumbnail{% endif %}"
+                aria-label="{% if is_thumbnail %}Remove as thumbnail{% else %}Use as thumbnail{% endif %}"
+                aria-pressed="{% if is_thumbnail %}true{% else %}false{% endif %}"
+                hx-get="{% url 'hx_set_thumbnail_image' image.id %}"
                 hx-target="#image-gallery"
                 hx-swap="outerHTML">
             <ion-icon name="star" class="text-sm"></ion-icon>
@@ -25,8 +27,8 @@
     </div>
     <div class="relative overflow-hidden rounded-tl-lg rounded-tr-lg hover:cursor-pointer"
          style="aspect-ratio: {{ ratio }};">
-        {% if is_cover %}
-            <span class="absolute bottom-2 left-2 text-xs px-2 py-1 bg-gold-400 rounded-full text-pine-600 z-10">Cover Image</span>
+        {% if is_thumbnail %}
+            <span class="absolute bottom-2 left-2 text-xs px-2 py-1 bg-gold-400 rounded-full text-pine-600 z-10">Thumbnail</span>        
         {% endif %}
         <img src="/uploads/{{ image.image }}"
              alt="{{ image.title|default_if_none:'Mod image' }}"

@@ -1,57 +1,59 @@
+{% load bfilters %}
 {% comment %}
 TODO: link the title to the mod page once it exists.
 {% endcomment %}
-<article class="group/card rounded-2xl border border-white/10 bg-pine-700 hover:border-gold-400/40 hover:shadow-lg transition-all duration-200 overflow-hidden"
-         :class="view === 'list' ? 'flex items-center gap-4 p-3' : 'flex flex-col'">
+<article class="group/card flex flex-col h-full rounded-2xl border border-white/10 bg-pine-700 overflow-hidden transition-all duration-200 hover:border-gold-400/40 hover:shadow-xl hover:shadow-black/20">
 
-    <div class="relative" x-show="view !== 'list'">
-        <div class="w-full bg-gradient-to-br from-pine-500 to-pine-800" style="aspect-ratio: 3 / 1;">
-            {% if mod.cover %}
-                <img src="{{ mod.cover.image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
-            {% endif %}
-        </div>
-        <div class="absolute left-4 -bottom-8 w-16 h-16 rounded-xl overflow-hidden border-2 border-pine-700 bg-pine-800 shadow-lg">
-            {% if mod.thumbnail %}
-                <img src="{{ mod.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
-            {% else %}
-                <span class="w-full h-full flex items-center justify-center text-white/30"><i class="bi bi-puzzle text-2xl"></i></span>
-            {% endif %}
-        </div>
-    </div>
-
-    {# list: small square thumbnail #}
-    <div class="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-pine-800" x-show="view === 'list'" x-cloak>
-        {% if mod.thumbnail %}
-            <img src="{{ mod.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+    {# thumbnail #}
+    <div class="relative overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800" style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
+        {% if mod.card_image_url %}
+            <img src="{{ mod.card_image_url }}" alt="" loading="lazy"
+                 class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-[1.03]">
         {% else %}
-            <span class="w-full h-full flex items-center justify-center text-white/30"><i class="bi bi-puzzle text-2xl"></i></span>
+            <span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image text-4xl"></i></span>
+        {% endif %}
+        {% if mod.is_archived_file %}
+            <span class="absolute top-3 left-3 inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-pine-900/75 text-white/80 backdrop-blur-sm">
+                <i class="bi bi-archive"></i> Archived
+            </span>
         {% endif %}
     </div>
 
-    {# text #}
-    <div class="flex-1 min-w-0" :class="view === 'list' ? '' : 'px-4 pt-10 pb-4'">
-        <h3 class="text-white font-semibold truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
-        <p class="text-xs text-gray-400 truncate">
-            {% if mod.uploaded_by %}by {{ mod.uploaded_by.username }}{% endif %}
-            {% if mod.is_archived_file %}<span class="ml-1 px-1.5 py-0.5 rounded bg-white/10 text-white/60">Archived</span>{% endif %}
-        </p>
-        <p class="text-sm text-granite-200 mt-2" :class="view === 'list' ? 'truncate' : 'line-clamp-2'" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
-
-        <div class="flex flex-wrap gap-1 mt-3" x-show="view !== 'list'">
-            {% for label in mod.game_labels %}
-                <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
-            {% endfor %}
-            {% for label in mod.category_labels|slice:":2" %}
-                <span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">{{ label }}</span>
-            {% endfor %}
+    <div class="flex gap-3 px-4 pt-4">
+        {% include 'mods/explore/mod_logo.html' with logo_class="w-14 h-14 rounded-xl" %}
+        <div class="min-w-0 flex-1">
+            <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
+            {% if mod.uploaded_by %}
+                <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+            {% endif %}
+            <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
         </div>
     </div>
 
+    {# categorization #}
+    <div class="flex flex-wrap gap-1.5 px-4 mt-3">
+        {% for label in mod.game_labels %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
+        {% endfor %}
+        {% for chip in mod.category_chips|slice:":2" %}
+            <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+                <i class="bi {{ chip.icon }} text-[10px] text-white/50"></i>{{ chip.label }}
+            </span>
+        {% endfor %}
+        {% if mod.category_chips|length > 2 %}
+            <span class="text-xs px-2 py-0.5 rounded-full text-white/50" title="{{ mod.category_labels|slice:'2:'|join:', ' }}">+{{ mod.category_chips|length|add:"-2" }}</span>
+        {% endif %}
+    </div>
+
     {# stats #}
-    <div class="flex items-center gap-4 text-xs text-gray-400"
-         :class="view === 'list' ? 'shrink-0 pr-2' : 'px-4 py-3 border-t border-white/5'">
-        <span title="Downloads"><i class="bi bi-download"></i> {{ mod.download_count }}</span>
-        <span title="Likes"><i class="bi bi-heart"></i> {{ mod.like_count }}</span>
-        <span class="ml-auto" title="Published">{{ mod.publish_date|date:date_prefs.date }}</span>
+    <div class="mt-auto pt-4">
+        <div class="flex items-center gap-4 px-4 py-3 border-t border-white/5 text-xs text-gray-400">
+            <span title="{{ mod.download_count }} downloads"><i class="bi bi-download mr-0.5"></i> {{ mod.download_count|compact }}</span>
+            <span title="{{ mod.like_count }} likes"><i class="bi bi-heart mr-0.5"></i> {{ mod.like_count|compact }}</span>
+            <time class="ml-auto truncate" datetime="{{ mod.last_updated|date:'c' }}"
+                  title="Last updated {{ mod.last_updated|date:date_prefs.datetime }}">
+                <i class="bi bi-arrow-repeat mr-0.5"></i> Updated {{ mod.last_updated|timeago }}
+            </time>
+        </div>
     </div>
 </article>

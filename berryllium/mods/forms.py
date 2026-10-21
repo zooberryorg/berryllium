@@ -57,8 +57,8 @@ from berryllium.mods.settings import (
     GAME_OPTIONS,
     EXPANSION_REQUIREMENTS,
     MAX_IMAGE_SIZE,
-    MOD_THUMBNAIL_MIN_SIZE,
-    MOD_THUMBNAIL_RECOMMENDED_SIZE,
+    MOD_LOGO_MIN_SIZE,
+    MOD_LOGO_RECOMMENDED_SIZE,
 )
 
 
@@ -111,14 +111,15 @@ class ModGeneralInfoForm(forms.ModelForm):
         widget=forms.MultipleHiddenInput,
     )
 
-    thumbnail = forms.ImageField(
+    logo = forms.ImageField(
         required=True,
-        label="Thumbnail / Logo",
+        label="Logo",
+        help_text=f"Square image shown next to your mod's title. At least {MOD_LOGO_MIN_SIZE}×{MOD_LOGO_MIN_SIZE}px, {MOD_LOGO_RECOMMENDED_SIZE} recommended.",
         widget=forms.FileInput(
             attrs={
                 "accept": ".jpg,.jpeg,.png,.webp",
                 "class": "hidden",
-                "x-ref": "thumbInput",
+                "x-ref": "logoInput",
                 "@change": "preview($event)",
             }
         ),
@@ -149,7 +150,7 @@ class ModGeneralInfoForm(forms.ModelForm):
     class Meta:
         model = Mod
         fields = [
-            "title", "summary", "thumbnail", "publish_date",
+            "title", "summary", "logo", "publish_date",
             "is_archived_file", "original_release_date", "original_websites",
         ]
         widgets = {
@@ -199,22 +200,22 @@ class ModGeneralInfoForm(forms.ModelForm):
         value = self.initial.get("publish_date") or self.instance.publish_date or timezone.now()
         return value.isoformat()
 
-    def clean_thumbnail(self):
-        thumb = self.cleaned_data.get("thumbnail")
+    def clean_logo(self):
+        logo = self.cleaned_data.get("logo")
         # editing without choosing a new file: keep the existing one
-        if not thumb or not hasattr(thumb, "image"):
-            return thumb
-        if thumb.size > MAX_IMAGE_SIZE:
-            raise forms.ValidationError(f"Thumbnail must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
-        if thumb.image.format not in ("JPEG", "PNG", "WEBP"):
-            raise forms.ValidationError("Thumbnail must be a JPG, PNG or WEBP image.")
-        width, height = thumb.image.size
-        if width < MOD_THUMBNAIL_MIN_SIZE or height < MOD_THUMBNAIL_MIN_SIZE:
+        if not logo or not hasattr(logo, "image"):
+            return logo
+        if logo.size > MAX_IMAGE_SIZE:
+            raise forms.ValidationError(f"Logo must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
+        if logo.image.format not in ("JPEG", "PNG", "WEBP"):
+            raise forms.ValidationError("Logo must be a JPG, PNG or WEBP image.")
+        width, height = logo.image.size
+        if width < MOD_LOGO_MIN_SIZE or height < MOD_LOGO_MIN_SIZE:            
             raise forms.ValidationError(
-                f"Thumbnail must be at least {MOD_THUMBNAIL_MIN_SIZE}×{MOD_THUMBNAIL_MIN_SIZE}px "
+                f"Logo must be at least {MOD_LOGO_MIN_SIZE}×{MOD_LOGO_MIN_SIZE}px "
                 f"(yours is {width}×{height})."
             )
-        return thumb
+        return logo
 
     def clean_original_release_date(self):
         value = self.cleaned_data.get("original_release_date")

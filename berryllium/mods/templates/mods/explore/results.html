@@ -21,9 +21,14 @@
 </p>
 
 {% if page.object_list %}
-    <div :class="view === 'list' ? 'flex flex-col gap-3' : 'grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4'">
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4" x-show="view !== 'list'">
         {% for mod in page.object_list %}
             {% include 'mods/explore/mod_card.html' %}
+        {% endfor %}
+    </div>
+    <div class="flex flex-col gap-3" x-show="view === 'list'" x-cloak>
+        {% for mod in page.object_list %}
+            {% include 'mods/explore/mod_row.html' %}
         {% endfor %}
     </div>
 
