@@ -141,13 +141,19 @@ def _category_counts(base):
         for key, label in MOD_CATEGORIES
     ]
 
-def _popular_tags(limit=15):
+def _license_counts():
     now = timezone.now()
-    return (
-        Tag.objects.annotate(uses=Count("mods", filter=Q(mods__draft=False, mods__publish_date__lte=now)))
-        .filter(uses__gt=0)
-        .order_by("-uses", "name")[:limit]
-    )
+    licenses = License.objects.annotate(
+        count=Count(
+            "mod_licenses__mod",
+            filter=Q(mod_licenses__mod__draft=False, mod_licenses__mod__publish_date__lte=now),
+            distinct=True,
+        )
+    ).filter(Q(is_enabled=True) | Q(count__gt=0))
+    return [
+        {"key": str(item.pk), "label": item.short_name or item.name, "title": item.name, "count": item.count}
+        for item in licenses.order_by("name")
+    ]
 
 def _category_chips(stored):
     """ Category chips for a mod's card, based on the stored CSV field. """
