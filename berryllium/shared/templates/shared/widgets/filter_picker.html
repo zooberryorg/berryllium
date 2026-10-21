@@ -1,0 +1,26 @@
+{% comment %}
+Search picker used as a filter in a GET form.
+label     panel heading
+config    picker_config(...) JSON
+add_label text of the button that opens the search dialog
+help      optional line under the heading
+{% endcomment %}
+<fieldset class="rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300"
+          x-data="filterPicker(JSON.parse($el.dataset.config))"
+          data-config="{{ config }}"
+          @explore-clear.window="clearFilter($event.detail)">
+    <legend class="sr-only">{{ label }}</legend>
+    <div class="flex items-baseline justify-between gap-2 px-4 pt-2 mb-1">
+        <h3 class="text-lg font-bold text-white">{{ label }}</h3>
+        <button type="button"
+                class="text-xs text-gray-400 hover:text-white underline underline-offset-2 cursor-pointer"
+                x-show="items.length"
+                x-cloak
+                @click="items = []">Clear</button>
+    </div>
+    {% if help %}<p class="text-xs text-gray-400 px-4 mb-2">{{ help }}</p>{% endif %}
+
+    <div class="flex flex-wrap gap-2 px-3 pt-2 pb-3 text-sm">
+        <template x-for="item in items" :key="item.value">
+            <span class="inline-flex items-center gap-1.5 max-w-full rounded-full border border-gold-400/50 bg-gold-400/15 text-gold-200 pl-3 pr-2 py-1"
+                  :title="item.sublabel || item.label">
