@@ -1,0 +1,68 @@
+{% load bfilters %}
+{% comment %}
+TODO: link the title to the mod page once it exists.
+{% endcomment %}
+<article class="group/row flex gap-4 p-3 rounded-2xl border border-white/10 bg-pine-700 transition-all duration-200 hover:border-gold-400/40 hover:shadow-lg hover:shadow-black/20">
+
+    {# thumbnail #}
+    <div class="hidden sm:block relative w-44 md:w-52 shrink-0 self-start rounded-xl overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800"
+         style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
+        {% if mod.card_image_url %}
+            <img src="{{ mod.card_image_url }}" alt="" loading="lazy"
+                 class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/row:scale-[1.03]">
+        {% else %}
+            <span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image text-3xl"></i></span>
+        {% endif %}
+    </div>
+
+    <div class="flex-1 min-w-0 flex flex-col py-0.5">
+        <div class="flex items-start gap-3">
+            {% include 'mods/explore/mod_logo.html' with logo_class="w-11 h-11 rounded-lg" %}
+            <div class="min-w-0 flex-1">
+                <div class="flex items-center gap-2 min-w-0">
+                    <h3 class="text-white font-semibold leading-snug truncate" title="{{ mod.title }}">{{ mod.title }}</h3>
+                    {% if mod.is_archived_file %}
+                        <span class="shrink-0 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded-md bg-white/10 text-white/60" title="Archived mod">
+                            <i class="bi bi-archive"></i><span class="sr-only sm:not-sr-only">Archived</span>
+                        </span>
+                    {% endif %}
+                </div>
+                {% if mod.uploaded_by %}
+                    <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+                {% endif %}
+            </div>
+            <dl class="shrink-0 flex items-center gap-1.5 text-xs">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.download_count }} downloads">
+                    <dt><i class="bi bi-download text-gold-300"></i><span class="sr-only">Downloads</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ mod.download_count|compact }}</dd>
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.like_count }} likes">
+                    <dt><i class="bi bi-heart-fill text-red-300"></i><span class="sr-only">Likes</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ mod.like_count|compact }}</dd>
+                </div>
+            </dl>
+        </div>
+
+        {# summary #}
+        <p class="text-sm text-granite-200 mt-2 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
+
+        {# categorization #}
+        <div class="mt-auto pt-3 flex flex-wrap items-center gap-1.5">
+            {% for label in mod.game_labels %}
+                <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
+            {% endfor %}
+            {% for chip in mod.category_chips %}
+                <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+                    <i class="bi {{ chip.icon }} text-[10px] text-white/50"></i>{{ chip.label }}
+                </span>
+            {% endfor %}
+            {% for tag in mod.tags.all|slice:":3" %}
+                <span class="text-xs px-1.5 py-0.5 text-white/45">#{{ tag.name }}</span>
+            {% endfor %}
+            <time class="ml-auto pl-2 text-xs text-gray-400 whitespace-nowrap" datetime="{{ mod.last_updated|date:'c' }}"
+                  title="Last updated {{ mod.last_updated|date:date_prefs.datetime }}">
+                <i class="bi bi-arrow-repeat mr-0.5"></i> Updated {{ mod.last_updated|timeago }}
+            </time>
+        </div>
+    </div>
+</article>
