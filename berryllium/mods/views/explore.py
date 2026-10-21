@@ -1,20 +1,28 @@
 import re
 from datetime import timedelta
+from urllib.parse import urlparse
 
 from django.core.paginator import Paginator
 from django.core.files.storage import default_storage
-from django.db.models import Count, OuterRef, Q, Subquery
+from django.db.models import Count, Max, OuterRef, Q, Subquery
+from django.http import JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
 from django.utils import timezone
+from django.views.decorators.http import require_GET
 
-from berryllium.mods.models import Mod, ModImage
+from berryllium.mods.models import Mod, ModDependency, ModImage, ModLicense
+from berryllium.mods.pickers import picker_config
 from berryllium.mods.review import _labels
 from berryllium.mods.settings import GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
-from berryllium.shared.models import Tag
+from berryllium.shared.fields import proper_case
+from berryllium.shared.models import License, Tag
 
 PAGE_SIZE = 24
 MAX_QUERY_LENGTH = 100
 MAX_TAGS = 10
+MAX_DEPENDS = 10
+EXTERNAL_PREFIX = "ext:"  # <mod_id> or <ext:url> in a dependency field means "external"
 
 SORTS = {
     "recent": ("Newest", ["-publish_date"]),
