@@ -1,0 +1,18 @@
+{% if form.kind %}
+    <fieldset class="mb-4">
+        <legend class="block text-sm font-medium mb-1 text-white">Type <span class="text-red-500">*</span></legend>
+        <div class="grid grid-cols-2 gap-2 max-w-md">
+            {% for choice in form.kind %}
+                <label class="relative flex items-start gap-3 rounded-xl border border-white/10 bg-pine-800/40 px-3 py-2.5 cursor-pointer hover:border-gold-400/40 has-[:checked]:border-gold-400 has-[:checked]:bg-gold-400/10 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-gold-400 transition-colors">
+                    <input type="radio" name="{{ choice.data.name }}" value="{{ choice.data.value }}" class="sr-only"{% if choice.data.selected %} checked{% endif %}>
+                    <i class="bi {% if choice.data.value == 'news' %}bi-newspaper{% else %}bi-tools{% endif %} text-gold-300 mt-0.5"></i>
+                    <span>
+                        <span class="block text-sm font-medium text-white">{{ choice.choice_label }}</span>
+                        <span class="block text-xs text-white/50">{% if choice.data.value == 'news' %}Site announcements{% else %}How-tos and guides{% endif %}</span>
+                    </span>
+                </label>
+            {% endfor %}
+        </div>
+        {% include "mods/create/field_errors.html" with field=form.kind %}
+    </fieldset>
+{% endif %}
