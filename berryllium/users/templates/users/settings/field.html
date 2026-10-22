@@ -1,0 +1,8 @@
+<div class="space-y-1.5">
+    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-white">
+        {{ field.label }}{% if field.field.required %} <span class="text-red-400">*</span>{% endif %}
+    </label>
+    {{ field }}
+    {% if field.help_text %}<p class="text-xs text-gray-400">{{ field.help_text }}</p>{% endif %}
+    {% for error in field.errors %}<p class="text-sm text-red-300"><i class="bi bi-exclamation-circle mr-1"></i>{{ error }}</p>{% endfor %}
+</div>

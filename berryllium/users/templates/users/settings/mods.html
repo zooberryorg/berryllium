@@ -1,0 +1,10 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_kicker %}Settings{% endblock %}
+{% block panel_title %}My mods{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        Every mod you've uploaded, including drafts. Click a title to open it in the upload form; changes to a published mod go live as each step saves.
+    </p>
+    {% url 'settings_mods_bulk' as bulk_url %}
+    {% include 'mods/panel/mod_list.html' with bulk_url=bulk_url show_uploader=False empty_text="You haven't uploaded any mods yet." %}
+{% endblock %}

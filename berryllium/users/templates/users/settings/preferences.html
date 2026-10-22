@@ -1,0 +1,25 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_kicker %}Settings{% endblock %}
+{% block panel_title %}Preferences{% endblock %}
+{% block panel_content %}
+    <form method="post" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 space-y-6">
+        {% csrf_token %}
+        <p class="text-sm text-gray-300">How dates and times are shown to you across the site, and in date pickers like the publish date in the upload form.</p>
+        {% for field in form %}
+            <fieldset class="space-y-2">
+                <legend class="text-sm font-medium text-white mb-2">{{ field.label }}</legend>
+                <div class="grid gap-2 sm:grid-cols-3">
+                    {% for choice in field %}
+                        <label class="flex items-center gap-3 rounded-xl border border-white/10 bg-pine-800/50 px-4 py-3 cursor-pointer hover:border-gold-400/40 transition-colors has-[:checked]:border-gold-400/60 has-[:checked]:bg-gold-400/10">
+                            {{ choice.tag }}
+                            <span class="text-sm text-white">{{ choice.choice_label }}</span>
+                        </label>
+                    {% endfor %}
+                </div>
+                {% for error in field.errors %}<p class="text-sm text-red-300">{{ error }}</p>{% endfor %}
+            </fieldset>
+        {% endfor %}
+        <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-2.5 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2"><i class="bi bi-check2"></i> Save preferences</button>
+    </form>
+    <style>[name=date_format], [name=time_format] { accent-color: var(--color-gold-400); }</style>
+{% endblock %}

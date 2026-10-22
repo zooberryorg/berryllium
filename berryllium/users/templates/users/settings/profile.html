@@ -1,0 +1,44 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_kicker %}Settings{% endblock %}
+{% block panel_title %}Profile{% endblock %}
+{% block panel_content %}
+    <form method="post" enctype="multipart/form-data" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 space-y-6"
+          x-data="{ previewUrl: '{% if user.avatar %}{{ user.avatar.url }}{% endif %}', removing: false,
+                    preview(event) { const file = event.target.files[0]; if (!file) return; this.removing = false; this.previewUrl = URL.createObjectURL(file); } }">
+        {% csrf_token %}
+        {% if form.non_field_errors %}<p class="text-sm text-red-300">{{ form.non_field_errors.0 }}</p>{% endif %}
+
+        {# picture #}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-5">
+            <span class="relative w-24 h-24 shrink-0 rounded-full overflow-hidden bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-4xl font-semibold text-gold-200 uppercase select-none">
+                <img x-show="previewUrl && !removing" :src="previewUrl" alt="" class="absolute inset-0 w-full h-full object-cover" x-cloak>
+                <span x-show="!previewUrl || removing">{{ user.username|slice:":1" }}</span>
+            </span>
+            <div class="space-y-2">
+                <p class="text-sm font-medium text-white">{{ form.avatar.label }}</p>
+                <div class="flex flex-wrap items-center gap-2">
+                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border border-gold-400/50 px-3.5 py-1.5 text-sm font-medium text-gold-200 hover:bg-gold-400 hover:text-pine-500 transition-colors cursor-pointer"
+                            @click="$refs.avatarInput.click()">
+                        <i class="bi bi-upload"></i> <span x-text="previewUrl ? 'Change picture' : 'Upload picture'">Upload picture</span>
+                    </button>
+                    {% if user.avatar %}
+                        <label class="inline-flex items-center gap-2 text-sm text-gray-300 cursor-pointer">
+                            {{ form.remove_avatar }}
+                            <span>Remove my picture</span>
+                        </label>
+                    {% endif %}
+                </div>
+                <p class="text-xs text-gray-400">{{ form.avatar.help_text }}</p>
+                {{ form.avatar }}
+                {% for error in form.avatar.errors %}<p class="text-sm text-red-300"><i class="bi bi-exclamation-circle mr-1"></i>{{ error }}</p>{% endfor %}
+            </div>
+        </div>
+
+        {% include 'users/settings/field.html' with field=form.biography %}
+
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-2.5 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2"><i class="bi bi-check2"></i> Save profile</button>
+            <a href="{% url 'member_profile' user.username %}" class="text-sm text-gray-300 hover:text-gold-200">View my profile <i class="bi bi-arrow-right"></i></a>
+        </div>
+    </form>
+{% endblock %}

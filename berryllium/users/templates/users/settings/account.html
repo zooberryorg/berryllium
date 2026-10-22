@@ -1,0 +1,29 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_kicker %}Settings{% endblock %}
+{% block panel_title %}Account{% endblock %}
+{% block panel_content %}
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6" aria-labelledby="account-details">
+        <h2 id="account-details" class="text-lg font-semibold text-white mb-4">Account details</h2>
+        <dl class="grid grid-cols-[8rem_minmax(0,1fr)] gap-y-2 text-sm mb-6">
+            <dt class="text-gray-400">Username</dt><dd class="text-white">{{ user.username }}</dd>
+            <dt class="text-gray-400">Member since</dt><dd class="text-white">{{ user.date_joined|date:date_prefs.date }}</dd>
+        </dl>
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% include 'users/settings/field.html' with field=email_form.email %}
+            <button type="submit" name="save_email" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-2.5 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2"><i class="bi bi-check2"></i> Save email</button>
+        </form>
+    </section>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6" aria-labelledby="password-title">
+        <h2 id="password-title" class="text-lg font-semibold text-white mb-4">Change password</h2>
+        <form method="post" class="space-y-4 max-w-md">
+            {% csrf_token %}
+            {% if password_form.non_field_errors %}<p class="text-sm text-red-300">{{ password_form.non_field_errors.0 }}</p>{% endif %}
+            {% include 'users/settings/field.html' with field=password_form.old_password %}
+            {% include 'users/settings/field.html' with field=password_form.new_password1 %}
+            {% include 'users/settings/field.html' with field=password_form.new_password2 %}
+            <button type="submit" name="save_password" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-2.5 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2"><i class="bi bi-key"></i> Change password</button>
+        </form>
+    </section>
+{% endblock %}
