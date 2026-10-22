@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.views.decorators.http import require_GET
 
 from berryllium.mods.models import Mod, ModCredit, ModFile, ModFileGroup
+from berryllium.users.permissions import can_edit_mod, is_moderator
 from berryllium.mods.review import _labels
 from berryllium.mods.settings import (
     EXPANSION_REQUIREMENTS,
@@ -24,10 +25,10 @@ def _is_public(mod):
 
 
 def _can_view(mod, user):
-    """Published mods are public, drafts and scheduled mods only viewable by staff or the uploader."""
+    """Published mods are public; drafts and scheduled mods are only viewable by the uploader and moderators."""
     if _is_public(mod):
         return True
-    return user.is_authenticated and (user.is_staff or user.pk == mod.uploaded_by_id)
+    return user.is_authenticated and (is_moderator(user) or user.pk == mod.uploaded_by_id)
 
 
 def _downloadable_files():
@@ -94,6 +95,7 @@ def mod_detail(request, mod_id):
         "expansion_labels": [label for label in _labels(mod.expansions, EXPANSION_REQUIREMENTS) if label != "None"],
         "tags": list(mod.tags.all()),
         "tabs": TABS,
+        "can_edit": can_edit_mod(request.user, mod),
     }
     return render(request, "mods/detail/base.html", context)
 

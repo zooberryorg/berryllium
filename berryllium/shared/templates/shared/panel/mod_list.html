@@ -1,0 +1,112 @@
+{% load bfilters %}
+<div class="space-y-4">
+    {# status tabs #}
+    <nav class="overflow-x-auto" aria-label="Filter by status">
+        <div class="inline-flex rounded-2xl bg-pine-600 p-1.5 border border-pine-300 min-w-max gap-1">
+            {% for tab in status_tabs %}
+                <a href="{{ tab.url }}"
+                   class="px-4 py-2 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-150 {% if tab.active %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}"
+                   {% if tab.active %}aria-current="page"{% endif %}>
+                    {{ tab.label }}
+                    <span class="text-xs tabular-nums {% if tab.active %}text-pine-500/70{% else %}text-gray-500{% endif %}">{{ tab.count }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </nav>
+
+    {# search #}
+    <form method="get" class="relative">
+        {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+        <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
+        <input type="search" name="q" value="{{ q }}" placeholder="Search by title..." aria-label="Search by title"
+               class="zb-input pl-11 text-sm w-full">
+    </form>
+
+    {% if page.object_list %}
+        <form method="post" action="{{ bulk_url }}"
+              x-data="{ selected: [], allIds: [], confirming: false }"
+              x-init="allIds = [...$el.querySelectorAll('input[name=ids]')].map(el => el.value)">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next_url }}">
+
+            {# bulk bar #}
+            <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 px-4 py-3">
+                <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
+                    <input type="checkbox" class="w-4 h-4 accent-gold-400 cursor-pointer"
+                           :checked="selected.length && selected.length === allIds.length"
+                           x-effect="$el.indeterminate = selected.length > 0 && selected.length < allIds.length"
+                           @change="selected = $event.target.checked ? [...allIds] : []; confirming = false">
+                    <span x-text="selected.length ? selected.length + ' selected' : 'Select all'">Select all</span>
+                </label>
+                <div class="flex flex-wrap items-center gap-2 ml-auto" x-show="!confirming">
+                    <button type="submit" name="action" value="publish" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500" :disabled="!selected.length">
+                        <i class="bi bi-send"></i> Publish
+                    </button>
+                    <button type="submit" name="action" value="unpublish" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" :disabled="!selected.length">
+                        <i class="bi bi-eye-slash"></i> Move to drafts
+                    </button>
+                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15" :disabled="!selected.length" @click="confirming = true">
+                        <i class="bi bi-trash"></i> Delete
+                    </button>
+                </div>
+                {# delete confirmation, in the page (the browser's confirm dialog isn't used) #}
+                <div class="flex flex-wrap items-center gap-2 ml-auto" x-show="confirming" x-cloak role="alert">
+                    <span class="text-sm text-red-200">
+                        Delete <strong x-text="selected.length"></strong> mod<span x-show="selected.length !== 1">s</span> permanently, with their files? This can't be undone.
+                    </span>
+                    <button type="submit" name="action" value="delete" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15 bg-red-500/20">Delete</button>
+                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="confirming = false">Keep them</button>
+                </div>
+            </div>
+
+            {# rows #}
+            <ul class="mt-3 divide-y divide-white/5 rounded-2xl border border-pine-300 bg-pine-600 overflow-hidden">
+                {% for mod in page.object_list %}
+                    <li class="flex items-center gap-3 sm:gap-4 px-4 py-3 transition-colors duration-150"
+                        :class="selected.includes('{{ mod.pk }}') ? 'bg-gold-400/5' : 'hover:bg-white/[0.03]'">
+                        <input type="checkbox" name="ids" value="{{ mod.pk }}" x-model="selected" @change="confirming = false"
+                               class="w-4 h-4 shrink-0 accent-gold-400 cursor-pointer" aria-label="Select {{ mod.title|default:'Untitled mod' }}">
+                        <span class="hidden sm:block w-24 shrink-0 overflow-hidden rounded-lg bg-pine-800" style="aspect-ratio: 16 / 9;">
+                            {% if mod.card_image_url %}<img src="{{ mod.card_image_url }}" alt="" loading="lazy" class="w-full h-full object-cover">{% endif %}
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <a href="{% url 'mod_edit' mod.pk %}" class="font-medium text-white hover:text-gold-200 truncate" title="Edit {{ mod.title|default:'Untitled mod' }}">{{ mod.title|default:"Untitled mod" }}</a>
+                                {% include 'mods/panel/status_badge.html' %}
+                            </div>
+                            <p class="text-xs text-gray-400 mt-0.5 truncate">
+                                {% if show_uploader %}by {{ mod.uploaded_by.username|default:"(deleted account)" }} · {% endif %}
+                                <span title="{{ mod.download_count }} downloads"><i class="bi bi-download"></i> {{ mod.download_count|compact }}</span> ·
+                                <time datetime="{{ mod.last_updated|date:'c' }}" title="{{ mod.last_updated|date:date_prefs.datetime }}">edited {{ mod.last_updated|timeago }}</time>
+                                {% if mod.status == "scheduled" %} · goes live {{ mod.publish_date|date:date_prefs.datetime }}{% endif %}
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                            <a href="{% url 'mod_edit' mod.pk %}" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="Edit" aria-label="Edit {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-pencil-square"></i></a>
+                            <a href="{% url 'mod_detail' mod.pk %}" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="{% if mod.status == 'published' %}View{% else %}Preview{% endif %}" aria-label="View {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-box-arrow-up-right"></i></a>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        </form>
+
+        {% if page.paginator.num_pages > 1 %}
+            <nav class="flex items-center justify-center gap-1" aria-label="Pages">
+                {% for number in page_range %}
+                    {% if number == page.paginator.ELLIPSIS %}
+                        <span class="text-gray-500 px-2">…</span>
+                    {% elif number == page.number %}
+                        <span class="w-10 h-10 rounded-lg bg-gold-400 text-pine-500 font-semibold flex items-center justify-center" aria-current="page">{{ number }}</span>
+                    {% else %}
+                        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}" class="w-10 h-10 rounded-lg bg-pine-600 text-gray-400 hover:text-white font-semibold flex items-center justify-center">{{ number }}</a>
+                    {% endif %}
+                {% endfor %}
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="rounded-2xl border border-pine-300 bg-pine-600 p-10 text-center">
+            <i class="bi bi-puzzle text-4xl text-white/30"></i>
+            <p class="text-white font-semibold mt-4">{% if q %}No mods match “{{ q }}”.{% else %}{{ empty_text|default:"No mods here yet." }}{% endif %}</p>
+        </div>
+    {% endif %}
+</div>
