@@ -31,6 +31,9 @@ from berryllium.mods.settings import UPLOAD_NAVIGATION
 from berryllium.mods.pickers import publish_mod
 from berryllium.mods.review import review_context
 from berryllium.shared.models import Language
+from berryllium.mods.editing import close_editing, open_for_editing
+from berryllium.users.permissions import can_edit_mod
+from django.contrib.auth.decorators import login_required
 
 class DraftModMixin:
     """Loads the mod from the URL's mod_id and checks this session created it."""
@@ -133,8 +136,8 @@ class ModDraftView(LoginRequiredMixin, CreateView):
         form.save_relations()
         english = Language.objects.filter(code="en").first()
         if english:
-            self.object.languages.add(english)        
-            draft_ids = self.request.session.get("draft_ids", [])
+           self.object.languages.add(english)
+        draft_ids = self.request.session.get("draft_ids", [])
         draft_ids.append(self.object.id)
         self.request.session["draft_ids"] = draft_ids
         self.request.session["session_id"] = self.object.id
@@ -441,6 +444,8 @@ class ModCreateReview(UploadStepMixin, TemplateView):
         if request.session.get("session_id") == mod.id:
             request.session.pop("session_id")
 
+        # finished with form; do not allow further edits in this session
+        close_editing(request, mod.id)
         # scheduled mods are only visible to the uploader until their date, which the mod page handles
         response = HttpResponse()
         response["HX-Redirect"] = reverse("mod_detail", kwargs={"mod_id": mod.id})
@@ -479,29 +484,26 @@ def cancel_mod_upload(request):
     Note: live version will only delete session data. Live version
     will keep draft and temp files until a cleanup task runs,
     the mod is processed into a full mod, or the user manually deletes the draft.
+    Leave the upload form. Nothing is deleted: drafts stay in the control panel (Settings > My mods),
+    where they can be continued or deleted, and published mods being edited keep their saved changes.
     """
     mod_id = request.session.get("session_id")
     if mod_id:
-        # Get all files with this session
-        mod = Mod.objects.filter(id=mod_id).first()
-        if mod:
-            files = mod.files.all()
-            for f in files:
-                # Delete file from storage
-                if f.staged_file and default_storage.exists(f.staged_file.name):
-                    default_storage.delete(f.staged_file.name)
-            # Delete session directory if it exists
-            session_dir = f"temp_uploads/{mod_id}/"
-            if default_storage.exists(session_dir):
-                default_storage.delete(session_dir)
-            # Delete draft mod
-            mod.delete()
+        close_editing(request, mod_id)
 
-        # Clear session data related to the upload
-        request.session.pop("session_id", None)
-        request.session.modified = True
-
-    # force htmx to redirect instead of trying to re-render
     response = HttpResponse()
-    response["HX-Redirect"] = redirect("home").url
+    if request.user.is_authenticated:
+        response["HX-Redirect"] = reverse("settings_mods")
+    else:
+        response["HX-Redirect"] = reverse("home")
     return response
+
+@login_required
+@require_http_methods(["GET"])
+def edit_mod(request, mod_id):
+    """Open any mod the user may edit (their own; any mod for moderators) in the upload form."""
+    mod = get_object_or_404(Mod, pk=mod_id)
+    if not can_edit_mod(request.user, mod):
+        raise Http404("Mod not found.")
+    open_for_editing(request, mod)
+    return redirect("mod_create_general", mod_id=mod.pk)
