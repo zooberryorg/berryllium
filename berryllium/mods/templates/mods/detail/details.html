@@ -36,7 +36,7 @@
             <dt class="text-gray-400">Released</dt>
             <dd class="text-white">{{ mod.original_release_date|date:date_prefs.date|default:"Unknown" }}</dd>
             <dt class="text-gray-400">Made by</dt>
-            <dd class="text-white">{% for credit in original_authors %}{{ credit.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}Unknown{% endfor %}</dd>
+            <<dd class="text-white">{% for credit in original_authors %}{% with url=credit|profile_url %}{% if url %}<a href="{{ url }}" class="hover:text-gold-300">{{ credit.display_name }}</a>{% else %}{{ credit.display_name }}{% endif %}{% endwith %}{% if not forloop.last %}, {% endif %}{% empty %}Unknown{% endfor %}</dd>
             {% if original_websites %}
                 <dt class="text-gray-400">First hosted on</dt>
                 <dd class="text-white">{{ original_websites|join:", " }}</dd>

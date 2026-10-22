@@ -49,9 +49,10 @@ def review_issues(mod):
     # Images
     if not mod.images.exists():
         problems.append(_issue(mod, "mod_create_images", "Upload at least one image."))
-    # Recommended    
+    # Description
     if not (mod.description or "").strip():
-        suggestions.append(_issue(mod, "mod_create_description", "Add a description."))
+        problems.append(_issue(mod, "mod_create_description", "Write a description."))
+    # Recommended
     if not mod.licenses.exists():
         suggestions.append(_issue(mod, "mod_create_resources", "Pick a license so others know how they may use your work."))
 

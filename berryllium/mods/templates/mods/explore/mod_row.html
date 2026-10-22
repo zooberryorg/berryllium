@@ -24,7 +24,7 @@
                     {% endif %}
                 </div>
                 {% if mod.uploaded_by %}
-                    <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+                    <p class="text-xs text-gray-400 truncate">by <a href="{% url 'member_profile' mod.uploaded_by.username %}" class="relative z-10 text-white/70 hover:text-gold-200">{{ mod.uploaded_by.username }}</a></p>
                 {% endif %}
             </div>
             <dl class="shrink-0 flex items-center gap-1.5 text-xs">

@@ -54,7 +54,7 @@ def mod_detail(request, mod_id):
             groups.append({"group": group, "files": files, "size": sum(f.size or 0 for f in files)})
     all_files = [f for g in groups for f in g["files"]]
 
-    credits = list(mod.credits.select_related("member", "author"))
+    credits = list(mod.credits.select_related("member", "author__member"))
     dependencies = list(mod.dependencies.select_related("ref"))
     now = timezone.now()
     for dep in dependencies:
