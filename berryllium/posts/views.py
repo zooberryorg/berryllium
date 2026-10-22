@@ -180,3 +180,36 @@ def preview(request, post_id):
     # the shared editor script sends the text as "description"
     html = render_markdown(request.POST.get("description", ""))
     return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
+
+# --------------------------------------------------------------------------- reading
+
+
+@require_GET
+def detail(request, post_id):
+    post = get_object_or_404(Post.objects.select_related("uploaded_by"), pk=post_id)
+    if not can_view(post, request.user):
+        raise Http404("Post not found.")
+    body_html, toc = render_markdown_with_toc(post.body)
+    credits = list(post.credits.select_related("member", "author__member"))
+    # related: same kind, most shared tags first, then newest
+    tag_ids = list(post.tags.values_list("pk", flat=True))
+    related = published_posts(post.kind).exclude(pk=post.pk).select_related("uploaded_by")
+    if tag_ids:
+        related = related.annotate(shared=Count("tags", filter=Q(tags__in=tag_ids))).order_by("-shared", "-publish_date")
+    related = related[:3]
+    return render(request, "posts/detail/base.html", {
+        "post": post,
+        "body_html": body_html,
+        "toc": toc,
+        "files": list(post.files.all()),
+        "collaborators": [c for c in credits if c.role == ModCredit.Role.COLLABORATOR],
+        "original_authors": [c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR],
+        "tags": list(post.tags.all()),
+        "original_websites": list(post.original_websites.all()),
+        "related": related,
+        # "Updated" only when an edit came more than a day after publishing
+        "was_updated": bool(post.first_published_at) and (post.last_updated - post.publish_date).total_seconds() > 86400,
+        "is_public": is_public(post),
+        "can_edit": can_edit_post(request.user, post),
+        "explore_tab": "news" if post.kind == Post.Kind.NEWS else "tutorials",
+    })
