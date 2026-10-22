@@ -278,3 +278,25 @@ def settings_posts(request):
         "panel_nav": _nav(request, "settings_posts"),
         "noun": _noun(request.user),
     })
+
+@login_required
+@require_POST
+def settings_posts_change(request, post_id):
+    post = get_object_or_404(_my_posts(request.user), pk=post_id)
+    action = request.POST.get("action")
+    name = f"\u201c{post.title or 'Untitled post'}\u201d"
+    if action == "unpublish" and not post.draft:
+        post.draft = True
+        post.save(update_fields=["draft"])
+        messages.success(request, f"Moved {name} to drafts.")
+    elif action == "publish" and post.draft:
+        problems = publish_problems(post)
+        if problems:
+            messages.warning(request, f"{name} wasn't published: " + " ".join(p["message"] for p in problems))
+        else:
+            publish_post(post)
+            messages.success(request, f"Published {name}.")
+    elif action == "delete":
+        post.delete()
+        messages.success(request, f"Deleted {name}.")
+    return redirect("settings_posts")
