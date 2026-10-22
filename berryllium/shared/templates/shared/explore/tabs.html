@@ -1,0 +1,29 @@
+<nav id="explore-tabs" class="mb-6 lg:mb-8 overflow-x-auto" aria-label="Explore sections" {% if oob %}hx-swap-oob="true"{% endif %}>
+    <div class="inline-flex rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300 min-w-max gap-1">
+        <a href="{% url 'explore_mods' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'mods' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'mods' %}aria-current="page"{% endif %}>
+            <i class="bi bi-puzzle-fill"></i> Mods
+        </a>
+        <a href="{% url 'explore_mods' %}?category=zoos_and_saves"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'zoos' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'zoos' %}aria-current="page"{% endif %}>
+            <i class="bi bi-map-fill"></i> Zoos & Saves
+        </a>
+        <a href="{% url 'explore_tutorials' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'tutorials' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'tutorials' %}aria-current="page"{% endif %}>
+            <i class="bi bi-tools"></i> Tutorials
+        </a>
+        <a href="{% url 'explore_news' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'news' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'news' %}aria-current="page"{% endif %}>
+            <i class="bi bi-newspaper"></i> News
+        </a>
+        <a href="{% url 'explore_modders' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'modders' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'modders' %}aria-current="page"{% endif %}>
+            <i class="bi bi-people-fill"></i> Modders
+        </a>
+    </div>
+</nav>

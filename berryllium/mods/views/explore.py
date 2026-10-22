@@ -289,9 +289,12 @@ def mods(request):
         "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
         "game_options": [option for option in GAME_OPTIONS if option[0] != "na"],
     }
+    # "Zoos & Saves" in the Explore tabs is this page with that category picked
+    explore_tab = "zoos" if filters["category"] == "zoos_and_saves" else "mods"
 
     is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
     if is_htmx:
+        context.update({"explore_tab": explore_tab, "oob_tabs": True})
         return render(request, "mods/explore/results.html", context)
 
     context["categories"] = _category_counts(base)
@@ -313,5 +316,5 @@ def mods(request):
         placeholder="Search mods or external downloads...",
         empty_text="Nothing that other mods depend on matches.",
     )    
-    context["explore_tab"] = "mods"
+    context["explore_tab"] = explore_tab
     return render(request, "mods/explore/base.html", context)

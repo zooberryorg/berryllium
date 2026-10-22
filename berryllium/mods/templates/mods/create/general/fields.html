@@ -30,7 +30,7 @@
         </div>
 
         <p class="text-white/50 text-xs mt-2" x-show="mode === 'now'">
-            Your mod goes live as soon as you click Finish on the last step.
+            {{ publish_hint|default:"Your mod goes live as soon as you click Finish on the last step." }}
         </p>
         <div class="mt-2 max-w-md" x-show="mode === 'schedule'" x-cloak>
             <input type="text"
@@ -58,7 +58,7 @@
                 <p class="text-xs text-heading flex">{{ form.is_archived_file.label }}</p>
             </div>
         </label>
-        <p class="text-white/50 text-xs mb-3">Turn this on if the mod was released somewhere else first.</p>
+        <p class="text-white/50 text-xs mb-3">{{ archive_hint|default:"Turn this on if the mod was released somewhere else first." }}</p>
         <div x-show="archived" x-collapse x-cloak>
             {% include "mods/create/general/field.html" with field=form.original_release_date %}
             {% include "shared/widgets/search_picker.html" with field=form.original_authors config=form.original_authors_picker disabled_expr="!archived" %}
