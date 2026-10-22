@@ -39,6 +39,7 @@ urlpatterns = [
     path("mods/files/<int:file_id>/download/", detail.download_file, name="mod_file_download"),
     # ---------------------------------------------- Session management
     path("mods/create/cancel/", create.cancel_mod_upload, name="cancel_mod_upload"),
+    path("mods/<int:mod_id>/edit/", create.edit_mod, name="mod_edit"),
     # ---------------------------------------------- HTMX endpoints
     path(
         "mods/validate-url/",
