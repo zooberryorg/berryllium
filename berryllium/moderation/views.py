@@ -133,3 +133,59 @@ def mods(request):
 @require_POST
 def mods_bulk(request):
     return handle_bulk_post(request, Mod.objects.all(), reverse("moderation_mods"))
+
+# --------------------------------------------------------------------------- tags
+
+
+@moderator_required
+def tags(request):
+    q = request.GET.get("q", "").strip()[:50]
+    now = timezone.now()
+    queryset = Tag.objects.annotate(
+        uses=Count("mods", distinct=True),
+        public_uses=Count("mods", filter=Q(mods__draft=False, mods__publish_date__lte=now), distinct=True),
+    )
+    if q:
+        queryset = queryset.filter(name__icontains=q)
+    page = Paginator(queryset.order_by("-uses", "name"), 50).get_page(request.GET.get("page"))
+    return render(request, "moderation/tags.html", {
+        "q": q, "page": page, "next_url": request.get_full_path(),
+        "panel_nav": _nav(request, "moderation_tags"),
+    })
+
+
+def _merge_tag(source, target):
+    """Move every mod from source onto target, then delete source."""
+    with transaction.atomic():
+        already = set(ModTag.objects.filter(tag=target).values_list("mod_id", flat=True))
+        ModTag.objects.filter(tag=source, mod_id__in=already).delete()
+        ModTag.objects.filter(tag=source).update(tag=target)
+        source.delete()
+
+
+@moderator_required
+@require_POST
+def tags_change(request):
+    tag = Tag.objects.filter(pk=request.POST.get("tag_id") or 0).first()
+    action = request.POST.get("action")
+    if tag is None:
+        messages.error(request, "That tag no longer exists.")
+    elif action == "rename":
+        name = proper_case(request.POST.get("name", ""))[:50]
+        other = Tag.objects.filter(name__iexact=name).exclude(pk=tag.pk).first()
+        if not name:
+            messages.error(request, "Enter a new name for the tag.")
+        elif other:
+            _merge_tag(tag, other)
+            messages.success(request, f"Merged \u201c{tag.name}\u201d into \u201c{other.name}\u201d.")
+        else:
+            old = tag.name
+            tag.name = name
+            tag.save()
+            messages.success(request, f"Renamed \u201c{old}\u201d to \u201c{tag.name}\u201d.")
+    elif action == "delete":
+        count = ModTag.objects.filter(tag=tag).count()
+        tag.delete()
+        messages.success(request, f"Deleted \u201c{tag.name}\u201d and removed it from {count} mod{'s' if count != 1 else ''}.")
+    next_url = request.POST.get("next", "")
+    return redirect(next_url if next_url.startswith("/moderation/") else reverse("moderation_tags"))
