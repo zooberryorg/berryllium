@@ -123,3 +123,13 @@ def apply_filters(people, filters):
     else:
         result.sort(key=lambda p: (-p["mod_count"], p["name"].lower()))
     return result
+
+def _remove_url(params, key, value=None):
+    query = params.copy()
+    query.pop("page", None)
+    if value is None:
+        query.pop(key, None)
+    else:
+        query.setlist(key, [v for v in query.getlist(key) if v != value])
+    encoded = query.urlencode()
+    return f"?{encoded}" if encoded else "?"
