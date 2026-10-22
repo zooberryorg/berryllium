@@ -55,3 +55,47 @@ def create_draft(request):
         response["HX-Redirect"] = reverse("post_edit", kwargs={"post_id": post.pk})
         return response
     return render(request, "posts/create/draft.html", {"form": form, "noun": _noun(request.user)})
+
+# --------------------------------------------------------------------------- editor
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def edit(request, post_id):
+    post = _editable_post(request, post_id)
+    form_kwargs = {"instance": post, "uploader": post.uploaded_by, "can_post_news": can_post_news(request.user), "user": request.user}
+    if request.method == "POST":
+        action = request.POST.get("action", "save")
+        form = PostEditorForm(request.POST, **form_kwargs)
+        saved = form.is_valid()
+        if saved:
+            form.save()
+            form.save_relations()
+        if action == "autosave":
+            errors = [message for field_errors in form.errors.values() for message in field_errors]
+            return JsonResponse({"saved": saved, "errors": errors[:3]})
+        if saved and action == "publish":
+            problems = publish_problems(post)
+            if not problems:
+                was_live = post.first_published_at is not None
+                publish_post(post)
+                messages.success(request, "Changes saved." if was_live else "Published.")
+                return redirect("post_detail", post_id=post.pk)
+            messages.error(request, "Fix the items in Publishing before publishing.")
+        elif saved:
+            messages.success(request, "Saved.")
+            return redirect("post_edit", post_id=post.pk)
+        else:
+            messages.error(request, "Some fields need fixing. They're marked below.")
+    else:
+        form = PostEditorForm(**form_kwargs)
+    return render(request, "posts/editor/base.html", {
+        "form": form,
+        "post": post,
+        "problems": publish_problems(post),
+        "files": post.files.all(),
+        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS),
+        "max_files": MAX_POST_FILES,
+        "noun": post.get_kind_display(),
+    })
+
