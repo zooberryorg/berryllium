@@ -39,3 +39,12 @@ def settings_profile(request):
         messages.success(request, "Profile saved.")
         return redirect("settings_profile")
     return render(request, "users/settings/profile.html", {"form": form, "panel_nav": _nav(request, "settings_profile")})
+
+@login_required
+def settings_preferences(request):
+    form = PreferencesForm(request.POST or None, instance=request.user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Preferences saved. Dates and times across the site now use your formats.")
+        return redirect("settings_preferences")
+    return render(request, "users/settings/preferences.html", {"form": form, "panel_nav": _nav(request, "settings_preferences")})
