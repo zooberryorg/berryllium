@@ -64,3 +64,19 @@ class PreferencesForm(forms.ModelForm):
             "time_format": forms.RadioSelect,
         }
         labels = {"date_format": "Dates", "time_format": "Times"}
+
+class EmailForm(forms.ModelForm):
+    class Meta:
+        model = Member
+        fields = ["email"]
+        widgets = {"email": forms.EmailInput(attrs={"class": INPUT, "autocomplete": "email"})}
+        labels = {"email": "Email address"}
+        help_texts = {"email": "Used to sign in and for account messages. It isn't shown on your profile."}
+
+    def clean_email(self):
+        email = self.cleaned_data.get("email", "").strip()
+        if not email:
+            raise forms.ValidationError("Enter an email address.")
+        if Member.objects.filter(email__iexact=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError("Another account already uses this email address.")
+        return email
