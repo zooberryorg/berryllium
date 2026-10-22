@@ -160,3 +160,23 @@ def file_change(request, post_id, file_id):
         "post": post, "files": post.files.all(), "file_errors": [],
         "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
     })
+
+@login_required
+@require_POST
+def body_image(request, post_id):
+    """Image button for editor"""
+    post = _editable_post(request, post_id)
+    form = PostImageForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return JsonResponse({"error": form.errors["image"][0]}, status=400)
+    image = PostImage.objects.create(post=post, image=form.cleaned_data["image"])
+    return JsonResponse({"url": image.image.url})
+
+
+@login_required
+@require_POST
+def preview(request, post_id):
+    _editable_post(request, post_id)
+    # the shared editor script sends the text as "description"
+    html = render_markdown(request.POST.get("description", ""))
+    return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
