@@ -96,3 +96,40 @@ def files(request):
         "next_url": request.get_full_path(),
         "panel_nav": _nav(request, "moderation_files"),
     })
+
+@moderator_required
+@require_POST
+def files_review(request):
+    """Approve or reject one or more files. Rejected files are hidden from downloads on the mod page."""
+    action = request.POST.get("action")
+    ids = [int(value) for value in request.POST.getlist("ids") if value.isdigit()]
+    note = request.POST.get("note", "").strip()[:1000]
+    new_status = {"approve": ModFile.Status.APPROVED, "reject": ModFile.Status.FAILED}.get(action)
+    if not new_status or not ids:
+        messages.warning(request, "Select at least one file and choose Approve or Reject.")
+    elif action == "reject" and not note:
+        messages.error(request, "Add a note saying why the file was rejected. The uploader will need it.")
+    else:
+        count = ModFile.objects.filter(pk__in=ids).update(
+            status=new_status, moderated_at=timezone.now(), moderation_notes=note
+        )
+        verb = "Approved" if action == "approve" else "Rejected"
+        messages.success(request, f"{verb} {count} file{'s' if count != 1 else ''}.")
+    next_url = request.POST.get("next", "")
+    return redirect(next_url if next_url.startswith("/moderation/") else reverse("moderation_files"))
+
+
+# --------------------------------------------------------------------------- mods
+
+
+@moderator_required
+def mods(request):
+    context = mod_list_context(request, Mod.objects.all())
+    context["panel_nav"] = _nav(request, "moderation_mods")
+    return render(request, "moderation/mods.html", context)
+
+
+@moderator_required
+@require_POST
+def mods_bulk(request):
+    return handle_bulk_post(request, Mod.objects.all(), reverse("moderation_mods"))
