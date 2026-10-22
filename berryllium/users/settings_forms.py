@@ -16,6 +16,18 @@ class ProfileSettingsForm(forms.ModelForm):
         widget=forms.CheckboxInput(attrs={"class": "w-4 h-4 accent-gold-400", "@change": "removing = $event.target.checked"}),
     )
 
+    class Meta:
+        model = Member
+        fields = ["avatar", "biography"]
+        labels = {"avatar": "Profile picture", "biography": "About you"}
+        help_texts = {
+            "avatar": f"JPG, PNG or WEBP, at least {MIN_AVATAR_SIZE}×{MIN_AVATAR_SIZE}px, up to {MAX_AVATAR_SIZE // (1024 * 1024)} MB. It's shown as a circle.",
+            "biography": "Shown in the About box on your profile. Up to 500 characters.",
+        }
+        widgets = {
+            "avatar": forms.FileInput(attrs={"accept": ".jpg,.jpeg,.png,.webp", "class": "sr-only", "x-ref": "avatarInput", "@change": "preview($event)"}),
+            "biography": forms.Textarea(attrs={"class": INPUT + " rounded-2xl", "rows": 5, "maxlength": 500}),
+        }
 
     def save(self, commit=True):
         old = Member.objects.filter(pk=self.instance.pk).values_list("avatar", flat=True).first()
