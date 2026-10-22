@@ -55,7 +55,7 @@ function autosaveForm({ interval = 2000 } = {}) {
       const data = new FormData(this.$root);
       data.set('action', 'autosave');
       try {
-        const response = await fetch(this.$root.getAttribute('hx-post'), {
+        const response = await fetch(this.$root.dataset.autosaveUrl || this.$root.getAttribute('hx-post'), {
           method: 'POST',
           body: data,
           headers: { 'X-CSRFToken': data.get('csrfmiddlewaretoken') || '' },
