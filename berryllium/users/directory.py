@@ -133,3 +133,76 @@ def _remove_url(params, key, value=None):
         query.setlist(key, [v for v in query.getlist(key) if v != value])
     encoded = query.urlencode()
     return f"?{encoded}" if encoded else "?"
+
+def modders(request):
+    params = request.GET
+    filters = read_filters(params)
+    everyone = collect_modders()
+    results = apply_filters(everyone, filters)
+
+    site_names = {str(site.pk): site.name for site in ArchivedWebsite.objects.all()}
+    site_names[ZOOBERRY] = "ZooBerry"
+
+    page = Paginator(results, PAGE_SIZE).get_page(params.get("page"))
+    for person in page.object_list:
+        labels = sorted((site_names.get(w, "") for w in person["websites"] if w != ZOOBERRY), key=str.lower)
+        person["website_labels"] = (["ZooBerry"] if ZOOBERRY in person["websites"] else []) + [l for l in labels if l]
+
+    active = []
+    if filters["q"]:
+        active.append({"label": f'"{filters["q"]}"', "name": "q", "value": "", "url": _remove_url(params, "q")})
+    if filters["category"]:
+        active.append({"label": dict(MOD_CATEGORIES)[filters["category"]], "name": "category", "value": "", "url": _remove_url(params, "category")})
+    for tag in filters["tags"]:
+        active.append({"label": tag, "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
+    if filters["year_from"]:
+        active.append({"label": f"Active since {filters['year_from']}", "name": "from", "value": "", "url": _remove_url(params, "from")})
+    if filters["year_to"]:
+        active.append({"label": f"Active until {filters['year_to']}", "name": "to", "value": "", "url": _remove_url(params, "to")})
+    for website in filters["websites"]:
+        active.append({"label": site_names.get(website, website), "name": "website", "value": website, "url": _remove_url(params, "website", website)})
+
+    page_query = params.copy()
+    page_query.pop("page", None)
+    context = {
+        "page": page,
+        "page_range": list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)),
+        "page_query": page_query.urlencode(),
+        "filters": filters,
+        "active_filters": active,
+        "has_anyone": bool(everyone),
+    }
+    is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
+    if is_htmx:
+        return render(request, "users/modders/results.html", context)
+
+    years = sorted({year for person in everyone for year in person["years"]})
+    year_options = [(str(year), str(year)) for year in range(years[0], max(years[-1], timezone.now().year) + 1)] if years else []
+    used_sites = {w for person in everyone for w in person["websites"]}
+    context.update({
+        "explore_tab": "modders",
+        "total_published": len(everyone),
+        "categories": [
+            {"key": key, "label": label, "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder"),
+             "count": sum(1 for p in everyone if key in p["categories"])}
+            for key, label in MOD_CATEGORIES
+        ],
+        "website_options": sorted(
+            ({"key": key, "label": site_names.get(key, key), "count": sum(1 for p in everyone if key in p["websites"])}
+             for key in used_sites),
+            key=lambda option: (option["key"] != ZOOBERRY, option["label"].lower()),
+        ),
+        "year_options": year_options,
+        "year_from": str(filters["year_from"] or ""),
+        "year_to": str(filters["year_to"] or ""),
+        "sort_options": list(SORTS.items()),
+        "tag_picker": picker_config(
+            name="tag",
+            search_url=reverse("explore_search_tags"),
+            items=[{"value": t, "label": t} for t in filters["tags"]],
+            title="Filter by tags",
+            placeholder="Search tags...",
+            empty_text="No tags match.",
+        ),
+    })
+    return render(request, "users/modders/base.html", context)
