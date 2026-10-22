@@ -223,3 +223,4 @@ package.json
 *.zip
 
 0012_remove_mod_logo.py
+0004_member_avatar.py
