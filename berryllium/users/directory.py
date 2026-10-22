@@ -48,3 +48,33 @@ def _modders_of(mod):
         member = mod.uploaded_by
         people.append((f"m:{member.pk}", member.username, member, profile_url(member=member)))
     return people
+
+def collect_modders():
+    """One dict per person, from every published mod."""
+    credits = Prefetch("credits", queryset=ModCredit.objects.select_related("member", "author__member"))
+    mods = published_mods().select_related("uploaded_by").prefetch_related(credits, "tags", "original_websites")
+    people = {}
+    for mod in mods:
+        categories = {key.strip() for key in (mod.category or "").split(",") if key.strip()}
+        tags = {tag.name for tag in mod.tags.all()}
+        websites = {str(site.pk) for site in mod.original_websites.all()} if mod.is_archived_file else {ZOOBERRY}
+        year = _mod_year(mod)
+        for key, name, member, url in _modders_of(mod):
+            person = people.setdefault(key, {
+                "key": key, "name": name, "member": member, "url": url, "mods": set(), "downloads": 0,
+                "years": set(), "websites": set(), "categories": set(), "tags": set(), "last_published": None,
+            })
+            if mod.pk in person["mods"]:
+                continue  # credited twice on the same mod
+            person["mods"].add(mod.pk)
+            person["downloads"] += mod.download_count
+            person["years"].add(year)
+            person["websites"] |= websites
+            person["categories"] |= categories
+            person["tags"] |= tags
+            if person["last_published"] is None or mod.publish_date > person["last_published"]:
+                person["last_published"] = mod.publish_date
+    for person in people.values():
+        person["mod_count"] = len(person["mods"])
+        person["first_year"], person["last_year"] = min(person["years"]), max(person["years"])
+    return list(people.values())
