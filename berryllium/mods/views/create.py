@@ -441,9 +441,9 @@ class ModCreateReview(UploadStepMixin, TemplateView):
         if request.session.get("session_id") == mod.id:
             request.session.pop("session_id")
 
-        # TODO: redirect to the mod's page once it exists
+        # scheduled mods are only visible to the uploader until their date, which the mod page handles
         response = HttpResponse()
-        response["HX-Redirect"] = reverse("home")
+        response["HX-Redirect"] = reverse("mod_detail", kwargs={"mod_id": mod.id})
         return response
 
 
