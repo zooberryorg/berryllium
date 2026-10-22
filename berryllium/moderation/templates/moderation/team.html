@@ -1,0 +1,50 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Moderation sections{% endblock %}
+{% block panel_kicker %}Moderation{% endblock %}
+{% block panel_title %}Team{% endblock %}
+{% block panel_content %}
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+        <h2 class="text-lg font-semibold text-white mb-1">Moderators</h2>
+        <p class="text-sm text-gray-400 mb-4">Moderators can open this panel: review files, manage any mod and fix tags. They can't change the team.</p>
+        <form method="post" action="{% url 'moderation_team_change' %}" class="flex flex-col sm:flex-row gap-2 mb-4">
+            {% csrf_token %}
+            <label class="sr-only" for="new-moderator">Username</label>
+            <input id="new-moderator" name="username" required placeholder="Username of the member to add" autocomplete="off" class="zb-input text-sm flex-1">
+            <button type="submit" name="action" value="add" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500 justify-center"><i class="bi bi-person-plus"></i> Add moderator</button>
+        </form>
+        {% if moderators %}
+            <ul class="divide-y divide-white/5">
+                {% for member in moderators %}
+                    <li class="flex items-center gap-3 py-2.5" x-data="{ confirming: false }">
+                        {% include 'shared/navigation/avatar.html' with member=member avatar_class="w-9 h-9 text-sm" %}
+                        <a href="{% url 'member_profile' member.username %}" class="min-w-0 flex-1 truncate text-white hover:text-gold-200">{{ member.username }}</a>
+                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" x-show="!confirming" @click="confirming = true">Remove</button>
+                        <form method="post" action="{% url 'moderation_team_change' %}" x-show="confirming" x-cloak class="flex items-center gap-2">
+                            {% csrf_token %}
+                            <input type="hidden" name="username" value="{{ member.username }}">
+                            <button type="submit" name="action" value="remove" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15">Remove {{ member.username }}</button>
+                            <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="confirming = false">Keep</button>
+                        </form>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-sm text-gray-400">No moderators yet.</p>
+        {% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+        <h2 class="text-lg font-semibold text-white mb-1">Admins</h2>
+        <p class="text-sm text-gray-400 mb-4">Staff and superuser accounts. They can do everything moderators can, plus manage this team. Change admins in the Django admin.</p>
+        <ul class="divide-y divide-white/5">
+            {% for member in admins %}
+                <li class="flex items-center gap-3 py-2.5">
+                    {% include 'shared/navigation/avatar.html' with member=member avatar_class="w-9 h-9 text-sm" %}
+                    <a href="{% url 'member_profile' member.username %}" class="min-w-0 flex-1 truncate text-white hover:text-gold-200">{{ member.username }}</a>
+                    <span class="text-xs text-gray-400">{% if member.is_superuser %}Superuser{% else %}Staff{% endif %}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endblock %}
