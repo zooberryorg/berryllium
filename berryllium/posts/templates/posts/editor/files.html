@@ -1,0 +1,54 @@
+<section id="files" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 scroll-mt-24">
+    <div class="flex items-baseline justify-between gap-2">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Files</h2>
+        <span class="text-xs text-white/40 tabular-nums">{{ files|length }} / {{ max_files }}</span>
+    </div>
+    <p class="text-xs text-white/50 mt-1 mb-3">Optional downloads that go with the article: {{ file_extensions }}.</p>
+
+    {% if files %}
+        <ul class="space-y-2 mb-3">
+            {% for file in files %}
+                <li class="rounded-xl bg-pine-800/50 px-3 py-2.5" x-data="{ editing: false }">
+                    <div class="flex items-center gap-2" x-show="!editing">
+                        <i class="bi bi-file-earmark-zip text-gold-300"></i>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-sm text-white truncate" title="{{ file.filename }}">{{ file.title|default:file.filename }}</p>
+                            <p class="text-xs text-white/40">{% if file.title %}{{ file.filename }} · {% endif %}{{ file.size|filesizeformat }}</p>
+                        </div>
+                        <button type="button" class="p-1.5 text-white/50 hover:text-white cursor-pointer" title="Rename" @click="editing = true; $nextTick(() => $refs.title.focus())"><i class="bi bi-pencil"></i></button>
+                        <button type="button" class="p-1.5 text-white/50 hover:text-red-300 cursor-pointer" title="Remove"
+                                hx-post="{% url 'post_file_change' post.pk file.pk %}"
+                                hx-vals='{"action": "delete"}'
+                                hx-target="#files" hx-swap="outerHTML"
+                                hx-confirm="Remove {{ file.filename }}?"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <div class="flex items-center gap-2" x-show="editing" x-cloak>
+                        <input type="text" name="title" x-ref="title" value="{{ file.title }}" placeholder="{{ file.filename }}" maxlength="255" class="zb-input text-sm flex-1 min-w-0"
+                               @keydown.escape="editing = false"
+                               @keydown.enter.prevent="$refs.saveTitle.click()">
+                        <button type="button" x-ref="saveTitle" class="zb-controls text-sm"
+                                hx-post="{% url 'post_file_change' post.pk file.pk %}"
+                                hx-include="previous input"
+                                hx-vals='{"action": "rename"}'
+                                hx-target="#files" hx-swap="outerHTML">Save</button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% if files|length < max_files %}
+        <label class="flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-white/15 bg-pine-800/40 px-4 py-5 text-sm text-white/50 hover:border-gold-400/50 hover:text-gold-200 cursor-pointer transition-colors">
+            <i class="bi bi-paperclip"></i> Attach files
+            <input type="file" name="files" multiple class="sr-only"
+                   hx-post="{% url 'post_files' post.pk %}"
+                   hx-encoding="multipart/form-data"
+                   hx-trigger="change"
+                   hx-target="#files"
+                   hx-swap="outerHTML"
+                   hx-indicator="#files-busy">
+        </label>
+    {% endif %}
+    <p id="files-busy" class="htmx-indicator text-xs text-white/50 mt-2"><i class="bi bi-arrow-repeat animate-spin inline-block"></i> Uploading…</p>
+    {% for error in file_errors %}<p class="text-red-400 text-sm mt-2">{{ error }}</p>{% endfor %}
+</section>
