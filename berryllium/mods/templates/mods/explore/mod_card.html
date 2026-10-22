@@ -42,12 +42,21 @@
 
     {# stats #}
     <div class="mt-auto pt-4">
-        <div class="flex items-center gap-4 px-4 py-3 border-t border-white/5 text-xs text-gray-400">
-            <span title="{{ mod.download_count }} downloads"><i class="bi bi-download mr-0.5"></i> {{ mod.download_count|compact }}</span>
-            <span title="{{ mod.like_count }} likes"><i class="bi bi-heart mr-0.5"></i> {{ mod.like_count|compact }}</span>
-            <time class="ml-auto truncate" datetime="{{ mod.last_updated|date:'c' }}"
+        <div class="flex items-center gap-1.5 px-4 py-3 border-t border-white/5 text-xs text-gray-400">
+            {# same stat pills as the list rows #}
+            <dl class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.download_count }} downloads">
+                    <dt><i class="bi bi-download"></i><span class="sr-only">Downloads</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ mod.download_count|compact }}</dd>
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.like_count }} likes">
+                    <dt><i class="bi bi-heart-fill"></i><span class="sr-only">Likes</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ mod.like_count|compact }}</dd>
+                </div>
+            </dl>
+            <time class="ml-auto pl-2 truncate" datetime="{{ mod.last_updated|date:'c' }}"
                   title="Last updated {{ mod.last_updated|date:date_prefs.datetime }}">
-                <i class="bi bi-arrow-repeat mr-0.5"></i> Updated {{ mod.last_updated|timeago }}
+                <i class="bi bi-arrow-repeat mr-0.5" aria-hidden="true"></i><span class="sr-only">Updated</span> {{ mod.last_updated|timeago }}
             </time>
         </div>
     </div>
