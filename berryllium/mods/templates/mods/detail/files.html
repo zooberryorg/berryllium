@@ -1,0 +1,47 @@
+{% load bfilters %}
+<div class="space-y-4">
+    {% if mod.is_external and mod.external_url %}
+        <div class="flex flex-col sm:flex-row sm:items-center gap-3 rounded-xl border border-white/10 bg-pine-800/50 px-4 py-3">
+            <div class="min-w-0 flex-1">
+                <p class="text-white font-medium">Hosted on {{ external_host }}</p>
+                <p class="text-sm text-gray-400 truncate">{{ mod.external_url }}</p>
+            </div>
+            <a href="{{ mod.external_url }}" target="_blank" rel="noopener noreferrer nofollow" class="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-gold-400/50 px-3.5 py-1.5 text-sm font-medium text-gold-200 hover:bg-gold-400 hover:text-pine-500 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">
+                <i class="bi bi-box-arrow-up-right"></i> Open
+            </a>
+        </div>
+    {% endif %}
+
+    {% for entry in file_groups %}
+        <div class="overflow-hidden rounded-xl border border-white/10">
+            {% if mod.use_file_groups %}
+                <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 bg-pine-800/50 px-4 py-3">
+                    <h3 class="font-semibold text-white">{{ entry.group.name|default:"Files" }}</h3>
+                    <span class="text-xs text-gray-400">{{ entry.files|length }} file{{ entry.files|length|pluralize }} · {{ entry.size|filesizeformat }}</span>
+                    {% if entry.group.description %}<p class="basis-full text-sm text-granite-200">{{ entry.group.description }}</p>{% endif %}
+                </div>
+            {% endif %}
+            <ul class="divide-y divide-white/5">
+                {% for file in entry.files %}
+                    <li class="flex items-start sm:items-center gap-3 px-4 py-3">
+                        <span class="w-9 h-9 shrink-0 rounded-lg bg-gold-400/10 text-gold-300 flex items-center justify-center">
+                            <i class="bi bi-file-earmark-zip"></i>
+                        </span>
+                        <div class="min-w-0 flex-1">
+                            <p class="text-white break-words">{{ file.title|default:file.filename }}</p>
+                            <p class="text-xs text-gray-400 break-words">
+                                {% if file.title %}{{ file.filename }} · {% endif %}{{ file.size|filesizeformat }}{% if file.version %} · Version {{ file.version }}{% endif %}
+                            </p>
+                            {% if file.description %}<p class="mt-1 text-sm text-granite-200">{{ file.description }}</p>{% endif %}
+                        </div>
+                        <a href="{% url 'mod_file_download' file.pk %}" class="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-gold-400/50 px-3.5 py-1.5 text-sm font-medium text-gold-200 hover:bg-gold-400 hover:text-pine-500 transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" aria-label="Download {{ file.title|default:file.filename }}">
+                            <i class="bi bi-download"></i><span class="hidden sm:inline">Download</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% empty %}
+        {% if not mod.is_external %}<p class="text-sm text-white/40">No files have been uploaded yet.</p>{% endif %}
+    {% endfor %}
+</div>
