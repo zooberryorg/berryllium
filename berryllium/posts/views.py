@@ -121,3 +121,27 @@ def thumbnail(request, post_id):
         else:
             error = form.errors["image"][0]
     return render(request, "posts/editor/thumbnail.html", {"post": post, "thumbnail_error": error})
+
+@login_required
+@require_POST
+def files(request, post_id):
+    """Attach one or more files. Returns the files card."""
+    post = _editable_post(request, post_id)
+    errors = []
+    uploads = request.FILES.getlist("files")
+    room = MAX_POST_FILES - post.files.count()
+    if len(uploads) > room:
+        errors.append(f"A post can have at most {MAX_POST_FILES} files. Remove some first.")
+        uploads = uploads[:max(room, 0)]
+    order = post.files.count()
+    for upload in uploads:
+        problem = clean_post_file(upload)
+        if problem:
+            errors.append(problem)
+            continue
+        PostFile.objects.create(post=post, file=upload, filename=upload.name, size=upload.size, order=order)
+        order += 1
+    return render(request, "posts/editor/files.html", {
+        "post": post, "files": post.files.all(), "file_errors": errors,
+        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
+    })
