@@ -1,0 +1,7 @@
+<span class="{{ avatar_class|default:'w-10 h-10 text-base' }} shrink-0 rounded-full overflow-hidden bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center font-semibold text-gold-200 uppercase select-none">
+    {% if member.avatar %}
+        <img src="{{ member.avatar.url }}" alt="" class="w-full h-full object-cover">
+    {% else %}
+        {{ member.username|slice:":1" }}
+    {% endif %}
+</span>
