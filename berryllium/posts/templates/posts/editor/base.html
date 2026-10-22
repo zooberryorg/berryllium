@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load bfilters %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6">
+
+        <nav aria-label="Breadcrumb" class="text-sm text-gray-400">
+            <ol class="flex items-center gap-2 min-w-0">
+                <li><a href="{% url 'settings_posts' %}" class="hover:text-gold-300 transition-colors">My posts</a></li>
+                <li aria-hidden="true"><i class="bi bi-chevron-right text-[10px]"></i></li>
+                <li class="text-white/80 truncate" aria-current="page">{{ post.title|default:"Untitled post" }}</li>
+            </ol>
+        </nav>
+
+        <header class="flex flex-wrap items-end justify-between gap-4">
+            <div class="min-w-0">
+                <p class="text-xs font-semibold uppercase tracking-wider text-gold-300">{{ noun }} editor</p>
+                <h1 class="text-3xl font-bold text-white mt-1 break-words">{{ post.title|default:"Untitled post" }}</h1>
+            </div>
+            <div class="flex items-center gap-2">
+                {% include 'mods/panel/status_badge.html' with mod=post %}
+                <a href="{{ post.get_absolute_url }}" class="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3.5 py-1.5 text-sm text-white/80 hover:text-white hover:border-gold-400/50 transition-colors">
+                    <i class="bi bi-eye"></i> {% if post.status == 'published' %}View{% else %}Preview{% endif %}
+                </a>
+            </div>
+        </header>
+
+        {% include 'shared/messages.html' %}
+
+        <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1fr)_22rem]">
+
+            <form id="post-form" method="post" action="{% url 'post_edit' post.pk %}"
+                  data-autosave-url="{% url 'post_edit' post.pk %}"
+                  x-data="autosaveForm()"
+                  class="min-w-0 space-y-6">
+                {% csrf_token %}
+
+                <section id="details" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 scroll-mt-24">
+                    <h2 class="text-lg font-semibold text-white mb-4">Details</h2>
+                    {% include "posts/create/kind_field.html" %}
+                    {% include "mods/create/general/fields.html" with publish_hint="It goes live when you click Publish below." archive_hint="Turn this on if it was first published on another website." %}
+                </section>
+
+                <section id="tags" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 scroll-mt-24">
+                    {% include "shared/widgets/search_picker.html" with field=form.tags config=form.tags_picker %}
+                    <p class="text-xs text-white/50 -mt-2">Help readers find this. New tags (dashed) are created when you publish.</p>
+                </section>
+
+                <section id="article" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 scroll-mt-24">
+                    <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <h2 class="text-lg font-semibold text-white">Article</h2>
+                        <p class="text-xs text-white/50">Markdown. Each heading becomes an entry in the table of contents.</p>
+                    </div>
+                    {% url 'post_body_image' post.pk as upload_url %}
+                    {% url 'post_preview' post.pk as preview_url %}
+                    {% include "shared/widgets/markdown_editor.html" with field=form.body editor_class="mt-4" %}
+                </section>
+
+                {# action bar #}
+                <div class="sticky bottom-3 z-10 flex flex-wrap items-center gap-3 rounded-2xl border border-pine-300 bg-pine-700/95 backdrop-blur px-4 py-3 shadow-xl shadow-black/30">
+                    <p class="text-xs flex-1 min-w-40" :class="statusClass" x-text="statusText" aria-live="polite"></p>
+                    <button type="submit" name="action" value="save" class="zb-controls items-center justify-center">
+                        <i class="bi bi-floppy"></i> Save
+                    </button>
+                    <button type="submit" name="action" value="publish" class="zb-controls items-center justify-center text-pine-500 bg-gold-400 hover:bg-gold-300 transition-colors font-medium">
+                        {% if post.first_published_at and not post.draft %}<i class="bi bi-check2"></i> Save changes{% else %}<i class="bi bi-send"></i> Publish{% endif %}
+                    </button>
+                </div>
+            </form>
+
+            <aside class="min-w-0 space-y-6 lg:sticky lg:top-24" aria-label="Thumbnail, files and publishing">
+                <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5">
+                    <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">Before publishing</h2>
+                    {% if problems %}
+                        <ul class="space-y-2">
+                            {% for problem in problems %}
+                                <li><a href="#{{ problem.section }}" class="flex items-start gap-2 text-sm text-gold-200 hover:text-gold-100"><i class="bi bi-circle mt-0.5 text-xs"></i>{{ problem.message }}</a></li>
+                            {% endfor %}
+                        </ul>
+                        <p class="text-xs text-white/40 mt-3">This list updates when you save.</p>
+                    {% else %}
+                        <p class="flex items-center gap-2 text-sm text-white"><i class="bi bi-check-circle-fill text-gold-300"></i> Ready to publish.</p>
+                    {% endif %}
+                </section>
+                {% include 'posts/editor/thumbnail.html' %}
+                {% include 'posts/editor/files.html' %}
+            </aside>
+        </div>
+    </div>
+    <style>[x-cloak] { display: none !important; }</style>
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}
