@@ -54,3 +54,13 @@ class ProfileSettingsForm(forms.ModelForm):
             if old and old != (member.avatar.name if member.avatar else ""):
                 member.avatar.storage.delete(old)
         return member
+
+class PreferencesForm(forms.ModelForm):
+    class Meta:
+        model = Member
+        fields = ["date_format", "time_format"]
+        widgets = {
+            "date_format": forms.RadioSelect,
+            "time_format": forms.RadioSelect,
+        }
+        labels = {"date_format": "Dates", "time_format": "Times"}
