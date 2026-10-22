@@ -1,0 +1,33 @@
+{% load bfilters %}
+<header class="space-y-3">
+    <div class="flex flex-wrap items-center gap-2">
+        {% for label in game_labels %}
+            <span class="text-xs px-2.5 py-1 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
+        {% endfor %}
+        {% for category in categories %}
+            <a href="{% url 'explore_mods' %}?category={{ category.key }}"
+               class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white hover:border-gold-400/40 transition-colors duration-150">
+                <i class="bi {{ category.icon }} text-[10px] text-white/50"></i>{{ category.label }}
+            </a>
+        {% endfor %}
+        {% if mod.is_archived_file %}
+            <span class="inline-flex items-center gap-1.5 text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/70">
+                <i class="bi bi-archive"></i> Archived
+            </span>
+        {% endif %}
+    </div>
+    <h1 class="text-3xl sm:text-4xl font-bold text-white leading-tight" style="overflow-wrap: anywhere;">{{ mod.title }}</h1>
+    {% if mod.summary %}<p class="text-granite-200 text-lg max-w-3xl" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>{% endif %}
+    <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-400">
+        {% if mod.uploaded_by %}
+            <span class="flex items-center gap-2 min-w-0">
+                {% include 'shared/navigation/avatar.html' with member=mod.uploaded_by avatar_class="w-7 h-7 text-xs" %}
+                <span class="truncate">by <span class="text-white">{{ mod.uploaded_by.username }}</span>{% if collaborators|length > 1 %} and {{ collaborators|length|add:"-1" }} other{{ collaborators|length|add:"-1"|pluralize }}{% endif %}</span>
+            </span>
+        {% endif %}
+        <time datetime="{{ mod.last_updated|date:'c' }}" title="{{ mod.last_updated|date:date_prefs.datetime }}">
+            <i class="bi bi-arrow-repeat mr-1"></i>Updated {{ mod.last_updated|timeago }}
+        </time>
+        {% if mod.version %}<span><i class="bi bi-tag mr-1"></i>Version {{ mod.version }}</span>{% endif %}
+    </div>
+</header>
