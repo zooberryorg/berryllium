@@ -37,3 +37,21 @@ def _editable_post(request, post_id):
 def _noun(user):
     """"Post" for the site team (they pick the kind) or "Tutorial" for regular members (they can only post tutorials)."""
     return "Post" if can_post_news(user) else "Tutorial"
+
+# --------------------------------------------------------------------------- create (modal)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def create_draft(request):
+    form = PostGeneralForm(request.POST or None, uploader=request.user, can_post_news=can_post_news(request.user))
+    if request.method == "POST" and form.is_valid():
+        post = form.save(commit=False)
+        post.uploaded_by = request.user
+        post.save()
+        form.save_m2m()
+        form.save_relations()
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("post_edit", kwargs={"post_id": post.pk})
+        return response
+    return render(request, "posts/create/draft.html", {"form": form, "noun": _noun(request.user)})
