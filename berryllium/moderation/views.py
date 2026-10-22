@@ -189,3 +189,35 @@ def tags_change(request):
         messages.success(request, f"Deleted \u201c{tag.name}\u201d and removed it from {count} mod{'s' if count != 1 else ''}.")
     next_url = request.POST.get("next", "")
     return redirect(next_url if next_url.startswith("/moderation/") else reverse("moderation_tags"))
+
+# --------------------------------------------------------------------------- team (admins)
+
+
+@admin_required
+def team(request):
+    group = _moderators_group()
+    return render(request, "moderation/team.html", {
+        "moderators": group.members.filter(is_active=True).order_by("username"),
+        "admins": Member.objects.filter(Q(is_staff=True) | Q(is_superuser=True), is_active=True).order_by("username"),
+        "panel_nav": _nav(request, "moderation_team"),
+    })
+
+
+@admin_required
+@require_POST
+def team_change(request):
+    group = _moderators_group()
+    username = request.POST.get("username", "").strip()
+    member = Member.objects.filter(username__iexact=username, is_active=True).order_by("pk").first()
+    if member is None:
+        messages.error(request, f"No active member is called \u201c{username}\u201d.")
+    elif request.POST.get("action") == "add":
+        if is_site_admin(member):
+            messages.warning(request, f"{member.username} is an admin, so they can already moderate.")
+        else:
+            member.groups.add(group)
+            messages.success(request, f"{member.username} is now a moderator.")
+    elif request.POST.get("action") == "remove":
+        member.groups.remove(group)
+        messages.success(request, f"{member.username} is no longer a moderator.")
+    return redirect("moderation_team")
