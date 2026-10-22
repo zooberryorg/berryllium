@@ -1,0 +1,12 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Moderation sections{% endblock %}
+{% block panel_kicker %}Moderation{% endblock %}
+{% block panel_title %}Mods{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        Every mod on the site, including other members' drafts. You can edit any of them, move them to drafts, or delete them.
+    </p>
+    {% url 'moderation_mods_bulk' as bulk_url %}
+    {% include 'mods/panel/mod_list.html' with bulk_url=bulk_url show_uploader=True empty_text="No mods yet." %}
+{% endblock %}
