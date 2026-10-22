@@ -99,3 +99,25 @@ def edit(request, post_id):
         "noun": post.get_kind_display(),
     })
 
+
+@login_required
+@require_POST
+def thumbnail(request, post_id):
+    """Upload the post's one image. Returns the thumbnail card."""
+    post = _editable_post(request, post_id)
+    error = ""
+    if request.POST.get("action") == "remove":
+        if post.thumbnail:
+            post.thumbnail.delete(save=False)
+            post.thumbnail = None
+            post.save(update_fields=["thumbnail", "last_updated"])
+    else:
+        form = ThumbnailForm(request.POST, request.FILES)
+        if form.is_valid():
+            if post.thumbnail:
+                post.thumbnail.delete(save=False)
+            post.thumbnail = form.cleaned_data["image"]
+            post.save(update_fields=["thumbnail", "last_updated"])
+        else:
+            error = form.errors["image"][0]
+    return render(request, "posts/editor/thumbnail.html", {"post": post, "thumbnail_error": error})
