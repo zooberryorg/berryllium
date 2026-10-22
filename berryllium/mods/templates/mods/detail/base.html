@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load bfilters %}
+{% block content %}
+    <script>
+        function modGallery() {
+            return {
+                images: JSON.parse(document.getElementById('mod-gallery')?.textContent || '[]'),
+                index: 0,
+                lightbox: false,
+                get current() { return this.images[this.index] || {}; },
+                go(index) { this.index = (index + this.images.length) % this.images.length; },
+                next() { this.go(this.index + 1); },
+                prev() { this.go(this.index - 1); },
+                open() {
+                    this.lightbox = true;
+                    document.body.style.overflow = 'hidden';
+                    this.$nextTick(() => this.$refs.closeLightbox?.focus());
+                },
+                close() {
+                    this.lightbox = false;
+                    document.body.style.overflow = '';
+                    this.$refs.expand?.focus();
+                },
+            };
+        }
+
+        function modTabs() {
+            const names = ['description', 'files', 'credits'];
+            return {
+                tab: names.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'description',
+                show(name) {
+                    this.tab = name;
+                    history.replaceState(null, '', '#' + name);
+                },
+                move(step) {
+                    const next = names[(names.indexOf(this.tab) + step + names.length) % names.length];
+                    this.show(next);
+                    this.$nextTick(() => document.getElementById('tab-' + next)?.focus());
+                },
+            };
+        }
+    </script>
+
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6">
+
+        {# breadcrumb #}
+        <nav aria-label="Breadcrumb" class="text-sm text-gray-400">
+            <ol class="flex items-center gap-2 min-w-0">
+                <li><a href="{% url 'explore_mods' %}" class="hover:text-gold-300 transition-colors">Explore mods</a></li>
+                <li aria-hidden="true"><i class="bi bi-chevron-right text-[10px]"></i></li>
+                <li class="text-white/80 truncate" aria-current="page">{{ mod.title }}</li>
+            </ol>
+        </nav>
+
+        {% if not is_public %}
+            <div class="flex items-start gap-3 rounded-2xl border border-gold-400/40 bg-gold-400/10 px-4 py-3 text-sm text-gold-200">
+                <i class="bi bi-eye mt-0.5"></i>
+                <p>
+                    {% if is_scheduled %}
+                        This mod is scheduled to go live on {{ mod.publish_date|date:date_prefs.datetime }}. Until then, only you can see this page.
+                    {% else %}
+                        This is a preview of your draft. Only you can see this page.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+
+        {% include 'mods/detail/header.html' %}
+
+        {% comment %}
+        Desktop: gallery and tabs on the left, sidebar on the right spanning both rows.
+        Phone: gallery, download + requirements, tabs, then the details cards
+        (details.html is rendered twice and each copy is hidden at the other size).
+        {% endcomment %}
+        <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1fr)_20rem] lg:grid-rows-[auto_1fr]">
+            <div class="min-w-0 lg:col-start-1 lg:row-start-1">
+                {% include 'mods/detail/gallery.html' %}
+            </div>
+            <aside class="min-w-0 space-y-4 lg:col-start-2 lg:row-start-1 lg:row-span-2" aria-label="About this mod">
+                {% include 'mods/detail/sidebar.html' %}
+                <div class="hidden lg:block space-y-4">{% include 'mods/detail/details.html' %}</div>
+            </aside>
+            <section class="min-w-0 lg:col-start-1 lg:row-start-2 rounded-2xl border border-pine-300 bg-pine-600 scroll-mt-24"
+                     x-data="modTabs()"
+                     @show-files.window="show('files'); $el.scrollIntoView({ behavior: 'smooth', block: 'start' })">
+                <div role="tablist" aria-label="Mod information"
+                     class="flex gap-1 overflow-x-auto border-b border-white/10 px-2"
+                     @keydown.arrow-right.prevent="move(1)"
+                     @keydown.arrow-left.prevent="move(-1)">
+                    {% include 'mods/detail/tab_button.html' with name="description" label="Description" %}
+                    {% include 'mods/detail/tab_button.html' with name="files" label="Files" count=file_count %}
+                    {% include 'mods/detail/tab_button.html' with name="credits" label="Credits & license" %}
+                </div>
+
+                <div role="tabpanel" id="panel-description" aria-labelledby="tab-description" tabindex="0"
+                     class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'description'">
+                    {% if mod.description %}
+                        <div class="md-preview text-granite-200 leading-relaxed">{{ mod.description|markdown }}</div>
+                    {% else %}
+                        <p class="text-sm text-white/40">The author hasn't written a description yet.</p>
+                    {% endif %}
+                </div>
+                <div role="tabpanel" id="panel-files" aria-labelledby="tab-files" tabindex="0"
+                     class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'files'" x-cloak>
+                    {% include 'mods/detail/files.html' %}
+                </div>
+                <div role="tabpanel" id="panel-credits" aria-labelledby="tab-credits" tabindex="0"
+                     class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'credits'" x-cloak>
+                    {% include 'mods/detail/credits.html' %}
+                </div>
+            </section>
+            <div class="space-y-4 lg:hidden">{% include 'mods/detail/details.html' %}</div>
+        </div>
+    </div>
+
+    <style>
+        [x-cloak] { display: none !important; }
+        .md-preview > * + * { margin-top: 0.85rem; }
+        .md-preview h1 { font-size: 1.5rem; font-weight: 700; color: white; }
+        .md-preview h2 { font-size: 1.25rem; font-weight: 700; color: white; }
+        .md-preview h3 { font-size: 1.1rem; font-weight: 600; color: white; }
+        .md-preview a { color: var(--color-gold-300); text-decoration: underline; text-underline-offset: 2px; }
+        .md-preview ul { list-style: disc; padding-left: 1.5rem; }
+        .md-preview ol { list-style: decimal; padding-left: 1.5rem; }
+        .md-preview blockquote { border-left: 3px solid var(--color-gold-400); padding-left: 0.75rem; opacity: 0.85; }
+        .md-preview img { max-width: 100%; border-radius: 0.75rem; }
+        .md-preview code { background: rgb(0 0 0 / 0.25); border-radius: 0.25rem; padding: 0.1rem 0.3rem; font-size: 0.9em; }
+        .md-preview pre { background: rgb(0 0 0 / 0.25); border-radius: 0.75rem; padding: 0.75rem 1rem; overflow-x: auto; }
+        .md-preview pre code { background: none; padding: 0; }
+        .md-preview table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; }
+        .md-preview th, .md-preview td { border: 1px solid rgb(255 255 255 / 0.1); padding: 0.4rem 0.6rem; }
+    </style>
+{% endblock %}

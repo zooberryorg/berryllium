@@ -1,0 +1,71 @@
+<div class="space-y-6">
+    <section>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Made by</h3>
+        <ul class="grid gap-2 sm:grid-cols-2">
+            {% for credit in collaborators %}
+                <li class="flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5">
+                    {% if credit.member %}
+                        {% include 'shared/navigation/avatar.html' with member=credit.member avatar_class="w-9 h-9 text-sm" %}
+                    {% else %}
+                        <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-sm font-semibold text-gold-200 uppercase">{{ credit.display_name|slice:":1" }}</span>
+                    {% endif %}
+                    <span class="min-w-0">
+                        <span class="block text-white truncate">{{ credit.display_name }}</span>
+                        <span class="block text-xs text-gray-400">{% if credit.member_id and credit.member_id == mod.uploaded_by_id %}Uploader{% elif credit.member_id %}Member{% else %}Contributor{% endif %}</span>
+                    </span>
+                </li>
+            {% empty %}
+                {% if mod.uploaded_by %}
+                    <li class="flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5">
+                        {% include 'shared/navigation/avatar.html' with member=mod.uploaded_by avatar_class="w-9 h-9 text-sm" %}
+                        <span class="text-white">{{ mod.uploaded_by.username }}</span>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </section>
+
+    {% if original_authors %}
+        <section>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Original authors</h3>
+            <p class="text-sm text-white">{% for credit in original_authors %}{{ credit.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+        </section>
+    {% endif %}
+
+    {% if attributions %}
+        <section>
+            <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Uses work by</h3>
+            <ul class="space-y-2">
+                {% for credit in attributions %}
+                    <li class="text-sm">
+                        {% if credit.url %}
+                            <a href="{{ credit.url }}" target="_blank" rel="noopener noreferrer nofollow" class="font-medium text-white hover:text-gold-300">{{ credit.title }}</a>
+                        {% else %}
+                            <span class="font-medium text-white">{{ credit.title }}</span>
+                        {% endif %}
+                        <span class="text-gray-400">by {{ credit.authors }}</span>
+                        {% if credit.note %}<p class="text-granite-200 mt-0.5">{{ credit.note }}</p>{% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% endif %}
+
+    <section>
+        <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">License</h3>
+        {% for item in mod_licenses %}
+            <div class="rounded-xl border border-white/10 px-4 py-3 {% if not forloop.last %}mb-2{% endif %}">
+                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <p class="font-medium text-white">{{ item.license.name }}</p>
+                    {% if item.license.url %}
+                        <a href="{{ item.license.url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-gold-300 hover:text-gold-200">Read the license <i class="bi bi-box-arrow-up-right text-[10px]"></i></a>
+                    {% endif %}
+                </div>
+                {% if item.context %}<p class="text-sm text-gray-400 mt-0.5">Covers: {{ item.context }}</p>{% endif %}
+                {% if item.license.description %}<p class="text-sm text-granite-200 mt-1">{{ item.license.description }}</p>{% endif %}
+            </div>
+        {% empty %}
+            <p class="text-sm text-white/40">The author hasn't picked a license. Ask them before reusing any of this work.</p>
+        {% endfor %}
+    </section>
+</div>
