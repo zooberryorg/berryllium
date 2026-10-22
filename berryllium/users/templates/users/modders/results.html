@@ -1,0 +1,96 @@
+{% load bfilters %}
+{% if active_filters %}
+    <div class="flex items-center gap-2 flex-wrap mb-4 text-sm">
+        <span class="text-gray-400">Filters:</span>
+        {% for item in active_filters %}
+            <a href="{{ item.url }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-400/15 text-gold-200 border border-gold-400/30 hover:border-gold-400/60 transition-colors"
+               onclick="event.preventDefault(); exploreClearFilter('{{ item.name|escapejs }}', '{{ item.value|escapejs }}')"
+               aria-label="Remove filter {{ item.label }}">
+                {{ item.label }} <i class="bi bi-x"></i>
+            </a>
+        {% endfor %}
+        <button type="button" class="text-gray-400 hover:text-white underline underline-offset-2 cursor-pointer" onclick="exploreClearFilter()">Clear all</button>
+    </div>
+{% endif %}
+
+<p class="text-gray-400 text-sm mb-4">
+    <span class="text-white font-semibold">{{ page.paginator.count }}</span> modder{{ page.paginator.count|pluralize }} found
+</p>
+
+{% if page.object_list %}
+    <div class="overflow-x-auto rounded-2xl border border-pine-300">
+        <table class="w-full text-sm">
+            <thead class="bg-pine-800/80 text-left text-xs uppercase tracking-wider text-gray-400">
+                <tr>
+                    <th scope="col" class="px-4 py-3 font-semibold">Modder</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right">Mods</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right hidden sm:table-cell">Downloads</th>
+                    <th scope="col" class="px-4 py-3 font-semibold">Active</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden md:table-cell">Published on</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden lg:table-cell">Latest mod</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for person in page.object_list %}
+                    <tr class="odd:bg-pine-600 even:bg-pine-700 hover:bg-pine-300 transition-colors duration-150">
+                        <td class="px-4 py-2.5">
+                            <a href="{{ person.url }}" class="group/person flex items-center gap-3 min-w-0">
+                                {% if person.member %}
+                                    {% include 'shared/navigation/avatar.html' with member=person.member avatar_class="w-9 h-9 text-sm" %}
+                                {% else %}
+                                    <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-sm font-semibold text-gold-200 uppercase select-none">{{ person.name|slice:":1" }}</span>
+                                {% endif %}
+                                <span class="min-w-0">
+                                    <span class="block font-medium text-white truncate group-hover/person:text-gold-200">{{ person.name }}</span>
+                                    <span class="block text-xs text-gray-400">{% if person.member %}Member{% else %}Credited author{% endif %}</span>
+                                </span>
+                            </a>
+                        </td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-white">{{ person.mod_count }}</td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-gray-300 hidden sm:table-cell" title="{{ person.downloads }}">{{ person.downloads|compact }}</td>
+                        <td class="px-4 py-2.5 tabular-nums text-gray-300 whitespace-nowrap">{{ person.first_year }}{% if person.last_year != person.first_year %}–{{ person.last_year }}{% endif %}</td>
+                        <td class="px-4 py-2.5 hidden md:table-cell">
+                            <span class="flex flex-wrap gap-1">
+                                {% for label in person.website_labels|slice:":2" %}
+                                    <span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/80 whitespace-nowrap">{{ label }}</span>
+                                {% endfor %}
+                                {% if person.website_labels|length > 2 %}
+                                    <span class="text-xs px-1.5 py-0.5 text-gray-400" title="{{ person.website_labels|slice:'2:'|join:', ' }}">+{{ person.website_labels|length|add:"-2" }}</span>
+                                {% endif %}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap hidden lg:table-cell">
+                            <time datetime="{{ person.last_published|date:'c' }}" title="{{ person.last_published|date:date_prefs.date }}">{{ person.last_published|timeago }}</time>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if page.paginator.num_pages > 1 %}
+        <nav class="flex items-center justify-between gap-2 mt-6" aria-label="Pages">
+            {% if page.has_previous %}<a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}" hx-target="#modder-results" hx-push-url="true" class="px-5 py-2.5 rounded-full bg-pine-600 text-gray-300 hover:text-white border border-pine-300 flex items-center gap-2 transition-colors"><i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span></a>{% else %}<span class="px-5 py-2.5 rounded-full bg-pine-600/50 text-gray-500 border border-pine-300/50 flex items-center gap-2 cursor-not-allowed"><i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span></span>{% endif %}
+            <div class="flex items-center gap-1">
+                {% for number in page_range %}
+                    {% if number == page.paginator.ELLIPSIS %}<span class="text-gray-500 px-2">…</span>
+                    {% elif number == page.number %}<span class="w-10 h-10 rounded-lg bg-gold-400 text-pine-500 font-semibold flex items-center justify-center" aria-current="page">{{ number }}</span>
+                    {% else %}<a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}" hx-target="#modder-results" hx-push-url="true" class="w-10 h-10 rounded-lg bg-pine-600 text-gray-400 hover:text-white font-semibold flex items-center justify-center">{{ number }}</a>{% endif %}
+                {% endfor %}
+            </div>
+            {% if page.has_next %}<a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}" hx-target="#modder-results" hx-push-url="true" class="px-5 py-2.5 rounded-full bg-pine-600 text-gray-300 hover:text-white border border-pine-300 flex items-center gap-2 transition-colors"><span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i></a>{% else %}<span class="px-5 py-2.5 rounded-full bg-pine-600/50 text-gray-500 border border-pine-300/50 flex items-center gap-2 cursor-not-allowed"><span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i></span>{% endif %}
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="rounded-2xl border border-white/10 bg-pine-700/60 p-10 text-center">
+        <i class="bi bi-people text-4xl text-white/30"></i>
+        {% if has_anyone %}
+            <p class="text-white font-semibold mt-4">No modders match these filters.</p>
+            <p class="text-gray-400 text-sm mt-1">Try a wider year range or remove a filter.</p>
+            <button type="button" class="zb-action mt-4 cursor-pointer" onclick="exploreClearFilter()">Clear all filters</button>
+        {% else %}
+            <p class="text-white font-semibold mt-4">No mods have been published yet.</p>
+        {% endif %}
+    </div>
+{% endif %}
