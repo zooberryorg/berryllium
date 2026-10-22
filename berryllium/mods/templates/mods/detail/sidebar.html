@@ -1,0 +1,76 @@
+{% load bfilters %}
+{# download #}
+<section class="rounded-2xl border border-pine-300 bg-pine-600 p-4 space-y-4" aria-label="Download">
+    {% if mod.is_external and mod.external_url %}
+        <a href="{{ mod.external_url }}" target="_blank" rel="noopener noreferrer nofollow" class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-3 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2">
+            <i class="bi bi-box-arrow-up-right"></i> Download from {{ external_host }}
+        </a>
+        <p class="text-xs text-center text-gray-400">This mod is hosted on another website.</p>
+    {% elif single_file %}
+        <a href="{% url 'mod_file_download' single_file.pk %}" class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-3 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2">
+            <i class="bi bi-download"></i> Download
+        </a>
+        <p class="text-xs text-center text-gray-400 truncate" title="{{ single_file.filename }}">{{ single_file.filename }} · {{ single_file.size|filesizeformat }}</p>
+    {% elif file_count %}
+        <button type="button" x-data class="w-full inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-3 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-300 focus-visible:outline-offset-2" @click="$dispatch('show-files')">
+            <i class="bi bi-download"></i> Download
+        </button>
+        <p class="text-xs text-center text-gray-400">{{ file_count }} files · {{ total_size|filesizeformat }} in total</p>
+    {% else %}
+        <p class="rounded-full border border-dashed border-white/15 px-5 py-3 text-center text-sm text-gray-400">No files to download yet</p>
+    {% endif %}
+
+    <dl class="grid grid-cols-2 divide-x divide-white/10 rounded-xl bg-pine-800/50 py-3 text-center">
+        <div>
+            <dt class="text-xs text-gray-400">Downloads</dt>
+            <dd class="text-lg font-semibold text-white tabular-nums" title="{{ mod.download_count }}">{{ mod.download_count|compact }}</dd>
+        </div>
+        <div>
+            <dt class="text-xs text-gray-400">Likes</dt>
+            <dd class="text-lg font-semibold text-white tabular-nums" title="{{ mod.like_count }}">{{ mod.like_count|compact }}</dd>
+        </div>
+    </dl>
+
+    {% if required_count %}
+        <a href="#requirements" class="flex items-center gap-2 text-sm text-gold-200 hover:text-gold-300">
+            <i class="bi bi-exclamation-circle"></i>
+            Needs {{ required_count }} other download{{ required_count|pluralize }} to work
+        </a>
+    {% endif %}
+</section>
+
+{# requirements #}
+{% if dependencies %}
+    <section id="requirements" class="rounded-2xl border border-pine-300 bg-pine-600 p-4 scroll-mt-24">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Requirements</h2>
+        <ul class="space-y-3">
+            {% for dep in dependencies %}
+                <li class="flex items-start gap-3">
+                    <span class="mt-0.5 w-8 h-8 shrink-0 rounded-lg bg-gold-400/10 text-gold-300 flex items-center justify-center">
+                        <i class="bi {% if dep.is_external %}bi-box-arrow-up-right{% else %}bi-puzzle{% endif %} text-sm"></i>
+                    </span>
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-start justify-between gap-2">
+                            {% if dep.is_external %}
+                                <a href="{{ dep.external_url }}" target="_blank" rel="noopener noreferrer nofollow"
+                                   class="text-sm font-medium text-white hover:text-gold-300 break-words">{{ dep.display_title }}</a>
+                            {% elif dep.ref_is_public %}
+                                <a href="{% url 'mod_detail' dep.ref_id %}" class="text-sm font-medium text-white hover:text-gold-300 break-words">{{ dep.display_title }}</a>
+                            {% else %}
+                                <span class="text-sm font-medium text-white/80 break-words">{{ dep.display_title }}</span>
+                            {% endif %}
+                            <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full {% if dep.required %}bg-gold-400/15 text-gold-200{% else %}bg-white/5 text-gray-400{% endif %}">
+                                {% if dep.required %}Required{% else %}Optional{% endif %}
+                            </span>
+                        </div>
+                        {% if dep.version or dep.notes %}
+                            <p class="text-xs text-gray-400 mt-0.5">
+                                {% if dep.version %}Version {{ dep.version }}{% endif %}{% if dep.version and dep.notes %} · {% endif %}{{ dep.notes }}
+                            </p>
+                        {% endif %}
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
