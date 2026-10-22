@@ -68,48 +68,5 @@
         </div>
     </form>
 
-    <script>
-        // clear a filter (or all of them, without a name) and trigger the htmx request
-        function exploreClearFilter(name, value) {
-            const form = document.getElementById('explore-filters');
-            if (!form) return;
-            window.dispatchEvent(new CustomEvent('explore-clear', { detail: { name: name || '', value: value || '' } }));
-            // pickers and dropdowns (hidden inputs) clear themselves on this event
-            const controls = Array.from(form.elements).filter(
-                (el) => el.name && el.type !== 'hidden' && (!name || el.name === name)
-            );            
-            for (const el of controls) {
-                if (el.type === 'radio') {
-                    if (el.value === '' && !el.checked) {
-                        el.checked = true;
-                        el.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                } else if (el.type === 'checkbox') {
-                    if (el.checked && (value === undefined || value === '' || el.value === value)) {
-                        el.checked = false;
-                        el.dispatchEvent(new Event('change', { bubbles: true }));
-                    }
-                } else if (el.value !== '') {
-                    // text search: an input event updates x-model and the search trigger
-                    el.value = '';
-                    el.dispatchEvent(new Event('input', { bubbles: true }));
-                }
-            }
-        }
-    </script>
-
-    <style>
-        [x-cloak] { display: none !important; }
-        /* selected category / tag (the radio or checkbox inside is checked) */
-        .explore-option:has(input:checked) {
-            color: #fff;
-            border-color: color-mix(in oklab, var(--color-gold-300) 30%, transparent);
-            background-image: linear-gradient(to right,
-                color-mix(in oklab, var(--color-gold-500) 50%, transparent),
-                color-mix(in oklab, var(--color-gold-300) 50%, transparent));
-        }
-        .explore-option:has(input:checked) .explore-option-icon { color: var(--color-gold-300); }
-        .explore-option:has(input:focus-visible) { outline: 2px solid var(--color-gold-400); outline-offset: 2px; }
-        #explore-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }    
-    </style>
+    {% include 'shared/explore/filter_styles.html' %}
 {% endblock %}
