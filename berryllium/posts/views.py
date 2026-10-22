@@ -213,3 +213,41 @@ def detail(request, post_id):
         "can_edit": can_edit_post(request.user, post),
         "explore_tab": "news" if post.kind == Post.Kind.NEWS else "tutorials",
     })
+
+@require_GET
+def download(request, file_id):
+    attachment = get_object_or_404(PostFile.objects.select_related("post"), pk=file_id)
+    if not can_view(attachment.post, request.user):
+        raise Http404("File not found.")
+    if is_public(attachment.post):
+        PostFile.objects.filter(pk=attachment.pk).update(download_count=F("download_count") + 1)
+    return FileResponse(attachment.file.open("rb"), as_attachment=True, filename=attachment.filename)
+
+
+def _listing(request, kind, explore_tab):
+    params = request.GET
+    q = params.get("q", "").strip()[:100]
+    tag = proper_case(params.get("tag", ""))[:50]
+    sort = params.get("sort", "")
+    sort = sort if sort in SORTS else "recent"
+    posts = published_posts(kind).select_related("uploaded_by").prefetch_related("tags")
+    if q:
+        posts = posts.filter(Q(title__icontains=q) | Q(summary__icontains=q) | Q(tags__name__icontains=q)).distinct()
+    if tag:
+        posts = posts.filter(tags__name__iexact=tag)
+    page = Paginator(posts.order_by(*SORTS[sort][1]), PAGE_SIZE).get_page(params.get("page"))
+    page_query = params.copy()
+    page_query.pop("page", None)
+    context = {
+        "page": page,
+        "page_range": list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)),
+        "page_query": page_query.urlencode(),
+        "q": q, "tag": tag, "sort": sort,
+        "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
+        "kind": kind,
+        "kind_label": dict(Post.Kind.choices)[kind],
+        "explore_tab": explore_tab,
+        "has_any": published_posts(kind).exists(),
+    }
+    is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
+    return render(request, "posts/explore/results.html" if is_htmx else "posts/explore/base.html", context)
