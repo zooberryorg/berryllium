@@ -10,12 +10,12 @@
            {% if explore_tab == 'zoos' %}aria-current="page"{% endif %}>
             <i class="bi bi-map-fill"></i> Zoos & Saves
         </a>
-        <a href="{% url 'explore_tutorials' %}"
+        <a href="#"
            class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'tutorials' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
            {% if explore_tab == 'tutorials' %}aria-current="page"{% endif %}>
             <i class="bi bi-tools"></i> Tutorials
         </a>
-        <a href="{% url 'explore_news' %}"
+        <a href="#"
            class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'news' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
            {% if explore_tab == 'news' %}aria-current="page"{% endif %}>
             <i class="bi bi-newspaper"></i> News
