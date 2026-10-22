@@ -1,3 +1,6 @@
+import os
+import uuid
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from berryllium.shared.dates import (
@@ -7,7 +10,10 @@ from berryllium.shared.dates import (
     TIME_FORMAT_CHOICES,
 )
 
-# Create your models here.
+def member_avatar_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"avatars/{uuid.uuid4().hex}{ext}"
+
 class Member(AbstractUser):
     """
     Extends Django user. Pre-built fields:
@@ -36,6 +42,7 @@ class Member(AbstractUser):
         related_name="members",
         blank=True,
     )
+    avatar = models.ImageField(upload_to=member_avatar_path, blank=True)
 
 class Author(models.Model):
     """
