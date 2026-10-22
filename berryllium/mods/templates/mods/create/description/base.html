@@ -20,79 +20,11 @@
             </div>
         </div>
     {% endif %}
-    <div x-data="markdownEditor($el.dataset)"
-         data-upload-url="{% url 'hx_upload_description_image' mod_id=view.kwargs.mod_id %}"
-         data-preview-url="{% url 'hx_preview_description' mod_id=view.kwargs.mod_id %}"
-         class="flex flex-col px-6 mt-6 mb-6 gap-3">
-        <!-- toolbar -->
-        <div id="editor-actions" class="flex flex-wrap items-center gap-2">
-            <button type="button"
-                    class="zb-action rounded-xl"
-                    @click="togglePreview()">
-                <ion-icon :name="showPreview ? 'eye-off' : 'eye'" class="text-sm text-granite-100"></ion-icon>
-                <span class="text-sm" x-text="showPreview ? 'Hide Preview' : 'Show Preview'"></span>
-            </button>
-            <span class="w-px h-6 bg-white/10 mx-1"></span>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Bold (Ctrl+B)" :disabled="showPreview" @click="wrap('**', '**', 'bold text')"><i class="bi bi-type-bold"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Italic (Ctrl+I)" :disabled="showPreview" @click="wrap('*', '*', 'italic text')"><i class="bi bi-type-italic"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Heading" :disabled="showPreview" @click="prefixLines('## ')"><i class="bi bi-type-h2"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Link (Ctrl+K)" :disabled="showPreview" @click="link()"><i class="bi bi-link-45deg"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Bulleted list" :disabled="showPreview" @click="prefixLines('- ')"><i class="bi bi-list-ul"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Numbered list" :disabled="showPreview" @click="prefixLines('1. ')"><i class="bi bi-list-ol"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Quote" :disabled="showPreview" @click="prefixLines('> ')"><i class="bi bi-quote"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Inline code" :disabled="showPreview" @click="wrap('`', '`', 'code')"><i class="bi bi-code"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Code block" :disabled="showPreview" @click="codeBlock()"><i class="bi bi-code-square"></i></button>
-            <button type="button" class="zb-action rounded-xl disabled:opacity-40" title="Insert image at cursor" :disabled="showPreview || uploading" @click="pickImage()">
-                <i class="bi bi-image" x-show="!uploading"></i>
-                <ion-icon name="sync" class="animate-spin" x-show="uploading" x-cloak></ion-icon>
-            </button>
-            <input type="file"
-                   x-ref="imageInput"
-                   class="hidden"
-                   accept=".jpg,.jpeg,.png,.webp,.gif"
-                   @change="uploadImage($event)">
-        </div>
-        <p class="text-red-400 text-sm" x-show="uploadError" x-text="uploadError" x-cloak></p>
-        <!-- editor (markdown) -->
-        <div x-ref="editor"
-             x-show="!showPreview"
-             @keydown.ctrl.b.prevent="wrap('**', '**', 'bold text')"
-             @keydown.meta.b.prevent="wrap('**', '**', 'bold text')"
-             @keydown.ctrl.i.prevent="wrap('*', '*', 'italic text')"
-             @keydown.meta.i.prevent="wrap('*', '*', 'italic text')"
-             @keydown.ctrl.k.prevent="link()"
-             @keydown.meta.k.prevent="link()">
-            {{ form.description }}
-            {% if form.description.errors %}
-                <p class="text-red-400 text-sm mt-2">{{ form.description.errors.0 }}</p>
-            {% endif %}
-        </div>
-        <!-- preview (sanitized HTML from the server) -->
-        <div x-show="showPreview"
-             x-cloak
-             class="bg-pine-800/40 border border-white/10 rounded-xl p-4 min-h-40">
-            <div x-ref="preview" class="md-preview text-granite-200 text-sm"></div>
-        </div>
-    </div>
+    {% url 'hx_upload_description_image' mod_id=view.kwargs.mod_id as upload_url %}
+    {% url 'hx_preview_description' mod_id=view.kwargs.mod_id as preview_url %}
+    {% include "shared/widgets/markdown_editor.html" with field=form.description editor_class="px-6 mt-6 mb-6" %}
     <!-- Action Buttons -->
     <!-- autosave status -->
     <p class="px-6 pb-2 text-xs text-right" :class="statusClass" x-text="statusText" aria-live="polite"></p>
     {% include "mods/create/actions.html" %}
 </form>
-<style>
-    [x-cloak] { display: none !important; }
-    .md-preview > * + * { margin-top: 0.75rem; }
-    .md-preview h1 { font-size: 1.5rem; font-weight: 700; color: white; }
-    .md-preview h2 { font-size: 1.25rem; font-weight: 700; color: white; }
-    .md-preview h3 { font-size: 1.1rem; font-weight: 600; color: white; }
-    .md-preview a { color: var(--color-gold-400); text-decoration: underline; }
-    .md-preview ul { list-style: disc; padding-left: 1.5rem; }
-    .md-preview ol { list-style: decimal; padding-left: 1.5rem; }
-    .md-preview blockquote { border-left: 3px solid var(--color-gold-400); padding-left: 0.75rem; opacity: 0.85; }
-    .md-preview code { background: rgb(0 0 0 / 0.3); padding: 0.1rem 0.3rem; border-radius: 0.25rem; }
-    .md-preview pre { background: rgb(0 0 0 / 0.3); padding: 0.75rem; border-radius: 0.5rem; overflow-x: auto; }
-    .md-preview pre code { background: none; padding: 0; }
-    .md-preview img { max-width: 100%; border-radius: 0.5rem; }
-    .md-preview table { border-collapse: collapse; }
-    .md-preview th, .md-preview td { border: 1px solid rgb(255 255 255 / 0.1); padding: 0.25rem 0.5rem; }
-</style>
