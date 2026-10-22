@@ -96,3 +96,21 @@ def mod_detail(request, mod_id):
         "tabs": TABS,
     }
     return render(request, "mods/detail/base.html", context)
+
+@require_GET
+def download_file(request, file_id):
+    """Count download then hand over the file or send the visitor to where it's hosted."""
+    file = get_object_or_404(_downloadable_files().select_related("filegroup__mod"), pk=file_id)
+    mod = file.filegroup.mod
+    if not _can_view(mod, request.user):
+        raise Http404("File not found.")
+
+    if _is_public(mod):
+        # update() instead of save(): counting a download must not change the mod's "last updated" date
+        Mod.objects.filter(pk=mod.pk).update(download_count=F("download_count") + 1)
+
+    if file.url:
+        return HttpResponseRedirect(file.url)
+    if file.staged_file:
+        return FileResponse(file.staged_file.open("rb"), as_attachment=True, filename=file.filename or None)
+    raise Http404("This file isn't available.")
