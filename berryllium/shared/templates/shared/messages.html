@@ -1,0 +1,10 @@
+{% if messages %}
+    <ul class="space-y-2 {{ messages_class|default:'' }}" aria-live="polite">
+        {% for message in messages %}
+            <li class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm {% if message.level_tag == 'error' %}border-red-400/40 bg-red-500/10 text-red-200{% elif message.level_tag == 'warning' %}border-gold-400/40 bg-gold-400/10 text-gold-200{% else %}border-pine-300 bg-pine-600 text-white{% endif %}">
+                <i class="bi {% if message.level_tag == 'error' %}bi-x-circle{% elif message.level_tag == 'warning' %}bi-exclamation-triangle{% else %}bi-check-circle text-gold-300{% endif %} mt-0.5"></i>
+                <span class="whitespace-pre-line">{{ message }}</span>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
