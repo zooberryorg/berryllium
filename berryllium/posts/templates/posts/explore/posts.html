@@ -1,0 +1,46 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_kicker %}Settings{% endblock %}
+{% block panel_title %}My posts{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        Tutorials{% if user|is_moderator %} and news{% endif %} you've written, including drafts. Open one to keep writing; changes to a published post go live when they save.
+    </p>
+    {% if posts %}
+        <ul class="space-y-2">
+            {% for post in posts %}
+                <li class="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 p-3">
+                    <a href="{% url 'post_edit' post.pk %}" class="flex items-center gap-3 min-w-0 flex-1 group/item">
+                        <span class="w-24 aspect-video shrink-0 overflow-hidden rounded-lg bg-pine-800">
+                            {% if post.thumbnail %}<img src="{{ post.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">{% else %}<span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image"></i></span>{% endif %}
+                        </span>
+                        <span class="min-w-0">
+                            <span class="block text-white font-medium truncate group-hover/item:text-gold-200">{{ post.title|default:"Untitled post" }}</span>
+                            <span class="block text-xs text-gray-400">{{ post.get_kind_display }} · Edited {{ post.last_updated|timeago }}</span>
+                        </span>
+                    </a>
+                    <div class="flex items-center gap-2 sm:justify-end">
+                        {% include 'mods/panel/status_badge.html' with mod=post %}
+                        <a href="{{ post.get_absolute_url }}" class="p-2 text-white/60 hover:text-white" title="{% if post.status == 'published' %}View{% else %}Preview{% endif %}"><i class="bi bi-eye"></i></a>
+                        <form method="post" action="{% url 'settings_posts_change' post.pk %}" class="contents">
+                            {% csrf_token %}
+                            {% if post.draft %}
+                                <button type="submit" name="action" value="publish" class="p-2 text-white/60 hover:text-gold-200 cursor-pointer" title="Publish"><i class="bi bi-send"></i></button>
+                            {% else %}
+                                <button type="submit" name="action" value="unpublish" class="p-2 text-white/60 hover:text-gold-200 cursor-pointer" title="Move to drafts"><i class="bi bi-eye-slash"></i></button>
+                            {% endif %}
+                            <button type="submit" name="action" value="delete" class="p-2 text-white/60 hover:text-red-300 cursor-pointer" title="Delete"
+                                    onclick="return confirm('Delete this post and its files? This can\'t be undone.')"><i class="bi bi-trash"></i></button>
+                        </form>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <div class="rounded-2xl border border-dashed border-white/15 px-6 py-12 text-center">
+            <i class="bi bi-journal-text text-4xl text-white/20"></i>
+            <p class="mt-3 text-white">You haven't written anything yet.</p>
+            <p class="mt-1 text-sm text-gray-400">Start a {{ noun|lower }} from the <span class="text-white">New</span> menu.</p>
+        </div>
+    {% endif %}
+{% endblock %}
