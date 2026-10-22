@@ -15,3 +15,16 @@ class ProfileSettingsForm(forms.ModelForm):
         # ticking it previews the initial instead of the picture
         widget=forms.CheckboxInput(attrs={"class": "w-4 h-4 accent-gold-400", "@change": "removing = $event.target.checked"}),
     )
+
+
+    def save(self, commit=True):
+        old = Member.objects.filter(pk=self.instance.pk).values_list("avatar", flat=True).first()
+        member = super().save(commit=False)
+        if self.cleaned_data.get("remove_avatar") and "avatar" not in self.files:
+            member.avatar = None
+        if commit:
+            member.save()
+            # delete the replaced or removed file
+            if old and old != (member.avatar.name if member.avatar else ""):
+                member.avatar.storage.delete(old)
+        return member
