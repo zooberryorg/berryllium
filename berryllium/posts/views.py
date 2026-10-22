@@ -261,3 +261,20 @@ def explore_tutorials(request):
 @require_GET
 def explore_news(request):
     return _listing(request, Post.Kind.NEWS, "news")
+
+# --------------------------------------------------------------------------- Settings > My posts
+
+
+def _my_posts(user):
+    return Post.objects.filter(uploaded_by=user)
+
+
+@login_required
+def settings_posts(request):
+    from berryllium.users.settings_views import _nav  # the Settings menu
+    posts = _my_posts(request.user).order_by("-last_updated")
+    return render(request, "posts/settings/posts.html", {
+        "posts": posts,
+        "panel_nav": _nav(request, "settings_posts"),
+        "noun": _noun(request.user),
+    })
