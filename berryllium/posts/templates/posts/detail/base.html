@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% load bfilters %}
+{% block content %}
+    <script>
+        function postPage() {
+            return {
+                tab: location.hash === '#files' ? 'files' : 'article',
+                active: '',
+                headings: [],
+                init() {
+                    this.headings = [...document.querySelectorAll('#post-body :is(h1, h2, h3, h4, h5, h6)[id]')];
+                    this.track();
+                },
+                track() {
+                    let current = this.headings[0]?.id || '';
+                    for (const heading of this.headings) {
+                        if (heading.getBoundingClientRect().top > 120) break;
+                        current = heading.id;
+                    }
+                    this.active = current;
+                },
+                show(name) {
+                    this.tab = name;
+                    history.replaceState(null, '', name === 'files' ? '#files' : location.pathname + location.search);
+                },
+                move() {
+                    const next = this.tab === 'article' ? 'files' : 'article';
+                    if (!document.getElementById('tab-' + next)) return;
+                    this.show(next);
+                    this.$nextTick(() => document.getElementById('tab-' + next)?.focus());
+                },
+                goTo(id) {
+                    this.tab = 'article';
+                    this.$nextTick(() => {
+                        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        history.replaceState(null, '', '#' + id);
+                        this.active = id;
+                    });
+                },
+            };
+        }
+    </script>
+
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6"
+         x-data="postPage()"
+         @scroll.window.throttle.100ms="track()">
+
+        <nav aria-label="Breadcrumb" class="text-sm text-gray-400">
+            <ol class="flex items-center gap-2 min-w-0">
+                <li><a href="{% if post.kind == 'news' %}{% url 'explore_news' %}{% else %}{% url 'explore_tutorials' %}{% endif %}" class="hover:text-gold-300 transition-colors">{% if post.kind == 'news' %}News{% else %}Tutorials{% endif %}</a></li>
+                <li aria-hidden="true"><i class="bi bi-chevron-right text-[10px]"></i></li>
+                <li class="text-white/80 truncate" aria-current="page">{{ post.title }}</li>
+            </ol>
+        </nav>
+
+        {% include 'shared/messages.html' %}
+
+        {% if not is_public %}
+            <div class="flex items-start gap-3 rounded-2xl border border-gold-400/40 bg-gold-400/10 px-4 py-3 text-sm text-gold-200">
+                <i class="bi bi-eye mt-0.5"></i>
+                <p>
+                    {% if post.status == 'scheduled' %}
+                        This is scheduled to go live on {{ post.publish_date|date:date_prefs.datetime }}. Until then, only you and the moderators can see it.
+                    {% else %}
+                        This is a preview. Only you and the moderators can see this page.
+                    {% endif %}
+                </p>
+            </div>
+        {% endif %}
+
+        {% include 'posts/detail/header.html' %}
+
+        <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1fr)_17rem]">
+            <div class="min-w-0 space-y-6">
+                {% if toc %}
+                    {# phone/tablet: a collapsible table of contents above the article #}
+                    <details class="lg:hidden rounded-2xl border border-pine-300 bg-pine-600 group/toc">
+                        <summary class="flex items-center justify-between gap-2 px-5 py-3.5 cursor-pointer text-sm font-semibold text-white list-none">
+                            <span><i class="bi bi-list-nested text-gold-300 mr-1.5"></i> On this page</span>
+                            <i class="bi bi-chevron-down text-xs text-white/50 transition-transform group-open/toc:rotate-180"></i>
+                        </summary>
+                        <div class="px-3 pb-4">{% include 'posts/detail/toc_list.html' with entries=toc depth=0 %}</div>
+                    </details>
+                {% endif %}
+
+                <section class="rounded-2xl border border-pine-300 bg-pine-600">
+                    <div role="tablist" aria-label="{{ post.get_kind_display }}"
+                         class="flex gap-1 overflow-x-auto border-b border-white/10 px-2"
+                         @keydown.arrow-right.prevent="move()"
+                         @keydown.arrow-left.prevent="move()">
+                        {% include 'posts/detail/tab_button.html' with name="article" label=post.get_kind_display icon="bi-file-text" %}
+                        {% if files %}
+                            {% include 'posts/detail/tab_button.html' with name="files" label="Files" icon="bi-paperclip" count=files|length %}
+                        {% endif %}
+                    </div>
+
+                    <div role="tabpanel" id="panel-article" aria-labelledby="tab-article" tabindex="0"
+                         class="p-5 sm:p-8 focus:outline-none" x-show="tab === 'article'">
+                        {% if body_html %}
+                            <div id="post-body" class="md-preview text-granite-200 leading-relaxed max-w-3xl">{{ body_html }}</div>
+                        {% else %}
+                            <p class="text-sm text-white/40">Nothing has been written yet.</p>
+                        {% endif %}
+                        {% if tags %}
+                            <ul class="mt-8 pt-5 border-t border-white/10 flex flex-wrap gap-2" aria-label="Tags">
+                                {% for tag in tags %}
+                                    <li><a href="{% if post.kind == 'news' %}{% url 'explore_news' %}{% else %}{% url 'explore_tutorials' %}{% endif %}?tag={{ tag.name|urlencode }}" class="inline-block rounded-full bg-white/5 border border-white/10 px-3 py-1 text-xs text-white/70 hover:text-gold-200 hover:border-gold-400/40 transition-colors">#{{ tag.name }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    {% if files %}
+                        <div role="tabpanel" id="panel-files" aria-labelledby="tab-files" tabindex="0"
+                             class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'files'" x-cloak>
+                            {% include 'posts/detail/files.html' %}
+                        </div>
+                    {% endif %}
+                </section>
+            </div>
+
+            <aside class="hidden lg:block lg:sticky lg:top-24 space-y-4 max-h-[calc(100vh-7rem)] overflow-y-auto" aria-label="On this page">
+                {% if toc %}
+                    <nav class="rounded-2xl border border-pine-300 bg-pine-600 p-4" aria-label="Table of contents">
+                        <p class="px-2 mb-2 text-xs font-semibold uppercase tracking-wider text-gray-400">On this page</p>
+                        {% include 'posts/detail/toc_list.html' with entries=toc depth=0 %}
+                    </nav>
+                {% endif %}
+                {% if files %}
+                    <button type="button" @click="show('files'); $nextTick(() => document.getElementById('tab-files')?.scrollIntoView({ behavior: 'smooth', block: 'center' }))"
+                            class="w-full flex items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 px-4 py-3 text-left hover:border-gold-400/40 transition-colors cursor-pointer">
+                        <span class="w-9 h-9 shrink-0 rounded-lg bg-gold-400/10 text-gold-300 flex items-center justify-center"><i class="bi bi-paperclip"></i></span>
+                        <span class="text-sm"><span class="block text-white font-medium">{{ files|length }} file{{ files|length|pluralize }}</span><span class="block text-xs text-gray-400">Go with this {{ post.get_kind_display|lower }}</span></span>
+                    </button>
+                {% endif %}
+                <a href="#" @click.prevent="window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex items-center gap-2 px-2 text-xs text-gray-400 hover:text-gold-300 transition-colors">
+                    <i class="bi bi-arrow-up"></i> Back to top
+                </a>
+            </aside>
+        </div>
+
+        {% if related %}
+            <section aria-labelledby="related-heading" class="pt-4">
+                <h2 id="related-heading" class="text-lg font-semibold text-white mb-4">More {% if post.kind == 'news' %}news{% else %}tutorials{% endif %}</h2>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {% for item in related %}{% include 'posts/explore/card.html' with post=item %}{% endfor %}
+                </div>
+            </section>
+        {% endif %}
+    </div>
+
+    <style>[x-cloak] { display: none !important; } details > summary::-webkit-details-marker { display: none; }</style>
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}
