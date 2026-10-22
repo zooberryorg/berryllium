@@ -44,3 +44,55 @@ def _moderators_group():
     group, _ = Group.objects.get_or_create(name=MODERATOR_GROUP)
     return group
 
+# --------------------------------------------------------------------------- overview
+
+
+@moderator_required
+def overview(request):
+    mods = Mod.objects.all()
+    stats = [
+        {"label": "Files waiting", "value": ModFile.objects.filter(status=ModFile.Status.PENDING).count(),
+         "url": reverse("moderation_files"), "icon": "bi-inboxes", "attention": True},
+        {"label": "Published mods", "value": mods.filter(status_filter("published")).count(),
+         "url": reverse("moderation_mods") + "?status=published", "icon": "bi-puzzle"},
+        {"label": "Scheduled", "value": mods.filter(status_filter("scheduled")).count(),
+         "url": reverse("moderation_mods") + "?status=scheduled", "icon": "bi-calendar-event"},
+        {"label": "Drafts", "value": mods.filter(status_filter("draft")).count(),
+         "url": reverse("moderation_mods") + "?status=draft", "icon": "bi-pencil"},
+        {"label": "Members", "value": Member.objects.filter(is_active=True).count(), "url": "", "icon": "bi-people"},
+        {"label": "Tags", "value": Tag.objects.count(), "url": reverse("moderation_tags"), "icon": "bi-tags"},
+    ]
+    context = {
+        "stats": stats,
+        "waiting_files": ModFile.objects.filter(status=ModFile.Status.PENDING)
+            .select_related("filegroup__mod__uploaded_by").order_by("uploaded_at")[:5],
+        "recent_mods": mods.filter(status_filter("published")).select_related("uploaded_by").order_by("-publish_date")[:6],
+        "panel_nav": _nav(request, "moderation_overview"),
+    }
+    return render(request, "moderation/overview.html", context)
+
+
+# --------------------------------------------------------------------------- file queue
+
+
+@moderator_required
+def files(request):
+    status = request.GET.get("status", "pending")
+    status = status if status in dict(FILE_STATUSES) else "pending"
+    queryset = ModFile.objects.select_related("filegroup__mod__uploaded_by")
+    tabs = [
+        {"key": key, "label": label, "active": key == status,
+         "count": queryset.filter(status=key).count() if key else queryset.count(),
+         "url": f"?status={key}" if key else "?status="}
+        for key, label in FILE_STATUSES
+    ]
+    if status:
+        queryset = queryset.filter(status=status)
+    # oldest first while waiting (a queue); newest first otherwise
+    queryset = queryset.order_by("uploaded_at" if status == "pending" else "-uploaded_at")
+    page = Paginator(queryset, 30).get_page(request.GET.get("page"))
+    return render(request, "moderation/files.html", {
+        "status": status, "status_tabs": tabs, "page": page,
+        "next_url": request.get_full_path(),
+        "panel_nav": _nav(request, "moderation_files"),
+    })
