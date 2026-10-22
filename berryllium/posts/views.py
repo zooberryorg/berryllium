@@ -145,3 +145,18 @@ def files(request, post_id):
         "post": post, "files": post.files.all(), "file_errors": errors,
         "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
     })
+
+@login_required
+@require_POST
+def file_change(request, post_id, file_id):
+    post = _editable_post(request, post_id)
+    attachment = get_object_or_404(PostFile, pk=file_id, post=post)
+    if request.POST.get("action") == "delete":
+        attachment.delete()
+    else:
+        attachment.title = request.POST.get("title", "").strip()[:255]
+        attachment.save(update_fields=["title"])
+    return render(request, "posts/editor/files.html", {
+        "post": post, "files": post.files.all(), "file_errors": [],
+        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
+    })
