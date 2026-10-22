@@ -20,7 +20,7 @@
             <a href="{% url 'mod_detail' mod.pk %}" class="hover:text-gold-200 focus-visible:outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline-2 focus-visible:after:outline-gold-400 focus-visible:after:outline-offset-2">{{ mod.title }}</a>
         </h3>
         {% if mod.uploaded_by %}
-            <p class="text-xs text-gray-400 truncate">by <span class="text-white/70">{{ mod.uploaded_by.username }}</span></p>
+            <p class="text-xs text-gray-400 truncate">by <a href="{% url 'member_profile' mod.uploaded_by.username %}" class="relative z-10 text-white/70 hover:text-gold-200">{{ mod.uploaded_by.username }}</a></p>
         {% endif %}
         <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ mod.summary }}</p>
     </div>
