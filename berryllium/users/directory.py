@@ -78,3 +78,19 @@ def collect_modders():
         person["mod_count"] = len(person["mods"])
         person["first_year"], person["last_year"] = min(person["years"]), max(person["years"])
     return list(people.values())
+
+def _int(value):
+    return int(value) if str(value).isdigit() else None
+
+
+def read_filters(params):
+    sort = params.get("sort", "")
+    return {
+        "q": params.get("q", "").strip()[:100],
+        "category": params.get("category", "") if params.get("category", "") in dict(MOD_CATEGORIES) else "",
+        "tags": list(dict.fromkeys(proper_case(t) for t in params.getlist("tag") if t.strip()))[:MAX_TAGS],
+        "year_from": _int(params.get("from", "")),
+        "year_to": _int(params.get("to", "")),
+        "websites": [w for w in params.getlist("website") if w == ZOOBERRY or w.isdigit()],
+        "sort": sort if sort in SORTS else DEFAULT_SORT,
+    }
