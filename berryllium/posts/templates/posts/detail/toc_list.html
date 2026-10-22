@@ -1,0 +1,11 @@
+<ul class="{% if depth %}ml-3 mt-0.5 border-l border-white/10 pl-2{% endif %} space-y-0.5">
+    {% for entry in entries %}
+        <li>
+            <a href="#{{ entry.id }}"
+               @click.prevent="goTo('{{ entry.id }}')"
+               class="block rounded-lg px-2 py-1 text-sm leading-snug text-gray-400 hover:text-white hover:bg-white/5 aria-[current=location]:text-gold-200 aria-[current=location]:bg-gold-400/10 transition-colors duration-150 {% if not depth %}font-medium{% endif %}"
+               :aria-current="active === '{{ entry.id }}' ? 'location' : null">{{ entry.title }}</a>
+            {% if entry.children %}{% include 'posts/detail/toc_list.html' with entries=entry.children depth=1 %}{% endif %}
+        </li>
+    {% endfor %}
+</ul>
