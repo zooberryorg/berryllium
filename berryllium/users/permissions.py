@@ -26,6 +26,10 @@ def can_edit_mod(user, mod):
     """The uploader, plus moderators and admins."""
     return bool(user and user.is_authenticated and (user.pk == mod.uploaded_by_id or is_moderator(user)))
 
+can_edit_post = can_edit_mod
+def can_post_news(user):
+    """News posts are for the site team; members write tutorials."""
+    return is_moderator(user)
 
 def moderator_required(view):
     @login_required
