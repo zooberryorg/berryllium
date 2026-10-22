@@ -31,6 +31,12 @@
         </div>
     </dl>
 
+    {% if can_edit %}
+        <a href="{% url 'mod_edit' mod.pk %}" class="flex items-center justify-center gap-2 rounded-full border border-gold-400/50 px-4 py-2 text-sm font-medium text-gold-200 hover:bg-gold-400 hover:text-pine-500 transition-colors duration-150">
+            <i class="bi bi-pencil-square"></i> Edit mod
+        </a>
+    {% endif %}
+
     {% if required_count %}
         <a href="#requirements" class="flex items-center gap-2 text-sm text-gold-200 hover:text-gold-300">
             <i class="bi bi-exclamation-circle"></i>
