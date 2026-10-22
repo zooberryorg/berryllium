@@ -46,6 +46,22 @@ def compact(value):
             return f"{text.removesuffix('.0')}{suffix}"
     return str(number)
 
+@register.filter
+def profile_url(person):
+    """
+    Profile link for a member, an Author or a ModCredit. "" when there is no page (e.g. a pending name).
+    Usage: {% with url=credit|profile_url %}{% if url %}<a href="{{ url }}">...{% endif %}{% endwith %}
+    """
+    # imported here: the users app imports the mods views, which load this library
+    from berryllium.users.profiles import credit_profile_url, profile_url as _profile_url
+    if person is None:
+        return ""
+    if hasattr(person, "role") and hasattr(person, "pending_name"):
+        return credit_profile_url(person)
+    if hasattr(person, "username"):
+        return _profile_url(member=person)
+    return _profile_url(author=person)
+
 # --------------------------- template tags
 
 
