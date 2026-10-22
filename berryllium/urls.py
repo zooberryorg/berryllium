@@ -27,6 +27,7 @@ urlpatterns = [
     path("", include("berryllium.mods.urls")),
     path("", include("berryllium.users.urls")),
     path("", include("berryllium.moderation.urls")),
+    path("", include("berryllium.posts.urls")),
 ]
 
 
