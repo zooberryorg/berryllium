@@ -1,0 +1,69 @@
+{% load bfilters %}
+{# details #}
+<section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+    <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Details</h2>
+    <dl class="grid grid-cols-[7rem_minmax(0,1fr)] gap-x-3 gap-y-2.5 text-sm">
+        <dt class="text-gray-400">Game</dt>
+        <dd class="text-white">{{ game_labels|join:", "|default:"—" }}</dd>
+        <dt class="text-gray-400">Expansions</dt>
+        <dd class="text-white">{{ expansion_labels|join:", "|default:"None needed" }}</dd>
+        <dt class="text-gray-400">License</dt>
+        <dd class="text-white">
+            {% for item in mod_licenses %}
+                <a href="{% url 'explore_mods' %}?license={{ item.license.pk }}" class="hover:text-gold-300" title="{{ item.license.name }}">{{ item.license }}</a>{% if not forloop.last %}, {% endif %}
+            {% empty %}Not specified{% endfor %}
+        </dd>
+        {% if languages %}
+            <dt class="text-gray-400">Languages</dt>
+            <dd class="text-white">{{ languages|join:", " }}</dd>
+        {% endif %}
+        <dt class="text-gray-400">Published</dt>
+        <dd class="text-white"><time datetime="{{ mod.publish_date|date:'c' }}">{{ mod.publish_date|date:date_prefs.date }}</time></dd>
+        <dt class="text-gray-400">Updated</dt>
+        <dd class="text-white"><time datetime="{{ mod.last_updated|date:'c' }}" title="{{ mod.last_updated|date:date_prefs.datetime }}">{{ mod.last_updated|date:date_prefs.date }}</time></dd>
+        {% if mod.version %}
+            <dt class="text-gray-400">Version</dt>
+            <dd class="text-white break-words">{{ mod.version }}</dd>
+        {% endif %}
+    </dl>
+</section>
+
+{# archive #}
+{% if mod.is_archived_file %}
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">From the archive</h2>
+        <dl class="grid grid-cols-[7rem_minmax(0,1fr)] gap-x-3 gap-y-2.5 text-sm">
+            <dt class="text-gray-400">Released</dt>
+            <dd class="text-white">{{ mod.original_release_date|date:date_prefs.date|default:"Unknown" }}</dd>
+            <dt class="text-gray-400">Made by</dt>
+            <dd class="text-white">{% for credit in original_authors %}{{ credit.display_name }}{% if not forloop.last %}, {% endif %}{% empty %}Unknown{% endfor %}</dd>
+            {% if original_websites %}
+                <dt class="text-gray-400">First hosted on</dt>
+                <dd class="text-white">{{ original_websites|join:", " }}</dd>
+            {% endif %}
+        </dl>
+    </section>
+{% endif %}
+
+{# tags #}
+{% if tags %}
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Tags</h2>
+        <ul class="flex flex-wrap gap-1.5">
+            {% for tag in tags %}
+                <li>
+                    <a href="{% url 'explore_mods' %}?tag={{ tag.name|urlencode }}"
+                       class="inline-block text-xs px-2.5 py-1 rounded-full bg-white/5 border border-white/10 text-white/80 hover:text-white hover:border-gold-400/40 transition-colors duration-150">{{ tag.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </section>
+{% endif %}
+
+{# links #}
+{% if links %}
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Links</h2>
+        {% include "shared/links/link_list.html" with links=links %}
+    </section>
+{% endif %}
