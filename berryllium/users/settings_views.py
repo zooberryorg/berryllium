@@ -71,3 +71,15 @@ def settings_account(request):
         "password_form": password_form,
         "panel_nav": _nav(request, "settings_account"),
     })
+
+@login_required
+def settings_mods(request):
+    context = mod_list_context(request, _my_mods(request.user))
+    context["panel_nav"] = _nav(request, "settings_mods")
+    return render(request, "users/settings/mods.html", context)
+
+
+@login_required
+@require_POST
+def settings_mods_bulk(request):
+    return handle_bulk_post(request, _my_mods(request.user), reverse("settings_mods"))
