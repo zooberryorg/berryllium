@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8">
+        <header class="mb-6">
+            <p class="text-xs font-semibold uppercase tracking-wider text-gold-300">{% block panel_kicker %}{% endblock %}</p>
+            <h1 class="text-3xl font-bold text-white mt-1">{% block panel_title %}{% endblock %}</h1>
+        </header>
+
+        <div class="flex flex-col lg:flex-row lg:items-start gap-6">
+            <nav class="lg:w-64 shrink-0 rounded-2xl border border-pine-300 bg-pine-600 p-1.5" aria-label="{% block panel_nav_label %}Sections{% endblock %}">
+                <ul class="flex lg:flex-col gap-1 overflow-x-auto">
+                    {% for item in panel_nav %}
+                        {% if item.group %}
+                            <li class="hidden lg:block px-4 pt-3 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-500">{{ item.group }}</li>
+                        {% else %}
+                            <li class="shrink-0">
+                                <a href="{{ item.url }}"
+                                   class="flex items-center gap-3 px-4 py-2 rounded-xl text-sm whitespace-nowrap transition-[color,background-color] duration-150 {% if item.active %}bg-gradient-to-r from-gold-500/50 to-gold-300/50 text-white border border-gold-300/30{% else %}text-gray-400 hover:text-white hover:bg-white/5 border border-transparent{% endif %}"
+                                   {% if item.active %}aria-current="page"{% endif %}>
+                                    <i class="bi {{ item.icon }} {% if item.active %}text-gold-300{% endif %}"></i>
+                                    <span class="flex-1">{{ item.label }}</span>
+                                    {% if item.count is not None %}<span class="text-xs bg-pine-700/50 px-2 py-0.5 rounded-full tabular-nums">{{ item.count }}</span>{% endif %}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </nav>
+
+            <div class="flex-1 min-w-0 space-y-6">
+                {% if messages %}
+                    <ul class="space-y-2" aria-live="polite">
+                        {% for message in messages %}
+                            <li class="flex items-start gap-3 rounded-xl border px-4 py-3 text-sm {% if message.level_tag == 'error' %}border-red-400/40 bg-red-500/10 text-red-200{% elif message.level_tag == 'warning' %}border-gold-400/40 bg-gold-400/10 text-gold-200{% else %}border-pine-300 bg-pine-600 text-white{% endif %}">
+                                <i class="bi {% if message.level_tag == 'error' %}bi-x-circle{% elif message.level_tag == 'warning' %}bi-exclamation-triangle{% else %}bi-check-circle text-gold-300{% endif %} mt-0.5"></i>
+                                <span class="whitespace-pre-line">{{ message }}</span>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                {% block panel_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <style>[x-cloak] { display: none !important; }</style>
+{% endblock %}
