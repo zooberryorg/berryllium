@@ -1,0 +1,96 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Moderation sections{% endblock %}
+{% block panel_kicker %}Moderation{% endblock %}
+{% block panel_title %}File queue{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        Files uploaded to mods. Approving marks a file as checked. Rejecting hides it from downloads on the mod page, and needs a note saying why.
+    </p>
+
+    <nav class="overflow-x-auto" aria-label="Filter by review status">
+        <div class="inline-flex rounded-2xl bg-pine-600 p-1.5 border border-pine-300 min-w-max gap-1">
+            {% for tab in status_tabs %}
+                <a href="{{ tab.url }}"
+                   class="px-4 py-2 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-150 {% if tab.active %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold{% else %}text-gray-400 hover:text-white hover:bg-white/5{% endif %}"
+                   {% if tab.active %}aria-current="page"{% endif %}>
+                    {{ tab.label }} <span class="text-xs tabular-nums {% if tab.active %}text-pine-500/70{% else %}text-gray-500{% endif %}">{{ tab.count }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </nav>
+
+    {% if page.object_list %}
+        <form method="post" action="{% url 'moderation_files_review' %}"
+              x-data="{ selected: [], allIds: [], rejecting: false }"
+              x-init="allIds = [...$el.querySelectorAll('input[name=ids]')].map(el => el.value)">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ next_url }}">
+
+            <div class="rounded-2xl border border-pine-300 bg-pine-600 px-4 py-3 space-y-3">
+                <div class="flex flex-wrap items-center gap-3">
+                    <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
+                        <input type="checkbox" class="w-4 h-4 accent-gold-400 cursor-pointer"
+                               :checked="selected.length && selected.length === allIds.length"
+                               x-effect="$el.indeterminate = selected.length > 0 && selected.length < allIds.length"
+                               @change="selected = $event.target.checked ? [...allIds] : []">
+                        <span x-text="selected.length ? selected.length + ' selected' : 'Select all'">Select all</span>
+                    </label>
+                    <div class="flex flex-wrap items-center gap-2 ml-auto">
+                        <button type="submit" name="action" value="approve" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500" :disabled="!selected.length">
+                            <i class="bi bi-check2-circle"></i> Approve
+                        </button>
+                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15" :disabled="!selected.length" @click="rejecting = !rejecting; $nextTick(() => rejecting && $refs.note.focus())">
+                            <i class="bi bi-x-circle"></i> Reject...
+                        </button>
+                    </div>
+                </div>
+                <div x-show="rejecting" x-cloak class="flex flex-col sm:flex-row gap-2">
+                    <label class="sr-only" for="reject-note">Why are these files rejected?</label>
+                    <input id="reject-note" x-ref="note" name="note" type="text" maxlength="1000" class="zb-input text-sm flex-1"
+                           placeholder="Why are these files rejected? (required)">
+                    <button type="submit" name="action" value="reject" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15 bg-red-500/20 justify-center">Reject selected</button>
+                </div>
+            </div>
+
+            <ul class="mt-3 divide-y divide-white/5 rounded-2xl border border-pine-300 bg-pine-600 overflow-hidden">
+                {% for file in page.object_list %}
+                    {% with mod=file.filegroup.mod %}
+                        <li class="flex items-start sm:items-center gap-3 px-4 py-3"
+                            :class="selected.includes('{{ file.pk }}') ? 'bg-gold-400/5' : ''">
+                            <input type="checkbox" name="ids" value="{{ file.pk }}" x-model="selected"
+                                   class="w-4 h-4 mt-1 sm:mt-0 shrink-0 accent-gold-400 cursor-pointer" aria-label="Select {{ file.filename }}">
+                            <span class="w-9 h-9 shrink-0 rounded-lg bg-gold-400/10 text-gold-300 flex items-center justify-center"><i class="bi bi-file-earmark-zip"></i></span>
+                            <div class="min-w-0 flex-1">
+                                <p class="text-white break-words">{{ file.title|default:file.filename }}</p>
+                                <p class="text-xs text-gray-400 break-words">
+                                    {% if file.title %}{{ file.filename }} · {% endif %}{{ file.size|filesizeformat }} ·
+                                    in <a href="{% url 'mod_detail' mod.pk %}" class="text-gray-300 hover:text-gold-200">{{ mod.title|default:"Untitled mod" }}</a>
+                                    by {{ mod.uploaded_by.username|default:"(deleted account)" }} ·
+                                    <span title="{{ file.uploaded_at|date:date_prefs.datetime }}">uploaded {{ file.uploaded_at|timeago }}</span>
+                                </p>
+                                {% if file.moderation_notes %}<p class="text-xs text-gray-300 mt-1"><i class="bi bi-chat-left-text mr-1"></i>{{ file.moderation_notes }}</p>{% endif %}
+                            </div>
+                            <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full {% if file.status == 'approved' %}bg-gold-400/15 text-gold-200{% elif file.status == 'failed' %}bg-red-500/15 text-red-200{% else %}bg-white/10 text-white/80{% endif %}">{{ file.get_status_display }}</span>
+                            {% if file.status != 'failed' %}
+                                <a href="{% url 'mod_file_download' file.pk %}" class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="Download to check" aria-label="Download {{ file.filename }}"><i class="bi bi-download"></i></a>
+                            {% endif %}
+                        </li>
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+        </form>
+        {% if page.has_other_pages %}
+            <nav class="flex items-center justify-center gap-3 text-sm" aria-label="Pages">
+                {% if page.has_previous %}<a href="?status={{ status }}&page={{ page.previous_page_number }}" class="text-gray-300 hover:text-gold-200"><i class="bi bi-chevron-left"></i> Previous</a>{% endif %}
+                <span class="text-gray-400">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+                {% if page.has_next %}<a href="?status={{ status }}&page={{ page.next_page_number }}" class="text-gray-300 hover:text-gold-200">Next <i class="bi bi-chevron-right"></i></a>{% endif %}
+            </nav>
+        {% endif %}
+    {% else %}
+        <div class="rounded-2xl border border-pine-300 bg-pine-600 p-10 text-center">
+            <i class="bi bi-inboxes text-4xl text-white/30"></i>
+            <p class="text-white font-semibold mt-4">{% if status == 'pending' %}Nothing is waiting for review.{% else %}No files here.{% endif %}</p>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Moderation sections{% endblock %}
+{% block panel_kicker %}Moderation{% endblock %}
+{% block panel_title %}Overview{% endblock %}
+{% block panel_content %}
+    <ul class="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {% for stat in stats %}
+            <li>
+                <{% if stat.url %}a href="{{ stat.url }}"{% else %}div{% endif %}
+                    class="block h-full rounded-2xl border px-4 py-3 transition-colors duration-150 {% if stat.attention and stat.value %}border-gold-400/50 bg-gold-400/10 hover:bg-gold-400/15{% else %}border-pine-300 bg-pine-600 {% if stat.url %}hover:border-gold-400/40{% endif %}{% endif %}">
+                    <span class="flex items-center gap-2 text-xs text-gray-400"><i class="bi {{ stat.icon }}"></i>{{ stat.label }}</span>
+                    <span class="block text-2xl font-bold text-white tabular-nums mt-1">{{ stat.value }}</span>
+                </{% if stat.url %}a{% else %}div{% endif %}>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+        <div class="flex items-baseline justify-between gap-3 mb-3">
+            <h2 class="text-lg font-semibold text-white">Waiting the longest</h2>
+            <a href="{% url 'moderation_files' %}" class="text-sm text-gold-300 hover:text-gold-200">Open the file queue <i class="bi bi-arrow-right"></i></a>
+        </div>
+        {% if waiting_files %}
+            <ul class="divide-y divide-white/5">
+                {% for file in waiting_files %}
+                    <li class="flex items-center gap-3 py-2.5 text-sm">
+                        <i class="bi bi-file-earmark-zip text-gold-300"></i>
+                        <span class="min-w-0 flex-1 truncate text-white">{{ file.title|default:file.filename }}</span>
+                        <a href="{% url 'mod_detail' file.filegroup.mod_id %}" class="hidden sm:inline truncate max-w-[14rem] text-gray-300 hover:text-gold-200">{{ file.filegroup.mod.title|default:"Untitled mod" }}</a>
+                        <span class="shrink-0 text-xs text-gray-400" title="{{ file.uploaded_at|date:date_prefs.datetime }}">{{ file.uploaded_at|timeago }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-sm text-gray-400">Nothing is waiting. Every uploaded file has been reviewed.</p>
+        {% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+        <h2 class="text-lg font-semibold text-white mb-3">Recently published</h2>
+        {% if recent_mods %}
+            <ul class="divide-y divide-white/5">
+                {% for mod in recent_mods %}
+                    <li class="flex items-center gap-3 py-2.5 text-sm">
+                        <a href="{% url 'mod_detail' mod.pk %}" class="min-w-0 flex-1 truncate text-white hover:text-gold-200">{{ mod.title }}</a>
+                        <span class="hidden sm:inline text-gray-400">by {{ mod.uploaded_by.username|default:"(deleted account)" }}</span>
+                        <span class="shrink-0 text-xs text-gray-400">{{ mod.publish_date|timeago }}</span>
+                        <a href="{% url 'mod_edit' mod.pk %}" class="shrink-0 text-gray-300 hover:text-gold-200" title="Edit" aria-label="Edit {{ mod.title }}"><i class="bi bi-pencil-square"></i></a>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="text-sm text-gray-400">No mods have been published yet.</p>
+        {% endif %}
+    </section>
+{% endblock %}
