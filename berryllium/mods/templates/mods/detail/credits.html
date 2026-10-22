@@ -3,22 +3,28 @@
         <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Made by</h3>
         <ul class="grid gap-2 sm:grid-cols-2">
             {% for credit in collaborators %}
-                <li class="flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5">
+                <li>
+                    {% with url=credit|profile_url %}
+                    <{% if url %}a href="{{ url }}"{% else %}div{% endif %} class="group/person flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5 {% if url %}hover:bg-pine-800 transition-colors duration-150{% endif %}">
                     {% if credit.member %}
                         {% include 'shared/navigation/avatar.html' with member=credit.member avatar_class="w-9 h-9 text-sm" %}
                     {% else %}
                         <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-sm font-semibold text-gold-200 uppercase">{{ credit.display_name|slice:":1" }}</span>
                     {% endif %}
                     <span class="min-w-0">
-                        <span class="block text-white truncate">{{ credit.display_name }}</span>
+                        <span class="block text-white truncate group-hover/person:text-gold-200">{{ credit.display_name }}</span>
                         <span class="block text-xs text-gray-400">{% if credit.member_id and credit.member_id == mod.uploaded_by_id %}Uploader{% elif credit.member_id %}Member{% else %}Contributor{% endif %}</span>
                     </span>
+                    </{% if url %}a{% else %}div{% endif %}>
+                    {% endwith %}
                 </li>
             {% empty %}
                 {% if mod.uploaded_by %}
-                    <li class="flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5">
-                        {% include 'shared/navigation/avatar.html' with member=mod.uploaded_by avatar_class="w-9 h-9 text-sm" %}
-                        <span class="text-white">{{ mod.uploaded_by.username }}</span>
+                    <li>
+                        <a href="{% url 'member_profile' mod.uploaded_by.username %}" class="group/person flex items-center gap-3 rounded-xl bg-pine-800/50 px-3 py-2.5 hover:bg-pine-800 transition-colors duration-150">
+                            {% include 'shared/navigation/avatar.html' with member=mod.uploaded_by avatar_class="w-9 h-9 text-sm" %}
+                            <span class="text-white group-hover/person:text-gold-200">{{ mod.uploaded_by.username }}</span>
+                        </a>
                     </li>
                 {% endif %}
             {% endfor %}
@@ -28,7 +34,7 @@
     {% if original_authors %}
         <section>
             <h3 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Original authors</h3>
-            <p class="text-sm text-white">{% for credit in original_authors %}{{ credit.display_name }}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
+            <p class="text-sm text-white">{% for credit in original_authors %}{% with url=credit|profile_url %}{% if url %}<a href="{{ url }}" class="text-white hover:text-gold-300 transition-colors duration-150">{{ credit.display_name }}</a>{% else %}{{ credit.display_name }}{% endif %}{% endwith %}{% if not forloop.last %}, {% endif %}{% endfor %}</p>
         </section>
     {% endif %}
 
