@@ -11,7 +11,7 @@
          @click.outside="open = false"
          x-transition
          class="absolute pt-2 z-50 right-0">
-        <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[280px]">
+        <div class="rounded-2xl border border-pine-300 bg-pine-700 p-2 shadow-2xl shadow-black/40 min-w-[280px]">
             <a @click="$dispatch('open-modal', { 
                     endpoint: '{% url 'mod_create_draft' %}', 
                     modalTitle: 'Create Mod Draft', 
@@ -19,32 +19,24 @@
                     maxWidth: 'max-w-2xl',
                     focusAfterRender: document.getElementById('upload-frame'),
                 })"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item cursor-pointer">
-                <div class="w-10 h-10 rounded-lg bg-amber-600/10 flex items-center justify-center mr-3 group-hover/item:bg-amber-600/20 transition-colors">
-                    <i class="bi bi-upload text-amber-400"></i>
-                </div>
-                <span class="text-white font-medium group-hover/item:text-amber-400 transition-colors">Mod Page</span>
+               class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-upload"></i></span>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Mod Page</span>
             </a>
             <a href="#"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-                <div class="w-10 h-10 rounded-lg bg-blue-600/10 flex items-center justify-center mr-3 group-hover/item:bg-blue-600/20 transition-colors">
-                    <i class="bi bi-journal-text text-blue-400"></i>
-                </div>
-                <span class="text-white font-medium group-hover/item:text-blue-400 transition-colors">New Dev Diary</span>
+               class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-journal-text"></i></span>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">New Dev Diary</span>
             </a>
             <a href="#"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-                <div class="w-10 h-10 rounded-lg bg-cyan-600/10 flex items-center justify-center mr-3 group-hover/item:bg-cyan-600/20 transition-colors">
-                    <i class="bi bi-newspaper text-cyan-400"></i>
-                </div>
-                <span class="text-white font-medium group-hover/item:text-cyan-400 transition-colors">Tutorial</span>
+               class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-newspaper"></i></span>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Tutorial</span>
             </a>
             <a href="#"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-                <div class="w-10 h-10 rounded-lg bg-green-600/10 flex items-center justify-center mr-3 group-hover/item:bg-green-600/20 transition-colors">
-                    <i class="bi bi-people-fill text-green-400"></i>
-                </div>
-                <span class="text-white font-medium group-hover/item:text-green-400 transition-colors">Organization</span>
+               class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-people-fill"></i></span>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Organization</span>
             </a>
         </div>
     </div>

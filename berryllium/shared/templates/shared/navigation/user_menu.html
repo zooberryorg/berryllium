@@ -1,30 +1,32 @@
 <div class="relative group">
-    <button class="w-11 h-11 rounded-full bg-pine-400 border-2 border-pine-300 hover:border-pine-200 flex items-center justify-center cursor-pointer transition-all duration-200">
-        <i class="bi bi-person-fill text-pine-200 text-lg"></i>
+    <button type="button"
+            class="rounded-full cursor-pointer hover:brightness-110 focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 transition"
+            aria-haspopup="true"
+            aria-label="Account menu for {{ user.username }}">
+        {% include 'shared/navigation/avatar.html' with member=user avatar_class="w-11 h-11 text-lg" %}
     </button>
-    <div class="absolute hidden group-hover:block pt-2 z-50 right-0">
-        <div class="bg-pine-300/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-[#4a5a4b]/50 p-2 min-w-[220px] opacity-0 group-hover:opacity-100 transition-all duration-300">
-            <div class="px-4 py-3 border-b border-[#4a5a4b]/50">
-                <p class="text-sm text-gray-400">Signed in as</p>
-                <p class="text-white font-semibold truncate">{{ user.username }}</p>
-            </div>
-            <a href="#"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item mt-2">
-                <i class="bi bi-person-fill text-amber-400 mr-3"></i>
-                <span class="text-white font-medium group-hover/item:text-amber-400 transition-colors">Profile</span>
+    <div class="absolute hidden group-hover:block group-focus-within:block pt-2 z-50 right-0">
+        <div class="rounded-2xl border border-pine-300 bg-pine-700 p-2 shadow-2xl shadow-black/40 min-w-[240px]">
+            {# TODO: point this at the member profile page once it exists #}
+            <a href="#" class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 py-3">
+                {% include 'shared/navigation/avatar.html' with member=user avatar_class="w-11 h-11 text-lg" %}
+                <span class="flex-1 min-w-0">
+                    <span class="block text-sm font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">View profile</span>
+                    <span class="block text-xs text-gray-400 truncate">{{ user.username }}</span>
+                </span>
+                <i class="bi bi-chevron-right text-xs text-gray-500 group-hover/item:text-gold-300 transition-colors duration-150"></i>
             </a>
-            <a href="#"
-               class="flex items-center px-4 py-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-600/10 hover:to-blue-600/10 transition-all duration-200 group/item">
-                <i class="bi bi-gear-fill text-blue-400 mr-3"></i>
-                <span class="text-white font-medium group-hover/item:text-blue-400 transition-colors">Settings</span>
+            <div class="h-px bg-pine-300 my-2"></div>
+            <a href="#" class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150">
+                <i class="bi bi-gear-fill w-5 text-center text-gold-300"></i>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Settings</span>
             </a>
-            <div class="h-px bg-[#4a5a4b]/50 my-2"></div>
             <form method="post" action="{% url 'logout' %}">
                 {% csrf_token %}
                 <button type="submit"
-                        class="w-full flex items-center px-4 py-3 rounded-xl hover:bg-red-600/10 transition-all duration-200 group/item cursor-pointer text-left">
-                    <i class="bi bi-box-arrow-right text-red-400 mr-3"></i>
-                    <span class="text-white font-medium group-hover/item:text-red-400 transition-colors">Logout</span>
+                        class="w-full text-left cursor-pointer group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-red-500/10 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150">
+                    <i class="bi bi-box-arrow-right w-5 text-center text-red-300"></i>
+                    <span class="font-medium text-white group-hover/item:text-red-300 transition-colors duration-150">Log out</span>
                 </button>
             </form>
         </div>
