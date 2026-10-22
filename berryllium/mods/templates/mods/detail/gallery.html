@@ -1,0 +1,97 @@
+{% if gallery %}
+    {{ gallery|json_script:"mod-gallery" }}
+    <section aria-label="Screenshots"
+             x-data="modGallery()"
+             @keydown.arrow-right="if (!lightbox) next()"
+             @keydown.arrow-left="if (!lightbox) prev()">
+        <div class="relative overflow-hidden rounded-2xl border border-pine-300 bg-pine-900"
+             style="aspect-ratio: {{ gallery_ratio }};">
+            <img :src="current.url" src="{{ gallery.0.url }}"
+                 :alt="current.title || ('Screenshot ' + (index + 1) + ' of ' + images.length)"
+                 alt="{{ gallery.0.title|default:'Screenshot 1' }}"
+                 class="w-full h-full object-contain cursor-zoom-in"
+                 @click="open()">
+            {% if gallery|length > 1 %}
+                <button type="button" aria-label="Previous screenshot" @click="prev()"
+                        class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-pine-900/75 text-white hover:bg-pine-900 hover:text-gold-300 flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400">
+                    <i class="bi bi-chevron-left"></i>
+                </button>
+                <button type="button" aria-label="Next screenshot" @click="next()"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-pine-900/75 text-white hover:bg-pine-900 hover:text-gold-300 flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <span class="absolute bottom-3 left-3 rounded-full bg-pine-900/75 px-2.5 py-1 text-xs text-white/80 tabular-nums" aria-live="polite">
+                    <span x-text="index + 1">1</span> / {{ gallery|length }}
+                </span>
+            {% endif %}
+            <button type="button" x-ref="expand" aria-label="View full size" @click="open()"
+                    class="absolute top-3 right-3 w-9 h-9 rounded-full bg-pine-900/75 text-white hover:bg-pine-900 hover:text-gold-300 flex items-center justify-center transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400">
+                <i class="bi bi-arrows-fullscreen text-sm"></i>
+            </button>
+        </div>
+
+        <div class="mt-2 min-h-5" x-show="current.title || current.caption">
+            <p class="text-sm font-medium text-white" x-show="current.title" x-text="current.title"></p>
+            <p class="text-sm text-gray-400" x-show="current.caption" x-text="current.caption"></p>
+        </div>
+
+        {% if gallery|length > 1 %}
+            <div class="mt-3 flex gap-2 overflow-x-auto pb-1" aria-label="Choose a screenshot">
+                {% for image in gallery %}
+                    <button type="button"
+                            class="shrink-0 w-24 sm:w-28 overflow-hidden rounded-lg border border-pine-300 transition-[opacity,box-shadow] duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400"
+                            style="aspect-ratio: {{ gallery_ratio }};"
+                            :class="index === {{ forloop.counter0 }} ? 'ring-2 ring-gold-400 opacity-100' : 'opacity-60 hover:opacity-100'"
+                            :aria-current="index === {{ forloop.counter0 }} ? 'true' : 'false'"
+                            aria-label="Screenshot {{ forloop.counter }}"
+                            @click="go({{ forloop.counter0 }})">
+                        <img src="{{ image.url }}" alt="" loading="lazy" class="w-full h-full object-cover">
+                    </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {# lightbox #}
+        <template x-teleport="body">
+            <div x-show="lightbox" x-cloak x-transition.opacity
+                 class="fixed inset-0 z-[80] flex flex-col bg-black/90 p-4 sm:p-8"
+                 role="dialog" aria-modal="true" aria-label="Screenshot viewer"
+                 @keydown.escape.window="if (lightbox) close()"
+                 @keydown.arrow-right.window="if (lightbox) next()"
+                 @keydown.arrow-left.window="if (lightbox) prev()">
+                <div class="flex items-center justify-between gap-4 text-white/80 text-sm">
+                    <span class="tabular-nums"><span x-text="index + 1"></span> / <span x-text="images.length"></span></span>
+                    <button type="button" x-ref="closeLightbox" @click="close()" aria-label="Close"
+                            class="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 hover:text-gold-300 flex items-center justify-center cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="relative flex-1 min-h-0 flex items-center justify-center my-4" @click.self="close()">
+                    <img :src="current.url" :alt="current.title || 'Screenshot'" class="max-h-full max-w-full object-contain rounded-lg">
+                    <template x-if="images.length > 1">
+                        <div>
+                            <button type="button" aria-label="Previous screenshot" @click="prev()"
+                                    class="absolute left-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-gold-300 flex items-center justify-center cursor-pointer">
+                                <i class="bi bi-chevron-left"></i>
+                            </button>
+                            <button type="button" aria-label="Next screenshot" @click="next()"
+                                    class="absolute right-0 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white hover:text-gold-300 flex items-center justify-center cursor-pointer">
+                                <i class="bi bi-chevron-right"></i>
+                            </button>
+                        </div>
+                    </template>
+                </div>
+                <div class="text-center min-h-10">
+                    <p class="text-white font-medium" x-text="current.title"></p>
+                    <p class="text-white/60 text-sm" x-text="current.caption"></p>
+                </div>
+            </div>
+        </template>
+    </section>
+{% else %}
+    <div class="flex flex-col items-center justify-center gap-2 rounded-2xl border border-pine-300 bg-gradient-to-br from-pine-500 to-pine-800 text-white/30"
+         style="aspect-ratio: {{ gallery_ratio }};">
+        <i class="bi bi-image text-5xl"></i>
+        <span class="text-sm">No screenshots yet</span>
+    </div>
+{% endif %}
