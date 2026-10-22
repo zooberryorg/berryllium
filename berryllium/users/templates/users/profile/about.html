@@ -1,0 +1,12 @@
+<section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+    <h2 class="text-lg font-semibold text-white mb-3">About {{ display_name }}</h2>
+    {% if member %}
+        {% if member.biography %}
+            <p class="text-granite-200 whitespace-pre-line" style="overflow-wrap: anywhere;">{{ member.biography }}</p>
+        {% else %}
+            <p class="text-gray-400">{% if is_own_profile %}You haven't added a bio yet.{% else %}This member hasn't added a bio yet.{% endif %}</p>
+        {% endif %}
+    {% else %}
+        <p class="text-gray-400">{{ display_name }} doesn't have an account on ZooBerry. This page lists the mods they're credited on.</p>
+    {% endif %}
+</section>
