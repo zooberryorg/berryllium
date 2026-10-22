@@ -1,0 +1,9 @@
+{% if mod.status == "published" %}
+    <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">Published</span>
+{% elif mod.status == "scheduled" %}
+    <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-white/80" title="Goes live {{ mod.publish_date|date:date_prefs.datetime }}">Scheduled</span>
+{% elif mod.status == "unpublished" %}
+    <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-white/5 text-gray-400 border border-white/10">Unpublished</span>
+{% else %}
+    <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full text-gray-400 border border-dashed border-white/20">Draft</span>
+{% endif %}
