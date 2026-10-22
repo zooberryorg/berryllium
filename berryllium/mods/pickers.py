@@ -140,18 +140,19 @@ def credits_as_resolved(mod, role):
     return resolved
 
 def save_credits(mod, role, resolved, uploader=None):
-    """Replace this mod's credits for `role`. The uploader (if given) is always first."""
+    """Replace this mod's credits for `role`. The uploader (if given) is always first.
+    Works for anything with a `credits` relation shaped like ModCredit (mods, posts).
+    """
     with transaction.atomic():
         mod.credits.filter(role=role).delete()
         order = 0
         if uploader is not None:
-            ModCredit.objects.create(mod=mod, role=role, member=uploader, order=order)
+            mod.credits.create(role=role, member=uploader, order=order)
             order += 1
         for kind, obj in resolved:
             if kind == "member" and uploader is not None and obj.pk == uploader.pk:
                 continue
-            ModCredit.objects.create(
-                mod=mod,
+            mod.credits.create(
                 role=role,
                 member=obj if kind == "member" else None,
                 author=obj if kind == "author" else None,
@@ -226,20 +227,24 @@ def save_tags(mod, existing, new_names, user=None):
         mod.pending_tags = new_names
         mod.save(update_fields=["pending_tags"])
 
+def resolve_pending_credits(obj):
+    """Turn new names typed into the people pickers into Authors. For mods and posts, at publish time."""
+    for credit in obj.credits.filter(member__isnull=True, author__isnull=True).exclude(pending_name=""):
+        author = (
+            Author.objects.filter(name__iexact=credit.pending_name, member__isnull=True).first()
+            or Author.objects.create(name=credit.pending_name)
+        )
+        credit.author = author
+        credit.pending_name = ""
+        credit.save(update_fields=["author", "pending_name"])
+
 def publish_mod(mod):
     """
     This saves everythingn to the database when a mod is published. It creates any new authors and tags, etc that
     were waiting on the publish step.
     """
     with transaction.atomic():
-        for credit in mod.credits.filter(member__isnull=True, author__isnull=True).exclude(pending_name=""):
-            author = (
-                Author.objects.filter(name__iexact=credit.pending_name, member__isnull=True).first()
-                or Author.objects.create(name=credit.pending_name)
-            )
-            credit.author = author
-            credit.pending_name = ""
-            credit.save(update_fields=["author", "pending_name"])
+        resolve_pending_credits(mod)
 
         for name in mod.pending_tags:
             name = normalize_tag(name)
