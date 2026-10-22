@@ -1,5 +1,5 @@
 from django.urls import path
-from berryllium.mods.views import create, explore, search
+from berryllium.mods.views import create, detail, explore, search
 import berryllium.mods.validations as validations
 
 urlpatterns = [
@@ -34,6 +34,9 @@ urlpatterns = [
     path("explore/mods/", explore.mods, name="explore_mods"),
     path("explore/search/tags/", explore.search_tags, name="explore_search_tags"),
     path("explore/search/dependencies/", explore.search_dependencies, name="explore_search_dependencies"),
+    #---------------------------------------------- Mod detail (READ)
+    path("mods/<int:mod_id>/", detail.mod_detail, name="mod_detail"),
+    path("mods/files/<int:file_id>/download/", detail.download_file, name="mod_file_download"),
     # ---------------------------------------------- Session management
     path("mods/create/cancel/", create.cancel_mod_upload, name="cancel_mod_upload"),
     # ---------------------------------------------- HTMX endpoints
