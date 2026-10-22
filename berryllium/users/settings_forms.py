@@ -29,6 +29,20 @@ class ProfileSettingsForm(forms.ModelForm):
             "biography": forms.Textarea(attrs={"class": INPUT + " rounded-2xl", "rows": 5, "maxlength": 500}),
         }
 
+    def clean_avatar(self):
+        avatar = self.cleaned_data.get("avatar")
+        # no new file chosen: keep the current one
+        if not avatar or not hasattr(avatar, "image"):
+            return avatar
+        if avatar.size > MAX_AVATAR_SIZE:
+            raise forms.ValidationError(f"Pictures must be under {MAX_AVATAR_SIZE // (1024 * 1024)} MB.")
+        if avatar.image.format not in ("JPEG", "PNG", "WEBP"):
+            raise forms.ValidationError("Pictures must be JPG, PNG or WEBP.")
+        width, height = avatar.image.size
+        if width < MIN_AVATAR_SIZE or height < MIN_AVATAR_SIZE:
+            raise forms.ValidationError(f"Pictures must be at least {MIN_AVATAR_SIZE}×{MIN_AVATAR_SIZE}px (yours is {width}×{height}).")
+        return avatar
+
     def save(self, commit=True):
         old = Member.objects.filter(pk=self.instance.pk).values_list("avatar", flat=True).first()
         member = super().save(commit=False)
