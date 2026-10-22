@@ -1,0 +1,52 @@
+<p class="text-gray-400 text-sm mb-4">
+    {% if q %}
+        <span class="text-white font-semibold">{{ page.paginator.count }}</span> mod{{ page.paginator.count|pluralize }} matching “{{ q }}”
+    {% else %}
+        <span class="text-white font-semibold">{{ page.paginator.count }}</span> mod{{ page.paginator.count|pluralize }}
+    {% endif %}
+</p>
+
+{% if page.object_list %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+        {% for mod in page.object_list %}
+            {% include 'mods/explore/mod_card.html' %}
+        {% endfor %}
+    </div>
+
+    {% if page.paginator.num_pages > 1 %}
+        <nav class="flex items-center justify-between gap-2 mt-6" aria-label="Pages">
+            {% if page.has_previous %}
+                <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.previous_page_number }}" hx-target="#profile-results" hx-push-url="true" class="px-5 py-2.5 rounded-full bg-pine-600 text-gray-300 hover:text-white border border-pine-300 flex items-center gap-2 transition-colors"><i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span></a>
+            {% else %}
+                <span class="px-5 py-2.5 rounded-full bg-pine-600/50 text-gray-500 border border-pine-300/50 flex items-center gap-2 cursor-not-allowed"><i class="bi bi-chevron-left"></i> <span class="hidden sm:inline">Previous</span></span>
+            {% endif %}
+            <div class="flex items-center gap-1">
+                {% for number in page_range %}
+                    {% if number == page.paginator.ELLIPSIS %}
+                        <span class="text-gray-500 px-2">…</span>
+                    {% elif number == page.number %}
+                        <span class="w-10 h-10 rounded-lg bg-gold-400 text-pine-500 font-semibold flex items-center justify-center" aria-current="page">{{ number }}</span>
+                    {% else %}
+                        <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ number }}" hx-target="#profile-results" hx-push-url="true" class="w-10 h-10 rounded-lg bg-pine-600 text-gray-400 hover:text-white font-semibold flex items-center justify-center transition-colors">{{ number }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if page.has_next %}
+                <a href="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}" hx-get="?{% if page_query %}{{ page_query }}&{% endif %}page={{ page.next_page_number }}" hx-target="#profile-results" hx-push-url="true" class="px-5 py-2.5 rounded-full bg-pine-600 text-gray-300 hover:text-white border border-pine-300 flex items-center gap-2 transition-colors"><span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i></a>
+            {% else %}
+                <span class="px-5 py-2.5 rounded-full bg-pine-600/50 text-gray-500 border border-pine-300/50 flex items-center gap-2 cursor-not-allowed"><span class="hidden sm:inline">Next</span> <i class="bi bi-chevron-right"></i></span>
+            {% endif %}
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="rounded-2xl border border-pine-300 bg-pine-600 p-10 text-center">
+        <i class="bi bi-{% if q %}search{% else %}puzzle{% endif %} text-4xl text-white/30"></i>
+        {% if q %}
+            <p class="text-white font-semibold mt-4">No mods match “{{ q }}”.</p>
+            <p class="text-gray-400 text-sm mt-1">Try a different search.</p>
+        {% else %}
+            <p class="text-white font-semibold mt-4">No published mods yet.</p>
+            {% if is_own_profile %}<p class="text-gray-400 text-sm mt-1">Mods you publish, or are credited on, will show up here.</p>{% endif %}
+        {% endif %}
+    </div>
+{% endif %}
