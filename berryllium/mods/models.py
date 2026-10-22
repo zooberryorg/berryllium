@@ -86,6 +86,7 @@ class Mod(models.Model):
     submission_date = models.DateTimeField(auto_now_add=True)
     last_updated = models.DateTimeField(auto_now=True)
     publish_date = models.DateTimeField(default=timezone.now)
+    first_published_at = models.DateTimeField(null=True, blank=True)
 
     contents = models.TextField(blank=True)
 
@@ -113,6 +114,20 @@ class Mod(models.Model):
     def files(self):
         return ModFile.objects.filter(filegroup__mod=self)
 
+    @property
+    def status(self):
+        """
+        - draft: never published
+        - unpublished: was published, then moved back to drafts
+        - scheduled: published with a publish date in the future
+        - published: live
+        """
+        if self.draft:
+            return "unpublished" if self.first_published_at else "draft"
+        if self.publish_date and self.publish_date > timezone.now():
+            return "scheduled"
+        return "published"
+    
     @property
     def file_groups(self):
         return ModFileGroup.objects.filter(mod=self)

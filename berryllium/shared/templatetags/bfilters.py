@@ -62,6 +62,18 @@ def profile_url(person):
         return _profile_url(member=person)
     return _profile_url(author=person)
 
+@register.filter
+def is_moderator(user):
+    """Usage: {% if user|is_moderator %} (moderators and admins)"""
+    from berryllium.users.permissions import is_moderator as _is_moderator
+    return _is_moderator(user)
+
+@register.filter
+def is_site_admin(user):
+    """Usage: {% if user|is_site_admin %} (staff and superusers)"""
+    from berryllium.users.permissions import is_site_admin as _is_site_admin
+    return _is_site_admin(user)
+
 # --------------------------- template tags
 
 
