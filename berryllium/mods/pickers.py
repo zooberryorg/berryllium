@@ -247,8 +247,10 @@ def publish_mod(mod):
             ModTag.objects.get_or_create(mod=mod, tag=tag)
         mod.pending_tags = []
 
-        if mod.publish_date is None or mod.publish_date <= timezone.now():
-            mod.publish_date = timezone.now()
+        if mod.first_published_at is None:
+            if mod.publish_date is None or mod.publish_date <= timezone.now():
+                mod.publish_date = timezone.now()
+            mod.first_published_at = mod.publish_date
 
         mod.draft = False
-        mod.save(update_fields=["pending_tags", "draft", "publish_date"])
+        mod.save(update_fields=["pending_tags", "draft", "publish_date", "first_published_at"])
