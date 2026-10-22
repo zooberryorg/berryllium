@@ -30,3 +30,12 @@ def _nav(request, active):
 @login_required
 def settings_home(request):
     return redirect("settings_profile")
+
+@login_required
+def settings_profile(request):
+    form = ProfileSettingsForm(request.POST or None, request.FILES or None, instance=request.user)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Profile saved.")
+        return redirect("settings_profile")
+    return render(request, "users/settings/profile.html", {"form": form, "panel_nav": _nav(request, "settings_profile")})
