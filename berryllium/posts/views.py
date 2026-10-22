@@ -251,3 +251,13 @@ def _listing(request, kind, explore_tab):
     }
     is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
     return render(request, "posts/explore/results.html" if is_htmx else "posts/explore/base.html", context)
+
+
+@require_GET
+def explore_tutorials(request):
+    return _listing(request, Post.Kind.TUTORIAL, "tutorials")
+
+
+@require_GET
+def explore_news(request):
+    return _listing(request, Post.Kind.NEWS, "news")
