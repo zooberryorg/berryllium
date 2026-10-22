@@ -48,3 +48,26 @@ def settings_preferences(request):
         messages.success(request, "Preferences saved. Dates and times across the site now use your formats.")
         return redirect("settings_preferences")
     return render(request, "users/settings/preferences.html", {"form": form, "panel_nav": _nav(request, "settings_preferences")})
+
+@login_required
+def settings_account(request):
+    email_form = EmailForm(instance=request.user)
+    password_form = StyledPasswordChangeForm(request.user)
+    if request.method == "POST" and "save_email" in request.POST:
+        email_form = EmailForm(request.POST, instance=request.user)
+        if email_form.is_valid():
+            email_form.save()
+            messages.success(request, "Email address updated.")
+            return redirect("settings_account")
+    elif request.method == "POST" and "save_password" in request.POST:
+        password_form = StyledPasswordChangeForm(request.user, request.POST)
+        if password_form.is_valid():
+            user = password_form.save()
+            update_session_auth_hash(request, user)  # stay signed in on this device
+            messages.success(request, "Password changed.")
+            return redirect("settings_account")
+    return render(request, "users/settings/account.html", {
+        "email_form": email_form,
+        "password_form": password_form,
+        "panel_nav": _nav(request, "settings_account"),
+    })
