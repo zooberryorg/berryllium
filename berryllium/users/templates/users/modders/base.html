@@ -1,0 +1,79 @@
+{% extends 'shared/explore/base.html' %}
+{% block explore_content %}
+    <form id="explore-filters"
+          method="get"
+          action="{% url 'explore_modders' %}"
+          hx-get="{% url 'explore_modders' %}"
+          hx-target="#modder-results"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
+          x-data="{ showFilters: false, q: '{{ filters.q|escapejs }}' }"
+          class="flex flex-col lg:flex-row lg:items-start gap-6">
+
+        <div class="lg:w-72 flex-shrink-0">
+            <button type="button" class="lg:hidden w-full zb-action flex items-center justify-center gap-2 mb-3"
+                    @click="showFilters = !showFilters" :aria-expanded="showFilters">
+                <i class="bi bi-funnel"></i> <span x-text="showFilters ? 'Hide filters' : 'Filters'"></span>
+            </button>
+            <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
+                {# modders who worked on mods in that category #}
+                {% include 'mods/explore/categories.html' %}
+                {% include 'shared/widgets/filter_picker.html' with label="Tags" config=tag_picker add_label="Search tags" help="Modders whose mods have all of these tags." %}
+
+                <fieldset class="rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300">
+                    <legend class="sr-only">Active between</legend>
+                    <h3 class="text-lg font-bold text-white px-4 pt-2 mb-1">Active</h3>
+                    <p class="text-xs text-gray-400 px-4 mb-3">Released a mod at some point in this range.</p>
+                    <div class="grid grid-cols-2 gap-2 px-3 pb-3 text-sm">
+                        {% include 'shared/widgets/dropdown.html' with name="from" label="Active from" options=year_options selected=year_from empty_label="Any year" icon="bi-calendar3" clearable="true" %}
+                        {% include 'shared/widgets/dropdown.html' with name="to" label="Active until" options=year_options selected=year_to empty_label="Any year" icon="bi-calendar3" clearable="true" %}
+                    </div>
+                </fieldset>
+
+                {% if website_options %}
+                    <fieldset class="rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300">
+                        <legend class="sr-only">Published on</legend>
+                        <h3 class="text-lg font-bold text-white px-4 pt-2 mb-1">Published on</h3>
+                        <p class="text-xs text-gray-400 px-4 mb-3">ZooBerry, or the archived sites their mods first appeared on.</p>
+                        <div class="space-y-1 text-sm">
+                            {% for site in website_options %}
+                                <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-transparent transition-[color,background-color] duration-150 cursor-pointer">
+                                    <input type="checkbox" name="website" value="{{ site.key }}" class="sr-only" {% if site.key in filters.websites %}checked{% endif %}>
+                                    <span class="w-8 h-8 rounded-lg flex items-center justify-center">
+                                        <i class="explore-option-icon bi {% if site.key == 'zooberry' %}bi-house-heart{% else %}bi-archive{% endif %} text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i>
+                                    </span>
+                                    <span class="flex-1 min-w-0 truncate">{{ site.label }}</span>
+                                    <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ site.count }}</span>
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </fieldset>
+                {% endif %}
+            </aside>
+        </div>
+
+        <div class="flex-1 min-w-0 space-y-4">
+            <div class="flex flex-col sm:flex-row gap-3 text-sm">
+                <div class="relative flex-1">
+                    <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none" aria-hidden="true"></i>
+                    <input type="search" id="explore-search" name="q" value="{{ filters.q }}" x-model="q"
+                           placeholder="Search modders by name..." aria-label="Search modders by name" autocomplete="off"
+                           class="zb-input pl-12 pr-12 text-sm w-full">
+                    <button type="button" class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+                            x-show="q" x-cloak aria-label="Clear search" @click="exploreClearFilter('q')">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+                <div class="sm:w-56">
+                    {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=filters.sort icon="bi-sort-down" %}
+                </div>
+            </div>
+
+            <div id="modder-results" aria-live="polite">
+                {% include 'users/modders/results.html' %}
+            </div>
+        </div>
+    </form>
+    {% include 'shared/explore/filter_styles.html' %}
+{% endblock %}
