@@ -94,3 +94,32 @@ def read_filters(params):
         "websites": [w for w in params.getlist("website") if w == ZOOBERRY or w.isdigit()],
         "sort": sort if sort in SORTS else DEFAULT_SORT,
     }
+
+def apply_filters(people, filters):
+    tags_lower = {t.lower() for t in filters["tags"]}
+    result = []
+    for person in people:
+        if filters["q"] and filters["q"].lower() not in person["name"].lower():
+            continue
+        if filters["category"] and filters["category"] not in person["categories"]:
+            continue
+        if tags_lower and not tags_lower <= {t.lower() for t in person["tags"]}:
+            continue
+        # active at any point in the range: their first..last year overlaps it
+        if filters["year_from"] and person["last_year"] < filters["year_from"]:
+            continue
+        if filters["year_to"] and person["first_year"] > filters["year_to"]:
+            continue
+        if filters["websites"] and not set(filters["websites"]) & person["websites"]:
+            continue
+        result.append(person)
+    sort = filters["sort"]
+    if sort == "name":
+        result.sort(key=lambda p: p["name"].lower())
+    elif sort == "downloads":
+        result.sort(key=lambda p: (-p["downloads"], p["name"].lower()))
+    elif sort == "recent":
+        result.sort(key=lambda p: (p["last_published"], p["name"].lower()), reverse=True)
+    else:
+        result.sort(key=lambda p: (-p["mod_count"], p["name"].lower()))
+    return result
