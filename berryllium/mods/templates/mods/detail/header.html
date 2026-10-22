@@ -22,7 +22,7 @@
         {% if mod.uploaded_by %}
             <span class="flex items-center gap-2 min-w-0">
                 {% include 'shared/navigation/avatar.html' with member=mod.uploaded_by avatar_class="w-7 h-7 text-xs" %}
-                <span class="truncate">by <span class="text-white">{{ mod.uploaded_by.username }}</span>{% if collaborators|length > 1 %} and {{ collaborators|length|add:"-1" }} other{{ collaborators|length|add:"-1"|pluralize }}{% endif %}</span>
+                <span class="truncate">by <a href="{% url 'member_profile' mod.uploaded_by.username %}" class="text-white hover:text-gold-300 transition-colors duration-150">{{ mod.uploaded_by.username }}</a>{% if collaborators|length > 1 %} and {{ collaborators|length|add:"-1" }} other{{ collaborators|length|add:"-1"|pluralize }}{% endif %}</span>
             </span>
         {% endif %}
         <time datetime="{{ mod.last_updated|date:'c' }}" title="{{ mod.last_updated|date:date_prefs.datetime }}">
