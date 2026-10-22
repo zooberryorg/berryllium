@@ -1,0 +1,11 @@
+<button type="button"
+        role="tab"
+        id="tab-{{ name }}"
+        aria-controls="panel-{{ name }}"
+        aria-selected="{% if name == 'article' %}true{% else %}false{% endif %}"
+        :aria-selected="(tab === '{{ name }}').toString()"
+        :tabindex="tab === '{{ name }}' ? 0 : -1"
+        class="shrink-0 -mb-px border-b-2 border-transparent px-4 py-3.5 text-sm font-medium text-gray-400 hover:text-white aria-selected:border-gold-400 aria-selected:text-white transition-colors duration-150 cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:-outline-offset-2 rounded-t-lg"
+        @click="show('{{ name }}')">
+    <i class="bi {{ icon }} mr-1"></i> {{ label }}{% if count %} <span class="ml-1 rounded-full bg-pine-800/70 px-2 py-0.5 text-xs text-gray-300">{{ count }}</span>{% endif %}
+</button>

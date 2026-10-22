@@ -1,0 +1,74 @@
+{% load bfilters %}
+<header class="overflow-hidden rounded-2xl border border-pine-300 bg-pine-600">
+    <div class="relative aspect-video sm:aspect-[21/9] lg:aspect-[3/1] bg-gradient-to-br from-pine-500 to-pine-800">
+        {% if post.thumbnail %}
+            <img src="{{ post.thumbnail.url }}" alt="" class="absolute inset-0 w-full h-full object-cover">
+        {% endif %}
+        <div class="absolute inset-0 bg-gradient-to-t from-pine-900 via-pine-900/60 to-transparent"></div>
+        <div class="absolute inset-x-0 bottom-0 p-5 sm:p-8">
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-gold-400 px-3 py-1 text-xs font-semibold text-pine-600">
+                    <i class="bi {% if post.kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %}"></i> {{ post.get_kind_display }}
+                </span>
+                {% if post.is_archived_file %}
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-black/40 px-3 py-1 text-xs text-white/80"><i class="bi bi-archive"></i> Archived</span>
+                {% endif %}
+            </div>
+            <h1 class="text-2xl sm:text-4xl font-bold text-white leading-tight max-w-4xl break-words">{{ post.title }}</h1>
+            {% if post.summary %}<p class="hidden sm:block mt-2 text-white/80 max-w-3xl">{{ post.summary }}</p>{% endif %}
+        </div>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-x-6 gap-y-3 px-5 sm:px-8 py-4">
+        {# authors #}
+        <div class="flex items-center gap-3 min-w-0">
+            <div class="flex -space-x-2">
+                {% for credit in collaborators|slice:":3" %}
+                    {% if credit.member %}
+                        {% include 'shared/navigation/avatar.html' with member=credit.member avatar_class="w-9 h-9 text-sm" %}
+                    {% else %}
+                        <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-sm font-semibold text-gold-200 uppercase">{{ credit.display_name|slice:":1" }}</span>
+                    {% endif %}
+                {% empty %}
+                    {% if post.uploaded_by %}{% include 'shared/navigation/avatar.html' with member=post.uploaded_by avatar_class="w-9 h-9 text-sm" %}{% endif %}
+                {% endfor %}
+            </div>
+            <p class="text-sm text-gray-300 min-w-0">
+                by
+                {% for credit in collaborators %}{% with url=credit|profile_url %}{% if url %}<a href="{{ url }}" class="font-medium text-white hover:text-gold-300 transition-colors">{{ credit.display_name }}</a>{% else %}<span class="font-medium text-white">{{ credit.display_name }}</span>{% endif %}{% endwith %}{% if not forloop.last %}, {% endif %}{% empty %}{% if post.uploaded_by %}<a href="{{ post.uploaded_by|profile_url }}" class="font-medium text-white hover:text-gold-300 transition-colors">{{ post.uploaded_by.username }}</a>{% endif %}{% endfor %}
+            </p>
+        </div>
+
+        <dl class="flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-gray-400">
+            <div class="flex items-center gap-1.5" title="{{ post.publish_date|date:date_prefs.datetime }}">
+                <dt><i class="bi bi-calendar3"></i><span class="sr-only">Published</span></dt>
+                <dd>{{ post.publish_date|date:date_prefs.date }}</dd>
+            </div>
+            {% if was_updated %}
+                <div class="flex items-center gap-1.5" title="{{ post.last_updated|date:date_prefs.datetime }}">
+                    <dt><i class="bi bi-arrow-repeat"></i><span class="sr-only">Updated</span></dt>
+                    <dd>Updated {{ post.last_updated|timeago }}</dd>
+                </div>
+            {% endif %}
+            <div class="flex items-center gap-1.5">
+                <dt><i class="bi bi-clock"></i><span class="sr-only">Reading time</span></dt>
+                <dd>{{ post.reading_minutes }} min read</dd>
+            </div>
+        </dl>
+
+        {% if can_edit %}
+            <a href="{% url 'post_edit' post.pk %}" class="ml-auto inline-flex items-center gap-1.5 rounded-full border border-gold-400/50 px-3.5 py-1.5 text-sm font-medium text-gold-200 hover:bg-gold-400 hover:text-pine-500 transition-colors duration-150">
+                <i class="bi bi-pencil"></i> Edit
+            </a>
+        {% endif %}
+    </div>
+
+    {% if post.is_archived_file %}
+        <div class="border-t border-white/10 px-5 sm:px-8 py-3 text-sm text-gray-400 flex flex-wrap gap-x-2 gap-y-1">
+            <i class="bi bi-archive text-gold-300"></i>
+            <span>
+                Originally published{% if original_authors %} by {% for credit in original_authors %}{% with url=credit|profile_url %}{% if url %}<a href="{{ url }}" class="text-white hover:text-gold-300">{{ credit.display_name }}</a>{% else %}<span class="text-white">{{ credit.display_name }}</span>{% endif %}{% endwith %}{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if original_websites %} on {% for site in original_websites %}<span class="text-white">{{ site.name }}</span>{% if not forloop.last %}, {% endif %}{% endfor %}{% endif %}{% if post.original_release_date %} in {{ post.original_release_date|date:"F Y" }}{% endif %}.
+            </span>
+        </div>
+    {% endif %}
+</header>

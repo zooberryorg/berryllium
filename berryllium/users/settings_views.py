@@ -20,6 +20,7 @@ def _nav(request, active):
         ("settings_preferences", "Preferences", "bi-sliders", None),
         ("settings_account", "Account", "bi-shield-lock", None),
         ("settings_mods", "My mods", "bi-puzzle", _my_mods(request.user).count()),
+        ("settings_posts", "My posts", "bi-journal-text", request.user.posts.count()),
     ]
     return [
         {"url": reverse(name), "label": label, "icon": icon, "count": count, "active": name == active}

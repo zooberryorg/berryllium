@@ -6,6 +6,7 @@ import html as html_lib
 import markdown
 import nh3
 from django.conf import settings
+from django.utils.safestring import mark_safe
 from markdown.extensions.toc import slugify_unicode
 
 try:
@@ -91,7 +92,7 @@ def render_markdown_with_toc(text):
         url_schemes={"http", "https", "mailto"},
         link_rel="noopener noreferrer nofollow",
     )
-    return clean, _toc_entries(getattr(md, "toc_tokens", []))
+    return mark_safe(clean), _toc_entries(getattr(md, "toc_tokens", []))
 
 
 def render_markdown(text):
