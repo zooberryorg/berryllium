@@ -161,3 +161,16 @@ def edit(request, comment_id):
         comment.save(update_fields=["body", "edited_at"])
         return render(request, "comments/comment.html", {"comments": comments, "comment": comment})
     return render(request, "comments/form.html", {"comments": comments, "form": form, "mode": "edit", "comment": comment})
+
+@login_required
+@require_POST
+def delete(request, comment_id):
+    comment, obj = _editable(request, comment_id)
+    if not services.can_delete(comment, request.user):
+        raise PermissionDenied
+    thread_id = comment.thread_id
+    services.delete_comment(comment, request.user)
+    obj.refresh_from_db(fields=["comment_count"])
+    # the thread may be gone entirely then only the counter is sent
+    return _thread(request, obj, thread_id)
+
