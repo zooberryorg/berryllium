@@ -42,3 +42,11 @@ def index(request):
     page = Paginator(items, PAGE_SIZE).get_page(request.GET.get("page"))
     _decorate(page.object_list)
     return render(request, "notifications/index.html", {"page": page, "show": show, "unread": unread_count(request.user)})
+
+@login_required
+@require_GET
+def open_notification(request, notification_id):
+    """Mark it read, then go to what it's about."""
+    item = get_object_or_404(Notification, pk=notification_id, recipient=request.user)
+    mark_read(Notification.objects.filter(pk=item.pk))
+    return redirect(safe_url(item.url))
