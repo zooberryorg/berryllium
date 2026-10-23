@@ -1,5 +1,6 @@
 import os
 import uuid
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.utils import timezone
 from markdownx.models import MarkdownxField
@@ -96,6 +97,11 @@ class Mod(models.Model):
     )
     is_archived_file = models.BooleanField(default=False)
     original_release_date = models.DateField(null=True, blank=True)
+    comment_count = models.PositiveIntegerField(default=0)  # kept up to date by comments.services.refresh_count
+
+    # comments
+    comments_enabled = models.BooleanField(default=True)
+    comments = GenericRelation("comments.Comment")
 
     # stats
     download_count = models.IntegerField(default=0)
