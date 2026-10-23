@@ -33,3 +33,20 @@ class ConversationMember(models.Model):
 
     def __str__(self):
         return f"{self.member_id} in {self.conversation_id}"
+
+class Message(models.Model):
+    """A message. Quotes work like comment quotes: copied when sent."""
+
+    conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_messages")
+    body = models.TextField()
+    quote_of = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    quote_author = models.CharField(max_length=150, blank=True)
+    quote_text = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ["created_at"]
+
+    def __str__(self):
+        return f"Message {self.pk} in {self.conversation_id}"
