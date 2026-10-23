@@ -14,16 +14,16 @@
         <div class="relative overflow-hidden rounded-xl aspect-video bg-pine-800">
             <img src="{{ post.thumbnail.url }}" alt="" class="w-full h-full object-cover">
         </div>
-        <div class="mt-3 flex gap-2">
-            <label for="thumbnail-input" class="zb-controls flex-1 items-center justify-center cursor-pointer"><i class="bi bi-arrow-repeat"></i> Replace</label>
-            <button type="button" class="zb-controls items-center justify-center text-red-300 hover:text-red-200"
+        <div class="mt-3 flex flex-wrap items-center gap-2" x-data="{ confirming: false }">
+            <label for="thumbnail-input" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm cursor-pointer" x-show="!confirming"><i class="bi bi-arrow-repeat"></i> Replace</label>
+            <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm" x-show="!confirming" @click="confirming = true"><i class="bi bi-trash"></i> Remove</button>
+            <span class="text-sm text-gray-200" x-show="confirming" x-cloak>Remove the thumbnail?</span>
+            <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm" x-show="confirming" x-cloak
                     hx-post="{% url 'post_thumbnail' post.pk %}"
                     hx-vals='{"action": "remove"}'
                     hx-target="#thumbnail"
-                    hx-swap="outerHTML"
-                    hx-confirm="Remove the thumbnail?">
-                <i class="bi bi-trash"></i><span class="sr-only">Remove</span>
-            </button>
+                    hx-swap="outerHTML"><i class="bi bi-trash"></i> Remove</button>
+            <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm" x-show="confirming" x-cloak @click="confirming = false">Keep it</button>
         </div>
     {% else %}
         <label for="thumbnail-input"
