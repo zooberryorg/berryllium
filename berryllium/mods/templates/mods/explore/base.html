@@ -13,7 +13,6 @@
           hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
           x-data="{
               showFilters: false,
-              q: '{{ filters.q|escapejs }}',
               view: (() => { try { return localStorage.getItem('exploreView') || 'grid' } catch { return 'grid' } })(),
               setView(value) { this.view = value; try { localStorage.setItem('exploreView', value) } catch {} },
           }"
@@ -38,27 +37,7 @@
         {# ---------------- main ---------------- #}
         <div class="flex-1 min-w-0 space-y-4">
             {# search #}
-            <div class="relative">
-                <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none" aria-hidden="true"></i>
-                <input type="search"
-                       id="explore-search"
-                       name="q"
-                       value="{{ filters.q }}"
-                       placeholder="Search mods by name, author, tag or description..."
-                       autocomplete="off"
-                       aria-label="Search mods"
-                       x-model="q"
-                       class="zb-input pl-12 pr-12 text-sm w-full">
-                <button type="button"
-                        class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
-                        x-show="q"
-                        x-cloak
-                        aria-label="Clear search"
-                        @click="exploreClearFilter('q')">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
-
+            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=filters.q placeholder="Search mods by name, author, tag or description..." label="Search mods" %}
             {% include 'mods/explore/filters.html' %}
 
             {# results: replaced by htmx on every filter change #}
