@@ -4,6 +4,7 @@ import re
 import uuid
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.db import models
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
@@ -70,6 +71,11 @@ class Post(models.Model):
     is_archived_file = models.BooleanField(default=False)
     original_release_date = models.DateField(null=True, blank=True)
     original_websites = models.ManyToManyField("shared.ArchivedWebsite", blank=True, related_name="archived_posts")
+
+    # comments
+    comments_enabled = models.BooleanField(default=True)
+    comment_count = models.PositiveIntegerField(default=0)  # kept up to date by comments.services.refresh_count
+    comments = GenericRelation("comments.Comment")
 
     class Meta:
         ordering = ["-publish_date"]
