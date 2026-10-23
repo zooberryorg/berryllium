@@ -1,0 +1,25 @@
+{% extends 'inbox/base.html' %}
+{% block list_class %}hidden lg:block{% endblock %}
+{% block inbox_main %}
+    <a href="{% url 'inbox' %}" class="lg:hidden mb-3 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gold-300"><i class="bi bi-chevron-left"></i> Inbox</a>
+    <form method="post" action="{% url 'inbox_new' %}" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 space-y-4">
+        {% csrf_token %}
+        <h2 class="text-lg font-semibold text-white">New message</h2>
+        {% if problem %}
+            <p class="flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert"><i class="bi bi-exclamation-circle"></i> {{ problem }}</p>
+        {% endif %}
+        <div>
+            <label for="{{ form.to.id_for_label }}" class="block text-sm font-medium mb-1 text-white">To</label>
+            <div class="max-w-sm">{{ form.to }}</div>
+            {% include "mods/create/field_errors.html" with field=form.to %}
+        </div>
+        {% url 'markdown_image' as upload_url %}
+        {% url 'markdown_preview' as preview_url %}
+        {% include "shared/widgets/markdown_editor.html" with field=form.body %}
+        <div class="flex justify-end">
+            <button type="submit" class="inline-flex items-center gap-1.5 rounded-full bg-gold-400 hover:bg-gold-300 px-5 py-2 text-sm font-medium text-pine-500 transition-colors cursor-pointer">
+                <i class="bi bi-send"></i> Send
+            </button>
+        </div>
+    </form>
+{% endblock %}
