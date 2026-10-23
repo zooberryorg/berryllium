@@ -1,0 +1,24 @@
+<div class="flex items-center justify-between gap-3 px-3 pt-1.5 pb-2">
+    <p class="text-sm font-semibold text-white">Notifications</p>
+    {% if unread %}
+        <button type="button"
+                class="text-xs text-gold-300 hover:text-gold-200 cursor-pointer"
+                hx-post="{% url 'notifications_read_all' %}"
+                hx-vals='{"from": "menu"}'
+                hx-target="#notification-menu"
+                hx-swap="innerHTML">Mark all as read</button>
+    {% endif %}
+</div>
+{% if items %}
+    <div class="max-h-[60vh] overflow-y-auto space-y-0.5">
+        {% for item in items %}{% include 'notifications/item.html' %}{% endfor %}
+    </div>
+{% else %}
+    <div class="px-3 py-8 text-center">
+        <i class="bi bi-bell-slash text-2xl text-white/20"></i>
+        <p class="mt-2 text-sm text-gray-400">Nothing yet. Replies and new comments on your work will show up here.</p>
+    </div>
+{% endif %}
+<div class="h-px bg-pine-300 my-2"></div>
+<a href="{% url 'notifications' %}" class="block rounded-xl px-3 py-2 text-center text-sm text-gray-300 hover:text-white hover:bg-white/5">See all notifications</a>
+{% include 'notifications/badge.html' with oob=True unread_notifications=unread %}

@@ -9,7 +9,7 @@
     {% if posts %}
         <ul class="space-y-2">
             {% for post in posts %}
-                <li class="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 p-3">
+                <li class="flex flex-col sm:flex-row sm:items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 p-3" x-data="{ confirming: false }">
                     <a href="{% url 'post_edit' post.pk %}" class="flex items-center gap-3 min-w-0 flex-1 group/item">
                         <span class="w-24 aspect-video shrink-0 overflow-hidden rounded-lg bg-pine-800">
                             {% if post.thumbnail %}<img src="{{ post.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">{% else %}<span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image"></i></span>{% endif %}
@@ -19,20 +19,24 @@
                             <span class="block text-xs text-gray-400">{{ post.get_kind_display }} · Edited {{ post.last_updated|timeago }}</span>
                         </span>
                     </a>
-                    <div class="flex items-center gap-2 sm:justify-end">
+                    <form method="post" action="{% url 'settings_posts_change' post.pk %}" class="flex flex-wrap items-center gap-2 sm:justify-end">
+                        {% csrf_token %}
                         {% include 'mods/panel/status_badge.html' with mod=post %}
-                        <a href="{{ post.get_absolute_url }}" class="p-2 text-white/60 hover:text-white" title="{% if post.status == 'published' %}View{% else %}Preview{% endif %}"><i class="bi bi-eye"></i></a>
-                        <form method="post" action="{% url 'settings_posts_change' post.pk %}" class="contents">
-                            {% csrf_token %}
+                        <span class="contents" x-show="!confirming">
+                            <a href="{{ post.get_absolute_url }}" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-eye"></i> {% if post.status == 'published' %}View{% else %}Preview{% endif %}</a>
                             {% if post.draft %}
-                                <button type="submit" name="action" value="publish" class="p-2 text-white/60 hover:text-gold-200 cursor-pointer" title="Publish"><i class="bi bi-send"></i></button>
+                                <button type="submit" name="action" value="publish" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-send"></i> Publish</button>
                             {% else %}
-                                <button type="submit" name="action" value="unpublish" class="p-2 text-white/60 hover:text-gold-200 cursor-pointer" title="Move to drafts"><i class="bi bi-eye-slash"></i></button>
+                                <button type="submit" name="action" value="unpublish" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-eye-slash"></i> Move to drafts</button>
                             {% endif %}
-                            <button type="submit" name="action" value="delete" class="p-2 text-white/60 hover:text-red-300 cursor-pointer" title="Delete"
-                                    onclick="return confirm('Delete this post and its files? This can\'t be undone.')"><i class="bi bi-trash"></i></button>
-                        </form>
-                    </div>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="confirming = true"><i class="bi bi-trash"></i> Delete</button>
+                        </span>
+                        <span class="contents" x-show="confirming" x-cloak role="alert">
+                            <span class="text-sm text-gray-200">Delete it and its files? This can't be undone.</span>
+                            <button type="submit" name="action" value="delete" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-trash"></i> Delete</button>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="confirming = false">Keep it</button>
+                        </span>
+                    </form>
                 </li>
             {% endfor %}
         </ul>
