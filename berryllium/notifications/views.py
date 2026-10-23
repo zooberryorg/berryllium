@@ -32,3 +32,13 @@ def badge(request):
     """Unread count for the top bar bell. Every minute updated via AJAX."""
     return render(request, "notifications/badge.html", {"unread_notifications": unread_count(request.user)})
 
+@login_required
+@require_GET
+def index(request):
+    show = request.GET.get("show", "")
+    items = Notification.objects.filter(recipient=request.user).select_related("actor")
+    if show == "unread":
+        items = items.filter(read_at__isnull=True)
+    page = Paginator(items, PAGE_SIZE).get_page(request.GET.get("page"))
+    _decorate(page.object_list)
+    return render(request, "notifications/index.html", {"page": page, "show": show, "unread": unread_count(request.user)})
