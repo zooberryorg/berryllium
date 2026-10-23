@@ -67,3 +67,15 @@ class InboxSettings(models.Model):
     def load(cls):
         settings_row, _ = cls.objects.get_or_create(pk=1)
         return settings_row
+
+class InboxQuota(models.Model):
+    """A different inbox size for one member, set by a moderator or admin."""
+
+    member = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="inbox_quota")
+    limit = models.PositiveIntegerField()
+    note = models.CharField(max_length=200, blank=True)
+    set_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.member_id}: {self.limit}"
