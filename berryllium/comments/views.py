@@ -130,3 +130,17 @@ def create(request, kind, pk):
     if reply_to is not None:
         return _posted(_thread(request, obj, comment.thread_id), comment)
     return _posted(_section(request, obj), comment)
+
+@login_required
+@require_GET
+def reply_form(request, comment_id):
+    """The form under a thread, for Reply (no quote) or Quote (?quote=1)."""
+    comment, obj = _editable(request, comment_id)
+    if comment.is_deleted or not services.can_comment(obj, request.user):
+        return HttpResponse("")
+    quote = comment if request.GET.get("quote") else None
+    form = CommentForm(auto_id=f"id_reply_{comment.thread_id}_%s", rows=4, placeholder=f"Reply to {comment.author.username if comment.author else 'this comment'}...")
+    return render(request, "comments/form.html", {
+        "comments": section_context(request, obj), "form": form, "mode": "reply",
+        "thread_id": comment.thread_id, "reply_to": comment, "quote": quote,
+    })
