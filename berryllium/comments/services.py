@@ -70,3 +70,25 @@ def quote_text(comment):
     """the quoted part cut to a reasonable length"""
     body = comment.body.strip()
     return body if len(body) <= QUOTE_LENGTH else body[:QUOTE_LENGTH].rstrip() + "…"
+
+@transaction.atomic
+def create_comment(obj, author, body, reply_to=None, quote=None):
+    """reply_to and quote must be comments on the same target (the view checks)."""
+    parent = None
+    if reply_to is not None:
+        parent = reply_to.parent or reply_to
+    comment = Comment.objects.create(
+        content_type=ContentType.objects.get_for_model(obj),
+        object_id=obj.pk,
+        author=author,
+        parent=parent,
+        reply_to=reply_to,
+        reply_to_name=reply_to.author.username if reply_to is not None and reply_to.author else "",
+        quote_of=quote,
+        quote_author=(quote.author.username if quote.author else "a deleted member") if quote is not None else "",
+        quote_text=quote_text(quote) if quote is not None else "",
+        body=body,
+    )
+    refresh_count(obj)
+    transaction.on_commit(lambda: _notify(obj, comment, reply_to, quote, parent))
+    return comment
