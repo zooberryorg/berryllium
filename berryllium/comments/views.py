@@ -174,3 +174,23 @@ def delete(request, comment_id):
     # the thread may be gone entirely then only the counter is sent
     return _thread(request, obj, thread_id)
 
+@login_required
+@require_POST
+def toggle(request, kind, pk):
+    """Turn comments off or on for a mod or post."""
+    obj = targets.get_target(kind, pk)
+    if not targets.can_manage(obj, request.user):
+        raise PermissionDenied
+    obj.comments_enabled = not obj.comments_enabled
+    type(obj).objects.filter(pk=obj.pk).update(comments_enabled=obj.comments_enabled)
+    return _section(request, obj)
+
+# --------------------------------------------------------------------------- editor helpers (comments and messages)
+
+
+@login_required
+@require_POST
+def preview(request):
+    # the shared editor script sends the text as "description"
+    html = render_markdown(request.POST.get("description", ""))
+    return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
