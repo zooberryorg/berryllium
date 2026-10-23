@@ -107,7 +107,28 @@ def _notify(obj, comment, reply_to, quote, parent):
         notify(people, comment.author, Notification.Kind.REPLY, f"{name} replied to you on “{title}”", link)
     else:
         text = f"{name} commented on your {targets.label(obj)} “{title}”"
-        # several comments in a row from one person: one notification until it's read
+        # several comments in a row from one person.. one notification until it's read
         waiting = set(Notification.objects.filter(kind=Notification.Kind.COMMENT, text=text, read_at__isnull=True).values_list("recipient_id", flat=True))
         people = [p for p in targets.owners(obj) if p.pk not in done and p.pk not in waiting]
         notify(people, comment.author, Notification.Kind.COMMENT, text, link)
+
+@transaction.atomic
+def delete_comment(comment, user):
+    """
+    A top-level comment with replies is blanked so the thread stays; anything else is removed.
+    A blanked comment goes too once its last reply is removed.
+    """
+    obj = comment.target
+    if comment.parent_id is None and comment.replies.exists():
+        comment.is_deleted = True
+        comment.deleted_by_moderator = comment.author_id != user.pk
+        comment.body = comment.quote_text = comment.quote_author = ""
+        comment.save(update_fields=["is_deleted", "deleted_by_moderator", "body", "quote_text", "quote_author"])
+    else:
+        parent = comment.parent
+        comment.delete()
+        if parent is not None and parent.is_deleted and not parent.replies.exists():
+            parent.delete()
+    if obj is not None:
+        refresh_count(obj)
+    return obj
