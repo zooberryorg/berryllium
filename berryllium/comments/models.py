@@ -66,3 +66,8 @@ class UploadedImage(models.Model):
 
     def __str__(self):
         return self.image.name
+
+@receiver(post_delete, sender=UploadedImage)
+def _delete_uploaded_image(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(save=False)
