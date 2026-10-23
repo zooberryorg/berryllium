@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6">
+        <header class="flex flex-wrap items-end justify-between gap-4">
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-gold-300">Your account</p>
+                <h1 class="text-3xl font-bold text-white mt-1">Inbox</h1>
+            </div>
+            <a href="{% url 'inbox_new' %}" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-300 px-4 py-2.5 text-sm font-medium text-pine-500 hover:shadow-lg hover:shadow-pine-900/50 transition-all">
+                <i class="bi bi-pencil-square"></i> New message
+            </a>
+        </header>
+
+        {% include 'shared/messages.html' %}
+
+        <div class="grid gap-6 items-start lg:grid-cols-[20rem_minmax(0,1fr)]">
+            <aside class="{% block list_class %}{% endblock %} space-y-3 lg:sticky lg:top-24" aria-label="Conversations">
+                {% include 'inbox/usage.html' %}
+                {% include 'inbox/list.html' %}
+            </aside>
+            <div class="min-w-0 {% block main_class %}{% endblock %}">
+                {% block inbox_main %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <style>[x-cloak] { display: none !important; }</style>
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}
