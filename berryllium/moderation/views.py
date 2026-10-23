@@ -30,6 +30,7 @@ def _nav(request, active):
         ("moderation_files", "File queue", "bi-inboxes", pending),
         ("moderation_mods", "Mods", "bi-puzzle", None),
         ("moderation_tags", "Tags", "bi-tags", None),
+        ("moderation_inbox", "Inbox limits", "bi-envelope-paper", None),
     ]
     nav = [{"url": reverse(name), "label": label, "icon": icon, "count": count, "active": name == active}
            for name, label, icon, count in items]

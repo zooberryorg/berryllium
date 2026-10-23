@@ -52,6 +52,27 @@ def unread_count(member):
         return 0
     return _unread_messages(member).count()
 
+# --------------------------------------------------------------------------- conversations
+
+
+def conversation_between(a, b):
+    return Conversation.objects.filter(memberships__member=a).filter(memberships__member=b).first()
+
+
+def other_member(conversation, me):
+    for membership in conversation.memberships.all():
+        if membership.member_id != me.pk:
+            return membership.member
+    return None
+
+
+def membership_for(conversation_id, member):
+    return (
+        ConversationMember.objects.select_related("conversation")
+        .filter(conversation_id=conversation_id, member=member)
+        .first()
+    )
+
 def conversation_list(member):
     """This member's conversations, newest first, with the other person, the last message and an unread count."""
     last = Message.objects.filter(conversation=OuterRef("conversation")).order_by("-created_at")

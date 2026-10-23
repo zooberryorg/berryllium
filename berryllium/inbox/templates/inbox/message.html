@@ -1,0 +1,19 @@
+{% load bfilters %}
+<article id="message-{{ message.pk }}" class="rounded-xl border p-4 scroll-mt-28 {% if message.sender_id == user.pk %}border-gold-400/20 bg-gold-400/[0.04]{% else %}border-white/5 bg-pine-800/40{% endif %}">
+    <header class="flex items-center gap-3">
+        {% if message.sender %}
+            {% include 'shared/navigation/avatar.html' with member=message.sender avatar_class="w-9 h-9 text-sm" %}
+        {% else %}
+            <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400/50 flex items-center justify-center text-gray-400"><i class="bi bi-person"></i></span>
+        {% endif %}
+        <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold text-white">{% if message.sender_id == user.pk %}You{% elif message.sender %}{{ message.sender.username }}{% else %}Deleted member{% endif %}</p>
+            <p class="text-xs text-gray-400"><a href="#message-{{ message.pk }}" class="hover:text-gold-200" title="{{ message.created_at|date:date_prefs.datetime }}"><time datetime="{{ message.created_at|date:'c' }}">{{ message.created_at|timeago }}</time></a></p>
+        </div>
+        <a href="?quote={{ message.pk }}#reply" class="zb-action inline-flex items-center gap-1.5 text-xs"><i class="bi bi-quote"></i> Quote</a>
+    </header>
+    {% if message.quote_text %}
+        {% include 'comments/quote.html' with quote_author=message.quote_author quote_text=message.quote_text quote_id=message.quote_of_id quote_anchor="message" %}
+    {% endif %}
+    <div class="md-preview text-sm text-granite-200 leading-relaxed mt-3" style="overflow-wrap: anywhere;">{{ message.body|markdown }}</div>
+</article>
