@@ -92,3 +92,22 @@ def create_comment(obj, author, body, reply_to=None, quote=None):
     refresh_count(obj)
     transaction.on_commit(lambda: _notify(obj, comment, reply_to, quote, parent))
     return comment
+
+def _notify(obj, comment, reply_to, quote, parent):
+    """Quoted people hear first, then the people replied to. owners only hear about new top-level comments."""
+    name = comment.author.username
+    title = obj.title or "Untitled"
+    link = f"{targets.url(obj)}#comment-{comment.pk}"
+    done = set()
+    if quote is not None and quote.author:
+        sent = notify([quote.author], comment.author, Notification.Kind.QUOTE, f"{name} quoted you on “{title}”", link)
+        done |= {row.recipient_id for row in sent}
+    if reply_to is not None:
+        people = [p for p in (reply_to.author, parent.author) if p is not None and p.pk not in done]
+        notify(people, comment.author, Notification.Kind.REPLY, f"{name} replied to you on “{title}”", link)
+    else:
+        text = f"{name} commented on your {targets.label(obj)} “{title}”"
+        # several comments in a row from one person: one notification until it's read
+        waiting = set(Notification.objects.filter(kind=Notification.Kind.COMMENT, text=text, read_at__isnull=True).values_list("recipient_id", flat=True))
+        people = [p for p in targets.owners(obj) if p.pk not in done and p.pk not in waiting]
+        notify(people, comment.author, Notification.Kind.COMMENT, text, link)
