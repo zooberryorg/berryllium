@@ -87,3 +87,15 @@ def _editable(request, comment_id):
     if obj is None or not targets.can_view(obj, request.user):
         raise Http404("Comment not found.")
     return comment, obj
+
+# --------------------------------------------------------------------------- reading
+
+
+@require_GET
+def more(request, kind, pk):
+    """The "Show more comments" button: the next page of threads, plus the next button."""
+    obj = targets.get_target(kind, pk)
+    if not targets.can_view(obj, request.user):
+        raise Http404("Not found.")
+    comments = section_context(request, obj, request.GET.get("page", 1))
+    return render(request, "comments/list.html", {"comments": comments})
