@@ -1,0 +1,14 @@
+{% if thread %}
+    <div id="thread-{{ thread.pk }}" class="space-y-3">
+        {% include 'comments/comment.html' with comment=thread %}
+        {% if thread.replies.all or reply_form %}
+            <div class="ml-4 sm:ml-8 pl-4 border-l-2 border-white/10 space-y-3">
+                {% for reply in thread.replies.all %}
+                    {% include 'comments/comment.html' with comment=reply %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        <div id="reply-slot-{{ thread.pk }}" class="ml-4 sm:ml-8 pl-4 empty:hidden">{% if reply_form %}{% include 'comments/form.html' with mode="reply" form=reply_form thread_id=thread.pk %}{% endif %}</div>
+    </div>
+{% endif %}
+{% if oob_count %}{% include 'comments/count.html' with oob=True %}{% endif %}
