@@ -1,0 +1,18 @@
+{% load bfilters %}
+<div class="rounded-lg border-l-2 border-gold-400/60 bg-black/15" x-data="{ keep: true, open: false }">
+    <input type="hidden" name="quote" value="{{ quote.pk }}" :disabled="!keep">
+    <div class="flex items-center gap-2 px-3 py-2 text-xs text-gray-300" x-show="keep">
+        <button type="button" class="flex items-center gap-2 min-w-0 flex-1 text-left cursor-pointer" @click="open = !open" :aria-expanded="open.toString()">
+            <i class="bi bi-quote text-gold-300"></i>
+            <span class="shrink-0">Quoting <span class="font-medium text-white">{{ quote_name }}</span></span>
+            <span class="min-w-0 truncate text-gray-500" x-show="!open">{{ quote.body|markdown|striptags|truncatechars:90 }}</span>
+            <i class="bi bi-chevron-down ml-auto text-[10px] text-gray-400 transition-transform" :class="open && 'rotate-180'"></i>
+        </button>
+        <button type="button" class="zb-action text-xs" title="Remove the quote" aria-label="Remove the quote" @click="keep = false"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="md-preview text-sm text-granite-200 px-3 pb-3" x-show="keep && open" x-collapse x-cloak style="overflow-wrap: anywhere;">{{ quote.body|markdown }}</div>
+    <p class="px-3 py-2 text-xs text-gray-400" x-show="!keep" x-cloak>
+        Quote removed.
+        <button type="button" class="text-gold-300 hover:text-gold-200 underline underline-offset-2 cursor-pointer" @click="keep = true">Undo</button>
+    </p>
+</div>
