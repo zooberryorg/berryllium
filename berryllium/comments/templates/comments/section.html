@@ -1,0 +1,43 @@
+<section id="comments" class="scroll-mt-24" aria-labelledby="comments-heading">
+    <div class="flex flex-wrap items-center gap-3 mb-4">
+        <h2 id="comments-heading" class="text-lg font-semibold text-white flex items-center gap-2">
+            Comments {% include 'comments/count.html' %}
+        </h2>
+        {% if comments.can_manage %}
+            <button type="button"
+                    class="ml-auto zb-action inline-flex items-center gap-1.5 text-sm"
+                    hx-post="{% url 'comments_toggle' comments.kind comments.target.pk %}"
+                    hx-target="#comments"
+                    hx-swap="outerHTML">
+                {% if comments.enabled %}<i class="bi bi-chat-square-dots"></i> Turn comments off{% else %}<i class="bi bi-chat-square"></i> Turn comments on{% endif %}
+            </button>
+        {% endif %}
+    </div>
+
+    {% if not comments.is_public %}
+        <p class="flex items-center gap-2 rounded-xl border border-white/10 bg-pine-800/40 px-4 py-3 text-sm text-gray-300">
+            <i class="bi bi-hourglass-split text-gold-300"></i> Comments open once this {{ comments.label }} is published.
+        </p>
+    {% elif not comments.enabled %}
+        <p class="flex items-center gap-2 rounded-xl border border-white/10 bg-pine-800/40 px-4 py-3 text-sm text-gray-300">
+            <i class="bi bi-chat-square text-gold-300"></i> Comments are turned off for this {{ comments.label }}.
+        </p>
+    {% elif not user.is_authenticated %}
+        <p class="flex flex-wrap items-center gap-2 rounded-xl border border-white/10 bg-pine-800/40 px-4 py-3 text-sm text-gray-300">
+            <i class="bi bi-person-circle text-gold-300"></i>
+            <a href="{{ comments.login_url }}" class="text-gold-300 hover:text-gold-200 underline underline-offset-2">Log in</a> to join the conversation.
+        </p>
+    {% else %}
+        {% include 'comments/form.html' with mode="new" form=comments.form %}
+    {% endif %}
+
+    <div id="comment-list" class="mt-6 space-y-4">
+        {% include 'comments/list.html' %}
+    </div>
+    {% if not comments.page.object_list and comments.is_public %}
+        <p class="text-sm text-gray-400">{% if comments.enabled %}No comments yet.{% if comments.can_comment %} Be the first.{% endif %}{% endif %}</p>
+    {% endif %}
+    <style>
+        .comment-flash { box-shadow: 0 0 0 2px var(--color-gold-400); transition: box-shadow 0.6s ease; }
+    </style>
+</section>

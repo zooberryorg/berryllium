@@ -1,0 +1,81 @@
+{% load bfilters %}
+<article id="comment-{{ comment.pk }}" class="comment-card rounded-xl border border-white/5 bg-pine-800/40 p-4 scroll-mt-28">
+    {% if comment.is_deleted %}
+        <p class="flex items-center gap-2 text-sm text-gray-400 italic">
+            <i class="bi bi-trash3"></i>
+            {% if comment.deleted_by_moderator %}This comment was removed by a moderator.{% else %}This comment was deleted.{% endif %}
+        </p>
+    {% else %}
+        <header class="flex items-start gap-3">
+            {% if comment.author %}
+                <a href="{% url 'member_profile' comment.author.username %}" class="shrink-0" tabindex="-1" aria-hidden="true">
+                    {% include 'shared/navigation/avatar.html' with member=comment.author avatar_class="w-9 h-9 text-sm" %}
+                </a>
+            {% else %}
+                <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400/50 flex items-center justify-center text-gray-400"><i class="bi bi-person"></i></span>
+            {% endif %}
+            <div class="min-w-0 flex-1">
+                <p class="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-sm">
+                    {% if comment.author %}
+                        <a href="{% url 'member_profile' comment.author.username %}" class="font-semibold text-white hover:text-gold-200">{{ comment.author.username }}</a>
+                        {% if comment.author_id in comments.owner_ids %}<span class="text-[11px] px-1.5 py-0.5 rounded-md bg-gold-400/15 text-gold-200">Author</span>{% endif %}
+                    {% else %}
+                        <span class="font-semibold text-gray-400">Deleted member</span>
+                    {% endif %}
+                    {% if comment.reply_to_name and comment.parent_id %}
+                        <span class="text-xs text-gray-400">
+                            <i class="bi bi-reply"></i>
+                            {% if comment.reply_to_id %}<a href="#comment-{{ comment.reply_to_id }}" class="hover:text-gold-200">@{{ comment.reply_to_name }}</a>{% else %}@{{ comment.reply_to_name }}{% endif %}
+                        </span>
+                    {% endif %}
+                </p>
+                <p class="text-xs text-gray-400">
+                    <a href="#comment-{{ comment.pk }}" class="hover:text-gold-200" title="{{ comment.created_at|date:date_prefs.datetime }}">
+                        <time datetime="{{ comment.created_at|date:'c' }}">{{ comment.created_at|timeago }}</time>
+                    </a>
+                    {% if comment.edited_at %}<span title="Edited {{ comment.edited_at|date:date_prefs.datetime }}"> · edited</span>{% endif %}
+                </p>
+            </div>
+        </header>
+
+        {% if comment.quote_text %}
+            {% include 'comments/quote.html' with quote_author=comment.quote_author quote_text=comment.quote_text quote_id=comment.quote_of_id %}
+        {% endif %}
+
+        <div class="md-preview text-sm text-granite-200 leading-relaxed mt-3" style="overflow-wrap: anywhere;">{{ comment.body|markdown }}</div>
+
+        {% if user.is_authenticated %}
+            <div class="mt-3 flex flex-wrap items-center gap-1.5" x-data="{ confirming: false }">
+                <span class="contents" x-show="!confirming">
+                    {% if comments.can_comment %}
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs"
+                                hx-get="{% url 'comment_reply_form' comment.pk %}"
+                                hx-target="#reply-slot-{{ comment.thread_id }}"
+                                hx-swap="innerHTML"><i class="bi bi-reply"></i> Reply</button>
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs"
+                                hx-get="{% url 'comment_reply_form' comment.pk %}?quote=1"
+                                hx-target="#reply-slot-{{ comment.thread_id }}"
+                                hx-swap="innerHTML"><i class="bi bi-quote"></i> Quote</button>
+                    {% endif %}
+                    {% if comment.author_id == user.pk %}
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs"
+                                hx-get="{% url 'comment_edit' comment.pk %}"
+                                hx-target="#comment-{{ comment.pk }}"
+                                hx-swap="outerHTML"><i class="bi bi-pencil"></i> Edit</button>
+                    {% endif %}
+                    {% if comment.author_id == user.pk or comments.is_moderator %}
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs" @click="confirming = true"><i class="bi bi-trash"></i> Delete</button>
+                    {% endif %}
+                </span>
+                <span class="contents" x-show="confirming" x-cloak role="alert">
+                    <span class="text-xs text-gray-200">Delete this comment?</span>
+                    <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs"
+                            hx-post="{% url 'comment_delete' comment.pk %}"
+                            hx-target="#thread-{{ comment.thread_id }}"
+                            hx-swap="outerHTML"><i class="bi bi-trash"></i> Delete</button>
+                    <button type="button" class="zb-action inline-flex items-center gap-1.5 text-xs" @click="confirming = false">Keep it</button>
+                </span>
+            </div>
+        {% endif %}
+    {% endif %}
+</article>

@@ -1,0 +1,42 @@
+{% url 'markdown_image' as upload_url %}
+{% url 'markdown_preview' as preview_url %}
+{% if mode == "edit" %}<article id="comment-{{ comment.pk }}" class="rounded-xl border border-gold-400/30 bg-pine-800/40 p-4 scroll-mt-28">{% endif %}
+<form {% if mode == "edit" %}hx-post="{% url 'comment_edit' comment.pk %}" hx-target="#comment-{{ comment.pk }}"{% else %}hx-post="{% url 'comment_create' comments.kind comments.target.pk %}" hx-target="{% if mode == 'reply' %}#thread-{{ thread_id }}{% else %}#comments{% endif %}"{% endif %}
+      hx-swap="outerHTML"
+      class="space-y-3 {% if mode == 'reply' %}rounded-xl border border-gold-400/20 bg-pine-800/30 p-4{% endif %}"
+      x-data
+      {% if mode != "new" %}x-init="$nextTick(() => { $el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); $el.querySelector('textarea')?.focus() })"{% endif %}>
+    {% csrf_token %}
+    {% if mode == "reply" %}
+        <input type="hidden" name="reply_to" value="{{ reply_to.pk }}">
+        <p class="flex items-center gap-2 text-xs text-gray-400">
+            <i class="bi bi-reply"></i> Replying to <span class="text-white">@{% if reply_to.author %}{{ reply_to.author.username }}{% else %}deleted member{% endif %}</span>
+        </p>
+        {% if quote %}
+            {% include 'comments/quote_box.html' with quote_name=quote.author.username|default:"a deleted member" %}
+        {% endif %}
+    {% elif mode == "edit" %}
+        <p class="flex items-center gap-2 text-xs text-gray-400"><i class="bi bi-pencil"></i> Editing your comment</p>
+    {% endif %}
+
+    {% if form_error %}
+        <p class="flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert"><i class="bi bi-exclamation-circle"></i> {{ form_error }}</p>
+    {% endif %}
+
+    {% include "shared/widgets/markdown_editor.html" with field=form.body %}
+
+    <div class="flex flex-wrap items-center justify-end gap-2">
+        {% if mode == "reply" %}
+            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="document.getElementById('reply-slot-{{ thread_id }}').innerHTML = ''">Cancel</button>
+        {% elif mode == "edit" %}
+            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm"
+                    hx-get="{% url 'comment_edit' comment.pk %}?cancel=1"
+                    hx-target="#comment-{{ comment.pk }}"
+                    hx-swap="outerHTML">Cancel</button>
+        {% endif %}
+        <button type="submit" class="inline-flex items-center gap-1.5 rounded-full bg-gold-400 hover:bg-gold-300 px-5 py-2 text-sm font-medium text-pine-500 transition-colors cursor-pointer focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">
+            {% if mode == "edit" %}<i class="bi bi-check2"></i> Save{% elif mode == "reply" %}<i class="bi bi-reply"></i> Reply{% else %}<i class="bi bi-send"></i> Post comment{% endif %}
+        </button>
+    </div>
+</form>
+{% if mode == "edit" %}</article>{% endif %}
