@@ -144,3 +144,20 @@ def reply_form(request, comment_id):
         "comments": section_context(request, obj), "form": form, "mode": "reply",
         "thread_id": comment.thread_id, "reply_to": comment, "quote": quote,
     })
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def edit(request, comment_id):
+    comment, obj = _editable(request, comment_id)
+    comments = section_context(request, obj)
+    if request.method == "GET" and request.GET.get("cancel"):
+        return render(request, "comments/comment.html", {"comments": comments, "comment": comment})
+    if not services.can_edit(comment, request.user):
+        raise PermissionDenied
+    form = CommentForm(request.POST or None, initial={"body": comment.body}, auto_id=f"id_edit_{comment.pk}_%s")
+    if request.method == "POST" and form.is_valid():
+        comment.body = form.cleaned_data["body"]
+        comment.edited_at = timezone.now()
+        comment.save(update_fields=["body", "edited_at"])
+        return render(request, "comments/comment.html", {"comments": comments, "comment": comment})
+    return render(request, "comments/form.html", {"comments": comments, "form": form, "mode": "edit", "comment": comment})
