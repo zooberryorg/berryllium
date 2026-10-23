@@ -127,3 +127,25 @@ def start_conversation(sender, recipient):
         ConversationMember.objects.create(conversation=conversation, member=sender, last_read_at=timezone.now())
         ConversationMember.objects.create(conversation=conversation, member=recipient)
     return conversation
+
+@transaction.atomic
+def send_message(conversation, sender, recipient, body, quote=None):
+    message = Message.objects.create(
+        conversation=conversation,
+        sender=sender,
+        body=body,
+        quote_of=quote,
+        quote_author=(quote.sender.username if quote.sender else "a deleted member") if quote is not None else "",
+        quote_text=quote_text(quote) if quote is not None else "",
+    )
+    conversation.last_message_at = message.created_at
+    conversation.save(update_fields=["last_message_at"])
+    # it shows up again for both, and the sender has read everything up to their own message
+    conversation.memberships.update(is_hidden=False)
+    conversation.memberships.filter(member=sender).update(last_read_at=message.created_at)
+
+    # one notification per sender until it's read, not one per message
+    if not has_unread(recipient, sender, Notification.Kind.MESSAGE):
+        link = reverse("inbox_conversation", kwargs={"conversation_id": conversation.pk}) + f"#message-{message.pk}"
+        transaction.on_commit(lambda: notify([recipient], sender, Notification.Kind.MESSAGE, f"{sender.username} sent you a message", link))
+    return message
