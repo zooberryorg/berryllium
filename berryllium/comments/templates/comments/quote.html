@@ -1,0 +1,10 @@
+{% load bfilters %}
+<details class="group/quote mt-3 rounded-lg border-l-2 border-gold-400/60 bg-black/15">
+    <summary class="flex items-center gap-2 px-3 py-2 text-xs text-gray-300 cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+        <i class="bi bi-quote text-gold-300"></i>
+        <span class="shrink-0">{% if quote_id %}<a href="#{{ quote_anchor|default:'comment' }}-{{ quote_id }}" class="font-medium text-white hover:text-gold-200">{{ quote_author }}</a>{% else %}<span class="font-medium text-white">{{ quote_author }}</span>{% endif %} wrote:</span>
+        <span class="min-w-0 truncate text-gray-500 group-open/quote:hidden">{{ quote_text|markdown|striptags|truncatechars:90 }}</span>
+        <i class="bi bi-chevron-down ml-auto text-[10px] text-gray-400 transition-transform group-open/quote:rotate-180"></i>
+    </summary>
+    <div class="md-preview text-sm text-granite-200 px-3 pb-3" style="overflow-wrap: anywhere;">{{ quote_text|markdown }}</div>
+</details>
