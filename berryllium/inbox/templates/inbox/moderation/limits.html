@@ -1,0 +1,70 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Moderation sections{% endblock %}
+{% block panel_kicker %}Moderation{% endblock %}
+{% block panel_title %}Inbox limits{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        An inbox holds a set number of messages, sent and received. When it's full, its owner can't send and others can't write to them until they delete conversations. Set 0 to stop someone using the inbox.
+    </p>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Default limit</h2>
+        {% if can_change_default %}
+            <form method="post" class="mt-3 flex flex-wrap items-center gap-3">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="default">
+                <label class="flex items-center gap-2 text-sm text-gray-300">{{ default_form.default_limit }} messages per member</label>
+                <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-check2"></i> Save</button>
+                {% for error in default_form.default_limit.errors %}<p class="basis-full text-sm text-red-300">{{ error }}</p>{% endfor %}
+            </form>
+        {% else %}
+            <p class="mt-2 text-sm text-white"><span class="text-2xl font-semibold tabular-nums">{{ settings_row.default_limit }}</span> messages per member</p>
+            <p class="text-xs text-gray-400 mt-1">Only admins can change the default.</p>
+        {% endif %}
+    </section>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Set a member's limit</h2>
+        <form method="post" class="mt-3 grid gap-3 sm:grid-cols-[1fr_8rem_1.5fr_auto] sm:items-start">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="quota">
+            <div>{{ quota_form.username }}{% for error in quota_form.username.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}</div>
+            <div>{{ quota_form.limit }}{% for error in quota_form.limit.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}</div>
+            <div>{{ quota_form.note }}</div>
+            <button type="submit" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm py-2"><i class="bi bi-check2"></i> Save</button>
+        </form>
+        <p class="text-xs text-gray-400 mt-2">Saving again for the same member replaces their limit.</p>
+    </section>
+
+    {% if quotas %}
+        <ul class="divide-y divide-white/5 rounded-2xl border border-pine-300 bg-pine-600 overflow-hidden">
+            {% for quota in quotas %}
+                <li class="flex flex-wrap items-center gap-3 px-4 py-3" x-data="{ confirming: false }">
+                    {% include 'shared/navigation/avatar.html' with member=quota.member avatar_class="w-9 h-9 text-sm" %}
+                    <div class="min-w-0 flex-1">
+                        <a href="{% url 'member_profile' quota.member.username %}" class="font-medium text-white hover:text-gold-200">{{ quota.member.username }}</a>
+                        <p class="text-xs text-gray-400">
+                            Using <span class="tabular-nums text-gray-200">{{ quota.used }}</span> of <span class="tabular-nums text-gray-200">{{ quota.limit }}</span>
+                            {% if quota.note %} · {{ quota.note }}{% endif %}
+                            {% if quota.set_by %} · set by {{ quota.set_by.username }} {{ quota.updated_at|timeago }}{% endif %}
+                        </p>
+                    </div>
+                    <form method="post" class="flex flex-wrap items-center gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="remove">
+                        <input type="hidden" name="quota" value="{{ quota.pk }}">
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" x-show="!confirming" @click="confirming = true"><i class="bi bi-arrow-counterclockwise"></i> Use default</button>
+                        <span class="contents" x-show="confirming" x-cloak>
+                            <span class="text-sm text-gray-200">Back to {{ settings_row.default_limit }}?</span>
+                            <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm">Yes</button>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = false">Cancel</button>
+                        </span>
+                    </form>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p class="text-sm text-gray-400">Every member is on the default limit.</p>
+    {% endif %}
+{% endblock %}
