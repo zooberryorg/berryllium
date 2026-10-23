@@ -35,3 +35,20 @@ def usage_summary(member):
     used, limit = inbox_usage(member), inbox_limit(member)
     percent = 100 if limit == 0 else min(100, round(used * 100 / limit))
     return {"used": used, "limit": limit, "percent": percent, "full": used >= limit, "nearly_full": percent >= 80}
+
+# --------------------------------------------------------------------------- unread
+
+
+def _unread_messages(member):
+    """messages from others that arrived after this member last opened the conversation"""
+    mine = ConversationMember.objects.filter(conversation=OuterRef("conversation"), member=member).filter(
+        Q(last_read_at__isnull=True) | Q(last_read_at__lt=OuterRef("created_at"))
+    )
+    return Message.objects.exclude(sender=member).filter(Exists(mine))
+
+
+def unread_count(member):
+    if not member.is_authenticated:
+        return 0
+    return _unread_messages(member).count()
+
