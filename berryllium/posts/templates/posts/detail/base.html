@@ -99,7 +99,9 @@
                         {% if body_html %}
                             <div id="post-body" class="md-preview text-granite-200 leading-relaxed max-w-3xl">{{ body_html }}</div>
                         {% else %}
-                            <p class="text-sm text-white/40">Nothing has been written yet.</p>
+                            <button type="submit" form="post-form" name="action" value="preview" class="zb-action inline-flex items-center gap-1.5 text-sm">
+                                <i class="bi bi-eye"></i> {% if post.status == 'published' %}Save and view{% else %}Preview{% endif %}
+                            </button>
                         {% endif %}
                         {% if tags %}
                             <ul class="mt-8 pt-5 border-t border-white/10 flex flex-wrap gap-2" aria-label="Tags">
@@ -138,7 +140,7 @@
             </aside>
         </div>
 
-        {% if related %}
+        {% if related and is_public %}
             <section aria-labelledby="related-heading" class="pt-4">
                 <h2 id="related-heading" class="text-lg font-semibold text-white mb-4">More {% if post.kind == 'news' %}news{% else %}tutorials{% endif %}</h2>
                 <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

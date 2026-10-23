@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -5,9 +7,12 @@ from django.db.models import Count, F, Q
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from berryllium.mods.models import ModCredit
+from berryllium.mods.settings import GAME_OPTIONS
+from berryllium.mods.views.explore import PERIODS, _csv_has
 from berryllium.posts.forms import (
     MAX_POST_FILES,
     POST_FILE_EXTENSIONS,
@@ -81,7 +86,9 @@ def edit(request, post_id):
                 publish_post(post)
                 messages.success(request, "Changes saved." if was_live else "Published.")
                 return redirect("post_detail", post_id=post.pk)
-            messages.error(request, "Fix the items in Publishing before publishing.")
+            messages.error(request, "Fix the items under Before publishing first.")
+        elif saved and action == "preview":
+            return redirect("post_detail", post_id=post.pk)
         elif saved:
             messages.success(request, "Saved.")
             return redirect("post_edit", post_id=post.pk)
@@ -230,11 +237,20 @@ def _listing(request, kind, explore_tab):
     tag = proper_case(params.get("tag", ""))[:50]
     sort = params.get("sort", "")
     sort = sort if sort in SORTS else "recent"
+    game_options = [option for option in GAME_OPTIONS if option[0] != "na"]
+    game = params.get("game", "")
+    game = game if game in dict(game_options) else ""
+    period = params.get("period", "")
+    period = period if period in PERIODS else ""
     posts = published_posts(kind).select_related("uploaded_by").prefetch_related("tags")
     if q:
         posts = posts.filter(Q(title__icontains=q) | Q(summary__icontains=q) | Q(tags__name__icontains=q)).distinct()
     if tag:
         posts = posts.filter(tags__name__iexact=tag)
+    if game:
+        posts = posts.filter(_csv_has("game", game))
+    if period:
+        posts = posts.filter(publish_date__gte=timezone.now() - timedelta(days=PERIODS[period][1]))
     page = Paginator(posts.order_by(*SORTS[sort][1]), PAGE_SIZE).get_page(params.get("page"))
     page_query = params.copy()
     page_query.pop("page", None)
@@ -242,8 +258,10 @@ def _listing(request, kind, explore_tab):
         "page": page,
         "page_range": list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)),
         "page_query": page_query.urlencode(),
-        "q": q, "tag": tag, "sort": sort,
+        "q": q, "tag": tag, "sort": sort, "game": game, "period": period,
         "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
+        "game_options": game_options,
+        "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
         "kind": kind,
         "kind_label": dict(Post.Kind.choices)[kind],
         "explore_tab": explore_tab,

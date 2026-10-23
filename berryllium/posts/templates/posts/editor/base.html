@@ -18,9 +18,9 @@
             </div>
             <div class="flex items-center gap-2">
                 {% include 'mods/panel/status_badge.html' with mod=post %}
-                <a href="{{ post.get_absolute_url }}" class="inline-flex items-center gap-1.5 rounded-full border border-white/15 px-3.5 py-1.5 text-sm text-white/80 hover:text-white hover:border-gold-400/50 transition-colors">
-                    <i class="bi bi-eye"></i> {% if post.status == 'published' %}View{% else %}Preview{% endif %}
-                </a>
+                <button type="submit" form="post-form" name="action" value="preview" class="zb-action inline-flex items-center gap-1.5 text-sm">
+                    <i class="bi bi-eye"></i> {% if post.status == 'published' %}Save and view{% else %}Preview{% endif %}
+                </button>
             </div>
         </header>
 
@@ -41,6 +41,12 @@
                 </section>
 
                 <section id="tags" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 scroll-mt-24">
+                    <div class="mb-4">
+                        <span class="block text-sm font-medium mb-1 text-white">{{ form.game.label }}</span>
+                        {{ form.game }}
+                        <p class="text-xs text-white/50 mt-2">Leave it empty if it isn't about a particular game.</p>
+                        {% include "mods/create/field_errors.html" with field=form.game %}
+                    </div>
                     {% include "shared/widgets/search_picker.html" with field=form.tags config=form.tags_picker %}
                     <p class="text-xs text-white/50 -mt-2">Help readers find this. New tags (dashed) are created when you publish.</p>
                 </section>
