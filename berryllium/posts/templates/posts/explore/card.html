@@ -23,6 +23,8 @@
             <span class="ml-auto whitespace-nowrap" title="{{ post.publish_date|date:date_prefs.datetime }}">{{ post.publish_date|timeago }}</span>
             <span aria-hidden="true">·</span>
             <span class="whitespace-nowrap">{{ post.reading_minutes }} min</span>
+            <span aria-hidden="true">·</span>
+            <span class="whitespace-nowrap" title="{{ post.comment_count }} comment{{ post.comment_count|pluralize }}"><i class="bi bi-chat-left-text"></i> {{ post.comment_count|compact }}</span>
         </div>
     </div>
 </article>

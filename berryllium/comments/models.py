@@ -51,3 +51,8 @@ class Comment(models.Model):
     @property
     def thread_id(self):
         return self.parent_id or self.pk
+
+
+def uploaded_image_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"uploads/markdown/{uuid.uuid4().hex}{ext}"
