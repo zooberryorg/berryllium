@@ -1,0 +1,63 @@
+{% extends 'inbox/base.html' %}
+{% block list_class %}hidden lg:block{% endblock %}
+{% block inbox_main %}
+    <a href="{% url 'inbox' %}" class="lg:hidden mb-3 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gold-300"><i class="bi bi-chevron-left"></i> Inbox</a>
+    <section class="rounded-2xl border border-pine-300 bg-pine-600" aria-label="Conversation">
+        <header class="flex flex-wrap items-center gap-3 border-b border-white/10 px-5 py-4" x-data="{ confirming: false }">
+            {% if other %}
+                <a href="{% url 'member_profile' other.username %}" class="flex items-center gap-3 min-w-0 group/person">
+                    {% include 'shared/navigation/avatar.html' with member=other avatar_class="w-11 h-11 text-lg" %}
+                    <span class="min-w-0">
+                        <span class="block font-semibold text-white truncate group-hover/person:text-gold-200">{{ other.username }}</span>
+                        <span class="block text-xs text-gray-400">View profile</span>
+                    </span>
+                </a>
+            {% else %}
+                <span class="font-semibold text-gray-400">Deleted member</span>
+            {% endif %}
+            <div class="ml-auto flex flex-wrap items-center gap-2">
+                <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" x-show="!confirming" @click="confirming = true"><i class="bi bi-trash"></i> Delete conversation</button>
+                <form method="post" action="{% url 'inbox_delete' conversation.pk %}" class="contents" x-show="confirming" x-cloak>
+                    {% csrf_token %}
+                    <span class="text-sm text-gray-200">Delete it for you? {% if other %}{{ other.username }} keeps their copy.{% endif %}</span>
+                    <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-trash"></i> Delete</button>
+                    <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = false">Keep it</button>
+                </form>
+            </div>
+        </header>
+
+        <div class="p-4 sm:p-5 space-y-3">
+            {% if has_earlier %}
+                <a href="?all=1" class="block zb-action text-center text-sm py-2"><i class="bi bi-chevron-up"></i> Show earlier messages</a>
+            {% endif %}
+            {% for message in thread %}
+                {% if message.pk == first_unread %}
+                    <div class="flex items-center gap-3 text-xs font-semibold uppercase tracking-wider text-gold-300" id="unread">
+                        <span class="h-px flex-1 bg-gold-400/30"></span> New <span class="h-px flex-1 bg-gold-400/30"></span>
+                    </div>
+                {% endif %}
+                {% include 'inbox/message.html' %}
+            {% empty %}
+                <p class="py-6 text-center text-sm text-gray-400">No messages here. Write the first one below.</p>
+            {% endfor %}
+        </div>
+
+        <form id="reply" method="post" action="{% url 'inbox_conversation' conversation.pk %}" class="border-t border-white/10 p-4 sm:p-5 space-y-3 scroll-mt-24">
+            {% csrf_token %}
+            {% if problem %}
+                <p class="flex items-center gap-2 rounded-lg border border-red-400/30 bg-red-500/10 px-3 py-2 text-sm text-red-200" role="alert"><i class="bi bi-exclamation-circle"></i> {{ problem }}</p>
+            {% endif %}
+            {% if quote %}
+                {% include 'comments/quote_box.html' with quote_name=quote.sender.username|default:"a deleted member" %}
+            {% endif %}
+            {% url 'markdown_image' as upload_url %}
+            {% url 'markdown_preview' as preview_url %}
+            {% include "shared/widgets/markdown_editor.html" with field=form.body %}
+            <div class="flex justify-end">
+                <button type="submit" class="inline-flex items-center gap-1.5 rounded-full bg-gold-400 hover:bg-gold-300 px-5 py-2 text-sm font-medium text-pine-500 transition-colors cursor-pointer">
+                    <i class="bi bi-send"></i> Send
+                </button>
+            </div>
+        </form>
+    </section>
+{% endblock %}
