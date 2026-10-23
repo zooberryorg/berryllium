@@ -15,11 +15,9 @@
     </nav>
 
     {# search #}
-    <form method="get" class="relative">
+    <form method="get">
         {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
-        <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
-        <input type="search" name="q" value="{{ q }}" placeholder="Search by title..." aria-label="Search by title"
-               class="zb-input pl-11 text-sm w-full">
+        {% include 'shared/widgets/search_input.html' with input_id="panel-search" value=q placeholder="Search by title..." label="Search by title" %}
     </form>
 
     {% if page.object_list %}
@@ -39,23 +37,23 @@
                     <span x-text="selected.length ? selected.length + ' selected' : 'Select all'">Select all</span>
                 </label>
                 <div class="flex flex-wrap items-center gap-2 ml-auto" x-show="!confirming">
-                    <button type="submit" name="action" value="publish" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500" :disabled="!selected.length">
+                    <button type="submit" name="action" value="publish" class="zb-action inline-flex items-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length">
                         <i class="bi bi-send"></i> Publish
                     </button>
-                    <button type="submit" name="action" value="unpublish" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" :disabled="!selected.length">
+                    <button type="submit" name="action" value="unpublish" class="zb-action inline-flex items-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length">
                         <i class="bi bi-eye-slash"></i> Move to drafts
                     </button>
-                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15" :disabled="!selected.length" @click="confirming = true">
+                    <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length" @click="confirming = true">
                         <i class="bi bi-trash"></i> Delete
                     </button>
                 </div>
                 {# delete confirmation, in the page (the browser's confirm dialog isn't used) #}
                 <div class="flex flex-wrap items-center gap-2 ml-auto" x-show="confirming" x-cloak role="alert">
-                    <span class="text-sm text-red-200">
+                    <span class="text-sm text-gray-200">
                         Delete <strong x-text="selected.length"></strong> mod<span x-show="selected.length !== 1">s</span> permanently, with their files? This can't be undone.
                     </span>
-                    <button type="submit" name="action" value="delete" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15 bg-red-500/20">Delete</button>
-                    <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="confirming = false">Keep them</button>
+                    <button type="submit" name="action" value="delete" class="zb-action inline-flex items-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Delete</button>
+                    <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="confirming = false">Keep them</button>
                 </div>
             </div>
 
