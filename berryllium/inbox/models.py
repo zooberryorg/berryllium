@@ -50,3 +50,20 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message {self.pk} in {self.conversation_id}"
+
+class InboxSettings(models.Model):
+    """Site-wide inbox settings. Admins can change them in cp."""
+
+    default_limit = models.PositiveIntegerField(default=500, help_text="How many messages a member's inbox can hold.")
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "inbox settings"
+
+    def __str__(self):
+        return f"Inbox limit {self.default_limit}"
+
+    @classmethod
+    def load(cls):
+        settings_row, _ = cls.objects.get_or_create(pk=1)
+        return settings_row
