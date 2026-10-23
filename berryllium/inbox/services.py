@@ -97,3 +97,24 @@ def clear(membership):
     membership.cleared_at = membership.last_read_at = now
     membership.is_hidden = True
     membership.save(update_fields=["cleared_at", "last_read_at", "is_hidden"])
+
+# --------------------------------------------------------------------------- sending
+
+
+def problem_sending(sender, recipient):
+    """Why sender can't write to recipient right now, or empty string."""
+    if recipient is None or not recipient.is_active or getattr(recipient, "is_archived", False):
+        return "This account can't receive messages."
+    if recipient.pk == sender.pk:
+        return "You can't send a message to yourself."
+    mine = usage_summary(sender)
+    if mine["full"]:
+        return f"Your inbox is full ({mine['used']} of {mine['limit']} messages). Delete some conversations to make room."
+    if usage_summary(recipient)["full"]:
+        return f"{recipient.username}'s inbox is full, so they can't receive messages right now."
+    return ""
+
+
+def too_soon(sender):
+    last = Message.objects.filter(sender=sender).order_by("-created_at").values_list("created_at", flat=True).first()
+    return bool(last and timezone.now() - last < timedelta(seconds=COOLDOWN_SECONDS))
