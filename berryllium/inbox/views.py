@@ -52,3 +52,47 @@ def new(request):
             return redirect(_conversation_url(conversation.pk, message.pk))
     return render(request, "inbox/new.html", {**_list_context(request), "form": form, "problem": problem})
 
+@login_required
+@require_http_methods(["GET", "POST"])
+def conversation(request, conversation_id):
+    membership = services.membership_for(conversation_id, request.user)
+    if membership is None:
+        raise Http404("Conversation not found.")
+    convo = membership.conversation
+    other = services.other_member(convo, request.user)
+    show_all = bool(request.GET.get("all"))
+
+    quote = None
+    quote_id = request.POST.get("quote") or request.GET.get("quote")
+    if quote_id and str(quote_id).isdigit():
+        quote = Message.objects.select_related("sender").filter(pk=int(quote_id), conversation=convo).first()
+
+    form = MessageForm(request.POST or None, auto_id="id_reply_%s", rows=5)
+    problem = ""
+    if request.method == "POST":
+        if form.is_valid():
+            problem = services.problem_sending(request.user, other)
+            if not problem and services.too_soon(request.user):
+                problem = "You're sending messages very quickly. Wait a moment and try again."
+            if not problem:
+                message = services.send_message(convo, request.user, other, form.cleaned_data["body"], quote=quote)
+                return redirect(_conversation_url(convo.pk, message.pk))
+
+    shown, has_earlier = services.visible_messages(membership, show_all=show_all)
+    first_unread = None
+    if membership.last_read_at:
+        first_unread = next((m.pk for m in shown if m.created_at > membership.last_read_at and m.sender_id != request.user.pk), None)
+    services.mark_read(membership)
+    return render(request, "inbox/conversation.html", {
+        **_list_context(request),
+        "membership": membership,
+        "conversation": convo,
+        "other": other,
+        "thread": shown,
+        "has_earlier": has_earlier,
+        "first_unread": first_unread,
+        "form": form,
+        "quote": quote,
+        "problem": problem or (services.problem_sending(request.user, other) if request.method == "GET" else ""),
+    })
+
