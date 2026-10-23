@@ -19,3 +19,10 @@ def _decorate(items):
 def _menu(request):
     items = _decorate(list(Notification.objects.filter(recipient=request.user).select_related("actor")[:MENU_SIZE]))
     return render(request, "notifications/menu.html", {"items": items, "unread": unread_count(request.user)})
+
+@login_required
+@require_GET
+def menu(request):
+    """The bell in the top bar. Loads last few notifications."""
+    return _menu(request)
+
