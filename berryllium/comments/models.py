@@ -51,3 +51,23 @@ class Comment(models.Model):
     @property
     def thread_id(self):
         return self.parent_id or self.pk
+
+
+def uploaded_image_path(instance, filename):
+    ext = os.path.splitext(filename)[1].lower()
+    return f"uploads/markdown/{uuid.uuid4().hex}{ext}"
+
+class UploadedImage(models.Model):
+    """An image added with the editor's image button in a comment or a message."""
+
+    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="uploaded_images")
+    image = models.ImageField(upload_to=uploaded_image_path)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.image.name
+
+@receiver(post_delete, sender=UploadedImage)
+def _delete_uploaded_image(sender, instance, **kwargs):
+    if instance.image:
+        instance.image.delete(save=False)

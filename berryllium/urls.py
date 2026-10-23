@@ -28,6 +28,9 @@ urlpatterns = [
     path("", include("berryllium.users.urls")),
     path("", include("berryllium.moderation.urls")),
     path("", include("berryllium.posts.urls")),
+    path("", include("berryllium.comments.urls")),
+    path("", include("berryllium.inbox.urls")),
+    path("", include("berryllium.notifications.urls")),
 ]
 
 

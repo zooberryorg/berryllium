@@ -36,6 +36,10 @@
                     <dt><i class="bi bi-heart-fill"></i><span class="sr-only">Likes</span></dt>
                     <dd class="font-semibold tabular-nums">{{ mod.like_count|compact }}</dd>
                 </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ mod.comment_count }} comment{{ mod.comment_count|pluralize }}">
+                    <dt><i class="bi bi-chat-left-text-fill"></i><span class="sr-only">Comments</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ mod.comment_count|compact }}</dd>
+                </div>
             </dl>
         </div>
 

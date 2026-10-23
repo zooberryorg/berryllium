@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
+from berryllium.comments.views import section_context as comments_context
 from berryllium.mods.models import ModCredit
 from berryllium.mods.settings import GAME_OPTIONS
 from berryllium.mods.views.explore import PERIODS, _csv_has
@@ -29,7 +30,12 @@ from berryllium.shared.markdown_render import render_markdown, render_markdown_w
 from berryllium.users.permissions import can_edit_post, can_post_news
 
 PAGE_SIZE = 12
-SORTS = {"recent": ("Newest", ["-publish_date"]), "updated": ("Recently updated", ["-last_updated"]), "title": ("Title (A–Z)", ["title"])}
+SORTS = {
+    "recent": ("Newest", ["-publish_date"]),
+    "updated": ("Recently updated", ["-last_updated"]),
+    "comments": ("Most discussed", ["-comment_count", "-publish_date"]),
+    "title": ("Title (A–Z)", ["title"]),
+}
 
 
 def _editable_post(request, post_id):
@@ -219,6 +225,7 @@ def detail(request, post_id):
         "is_public": is_public(post),
         "can_edit": can_edit_post(request.user, post),
         "explore_tab": "news" if post.kind == Post.Kind.NEWS else "tutorials",
+        "comments": comments_context(request, post),
     })
 
 @require_GET
