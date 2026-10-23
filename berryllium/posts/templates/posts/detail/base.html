@@ -99,9 +99,11 @@
                         {% if body_html %}
                             <div id="post-body" class="md-preview text-granite-200 leading-relaxed max-w-3xl">{{ body_html }}</div>
                         {% else %}
-                            <button type="submit" form="post-form" name="action" value="preview" class="zb-action inline-flex items-center gap-1.5 text-sm">
-                                <i class="bi bi-eye"></i> {% if post.status == 'published' %}Save and view{% else %}Preview{% endif %}
-                            </button>
+                            <div class="rounded-xl border border-dashed border-white/15 px-6 py-10 text-center">
+                                <i class="bi bi-file-text text-3xl text-white/20"></i>
+                                <p class="mt-2 text-white">Nothing has been written yet.</p>
+                                {% if can_edit %}<a href="{% url 'post_edit' post.pk %}#article" class="mt-1 inline-block text-sm text-gold-300 hover:text-gold-200">Write the article</a>{% endif %}
+                            </div>
                         {% endif %}
                         {% if tags %}
                             <ul class="mt-8 pt-5 border-t border-white/10 flex flex-wrap gap-2" aria-label="Tags">
@@ -118,6 +120,10 @@
                         </div>
                     {% endif %}
                 </section>
+
+                <div class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-8">
+                    {% include 'comments/section.html' %}
+                </div>
             </div>
 
             <aside class="hidden lg:block lg:sticky lg:top-24 space-y-4 max-h-[calc(100vh-7rem)] overflow-y-auto" aria-label="On this page">
