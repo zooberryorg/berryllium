@@ -118,3 +118,12 @@ def problem_sending(sender, recipient):
 def too_soon(sender):
     last = Message.objects.filter(sender=sender).order_by("-created_at").values_list("created_at", flat=True).first()
     return bool(last and timezone.now() - last < timedelta(seconds=COOLDOWN_SECONDS))
+
+@transaction.atomic
+def start_conversation(sender, recipient):
+    conversation = conversation_between(sender, recipient)
+    if conversation is None:
+        conversation = Conversation.objects.create()
+        ConversationMember.objects.create(conversation=conversation, member=sender, last_read_at=timezone.now())
+        ConversationMember.objects.create(conversation=conversation, member=recipient)
+    return conversation
