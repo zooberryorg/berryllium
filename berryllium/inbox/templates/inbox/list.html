@@ -1,0 +1,40 @@
+{% load bfilters %}
+{% if conversations.object_list %}
+    <ul class="rounded-2xl border border-pine-300 bg-pine-600 p-1.5 space-y-0.5">
+        {% for row in conversations.object_list %}
+            <li>
+                <a href="{% url 'inbox_conversation' row.conversation_id %}"
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 {% if membership and membership.conversation_id == row.conversation_id %}bg-gradient-to-r from-gold-500/40 to-gold-300/30 border border-gold-300/30{% else %}hover:bg-white/5 border border-transparent{% endif %}"
+                   {% if membership and membership.conversation_id == row.conversation_id %}aria-current="page"{% endif %}>
+                    {% if row.other %}
+                        {% include 'shared/navigation/avatar.html' with member=row.other avatar_class="w-10 h-10 text-base" %}
+                    {% else %}
+                        <span class="w-10 h-10 shrink-0 rounded-full bg-pine-400/50 flex items-center justify-center text-gray-400"><i class="bi bi-person"></i></span>
+                    {% endif %}
+                    <span class="min-w-0 flex-1">
+                        <span class="flex items-baseline gap-2">
+                            <span class="truncate text-sm {% if row.unread %}font-semibold text-white{% else %}text-gray-200{% endif %}">{% if row.other %}{{ row.other.username }}{% else %}Deleted member{% endif %}</span>
+                            <time class="ml-auto shrink-0 text-[11px] text-gray-400" datetime="{{ row.conversation.last_message_at|date:'c' }}">{{ row.conversation.last_message_at|timeago }}</time>
+                        </span>
+                        <span class="flex items-center gap-2">
+                            <span class="truncate text-xs {% if row.unread %}text-gray-200{% else %}text-gray-400{% endif %}">{% if row.last_sender_id == user.pk %}You: {% endif %}{{ row.last_body|markdown|striptags|truncatechars:80 }}</span>
+                            {% if row.unread %}<span class="ml-auto shrink-0 min-w-5 h-5 px-1.5 rounded-full bg-gold-400 text-pine-600 text-[11px] font-bold flex items-center justify-center tabular-nums">{{ row.unread }}<span class="sr-only"> unread</span></span>{% endif %}
+                        </span>
+                    </span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    {% if conversations.paginator.num_pages > 1 %}
+        <nav class="flex items-center justify-between gap-2" aria-label="Pages">
+            {% if conversations.has_previous %}<a href="{% url 'inbox' %}?page={{ conversations.previous_page_number }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-chevron-left"></i> Newer</a>{% else %}<span></span>{% endif %}
+            {% if conversations.has_next %}<a href="{% url 'inbox' %}?page={{ conversations.next_page_number }}" class="zb-action inline-flex items-center gap-1.5 text-sm">Older <i class="bi bi-chevron-right"></i></a>{% endif %}
+        </nav>
+    {% endif %}
+{% else %}
+    <div class="rounded-2xl border border-dashed border-white/15 px-6 py-10 text-center">
+        <i class="bi bi-envelope-open text-3xl text-white/20"></i>
+        <p class="mt-2 text-white">No conversations yet.</p>
+        <p class="mt-1 text-sm text-gray-400">Start one with <span class="text-white">New message</span>, or from a member's profile.</p>
+    </div>
+{% endif %}
