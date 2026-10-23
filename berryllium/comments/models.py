@@ -56,3 +56,13 @@ class Comment(models.Model):
 def uploaded_image_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"uploads/markdown/{uuid.uuid4().hex}{ext}"
+
+class UploadedImage(models.Model):
+    """An image added with the editor's image button in a comment or a message."""
+
+    uploader = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="uploaded_images")
+    image = models.ImageField(upload_to=uploaded_image_path)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    def __str__(self):
+        return self.image.name
