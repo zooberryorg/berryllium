@@ -2,12 +2,13 @@ from django.core.paginator import Paginator
 from django.db.models import Prefetch
 from django.shortcuts import render
 from django.urls import reverse
+from datetime import timedelta
 from django.utils import timezone
 
 from berryllium.mods.models import ModCredit
 from berryllium.mods.pickers import picker_config
-from berryllium.mods.settings import MOD_CATEGORIES, MOD_CATEGORY_ICONS
-from berryllium.mods.views.explore import published_mods
+from berryllium.mods.settings import GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
+from berryllium.mods.views.explore import PERIODS, published_mods
 from berryllium.shared.fields import proper_case
 from berryllium.shared.models import ArchivedWebsite
 from berryllium.users.profiles import profile_url
@@ -56,13 +57,14 @@ def collect_modders():
     people = {}
     for mod in mods:
         categories = {key.strip() for key in (mod.category or "").split(",") if key.strip()}
+        games = {key.strip() for key in (mod.game or "").split(",") if key.strip()}
         tags = {tag.name for tag in mod.tags.all()}
         websites = {str(site.pk) for site in mod.original_websites.all()} if mod.is_archived_file else {ZOOBERRY}
         year = _mod_year(mod)
         for key, name, member, url in _modders_of(mod):
             person = people.setdefault(key, {
                 "key": key, "name": name, "member": member, "url": url, "mods": set(), "downloads": 0,
-                "years": set(), "websites": set(), "categories": set(), "tags": set(), "last_published": None,
+                "years": set(), "websites": set(), "categories": set(), "games": set(), "tags": set(), "last_published": None,
             })
             if mod.pk in person["mods"]:
                 continue  # credited twice on the same mod
@@ -71,6 +73,7 @@ def collect_modders():
             person["years"].add(year)
             person["websites"] |= websites
             person["categories"] |= categories
+            person["games"] |= games
             person["tags"] |= tags
             if person["last_published"] is None or mod.publish_date > person["last_published"]:
                 person["last_published"] = mod.publish_date
@@ -92,11 +95,14 @@ def read_filters(params):
         "year_from": _int(params.get("from", "")),
         "year_to": _int(params.get("to", "")),
         "websites": [w for w in params.getlist("website") if w == ZOOBERRY or w.isdigit()],
+        "game": params.get("game", "") if params.get("game", "") in dict(GAME_OPTIONS) else "",
+        "period": params.get("period", "") if params.get("period", "") in PERIODS else "",
         "sort": sort if sort in SORTS else DEFAULT_SORT,
     }
 
 def apply_filters(people, filters):
     tags_lower = {t.lower() for t in filters["tags"]}
+    since = timezone.now() - timedelta(days=PERIODS[filters["period"]][1]) if filters["period"] else None
     result = []
     for person in people:
         if filters["q"] and filters["q"].lower() not in person["name"].lower():
@@ -111,6 +117,10 @@ def apply_filters(people, filters):
         if filters["year_to"] and person["first_year"] > filters["year_to"]:
             continue
         if filters["websites"] and not set(filters["websites"]) & person["websites"]:
+            continue
+        if filters["game"] and filters["game"] not in person["games"]:
+            continue
+        if since and person["last_published"] < since:
             continue
         result.append(person)
     sort = filters["sort"]
@@ -159,6 +169,10 @@ def modders(request):
         active.append({"label": f"Active since {filters['year_from']}", "name": "from", "value": "", "url": _remove_url(params, "from")})
     if filters["year_to"]:
         active.append({"label": f"Active until {filters['year_to']}", "name": "to", "value": "", "url": _remove_url(params, "to")})
+    if filters["game"]:
+        active.append({"label": dict(GAME_OPTIONS)[filters["game"]], "name": "game", "value": "", "url": _remove_url(params, "game")})
+    if filters["period"]:
+        active.append({"label": f"Last published {PERIODS[filters['period']][0].lower()}", "name": "period", "value": "", "url": _remove_url(params, "period")})
     for website in filters["websites"]:
         active.append({"label": site_names.get(website, website), "name": "website", "value": website, "url": _remove_url(params, "website", website)})
 
@@ -196,6 +210,8 @@ def modders(request):
         "year_from": str(filters["year_from"] or ""),
         "year_to": str(filters["year_to"] or ""),
         "sort_options": list(SORTS.items()),
+        "game_options": [option for option in GAME_OPTIONS if option[0] != "na"],
+        "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
         "tag_picker": picker_config(
             name="tag",
             search_url=reverse("explore_search_tags"),

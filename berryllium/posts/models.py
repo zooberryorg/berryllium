@@ -37,6 +37,7 @@ class Post(models.Model):
     - kind: tutorial (anyone) or news (moderators and admins)
     - body: markdown, rendered with shared.markdown_render (sanitized with nh3)
     - thumbnail: the one image shown on cards and at the top of the article; more images go in the body
+    - game: which games it is about, stored like Mod.game ("zt1, zt2"); blank means not game-specific
     - draft / publish_date / first_published_at: same meaning as on Mod
     - is_archived_file, original_*: the post was first published elsewhere (named like Mod's fields so the
       shared general-info form and template work for both)
@@ -52,6 +53,7 @@ class Post(models.Model):
     summary = models.CharField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     thumbnail = models.ImageField(upload_to=post_thumbnail_path, blank=True)
+    game = models.CharField(max_length=100, blank=True, db_index=True)
 
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"

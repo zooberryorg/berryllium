@@ -5,8 +5,9 @@ from django.urls import reverse
 
 from berryllium.mods.forms import DescriptionImageForm, ModGeneralInfoForm
 from berryllium.mods.pickers import PickerField, picker_config, resolve_tags, tag_items
-from berryllium.mods.settings import ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MAX_IMAGE_SIZE
+from berryllium.mods.settings import ALLOWED_EXTENSIONS, GAME_OPTIONS, MAX_FILE_SIZE, MAX_IMAGE_SIZE
 from berryllium.posts.models import Post
+from berryllium.shared.widgets import PillCheckboxSelectMultiple
 
 PostImageForm = DescriptionImageForm
 
@@ -40,6 +41,12 @@ class PostEditorForm(PostGeneralForm):
     """The editor: everything from the modal, plus tags and the article body (markdown)."""
 
     tags = PickerField(required=False, allow_new=True, max_items=20, label="Tags")
+    game = forms.MultipleChoiceField(
+        required=False,
+        label="Game",
+        choices=[option for option in GAME_OPTIONS if option[0] != "na"],
+        widget=PillCheckboxSelectMultiple,
+    )
     body = forms.CharField(
         required=False,
         label="Article",
@@ -51,11 +58,16 @@ class PostEditorForm(PostGeneralForm):
     )
 
     class Meta(PostGeneralForm.Meta):
-        fields = [*PostGeneralForm.Meta.fields, "body"]
+        fields = [*PostGeneralForm.Meta.fields, "game", "body"]
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        if isinstance(self.initial.get("game"), str):
+            self.initial["game"] = [key.strip() for key in self.initial["game"].split(",") if key.strip()]
+            
+    def clean_game(self):
+        return ", ".join(self.cleaned_data.get("game") or [])
 
     def clean_tags(self):
         return resolve_tags(self.cleaned_data.get("tags", []))

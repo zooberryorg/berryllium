@@ -7,9 +7,8 @@
     <p class="text-sm text-gray-300">
         Rename a tag to fix it. Renaming it to the name of another tag merges the two. Deleting a tag removes it from every mod.
     </p>
-    <form method="get" class="relative">
-        <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
-        <input type="search" name="q" value="{{ q }}" placeholder="Search tags..." aria-label="Search tags" class="zb-input pl-11 text-sm w-full">
+    <form method="get">
+        {% include 'shared/widgets/search_input.html' with input_id="tag-search" value=q placeholder="Search tags..." label="Search tags" %}
     </form>
 
     {% if page.object_list %}

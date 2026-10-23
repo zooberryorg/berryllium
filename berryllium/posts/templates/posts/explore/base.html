@@ -1,23 +1,32 @@
 {% extends 'shared/explore/base.html' %}
 {% block explore_content %}
     <form id="explore-filters"
+          method="get"
+          action="{{ request.path }}"
           hx-get="{{ request.path }}"
           hx-target="#post-results"
-          hx-trigger="input changed delay:300ms from:#explore-search, change"
+          hx-swap="innerHTML"
           hx-push-url="true"
-          class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-        <div class="relative flex-1">
-            <i class="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-white/40 pointer-events-none"></i>
-            <input type="search" id="explore-search" name="q" value="{{ q }}" placeholder="Search {% if kind == 'news' %}news{% else %}tutorials{% endif %}..."
-                   class="zb-input w-full pl-11" aria-label="Search {{ kind_label|lower }}">
-        </div>
+          hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
+          class="space-y-4">
+        {% if kind == 'news' %}
+            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search news by title, summary or tag..." label="Search news" %}
+        {% else %}
+            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search tutorials by title, summary or tag..." label="Search tutorials" %}
+        {% endif %}
+
         {% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
-        <label class="flex items-center gap-2 text-sm text-gray-400">
-            <span class="whitespace-nowrap">Sort by</span>
-            <select name="sort" class="zb-input text-sm py-2">
-                {% for value, label in sort_options %}<option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>{% endfor %}
-            </select>
-        </label>
+        <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+            <div class="sm:min-w-[200px]">
+                {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+            </div>
+            <div class="sm:min-w-[180px]">
+                {% include 'shared/widgets/dropdown.html' with name="game" label="Game" options=game_options selected=game empty_label="Any game" icon="bi-controller" clearable="true" %}
+            </div>
+            <div class="sm:min-w-[160px]">
+                {% include 'shared/widgets/dropdown.html' with name="period" label="Published" options=period_options selected=period empty_label="All time" icon="bi-calendar3" clearable="true" %}
+            </div>
+        </div>
+        <div id="post-results" aria-live="polite">{% include 'posts/explore/results.html' %}</div>
     </form>
-    <div id="post-results">{% include 'posts/explore/results.html' %}</div>
 {% endblock %}

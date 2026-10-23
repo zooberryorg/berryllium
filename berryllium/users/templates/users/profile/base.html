@@ -16,29 +16,14 @@
                       hx-swap="innerHTML"
                       hx-push-url="true"
                       hx-trigger="change delay:50ms, input changed delay:400ms from:#profile-search, submit"
-                      class="flex flex-col sm:flex-row gap-3 text-sm"
-                      x-data="{ q: '{{ q|escapejs }}' }">
-                    <div class="relative flex-1">
-                        <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" aria-hidden="true"></i>
-                        <input type="search"
-                               id="profile-search"
-                               name="q"
-                               value="{{ q }}"
-                               x-model="q"
-                               placeholder="Search {{ display_name }}'s mods..."
-                               aria-label="Search {{ display_name }}'s mods"
-                               autocomplete="off"
-                               class="zb-input pl-11 pr-11 text-sm w-full">
-                        <button type="button"
-                                class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
-                                x-show="q" x-cloak
-                                aria-label="Clear search"
-                                @click="q = ''; $nextTick(() => document.getElementById('profile-search').dispatchEvent(new Event('input', { bubbles: true })))">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                    <div class="sm:w-56">
-                        {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+                      class="space-y-4">
+                    {% with placeholder="Search "|add:display_name|add:"'s mods..." label="Search "|add:display_name|add:"'s mods" %}
+                        {% include 'shared/widgets/search_input.html' with input_id="profile-search" value=q %}
+                    {% endwith %}
+                    <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+                        <div class="sm:min-w-[200px]">
+                            {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+                        </div>
                     </div>
                 </form>
 

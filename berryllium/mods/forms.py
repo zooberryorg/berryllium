@@ -304,6 +304,10 @@ class ModCategorizationForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        for name in ("category", "game", "expansions"):
+            value = self.initial.get(name)
+            if isinstance(value, str):
+                self.initial[name] = [key.strip() for key in value.split(",") if key.strip()]
 
     def clean_tags(self):
         return resolve_tags(self.cleaned_data.get("tags", []))
