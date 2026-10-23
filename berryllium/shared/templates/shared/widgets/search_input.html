@@ -1,0 +1,26 @@
+<div class="relative" x-data="{ q: '' }" x-init="q = $refs.input.value">
+    <i class="bi bi-search absolute z-10 left-4 top-1/2 -translate-y-1/2 text-gray-400 text-lg pointer-events-none" aria-hidden="true"></i>
+    <input type="search"
+           id="{{ input_id }}"
+           name="q"
+           value="{{ value }}"
+           x-ref="input"
+           x-model="q"
+           placeholder="{{ placeholder }}"
+           aria-label="{{ label }}"
+           autocomplete="off"
+           class="zb-input pl-12 pr-12 text-sm w-full">
+    <button type="button"
+            class="absolute z-10 right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors cursor-pointer"
+            x-show="q"
+            x-cloak
+            aria-label="Clear search"
+            @click="q = '';
+                    $nextTick(() => {
+                        $refs.input.dispatchEvent(new Event('input', { bubbles: true }));
+                        if ($refs.input.form && !$refs.input.form.hasAttribute('hx-get')) $refs.input.form.requestSubmit();
+                        $refs.input.focus();
+                    })">
+        <i class="bi bi-x-lg"></i>
+    </button>
+</div>
