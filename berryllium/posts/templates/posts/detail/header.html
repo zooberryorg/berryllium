@@ -54,6 +54,10 @@
                 <dt><i class="bi bi-clock"></i><span class="sr-only">Reading time</span></dt>
                 <dd>{{ post.reading_minutes }} min read</dd>
             </div>
+            <div class="flex items-center gap-1.5">
+                <dt><i class="bi bi-chat-left-text"></i><span class="sr-only">Comments</span></dt>
+                <dd><a href="#comments" class="hover:text-gold-300">{{ post.comment_count }} comment{{ post.comment_count|pluralize }}</a></dd>
+            </div>
         </dl>
 
         {% if can_edit %}
