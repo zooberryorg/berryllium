@@ -26,3 +26,9 @@ def menu(request):
     """The bell in the top bar. Loads last few notifications."""
     return _menu(request)
 
+@login_required
+@require_GET
+def badge(request):
+    """Unread count for the top bar bell. Every minute updated via AJAX."""
+    return render(request, "notifications/badge.html", {"unread_notifications": unread_count(request.user)})
+
