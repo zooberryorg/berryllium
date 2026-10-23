@@ -48,6 +48,9 @@ INSTALLED_APPS = [
     "berryllium.users",
     "berryllium.moderation",
     "berryllium.posts",
+    "berryllium.notifications",
+    "berryllium.comments",
+    "berryllium.inbox",
 ]
 
 MIDDLEWARE = [
@@ -73,6 +76,8 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "berryllium.shared.context_processors.date_preferences",
+                "berryllium.notifications.context_processors.notification_counts",
+                "berryllium.inbox.context_processors.inbox_counts",
             ],
         },
     },
