@@ -52,3 +52,48 @@ def unread_count(member):
         return 0
     return _unread_messages(member).count()
 
+def conversation_list(member):
+    """This member's conversations, newest first, with the other person, the last message and an unread count."""
+    last = Message.objects.filter(conversation=OuterRef("conversation")).order_by("-created_at")
+    rows = list(
+        ConversationMember.objects.filter(member=member, is_hidden=False)
+        .select_related("conversation")
+        .prefetch_related("conversation__memberships__member")
+        .annotate(
+            last_body=Subquery(last.values("body")[:1]),
+            last_sender_id=Subquery(last.values("sender")[:1]),
+        )
+        .order_by("-conversation__last_message_at")
+    )
+    unread = dict(
+        _unread_messages(member).order_by().values("conversation_id").annotate(n=Count("pk")).values_list("conversation_id", "n")
+    )
+    for row in rows:
+        row.other = other_member(row.conversation, member)
+        row.unread = unread.get(row.conversation_id, 0)
+    return rows
+
+
+def visible_messages(membership, show_all=False):
+    """Returns tuple with (messages, has_earlier) for this member, oldest first."""
+    messages = membership.conversation.messages.select_related("sender")
+    if membership.cleared_at:
+        messages = messages.filter(created_at__gt=membership.cleared_at)
+    if show_all:
+        return list(messages), False
+    newest = list(messages.order_by("-created_at")[: SHOWN_MESSAGES + 1])
+    has_earlier = len(newest) > SHOWN_MESSAGES
+    return list(reversed(newest[:SHOWN_MESSAGES])), has_earlier
+
+
+def mark_read(membership):
+    membership.last_read_at = timezone.now()
+    membership.save(update_fields=["last_read_at"])
+
+
+def clear(membership):
+    """Delete a conversation for this member only."""
+    now = timezone.now()
+    membership.cleared_at = membership.last_read_at = now
+    membership.is_hidden = True
+    membership.save(update_fields=["cleared_at", "last_read_at", "is_hidden"])
