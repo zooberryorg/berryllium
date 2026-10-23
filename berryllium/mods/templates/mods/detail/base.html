@@ -25,9 +25,15 @@
         }
 
         function modTabs() {
-            const names = ['description', 'files', 'credits'];
+            const names = ['description', 'files', 'credits', 'comments'];
+            const hash = location.hash.slice(1);
+            // links to one comment and open the Comments tab
+            const linksComment = hash.startsWith('comment-');
             return {
-                tab: names.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'description',
+                tab: names.includes(hash) ? hash : (linksComment ? 'comments' : 'description'),
+                init() {
+                    if (linksComment) this.$nextTick(() => document.getElementById(hash)?.scrollIntoView({ block: 'center' }));
+                },
                 show(name) {
                     this.tab = name;
                     history.replaceState(null, '', '#' + name);
@@ -82,7 +88,8 @@
             </aside>
             <section class="min-w-0 lg:col-start-1 lg:row-start-2 rounded-2xl border border-pine-300 bg-pine-600 scroll-mt-24"
                      x-data="modTabs()"
-                     @show-files.window="show('files'); $el.scrollIntoView({ behavior: 'smooth', block: 'start' })">
+                     @show-files.window="show('files'); $el.scrollIntoView({ behavior: 'smooth', block: 'start' })"
+                     @show-comments.window="show('comments'); $el.scrollIntoView({ behavior: 'smooth', block: 'start' })">
                 <div role="tablist" aria-label="Mod information"
                      class="flex gap-1 overflow-x-auto border-b border-white/10 px-2"
                      @keydown.arrow-right.prevent="move(1)"
@@ -90,6 +97,8 @@
                     {% include 'mods/detail/tab_button.html' with name="description" label="Description" %}
                     {% include 'mods/detail/tab_button.html' with name="files" label="Files" count=file_count %}
                     {% include 'mods/detail/tab_button.html' with name="credits" label="Credits & license" %}
+                    {% include 'mods/detail/tab_button.html' with name="comments" label="Comments" count=mod.comment_count %}
+                </div>
                 </div>
 
                 <div role="tabpanel" id="panel-description" aria-labelledby="tab-description" tabindex="0"
@@ -107,6 +116,10 @@
                 <div role="tabpanel" id="panel-credits" aria-labelledby="tab-credits" tabindex="0"
                      class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'credits'" x-cloak>
                     {% include 'mods/detail/credits.html' %}
+                </div>
+                <div role="tabpanel" id="panel-comments" aria-labelledby="tab-comments" tabindex="0"
+                     class="p-5 sm:p-6 focus:outline-none" x-show="tab === 'comments'" x-cloak>
+                    {% include 'comments/section.html' %}
                 </div>
             </section>
             <div class="space-y-4 lg:hidden">{% include 'mods/detail/details.html' %}</div>
