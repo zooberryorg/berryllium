@@ -96,3 +96,13 @@ def conversation(request, conversation_id):
         "problem": problem or (services.problem_sending(request.user, other) if request.method == "GET" else ""),
     })
 
+@login_required
+@require_POST
+def delete(request, conversation_id):
+    membership = services.membership_for(conversation_id, request.user)
+    if membership is None:
+        raise Http404("Conversation not found.")
+    services.clear(membership)
+    messages.success(request, "Conversation deleted. The other person still has their copy.")
+    return redirect("inbox")
+
