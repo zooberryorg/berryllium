@@ -194,3 +194,15 @@ def preview(request):
     # the shared editor script sends the text as "description"
     html = render_markdown(request.POST.get("description", ""))
     return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
+
+@login_required
+@require_POST
+def image(request):
+    since = timezone.now() - timedelta(days=1)
+    if UploadedImage.objects.filter(uploader=request.user, created_at__gte=since).count() >= DAILY_IMAGE_LIMIT:
+        return JsonResponse({"error": f"You can add up to {DAILY_IMAGE_LIMIT} images a day. Try again tomorrow."}, status=400)
+    form = DescriptionImageForm(request.POST, request.FILES)
+    if not form.is_valid():
+        return JsonResponse({"error": form.errors["image"][0]}, status=400)
+    uploaded = UploadedImage.objects.create(uploader=request.user, image=form.cleaned_data["image"])
+    return JsonResponse({"url": uploaded.image.url})
