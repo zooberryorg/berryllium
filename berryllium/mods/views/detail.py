@@ -6,6 +6,7 @@ from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 from django.views.decorators.http import require_GET
 
+from berryllium.comments.views import section_context as comments_context
 from berryllium.mods.models import Mod, ModCredit, ModFile, ModFileGroup
 from berryllium.users.permissions import can_edit_mod, is_moderator
 from berryllium.mods.review import _labels
@@ -17,7 +18,7 @@ from berryllium.mods.settings import (
     MOD_CATEGORY_ICONS,
 )
 
-TABS = ("description", "files", "credits")
+TABS = ("description", "files", "credits", "comments")
 
 
 def _is_public(mod):
@@ -96,6 +97,7 @@ def mod_detail(request, mod_id):
         "tags": list(mod.tags.all()),
         "tabs": TABS,
         "can_edit": can_edit_mod(request.user, mod),
+        "comments": comments_context(request, mod),
     }
     return render(request, "mods/detail/base.html", context)
 
