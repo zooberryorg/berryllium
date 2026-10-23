@@ -1,0 +1,12 @@
+{% for thread in comments.page.object_list %}
+    {% include 'comments/thread.html' %}
+{% endfor %}
+{% if comments.page.has_next %}
+    <button type="button"
+            class="w-full zb-action inline-flex items-center justify-center gap-2 text-sm py-2"
+            hx-get="{% url 'comments_more' comments.kind comments.target.pk %}?page={{ comments.page.next_page_number }}"
+            hx-target="this"
+            hx-swap="outerHTML">
+        <i class="bi bi-chevron-down"></i> Show more comments
+    </button>
+{% endif %}
