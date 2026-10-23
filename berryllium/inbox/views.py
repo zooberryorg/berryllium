@@ -106,3 +106,49 @@ def delete(request, conversation_id):
     messages.success(request, "Conversation deleted. The other person still has their copy.")
     return redirect("inbox")
 
+# --------------------------------------------------------------------------- Moderation
+
+
+@moderator_required
+@require_http_methods(["GET", "POST"])
+def limits(request):
+    from berryllium.moderation.views import _nav  # the moderation menu
+
+    settings_row = InboxSettings.load()
+    default_form = DefaultLimitForm(instance=settings_row)
+    quota_form = QuotaForm()
+    can_change_default = is_site_admin(request.user)
+
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "default" and can_change_default:
+            default_form = DefaultLimitForm(request.POST, instance=settings_row)
+            if default_form.is_valid():
+                default_form.save()
+                messages.success(request, f"Inboxes now hold {settings_row.default_limit:,} messages unless a member has their own limit.")
+                return redirect("moderation_inbox")
+        elif action == "quota":
+            quota_form = QuotaForm(request.POST)
+            if quota_form.is_valid():
+                quota = quota_form.save(by=request.user)
+                messages.success(request, f"{quota.member.username}'s inbox now holds {quota.limit:,} messages.")
+                return redirect("moderation_inbox")
+        elif action == "remove" and request.POST.get("quota", "").isdigit():
+            quota = InboxQuota.objects.select_related("member").filter(pk=int(request.POST["quota"])).first()
+            if quota is not None:
+                name = quota.member.username
+                quota.delete()
+                messages.success(request, f"{name} is back on the default limit.")
+            return redirect("moderation_inbox")
+
+    quotas = list(InboxQuota.objects.select_related("member", "set_by").order_by("member__username"))
+    for quota in quotas:
+        quota.used = services.inbox_usage(quota.member)
+    return render(request, "inbox/moderation/limits.html", {
+        "panel_nav": _nav(request, "moderation_inbox"),
+        "settings_row": settings_row,
+        "default_form": default_form,
+        "quota_form": quota_form,
+        "quotas": quotas,
+        "can_change_default": can_change_default,
+    })
