@@ -29,6 +29,7 @@ SORTS = {
     "updated": ("Recently updated", ["-last_updated"]),
     "downloads": ("Most downloaded", ["-download_count", "-publish_date"]),
     "likes": ("Most liked", ["-like_count", "-publish_date"]),
+    "comments": ("Most discussed", ["-comment_count", "-publish_date"]),
     "title": ("Title (A–Z)", ["title"]),
 }
 DEFAULT_SORT = "recent"
