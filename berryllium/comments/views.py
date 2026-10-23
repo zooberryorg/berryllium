@@ -99,3 +99,34 @@ def more(request, kind, pk):
         raise Http404("Not found.")
     comments = section_context(request, obj, request.GET.get("page", 1))
     return render(request, "comments/list.html", {"comments": comments})
+
+# --------------------------------------------------------------------------- posting
+
+
+@login_required
+@require_POST
+def create(request, kind, pk):
+    obj = targets.get_target(kind, pk)
+    if not targets.can_view(obj, request.user):
+        raise Http404("Not found.")
+    reply_to = _comment_on(obj, request.POST.get("reply_to"))
+    quote = _comment_on(obj, request.POST.get("quote"))
+    # a reply form keeps its own ids, so it doesn't clash with the main form on the page
+    form = CommentForm(request.POST, auto_id=f"id_reply_{reply_to.thread_id}_%s" if reply_to else "id_comment_%s", rows=4 if reply_to else None)
+
+    def failed(message=""):
+        if reply_to is not None:
+            return _thread(request, obj, reply_to.thread_id, reply_form=form, reply_to=reply_to, quote=quote, error=message)
+        return _section(request, obj, form=form, error=message)
+
+    if not services.can_comment(obj, request.user):
+        return failed(f"Comments are turned off for this {targets.label(obj)}.")
+    if not form.is_valid():
+        return failed()
+    if services.too_soon(request.user):
+        return failed("You're commenting very quickly. Wait a few seconds and try again.")
+
+    comment = services.create_comment(obj, request.user, form.cleaned_data["body"], reply_to=reply_to, quote=quote)
+    if reply_to is not None:
+        return _posted(_thread(request, obj, comment.thread_id), comment)
+    return _posted(_section(request, obj), comment)
