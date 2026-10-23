@@ -28,3 +28,27 @@ def _conversation_url(conversation_id, message_id=None):
 @login_required
 def index(request):
     return render(request, "inbox/index.html", _list_context(request))
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def new(request):
+    """Creates a new conversation. If one already exists, redirect to it."""
+    if request.method == "GET" and request.GET.get("to"):
+        recipient = get_user_model().objects.filter(username__iexact=request.GET["to"], is_active=True).first()
+        if recipient is not None and recipient.pk != request.user.pk:
+            existing = services.conversation_between(request.user, recipient)
+            if existing is not None:
+                return redirect(_conversation_url(existing.pk) + "#reply")
+    form = NewMessageForm(request.POST or None, initial={"to": request.GET.get("to", "")}, auto_id="id_message_%s", rows=8)
+    problem = ""
+    if request.method == "POST" and form.is_valid():
+        recipient = form.cleaned_data["to"]
+        problem = services.problem_sending(request.user, recipient)
+        if not problem and services.too_soon(request.user):
+            problem = "You're sending messages very quickly. Wait a moment and try again."
+        if not problem:
+            conversation = services.start_conversation(request.user, recipient)
+            message = services.send_message(conversation, request.user, recipient, form.cleaned_data["body"])
+            return redirect(_conversation_url(conversation.pk, message.pk))
+    return render(request, "inbox/new.html", {**_list_context(request), "form": form, "problem": problem})
+
