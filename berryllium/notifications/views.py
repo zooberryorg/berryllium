@@ -50,3 +50,11 @@ def open_notification(request, notification_id):
     item = get_object_or_404(Notification, pk=notification_id, recipient=request.user)
     mark_read(Notification.objects.filter(pk=item.pk))
     return redirect(safe_url(item.url))
+
+@login_required
+@require_POST
+def mark_all_read(request):
+    mark_read(Notification.objects.filter(recipient=request.user))
+    if request.headers.get("HX-Request") and request.POST.get("from") == "menu":
+        return _menu(request)
+    return redirect("notifications")
