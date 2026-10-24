@@ -24,7 +24,6 @@
                     </a>
                     <form method="post" action="{% url 'settings_posts_change' post.pk %}" class="flex flex-wrap items-center gap-2 sm:justify-end">
                         {% csrf_token %}
-                        {% include 'mods/panel/status_badge.html' with mod=post %}
                         <span class="contents" x-show="!confirming">
                             <a href="{{ post.get_absolute_url }}" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-eye"></i> {% if post.status == 'published' %}View{% else %}Preview{% endif %}</a>
                             {% if post.draft %}
