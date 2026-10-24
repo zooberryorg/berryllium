@@ -37,7 +37,7 @@
                         <span x-text="selected.length ? selected.length + ' selected' : 'Select all'">Select all</span>
                     </label>
                     <div class="flex flex-wrap items-center gap-2 ml-auto">
-                                                <button type="submit" name="action" value="approve" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length">
+                        <button type="submit" name="action" value="approve" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length">
                             <i class="bi bi-check2-circle"></i> Approve
                         </button>
                         <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length" @click="rejecting = !rejecting; $nextTick(() => rejecting && $refs.note.focus())">
