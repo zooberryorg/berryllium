@@ -1,0 +1,8 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_nav_label %}Organization sections{% endblock %}
+{% block panel_kicker %}{{ org.name }}{% endblock %}
+{% block panel_title %}Inbox{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">Messages to {{ org.name }}. Everyone who may use this inbox sees them; answers go out with the organization's name next to yours.</p>
+    {% include 'inbox/list.html' %}
+{% endblock %}

@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load bfilters %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6">
+        {% include 'shared/messages.html' %}
+
+        <header class="overflow-hidden rounded-2xl border border-pine-300 bg-pine-600">
+            {% if org.banner %}
+                <div class="aspect-[3/1] sm:aspect-[4/1] bg-pine-800">
+                    <img src="{{ org.banner.url }}" alt="" class="w-full h-full object-cover">
+                </div>
+            {% endif %}
+            <div class="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 p-5 sm:p-6">
+                <div class="{% if org.banner %}-mt-16 sm:-mt-20{% endif %}">
+                    {% include 'organizations/logo.html' with logo_class="w-24 h-24 sm:w-32 sm:h-32 text-4xl ring-4 ring-pine-600" %}
+                </div>
+                <div class="min-w-0 flex-1 space-y-1.5">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-3xl sm:text-4xl font-bold text-white leading-tight" style="overflow-wrap: anywhere;">{{ org.name }}</h1>
+                        <span class="text-xs px-2.5 py-1 rounded-full bg-gold-400/15 text-gold-200"><i class="bi bi-people-fill mr-1"></i>Organization</span>
+                        {% if my_row %}<span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80">You're {% if my_row.role == 'member' %}a member{% else %}the {{ my_row.get_role_display|lower }}{% endif %}</span>{% endif %}
+                    </div>
+                    {% if org.tagline %}<p class="text-granite-200">{{ org.tagline }}</p>{% endif %}
+                    <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
+                        <span><strong class="text-white tabular-nums">{{ stats.mods }}</strong> mod{{ stats.mods|pluralize }}</span>
+                        <span class="text-gray-500" aria-hidden="true">•</span>
+                        <span title="{{ stats.downloads }} downloads"><strong class="text-white tabular-nums">{{ stats.downloads|compact }}</strong> download{{ stats.downloads|pluralize }}</span>
+                        <span class="text-gray-500" aria-hidden="true">•</span>
+                        <span><strong class="text-white tabular-nums">{{ member_rows|length }}</strong> member{{ member_rows|length|pluralize }}</span>
+                    </p>
+                    <p class="text-sm text-gray-400 italic">Since {{ org.created_at|date:"F Y" }}</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 sm:self-start">
+                    {% if user.is_authenticated %}
+                        {% if not my_row %}
+                            <a href="{% url 'inbox_new' %}?org={{ org.slug|urlencode }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-envelope"></i> Message</a>
+                            {% if pending %}
+                                <span class="zb-action inline-flex items-center gap-1.5 text-sm opacity-70 cursor-default"><i class="bi bi-hourglass-split"></i> {% if pending.kind == 'invite' %}You're invited{% else %}Asked to join{% endif %}</span>
+                                {% if pending.kind == 'invite' %}<a href="{% url 'settings_organizations' %}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-check2"></i> Answer</a>{% endif %}
+                            {% elif org.accepts_requests %}
+                                <form method="post" action="{% url 'organization_join' org.slug %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-person-plus"></i> Ask to join</button>
+                                </form>
+                            {% endif %}
+                        {% elif can_manage_page %}
+                            <a href="{% if my_row.can_edit_profile or my_row.is_manager %}{% url 'organization_manage_page' org.slug %}{% else %}{% url 'organization_inbox' org.slug %}{% endif %}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-sliders2"></i> Manage</a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-envelope"></i> Log in to message</a>
+                    {% endif %}
+                </div>
+            </div>
+        </header>
+
+        <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div class="min-w-0 space-y-4">
+                <form id="profile-filters"
+                      method="get"
+                      action="{{ request.path }}"
+                      hx-get="{{ request.path }}"
+                      hx-target="#profile-results"
+                      hx-swap="innerHTML"
+                      hx-push-url="true"
+                      hx-trigger="change delay:50ms, input changed delay:400ms from:#profile-search, submit"
+                      class="space-y-4">
+                    {% with placeholder="Search "|add:org.name|add:"'s mods..." label="Search "|add:org.name|add:"'s mods" %}
+                        {% include 'shared/widgets/search_input.html' with input_id="profile-search" value=q %}
+                    {% endwith %}
+                    <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+                        <div class="sm:min-w-[200px]">
+                            {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+                        </div>
+                    </div>
+                </form>
+                <div id="profile-results" aria-live="polite">
+                    {% include 'users/profile/results.html' %}
+                </div>
+            </div>
+
+            <aside class="min-w-0 space-y-4 order-first lg:order-none" aria-label="About {{ org.name }}">
+                <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+                    <h2 class="text-lg font-semibold text-white mb-3">About</h2>
+                    {% if org.description %}
+                        <div class="md-preview text-sm text-granite-200" style="overflow-wrap: anywhere;">{{ org.description|markdown }}</div>
+                    {% else %}
+                        <p class="text-sm text-gray-400">{{ org.name }} hasn't written a bio yet.</p>
+                    {% endif %}
+                </section>
+
+                {% if links %}
+                    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Links</h2>
+                        {% include "shared/links/link_list.html" with links=links %}
+                    </section>
+                {% endif %}
+
+                <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+                    <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Members</h2>
+                    <ul class="space-y-1">
+                        {% for row in member_rows %}
+                            <li>
+                                <a href="{% url 'member_profile' row.user.username %}" class="group/person flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5 transition-colors">
+                                    {% include 'shared/navigation/avatar.html' with member=row.user avatar_class="w-9 h-9 text-sm" %}
+                                    <span class="min-w-0 flex-1">
+                                        <span class="flex items-center gap-1.5">
+                                            <span class="truncate text-sm font-medium text-white group-hover/person:text-gold-200">{{ row.user.username }}</span>
+                                            {% if row.role != 'member' %}<span class="shrink-0 text-[10px] px-1.5 py-0.5 rounded-md bg-gold-400/15 text-gold-200">{{ row.get_role_display }}</span>{% endif %}
+                                        </span>
+                                        {% if row.title %}<span class="block truncate text-xs text-gray-400">{{ row.title }}</span>{% endif %}
+                                    </span>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+
+                {% if my_row and my_row.role != 'owner' %}
+                    <form method="post" action="{% url 'organization_leave' org.slug %}" x-data="{ confirming: false }" class="flex flex-wrap items-center gap-2 px-1">
+                        {% csrf_token %}
+                        <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" x-show="!confirming" @click="confirming = true"><i class="bi bi-box-arrow-left"></i> Leave {{ org.name }}</button>
+                        <span class="contents" x-show="confirming" x-cloak>
+                            <span class="text-sm text-gray-200">Leave {{ org.name }}?</span>
+                            <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm">Leave</button>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = false">Stay</button>
+                        </span>
+                    </form>
+                {% endif %}
+            </aside>
+        </div>
+    </div>
+    <style>
+        [x-cloak] { display: none !important; }
+        #profile-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    </style>
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}

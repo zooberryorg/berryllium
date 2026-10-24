@@ -1,0 +1,3 @@
+<span class="{{ logo_class|default:'w-10 h-10 text-base' }} shrink-0 rounded-xl overflow-hidden bg-pine-400 ring-2 ring-gold-400/30 flex items-center justify-center font-semibold text-gold-200 uppercase select-none">
+    {% if org.logo %}<img src="{{ org.logo.url }}" alt="" class="w-full h-full object-cover">{% else %}{{ org.name|slice:":1" }}{% endif %}
+</span>
