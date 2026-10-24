@@ -1,4 +1,8 @@
 (function () {
+    const CHEVRON = {
+        1: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 10l4-4 4 4"/></svg>',
+        '-1': '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 6l4 4 4-4"/></svg>',
+    };
     function step(input, direction) {
         if (input.disabled || input.readOnly) return;
         if (input.value === '') input.value = input.min !== '' ? input.min : 0;
