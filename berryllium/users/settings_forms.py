@@ -13,7 +13,7 @@ class ProfileSettingsForm(forms.ModelForm):
         required=False,
         label="Remove my picture",
         # ticking it previews the initial instead of the picture
-        widget=forms.CheckboxInput(attrs={"class": "w-4 h-4 accent-gold-400", "@change": "removing = $event.target.checked"}),
+        widget=forms.CheckboxInput(attrs={"class": "zb-checkbox", "@change": "removing = $event.target.checked"}),
     )
 
     class Meta:
@@ -87,3 +87,4 @@ class StyledPasswordChangeForm(PasswordChangeForm):
         super().__init__(*args, **kwargs)
         for field in self.fields.values():
             field.widget.attrs["class"] = INPUT
+        self.fields["new_password1"].help_text = ""

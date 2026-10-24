@@ -19,9 +19,9 @@
                         <a href="{% url 'explore_mods' %}?tag={{ tag.name|urlencode }}" class="font-medium text-white hover:text-gold-200">{{ tag.name }}</a>
                         <span class="text-xs text-gray-400 tabular-nums">{{ tag.public_uses }} published{% if tag.uses != tag.public_uses %} · {{ tag.uses }} in total{% endif %}</span>
                         <div class="ml-auto flex items-center gap-1">
-                            <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5 cursor-pointer" title="Rename or merge" aria-label="Rename {{ tag.name }}"
+                            <button type="button" class="zb-action shrink-0 inline-flex items-center justify-center text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" title="Rename or merge" aria-label="Rename {{ tag.name }}"
                                     @click="mode = 'rename'; $nextTick(() => $refs.name.select())"><i class="bi bi-pencil"></i></button>
-                            <button type="button" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-red-300 hover:bg-red-500/10 cursor-pointer" title="Delete" aria-label="Delete {{ tag.name }}"
+                            <button type="button" class="zb-action shrink-0 inline-flex items-center justify-center text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" title="Delete" aria-label="Delete {{ tag.name }}"
                                     @click="mode = 'delete'"><i class="bi bi-trash"></i></button>
                         </div>
                     </div>
@@ -31,16 +31,16 @@
                         <label class="sr-only" for="tag-name-{{ tag.pk }}">New name for {{ tag.name }}</label>
                         <input id="tag-name-{{ tag.pk }}" x-ref="name" name="name" value="{{ tag.name }}" maxlength="50" class="zb-input text-sm flex-1">
                         <div class="flex gap-2">
-                            <button type="submit" name="action" value="rename" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500">Save</button>
-                            <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="mode = ''">Cancel</button>
+                            <button type="submit" name="action" value="rename" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Save</button>
+                            <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="mode = ''">Cancel</button>
                         </div>
                     </form>
                     <form method="post" action="{% url 'moderation_tags_change' %}" x-show="mode === 'delete'" x-cloak class="flex flex-wrap items-center gap-2" role="alert">
                         {% csrf_token %}
                         <input type="hidden" name="tag_id" value="{{ tag.pk }}"><input type="hidden" name="next" value="{{ next_url }}">
                         <span class="text-sm text-red-200">Delete “{{ tag.name }}” and remove it from {{ tag.uses }} mod{{ tag.uses|pluralize }}?</span>
-                        <button type="submit" name="action" value="delete" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15 bg-red-500/20">Delete</button>
-                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="mode = ''">Keep it</button>
+                        <button type="submit" name="action" value="delete" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Delete</button>
+                        <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="mode = ''">Keep it</button>
                     </form>
                 </li>
             {% endfor %}

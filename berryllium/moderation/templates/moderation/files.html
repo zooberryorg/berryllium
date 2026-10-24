@@ -30,17 +30,17 @@
             <div class="rounded-2xl border border-pine-300 bg-pine-600 px-4 py-3 space-y-3">
                 <div class="flex flex-wrap items-center gap-3">
                     <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
-                        <input type="checkbox" class="w-4 h-4 accent-gold-400 cursor-pointer"
+                        <input type="checkbox" class="zb-checkbox"
                                :checked="selected.length && selected.length === allIds.length"
                                x-effect="$el.indeterminate = selected.length > 0 && selected.length < allIds.length"
                                @change="selected = $event.target.checked ? [...allIds] : []">
                         <span x-text="selected.length ? selected.length + ' selected' : 'Select all'">Select all</span>
                     </label>
                     <div class="flex flex-wrap items-center gap-2 ml-auto">
-                        <button type="submit" name="action" value="approve" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500" :disabled="!selected.length">
+                                                <button type="submit" name="action" value="approve" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length">
                             <i class="bi bi-check2-circle"></i> Approve
                         </button>
-                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15" :disabled="!selected.length" @click="rejecting = !rejecting; $nextTick(() => rejecting && $refs.note.focus())">
+                        <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" :disabled="!selected.length" @click="rejecting = !rejecting; $nextTick(() => rejecting && $refs.note.focus())">
                             <i class="bi bi-x-circle"></i> Reject...
                         </button>
                     </div>
@@ -49,7 +49,7 @@
                     <label class="sr-only" for="reject-note">Why are these files rejected?</label>
                     <input id="reject-note" x-ref="note" name="note" type="text" maxlength="1000" class="zb-input text-sm flex-1"
                            placeholder="Why are these files rejected? (required)">
-                    <button type="submit" name="action" value="reject" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15 bg-red-500/20 justify-center">Reject selected</button>
+                    <button type="submit" name="action" value="reject" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Reject selected</button>
                 </div>
             </div>
 
@@ -59,7 +59,7 @@
                         <li class="flex items-start sm:items-center gap-3 px-4 py-3"
                             :class="selected.includes('{{ file.pk }}') ? 'bg-gold-400/5' : ''">
                             <input type="checkbox" name="ids" value="{{ file.pk }}" x-model="selected"
-                                   class="w-4 h-4 mt-1 sm:mt-0 shrink-0 accent-gold-400 cursor-pointer" aria-label="Select {{ file.filename }}">
+                                   class="zb-checkbox mt-1 sm:mt-0 shrink-0" aria-label="Select {{ file.filename }}">
                             <span class="w-9 h-9 shrink-0 rounded-lg bg-gold-400/10 text-gold-300 flex items-center justify-center"><i class="bi bi-file-earmark-zip"></i></span>
                             <div class="min-w-0 flex-1">
                                 <p class="text-white break-words">{{ file.title|default:file.filename }}</p>
@@ -73,7 +73,7 @@
                             </div>
                             <span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full {% if file.status == 'approved' %}bg-gold-400/15 text-gold-200{% elif file.status == 'failed' %}bg-red-500/15 text-red-200{% else %}bg-white/10 text-white/80{% endif %}">{{ file.get_status_display }}</span>
                             {% if file.status != 'failed' %}
-                                <a href="{% url 'mod_file_download' file.pk %}" class="shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="Download to check" aria-label="Download {{ file.filename }}"><i class="bi bi-download"></i></a>
+                                <a href="{% url 'mod_file_download' file.pk %}" class="zb-action shrink-0 inline-flex items-center justify-center text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" title="Download to check" aria-label="Download {{ file.filename }}"><i class="bi bi-download"></i></a>
                             {% endif %}
                         </li>
                     {% endwith %}
@@ -82,9 +82,9 @@
         </form>
         {% if page.has_other_pages %}
             <nav class="flex items-center justify-center gap-3 text-sm" aria-label="Pages">
-                {% if page.has_previous %}<a href="?status={{ status }}&page={{ page.previous_page_number }}" class="text-gray-300 hover:text-gold-200"><i class="bi bi-chevron-left"></i> Previous</a>{% endif %}
+                {% if page.has_previous %}<a href="?status={{ status }}&page={{ page.previous_page_number }}" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-chevron-left"></i> Previous</a>{% endif %}                
                 <span class="text-gray-400">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
-                {% if page.has_next %}<a href="?status={{ status }}&page={{ page.next_page_number }}" class="text-gray-300 hover:text-gold-200">Next <i class="bi bi-chevron-right"></i></a>{% endif %}
+                {% if page.has_next %}<a href="?status={{ status }}&page={{ page.next_page_number }}" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Next <i class="bi bi-chevron-right"></i></a>{% endif %}
             </nav>
         {% endif %}
     {% else %}
