@@ -255,3 +255,44 @@ def org_inbox(request, slug):
         "panel_nav": _org_nav(request, org, row, "organization_inbox"),
         "org": org, "my_row": row, "conversations": page,
     })
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def org_conversation(request, slug, conversation_id):
+    org, row = _manage(request, slug, "use_inbox")
+    side = inbox.org_side(conversation_id, org)
+    if side is None:
+        raise Http404("Conversation not found.")
+    convo = side.conversation
+    other = next((s.member for s in convo.memberships.select_related("member") if s.member_id), None)
+    quote = None
+    quote_id = request.POST.get("quote") or request.GET.get("quote")
+    if quote_id and str(quote_id).isdigit():
+        quote = Message.objects.select_related("sender").filter(pk=int(quote_id), conversation=convo).first()
+    if request.method == "POST" and request.POST.get("action") == "delete":
+        inbox.clear(side)
+        messages.success(request, f"Conversation deleted for {org.name}. {other.username if other else 'The member'} keeps their copy.")
+        return redirect("organization_inbox", slug=org.slug)
+    form = MessageForm(request.POST or None, auto_id="id_reply_%s", rows=5)
+    problem = ""
+    if request.method == "POST" and form.is_valid():
+        problem = inbox.problem_sending(request.user, other, as_org=org)
+        if not problem and inbox.too_soon(request.user):
+            problem = "You're sending messages very quickly. Wait a moment and try again."
+        if not problem:
+            message = inbox.send_message(convo, request.user, other, form.cleaned_data["body"], quote=quote, as_org=org)
+            url = reverse("organization_conversation", kwargs={"slug": org.slug, "conversation_id": convo.pk})
+            return redirect(f"{url}#message-{message.pk}")
+    shown, has_earlier = inbox.visible_messages(side, show_all=bool(request.GET.get("all")))
+    first_unread = None
+    if side.last_read_at:
+        first_unread = next((m.pk for m in shown if m.created_at > side.last_read_at and m.sent_as_id is None), None)
+    inbox.mark_read(side)
+    page = Paginator(inbox.org_conversation_list(org), 25).get_page(request.GET.get("page"))
+    return render(request, "organizations/manage/conversation.html", {
+        "panel_nav": _org_nav(request, org, row, "organization_inbox"),
+        "org": org, "my_row": row, "conversations": page, "membership": side,
+        "conversation": convo, "other": other, "thread": shown, "has_earlier": has_earlier,
+        "first_unread": first_unread, "form": form, "quote": quote,
+        "problem": problem or (inbox.problem_sending(request.user, other, as_org=org) if request.method == "GET" else ""),
+    })
