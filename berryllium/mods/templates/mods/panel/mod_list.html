@@ -79,9 +79,9 @@
                                 {% if mod.status == "scheduled" %} · goes live {{ mod.publish_date|date:date_prefs.datetime }}{% endif %}
                             </p>
                         </div>
-                        <div class="flex items-center gap-1 shrink-0">
-                            <a href="{% url 'mod_edit' mod.pk %}" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="Edit" aria-label="Edit {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-pencil-square"></i></a>
-                            <a href="{% url 'mod_detail' mod.pk %}" class="w-9 h-9 rounded-full flex items-center justify-center text-gray-300 hover:text-gold-200 hover:bg-white/5" title="{% if mod.status == 'published' %}View{% else %}Preview{% endif %}" aria-label="View {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-box-arrow-up-right"></i></a>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <a href="{% url 'mod_edit' mod.pk %}" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" aria-label="Edit {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-pencil-square"></i><span class="hidden sm:inline">Edit</span></a>
+                            <a href="{% url 'mod_detail' mod.pk %}" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" aria-label="View {{ mod.title|default:'Untitled mod' }}"><i class="bi bi-box-arrow-up-right"></i><span class="hidden sm:inline">{% if mod.status == 'published' %}View{% else %}Preview{% endif %}</span></a>
                         </div>
                     </li>
                 {% endfor %}
