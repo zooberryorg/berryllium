@@ -17,10 +17,10 @@
                     <i class="explore-option-icon bi bi-shield-check text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i>
                 </span>
                 <span class="flex-1 min-w-0 truncate">{{ license.label }}</span>
-                <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full group-hover:bg-gold-400/20">{{ license.count }}</span>
+                <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ license.count }}</span>
             </label>
         {% empty %}
-            <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ license.count }}</span>
+            <p class="text-sm text-white/40 px-4 pb-2">No licenses yet.</p>
         {% endfor %}
     </div>
 </fieldset>
