@@ -9,6 +9,7 @@
       rel="stylesheet">
 <!-- Tailwind CSS -->
 <link href="{% static 'shared/css/be.css' %}" rel="stylesheet">
+<link href="{% static 'shared/css/controls.css' %}" rel="stylesheet">
 <!-- htmx csrf token -->
 <meta name="csrf-token" content="{{ csrf_token }}">
 <script>
@@ -53,5 +54,6 @@
 <script src="{% static 'shared/js/explore_filters.js' %}"></script>
 <script src="{% static 'shared/js/list_widgets.js' %}"></script>
 <script src="{% static 'shared/js/autosave.js' %}"></script>
+<script src="{% static 'shared/js/number_stepper.js' %}"></script>
 <script src="{% static 'comments/js/comments.js' %}"></script>
 {{ form.media }}
