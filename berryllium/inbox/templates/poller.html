@@ -1,0 +1,5 @@
+<div id="message-poller"
+     hx-get="{{ poll_url }}?after={{ last_id }}"
+     hx-trigger="every 10s [document.visibilityState === 'visible'], visibilitychange[document.visibilityState === 'visible'] from:document"
+     hx-swap="outerHTML"
+     aria-hidden="true"></div>
