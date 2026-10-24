@@ -1,0 +1,14 @@
+{% if active_filters %}
+    <div class="flex items-center gap-2 flex-wrap mb-4 text-sm">
+        <span class="text-gray-400">Filters:</span>
+        {% for item in active_filters %}
+            <a href="{{ item.url }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold-400/15 text-gold-200 border border-gold-400/30 hover:border-gold-400/60 transition-colors"
+               onclick="event.preventDefault(); exploreClearFilter('{{ item.name|escapejs }}', '{{ item.value|escapejs }}')"
+               aria-label="Remove filter {{ item.label }}">
+                {{ item.label }} <i class="bi bi-x"></i>
+            </a>
+        {% endfor %}
+        <button type="button" class="text-gray-400 hover:text-white underline underline-offset-2 cursor-pointer" onclick="exploreClearFilter()">Clear all</button>
+    </div>
+{% endif %}
