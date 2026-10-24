@@ -74,9 +74,9 @@ def review_context(mod):
         "original_authors": [c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR],
         "original_websites": list(mod.original_websites.all()),
         # categorization
-        "category_labels": _labels(mod.category, MOD_CATEGORIES),
-        "game_labels": _labels(mod.game, GAME_OPTIONS),
-        "expansion_labels": _labels(mod.expansions, EXPANSION_REQUIREMENTS),
+        "category_labels": _labels(mod.category, options.category_labels("mod")),
+        "game_labels": _labels(mod.game, options.game_labels()),
+        "expansion_labels": _labels(mod.expansions, options.expansion_labels()),
         "tags": list(mod.tags.all()),
         "pending_tags": mod.pending_tags or [],
         # files
