@@ -25,5 +25,15 @@
            {% if explore_tab == 'modders' %}aria-current="page"{% endif %}>
             <i class="bi bi-people-fill"></i> Modders
         </a>
+        <a href="{% url 'explore_organizations' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'organizations' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'organizations' %}aria-current="page"{% endif %}>
+            <i class="bi bi-diagram-3-fill"></i> Organizations
+        </a>
+        <a href="{% url 'explore_websites' %}"
+           class="px-5 py-2.5 text-sm rounded-xl whitespace-nowrap flex items-center gap-2 transition-colors duration-200 {% if explore_tab == 'websites' %}bg-gradient-to-r from-gold-500 to-gold-400 text-pine-500 font-semibold shadow-lg{% else %}text-gray-400 hover:text-white hover:bg-pine-400 font-medium{% endif %}"
+           {% if explore_tab == 'websites' %}aria-current="page"{% endif %}>
+            <i class="bi bi-archive-fill"></i> Websites
+        </a>
     </div>
 </nav>

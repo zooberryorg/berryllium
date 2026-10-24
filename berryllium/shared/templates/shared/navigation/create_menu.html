@@ -29,7 +29,7 @@
                 <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-journal-text"></i></span>
                 <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">New Dev Diary</span>
             </a>
-            {% with post_noun=user|is_moderator|yesno:"Post,Tutorial" %}
+            {% with post_noun=user|is_moderator|yesno:"Article,Tutorial" %}
             <a @click="$dispatch('open-modal', {
                     endpoint: '{% url 'post_create_draft' %}',
                     modalTitle: 'New {{ post_noun }}',
@@ -37,14 +37,25 @@
                     maxWidth: 'max-w-2xl',
                 })"
                class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
-                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi {% if post_noun == 'Post' %}bi-newspaper{% else %}bi-tools{% endif %}"></i></span>
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi {% if post_noun == 'Article' %}bi-newspaper{% else %}bi-tools{% endif %}"></i></span>
                 <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">{{ post_noun }}</span>
             </a>
             {% endwith %}
-            <a href="#"
+            <a @click="$dispatch('open-modal', {
+                    endpoint: '{% url 'organization_create' %}',
+                    modalTitle: 'New Organization',
+                    icon: 'people',
+                    maxWidth: 'max-w-xl',
+                })"
                class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
                 <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-people-fill"></i></span>
                 <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Organization</span>
+            </a>
+            <div class="h-px bg-pine-300 my-2"></div>
+            <a href="{% url 'inbox_new' %}"
+               class="group/item flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 focus-visible:bg-white/5 focus-visible:outline-none transition-[color,background-color] duration-150 cursor-pointer">
+                <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-envelope-fill"></i></span>
+                <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">Message</span>
             </a>
         </div>
     </div>

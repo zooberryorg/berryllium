@@ -19,8 +19,7 @@
         {# Right side actions #}
         <div class="flex md:order-2 items-center space-x-3">
             {% if user.is_authenticated %}
-                {# Inbox and notifications #}
-                {% include 'inbox/nav_link.html' %}
+                {# Notifications bell #}
                 {% include 'notifications/bell.html' %}
                 {# Create new content dropdown #}
                 {% include 'shared/navigation/create_menu.html' %}
