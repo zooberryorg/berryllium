@@ -72,7 +72,8 @@ def apply_filters(rows, filters):
         if filters["game"] and filters["game"] not in row["games"]:
             continue
         result.append(row)
-    name = lambda r: r["name"].lower()  # noqa: E731
+    def name(r):
+        return r["name"].lower()
     sort = filters["sort"]
     if sort == "name":
         result.sort(key=name)
