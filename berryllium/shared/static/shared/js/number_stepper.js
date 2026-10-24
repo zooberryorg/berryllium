@@ -26,7 +26,7 @@
         el.dataset.step = String(direction);
         el.setAttribute('aria-label', direction > 0 ? 'Increase' : 'Decrease');
         el.tabIndex = -1;
-        el.textContent = direction > 0 ? '+' : '−';
+        el.innerHTML = CHEVRON[direction];
         el.addEventListener('click', () => step(input, direction));
         return el;
     }
@@ -36,8 +36,12 @@
             if (input.parentElement.classList.contains('zb-stepper')) return;
             const wrapper = document.createElement('span');
             wrapper.className = 'zb-stepper';
+            [...input.classList].filter((c) => /^(sm:|md:|lg:)?w-/.test(c)).forEach((c) => wrapper.classList.add(c));
+            const arrows = document.createElement('span');
+            arrows.className = 'zb-stepper-arrows';
+            arrows.append(button(input, 1), button(input, -1));
             input.parentNode.insertBefore(wrapper, input);
-            wrapper.append(button(input, -1), input, button(input, 1));
+            wrapper.append(input, arrows);
             input.addEventListener('input', () => update(input));
             update(input);
         });
