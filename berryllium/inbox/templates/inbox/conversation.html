@@ -49,7 +49,6 @@
                 <p id="thread-empty" class="py-6 text-center text-sm text-gray-400">No messages here. Write the first one below.</p>
             {% endfor %}
             {% include 'inbox/poller.html' %}
-            {% endfor %}
         </div>
 
         <form id="reply" method="post" action="{% url 'inbox_conversation' conversation.pk %}" class="border-t border-white/10 p-4 sm:p-5 space-y-3 scroll-mt-24">
