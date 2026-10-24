@@ -25,7 +25,6 @@ class ConversationMember(models.Model):
     """
 
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="memberships")
-    member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="conversation_memberships")
     member = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="conversation_memberships"
     )
