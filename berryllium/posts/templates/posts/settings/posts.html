@@ -1,10 +1,10 @@
 {% extends 'shared/panel/base.html' %}
 {% load bfilters %}
 {% block panel_kicker %}Control Panel{% endblock %}
-{% block panel_title %}My posts{% endblock %}
+{% block panel_title %}My articles{% endblock %}
 {% block panel_content %}
     <p class="text-sm text-gray-300">
-        Tutorials{% if user|is_moderator %} and news{% endif %} you've written, including drafts. Open one to keep writing; changes to a published post go live when they save.
+        Tutorials{% if user|is_moderator %} and news{% endif %} you've written, including drafts. Open one to keep writing; changes to a published article go live when they save.
     </p>
     {% if posts %}
         <ul class="space-y-2">
@@ -15,13 +15,15 @@
                             {% if post.thumbnail %}<img src="{{ post.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover">{% else %}<span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image"></i></span>{% endif %}
                         </span>
                         <span class="min-w-0">
-                            <span class="block text-white font-medium truncate group-hover/item:text-gold-200">{{ post.title|default:"Untitled post" }}</span>
+                            <span class="flex flex-wrap items-center gap-2">
+                                <span class="text-white font-medium truncate group-hover/item:text-gold-200">{{ post.title|default:"Untitled article" }}</span>
+                                {% include 'mods/panel/status_badge.html' with mod=post %}
+                            </span>
                             <span class="block text-xs text-gray-400">{{ post.get_kind_display }} · Edited {{ post.last_updated|timeago }}</span>
                         </span>
                     </a>
                     <form method="post" action="{% url 'settings_posts_change' post.pk %}" class="flex flex-wrap items-center gap-2 sm:justify-end">
                         {% csrf_token %}
-                        {% include 'mods/panel/status_badge.html' with mod=post %}
                         <span class="contents" x-show="!confirming">
                             <a href="{{ post.get_absolute_url }}" class="zb-action inline-flex items-center gap-1.5 text-sm focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-eye"></i> {% if post.status == 'published' %}View{% else %}Preview{% endif %}</a>
                             {% if post.draft %}
