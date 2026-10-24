@@ -19,6 +19,14 @@ def get_item(list_obj, index):
         return None
 
 @register.filter
+def get_attr(obj, name):
+    """Read a permission flag by name, e.g. {{ membership|get_attr:"can_publish" }}. 
+    Only can_* names are allowed."""
+    if not str(name).startswith("can_"):
+        return None
+    return getattr(obj, str(name), None)
+
+@register.filter
 def markdown(value):
     """Usage: {{ mod.description|markdown }}"""
     return mark_safe(render_markdown(value))
