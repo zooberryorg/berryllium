@@ -1,8 +1,14 @@
 import os
 import uuid
 from django.db import models
+from django.urls import reverse
 from berryllium.shared.fields import proper_case
-from berryllium.shared.links import DEFAULT_LINK_PRESET, LINK_PRESET_CHOICES, link_preset
+from berryllium.shared.links import (
+    DEFAULT_LINK_PRESET,
+    LINK_PRESET_CHOICES,
+    link_preset,
+)
+
 
 class Tag(models.Model):
     """
@@ -18,16 +24,18 @@ class Tag(models.Model):
         self.name = proper_case(self.name)[:50]
         super().save(*args, **kwargs)
 
+
 def archived_website_image_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"archived_websites/{uuid.uuid4().hex}{ext}"
+
 
 class ArchivedWebsite(models.Model):
     """
     A site that used to host ZT mods.
 
     Definitions:
-    - name / slug: display name and URL-safe id (for a future website page)
+    - name / slug: display name and URL-safe id (its page is /websites/<slug>/)
     - aliases: other names the site went by, comma separated (searched by the picker)
     - description: history and notes about the site
     - url: the site's main address
@@ -36,21 +44,25 @@ class ArchivedWebsite(models.Model):
     - is_enabled: shown in the upload form's website picker
     - est_date / closure_date: when the site opened / closed
     - former_staff: people who ran the site
-    - banner / thumbnail: images for listings and a future website page
+    - banner / thumbnail: images for its page and the Explore > Websites table
     - links: related addresses (original, Wayback Machine snapshots, mirrors), see ArchivedWebsiteLink
     """
 
     name = models.CharField(max_length=150, unique=True)
     slug = models.SlugField(max_length=160, unique=True)
     aliases = models.CharField(
-        max_length=300, blank=True, help_text="Other names, comma separated. Used in search."
+        max_length=300,
+        blank=True,
+        help_text="Other names, comma separated. Used in search.",
     )
     description = models.TextField(blank=True)
     url = models.URLField(blank=True, help_text="Main address of the site.")
     games = models.CharField(max_length=50, blank=True, help_text='e.g. "zt1, zt2"')
 
     is_offline = models.BooleanField(default=True)
-    is_enabled = models.BooleanField(default=True, help_text="Show in the upload form's website picker.")
+    is_enabled = models.BooleanField(
+        default=True, help_text="Show in the upload form's website picker."
+    )
 
     est_date = models.DateField(null=True, blank=True, verbose_name="established")
     closure_date = models.DateField(null=True, blank=True)
@@ -71,6 +83,15 @@ class ArchivedWebsite(models.Model):
     def __str__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse("website_profile", kwargs={"slug": self.slug})
+
+    @property
+    def alias_list(self):
+        return [
+            name.strip() for name in (self.aliases or "").split(",") if name.strip()
+        ]
+
     @property
     def years_active(self):
         """e.g. "1999–2008", "2003–", or "" when unknown."""
@@ -82,6 +103,7 @@ class ArchivedWebsite(models.Model):
             return f"{start}–"
         return ""
 
+
 class ArchivedWebsiteLink(models.Model):
     """An address related to an archived website."""
 
@@ -91,7 +113,9 @@ class ArchivedWebsiteLink(models.Model):
         MIRROR = "mirror", "Mirror / backup"
         OTHER = "other", "Other"
 
-    website = models.ForeignKey(ArchivedWebsite, on_delete=models.CASCADE, related_name="links")
+    website = models.ForeignKey(
+        ArchivedWebsite, on_delete=models.CASCADE, related_name="links"
+    )
     kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.OTHER)
     label = models.CharField(max_length=100, blank=True)
     url = models.URLField()
@@ -99,16 +123,21 @@ class ArchivedWebsiteLink(models.Model):
     def __str__(self):
         return self.label or self.url
 
+
 class License(models.Model):
     """
     Model for licenses that can be applied to mods and tutorials.
     """
 
     name = models.CharField(max_length=150, unique=True)
-    short_name = models.CharField(max_length=50, blank=True, help_text='e.g. "CC BY 4.0"')
+    short_name = models.CharField(
+        max_length=50, blank=True, help_text='e.g. "CC BY 4.0"'
+    )
     description = models.TextField(blank=True)
     url = models.URLField(blank=True, help_text="Where to read the full license.")
-    is_enabled = models.BooleanField(default=True, help_text="Show in the upload form's license picker.")
+    is_enabled = models.BooleanField(
+        default=True, help_text="Show in the upload form's license picker."
+    )
 
     class Meta:
         ordering = ["name"]
@@ -116,15 +145,19 @@ class License(models.Model):
     def __str__(self):
         return self.short_name or self.name
 
+
 def language_icon_path(instance, filename):
     ext = os.path.splitext(filename)[1].lower()
     return f"language_icons/{uuid.uuid4().hex}{ext}"
+
 
 class Language(models.Model):
     """A language a mod is available in. Can only be edited by staff. Icon is just a ico graphic."""
 
     name = models.CharField(max_length=100, unique=True)
-    code = models.CharField(max_length=10, unique=True, help_text='Language code, e.g. "en", "pt-BR".')
+    code = models.CharField(
+        max_length=10, unique=True, help_text='Language code, e.g. "en", "pt-BR".'
+    )
     icon = models.ImageField(upload_to=language_icon_path, blank=True)
 
     class Meta:
@@ -133,14 +166,19 @@ class Language(models.Model):
     def __str__(self):
         return self.name
 
+
 class BaseLink(models.Model):
     """
     A labeled link preset for when users want to add a link to a mod, tutorial, or user profile.
     """
 
-    kind = models.CharField(max_length=30, choices=LINK_PRESET_CHOICES, default=DEFAULT_LINK_PRESET)
+    kind = models.CharField(
+        max_length=30, choices=LINK_PRESET_CHOICES, default=DEFAULT_LINK_PRESET
+    )
     url = models.URLField(max_length=500)
-    label = models.CharField(max_length=100, blank=True, help_text="Optional; defaults to the preset name.")
+    label = models.CharField(
+        max_length=100, blank=True, help_text="Optional; defaults to the preset name."
+    )
     order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -157,3 +195,90 @@ class BaseLink(models.Model):
     @property
     def display_label(self):
         return self.label or link_preset(self.kind)["label"]
+
+
+# --------------------------------------------------------------------------- options admins edit
+
+
+class Category(models.Model):
+    """A category for mods or for articles (each has its own list)."""
+
+    class Scope(models.TextChoices):
+        MOD = "mod", "Mods"
+        ARTICLE = "article", "Articles"
+
+    scope = models.CharField(
+        max_length=10, choices=Scope.choices, default=Scope.MOD, db_index=True
+    )
+    key = models.SlugField(
+        max_length=50,
+        help_text="Saved on mods and articles. Don't change it once it's in use.",
+    )
+    label = models.CharField(max_length=80)
+    icon = models.CharField(
+        max_length=50,
+        default="bi-folder",
+        help_text="A Bootstrap icon class, e.g. bi-map.",
+    )
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Offered in forms and filters. Turn off instead of deleting.",
+    )
+
+    class Meta:
+        ordering = ["scope", "order", "label"]
+        verbose_name_plural = "categories"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["scope", "key"], name="category_key_per_scope"
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.label} ({self.get_scope_display()})"
+
+
+class Game(models.Model):
+    """A game mods and articles can be for."""
+
+    key = models.SlugField(
+        max_length=30,
+        unique=True,
+        help_text="Saved on mods and articles. Don't change it once it's in use.",
+    )
+    label = models.CharField(max_length=80)
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "label"]
+
+    def __str__(self):
+        return self.label
+
+
+class Expansion(models.Model):
+    """An expansion pack a mod (or an article's subject) needs."""
+
+    key = models.SlugField(
+        max_length=30,
+        unique=True,
+        help_text="Saved on mods and articles. Don't change it once it's in use.",
+    )
+    label = models.CharField(max_length=80)
+    game = models.ForeignKey(
+        Game,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="expansions",
+    )
+    order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["order", "label"]
+
+    def __str__(self):
+        return self.label
