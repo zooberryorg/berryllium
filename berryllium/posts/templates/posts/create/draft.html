@@ -5,6 +5,7 @@
     <div class="space-y-4 p-6">
         {% include "posts/create/kind_field.html" %}
         {% include "mods/create/general/fields.html" with publish_hint="It goes live when you click Publish in the editor." archive_hint="Turn this on if it was first published on another website." %}
+        <div class="pt-4 border-t border-white/10">{% include "posts/create/categorization.html" %}</div>
     </div>
     <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
         <button type="button"

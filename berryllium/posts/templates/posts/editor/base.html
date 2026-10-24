@@ -5,16 +5,16 @@
 
         <nav aria-label="Breadcrumb" class="text-sm text-gray-400">
             <ol class="flex items-center gap-2 min-w-0">
-                <li><a href="{% url 'settings_posts' %}" class="hover:text-gold-300 transition-colors">My posts</a></li>
+                <li><a href="{% url 'settings_posts' %}" class="hover:text-gold-300 transition-colors">My articles</a></li>
                 <li aria-hidden="true"><i class="bi bi-chevron-right text-[10px]"></i></li>
-                <li class="text-white/80 truncate" aria-current="page">{{ post.title|default:"Untitled post" }}</li>
+                <li class="text-white/80 truncate" aria-current="page">{{ post.title|default:"Untitled article" }}</li>
             </ol>
         </nav>
 
         <header class="flex flex-wrap items-end justify-between gap-4">
             <div class="min-w-0">
                 <p class="text-xs font-semibold uppercase tracking-wider text-gold-300">{{ noun }} editor</p>
-                <h1 class="text-3xl font-bold text-white mt-1 break-words">{{ post.title|default:"Untitled post" }}</h1>
+                <h1 class="text-3xl font-bold text-white mt-1 break-words">{{ post.title|default:"Untitled article" }}</h1>
             </div>
             <div class="flex items-center gap-2">
                 {% include 'mods/panel/status_badge.html' with mod=post %}
@@ -41,12 +41,7 @@
                 </section>
 
                 <section id="tags" class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 scroll-mt-24">
-                    <div class="mb-4">
-                        <span class="block text-sm font-medium mb-1 text-white">{{ form.game.label }}</span>
-                        {{ form.game }}
-                        <p class="text-xs text-white/50 mt-2">Leave it empty if it isn't about a particular game.</p>
-                        {% include "mods/create/field_errors.html" with field=form.game %}
-                    </div>
+                    <div class="mb-6">{% include "posts/create/categorization.html" %}</div>
                     {% include "shared/widgets/search_picker.html" with field=form.tags config=form.tags_picker %}
                     <p class="text-xs text-white/50 -mt-2">Help readers find this. New tags (dashed) are created when you publish.</p>
                 </section>
