@@ -29,7 +29,7 @@
                 <span class="w-10 h-10 shrink-0 rounded-lg bg-gold-400/10 flex items-center justify-center text-gold-300 group-hover/item:bg-gold-400/20 transition-colors duration-150"><i class="bi bi-journal-text"></i></span>
                 <span class="font-medium text-white group-hover/item:text-gold-200 transition-colors duration-150">New Dev Diary</span>
             </a>
-            {% with post_noun=user|is_moderator|yesno:"Post,Tutorial" %}
+            {% with post_noun=user|is_moderator|yesno:"Article,Tutorial" %}
             <a @click="$dispatch('open-modal', {
                     endpoint: '{% url 'post_create_draft' %}',
                     modalTitle: 'New {{ post_noun }}',
