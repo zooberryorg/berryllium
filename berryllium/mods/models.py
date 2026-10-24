@@ -82,6 +82,9 @@ class Mod(models.Model):
     version = models.CharField(max_length=100)
     description = MarkdownxField(blank=True)
     prlicense = models.CharField(max_length=100, blank=True)
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="mods"
+    )
 
     # dates
     submission_date = models.DateTimeField(auto_now_add=True)
