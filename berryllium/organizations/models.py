@@ -21,10 +21,10 @@ class Organization(models.Model):
     - description: the biography, in markdown
     - logo: the profile picture; banner: optional wide image at the top of its page
     - accepts_requests: whether members can ask to join from its page (invites always work)
+    - is_archived: a historical group kept for the record. It can have members without an owner; moderators
+      and admins look after it, and an admin can give it an owner, which makes it a managed organization
     - members: through OrganizationMembership (roles and permissions)
     """
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=110, unique=True)
     tagline = models.CharField(max_length=160, blank=True)
@@ -32,6 +32,7 @@ class Organization(models.Model):
     logo = models.ImageField(upload_to=org_logo_path, blank=True)
     banner = models.ImageField(upload_to=org_banner_path, blank=True)
     accepts_requests = models.BooleanField(default=True)
+    is_archived = models.BooleanField(default=False, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     members = models.ManyToManyField(settings.AUTH_USER_MODEL, related_name="organizations", through="OrganizationMembership")
