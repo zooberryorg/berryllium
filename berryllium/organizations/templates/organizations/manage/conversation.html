@@ -40,6 +40,7 @@
                         {% endif %}
                         {% include 'inbox/message.html' %}
                     {% endfor %}
+                    {% include 'inbox/poller.html' %}
                 </div>
                 <form id="reply" method="post" class="border-t border-white/10 p-4 sm:p-5 space-y-3 scroll-mt-24">
                     {% csrf_token %}
