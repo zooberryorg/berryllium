@@ -1,5 +1,6 @@
 <div class="relative"
-     x-data="{ open: false }"
+     x-data="{ open: false, count: {{ unread_notifications|default:0 }} }"
+     x-on:notifications-count.camel.window="if (open && $event.detail.value > count) htmx.ajax('GET', '{% url 'notifications_menu' %}', { target: '#notification-menu', swap: 'innerHTML' }); count = $event.detail.value"
      @click.outside="open = false"
      @keydown.escape.window="open = false">
     <button type="button"
