@@ -15,6 +15,7 @@ class Notification(models.Model):
         REPLY = "reply", "Reply"
         QUOTE = "quote", "Quote"
         MESSAGE = "message", "Message"
+        ORGANIZATION = "organization", "Organization"
 
     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="notifications")
     actor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
