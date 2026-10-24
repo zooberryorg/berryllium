@@ -243,3 +243,15 @@ def manage_members(request, slug):
         "join_requests": org.requests.filter(kind=OrganizationRequest.Kind.REQUEST).select_related("member"),
         "invites": org.requests.filter(kind=OrganizationRequest.Kind.INVITE).select_related("member", "created_by"),
     })
+
+# --------------------------------------------------------------------------- the organization's inbox
+
+@login_required
+@require_GET
+def org_inbox(request, slug):
+    org, row = _manage(request, slug, "use_inbox")
+    page = Paginator(inbox.org_conversation_list(org), 25).get_page(request.GET.get("page"))
+    return render(request, "organizations/manage/inbox.html", {
+        "panel_nav": _org_nav(request, org, row, "organization_inbox"),
+        "org": org, "my_row": row, "conversations": page,
+    })
