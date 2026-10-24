@@ -26,7 +26,7 @@
 
     <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5">
         <h2 class="text-sm font-semibold uppercase tracking-wider text-gray-400">Set a member's limit</h2>
-        <form method="post" class="mt-3 grid gap-3 sm:grid-cols-[1fr_8rem_1.5fr_auto] sm:items-start">
+        <form method="post" class="mt-3 grid gap-3 sm:grid-cols-[1fr_11rem_1.5fr_auto] sm:items-start">
             {% csrf_token %}
             <input type="hidden" name="action" value="quota">
             <div>{{ quota_form.username }}{% for error in quota_form.username.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}</div>

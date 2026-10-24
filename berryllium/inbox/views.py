@@ -16,8 +16,9 @@ PAGE_SIZE = 25
 
 
 def _list_context(request):
+    from berryllium.users.settings_views import _nav  # the Control Panel menu
     page = Paginator(services.conversation_list(request.user), PAGE_SIZE).get_page(request.GET.get("page"))
-    return {"conversations": page, "usage": services.usage_summary(request.user)}
+    return {"conversations": page, "usage": services.usage_summary(request.user), "panel_nav": _nav(request, "inbox")}
 
 
 def _conversation_url(conversation_id, message_id=None):
@@ -33,6 +34,9 @@ def index(request):
 @require_http_methods(["GET", "POST"])
 def new(request):
     """Creates a new conversation. If one already exists, redirect to it."""
+    org_slug = request.GET.get("org") or request.POST.get("org")
+    if org_slug:
+        return _new_to_org(request, org_slug)
     if request.method == "GET" and request.GET.get("to"):
         recipient = get_user_model().objects.filter(username__iexact=request.GET["to"], is_active=True).first()
         if recipient is not None and recipient.pk != request.user.pk:
@@ -52,6 +56,27 @@ def new(request):
             return redirect(_conversation_url(conversation.pk, message.pk))
     return render(request, "inbox/new.html", {**_list_context(request), "form": form, "problem": problem})
 
+def _new_to_org(request, slug):
+    """Write to an organization. Its members who may use its inbox read and answer it."""
+    from berryllium.organizations.models import Organization
+    org = Organization.objects.filter(slug=slug).first()
+    if org is None:
+        raise Http404("Organization not found.")
+    existing = services.org_conversation(request.user, org)
+    if existing is not None and request.method == "GET":
+        return redirect(_conversation_url(existing.pk) + "#reply")
+    form = MessageForm(request.POST or None, auto_id="id_message_%s", rows=8)
+    problem = services.problem_sending_to_org(request.user, org) if request.method == "GET" else ""
+    if request.method == "POST" and form.is_valid():
+        problem = services.problem_sending_to_org(request.user, org)
+        if not problem and services.too_soon(request.user):
+            problem = "You're sending messages very quickly. Wait a moment and try again."
+        if not problem:
+            conversation = services.start_org_conversation(request.user, org)
+            message = services.send_message(conversation, request.user, None, form.cleaned_data["body"])
+            return redirect(_conversation_url(conversation.pk, message.pk))
+    return render(request, "inbox/new.html", {**_list_context(request), "form": form, "problem": problem, "to_org": org})
+
 @login_required
 @require_http_methods(["GET", "POST"])
 def conversation(request, conversation_id):
@@ -59,7 +84,8 @@ def conversation(request, conversation_id):
     if membership is None:
         raise Http404("Conversation not found.")
     convo = membership.conversation
-    other = services.other_member(convo, request.user)
+    org = convo.organization  # set when this conversation is with an organization
+    other = None if org else services.other_member(convo, request.user)
     show_all = bool(request.GET.get("all"))
 
     quote = None
@@ -71,7 +97,7 @@ def conversation(request, conversation_id):
     problem = ""
     if request.method == "POST":
         if form.is_valid():
-            problem = services.problem_sending(request.user, other)
+            problem = services.problem_sending_to_org(request.user, org) if org else services.problem_sending(request.user, other)
             if not problem and services.too_soon(request.user):
                 problem = "You're sending messages very quickly. Wait a moment and try again."
             if not problem:
@@ -93,7 +119,11 @@ def conversation(request, conversation_id):
         "first_unread": first_unread,
         "form": form,
         "quote": quote,
-        "problem": problem or (services.problem_sending(request.user, other) if request.method == "GET" else ""),
+        "org": org,
+        "problem": problem or (
+            (services.problem_sending_to_org(request.user, org) if org else services.problem_sending(request.user, other))
+            if request.method == "GET" else ""
+        ),
     })
 
 @login_required

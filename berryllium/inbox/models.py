@@ -7,7 +7,9 @@ class Conversation(models.Model):
     """
     Private messages between two members. There is one conversation per pair.
     """
-
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE, null=True, blank=True, related_name="conversations"
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     last_message_at = models.DateTimeField(default=timezone.now, db_index=True)
 
@@ -24,6 +26,12 @@ class ConversationMember(models.Model):
 
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="memberships")
     member = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="conversation_memberships")
+    member = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True, blank=True, related_name="conversation_memberships"
+    )
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.CASCADE, null=True, blank=True, related_name="conversation_memberships"
+    )
     last_read_at = models.DateTimeField(null=True, blank=True)
     cleared_at = models.DateTimeField(null=True, blank=True)
     is_hidden = models.BooleanField(default=False)
@@ -39,6 +47,9 @@ class Message(models.Model):
 
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE, related_name="messages")
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="sent_messages")
+    sent_as = models.ForeignKey(
+        "organizations.Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="+"
+    )
     body = models.TextField()
     quote_of = models.ForeignKey("self", on_delete=models.SET_NULL, null=True, blank=True, related_name="+")
     quote_author = models.CharField(max_length=150, blank=True)
