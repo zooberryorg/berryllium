@@ -80,3 +80,43 @@ def leave(request, slug):
     else:
         messages.success(request, f"You left {org.name}.")
     return redirect("settings_organizations")
+
+# --------------------------------------------------------------------------- Control Panel Organizations
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def my_organizations(request):
+    from berryllium.users.settings_views import _nav  # the Control Panel menu
+    form = CreateOrganizationForm(request.POST if request.POST.get("action") == "create" else None)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "create" and form.is_valid():
+            org = services.create_organization(request.user, form.cleaned_data["name"], form.cleaned_data["tagline"])
+            messages.success(request, f"{org.name} is ready. Add a picture and a bio, then invite your team.")
+            return redirect("organization_manage_page", slug=org.slug)
+        if action in ("accept", "decline", "cancel") and request.POST.get("request", "").isdigit():
+            pending = OrganizationRequest.objects.select_related("organization").filter(pk=int(request.POST["request"]), member=request.user).first()
+            if pending is not None:
+                name = pending.organization.name
+                if action == "accept" and pending.kind == OrganizationRequest.Kind.INVITE:
+                    services.accept(pending, request.user)
+                    messages.success(request, f"Welcome to {name}.")
+                else:
+                    services.decline(pending)
+                    messages.success(request, f"Declined the invitation from {name}." if action == "decline" else f"Withdrew your request to join {name}.")
+            return redirect("settings_organizations")
+    rows = list(
+        OrganizationMembership.objects.filter(user=request.user)
+        .select_related("organization")
+        .annotate(member_count=Count("organization__memberships", distinct=True))
+        .order_by("organization__name")
+    )
+    for row in rows:
+        row.unread = inbox.org_unread_count(row.organization) if row.has("use_inbox") else 0
+    return render(request, "organizations/panel/list.html", {
+        "panel_nav": _nav(request, "settings_organizations"),
+        "rows": rows,
+        "invites": OrganizationRequest.objects.filter(member=request.user, kind=OrganizationRequest.Kind.INVITE).select_related("organization", "created_by"),
+        "requests": OrganizationRequest.objects.filter(member=request.user, kind=OrganizationRequest.Kind.REQUEST).select_related("organization"),
+        "form": form,
+    })
