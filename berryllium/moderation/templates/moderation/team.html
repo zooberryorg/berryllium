@@ -19,12 +19,12 @@
                     <li class="flex items-center gap-3 py-2.5" x-data="{ confirming: false }">
                         {% include 'shared/navigation/avatar.html' with member=member avatar_class="w-9 h-9 text-sm" %}
                         <a href="{% url 'member_profile' member.username %}" class="min-w-0 flex-1 truncate text-white hover:text-gold-200">{{ member.username }}</a>
-                        <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" x-show="!confirming" @click="confirming = true">Remove</button>
+                        <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" x-show="!confirming" @click="confirming = true">Remove</button>
                         <form method="post" action="{% url 'moderation_team_change' %}" x-show="confirming" x-cloak class="flex items-center gap-2">
                             {% csrf_token %}
                             <input type="hidden" name="username" value="{{ member.username }}">
-                            <button type="submit" name="action" value="remove" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-red-400/50 text-red-300 enabled:hover:bg-red-500/15">Remove {{ member.username }}</button>
-                            <button type="button" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-pine-300 text-gray-300 enabled:hover:text-white enabled:hover:bg-white/5" @click="confirming = false">Keep</button>
+                            <button type="submit" name="action" value="remove" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2">Remove {{ member.username }}</button>
+                            <button type="button" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2" @click="confirming = false">Keep</button>
                         </form>
                     </li>
                 {% endfor %}

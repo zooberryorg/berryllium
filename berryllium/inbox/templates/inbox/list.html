@@ -15,11 +15,11 @@
                     {% endif %}
                     <span class="min-w-0 flex-1">
                         <span class="flex items-baseline gap-2">
-                            <span class="truncate text-sm {% if row.unread %}font-semibold text-white{% else %}text-gray-200{% endif %}">{% if row.other %}{{ row.other.username }}{% else %}Deleted member{% endif %}</span>
+                            <span class="truncate text-sm {% if row.unread %}font-semibold text-white{% else %}text-gray-200{% endif %}">{% if row.organization %}{{ row.organization.name }}{% elif row.other %}{{ row.other.username }}{% else %}Deleted member{% endif %}</span>
                             <time class="ml-auto shrink-0 text-[11px] text-gray-400" datetime="{{ row.conversation.last_message_at|date:'c' }}">{{ row.conversation.last_message_at|timeago }}</time>
                         </span>
                         <span class="flex items-center gap-2">
-                            <span class="truncate text-xs {% if row.unread %}text-gray-200{% else %}text-gray-400{% endif %}">{% if row.last_sender_id == user.pk %}You: {% endif %}{{ row.last_body|markdown|striptags|truncatechars:80 }}</span>
+                            <span class="truncate text-sm {% if row.unread %}font-semibold text-white{% else %}text-gray-200{% endif %}">{% if row.organization %}{{ row.organization.name }}{% elif row.other %}{{ row.other.username }}{% else %}Deleted member{% endif %}</span>
                             {% if row.unread %}<span class="ml-auto shrink-0 min-w-5 h-5 px-1.5 rounded-full bg-gold-400 text-pine-600 text-[11px] font-bold flex items-center justify-center tabular-nums">{{ row.unread }}<span class="sr-only"> unread</span></span>{% endif %}
                         </span>
                     </span>
