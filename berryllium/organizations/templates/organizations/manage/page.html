@@ -1,0 +1,80 @@
+{% extends 'shared/panel/base.html' %}
+{% block panel_nav_label %}Organization sections{% endblock %}
+{% block panel_kicker %}{{ org.name }}{% endblock %}
+{% block panel_title %}Page{% endblock %}
+{% block panel_content %}
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        {% csrf_token %}
+        <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6 space-y-4">
+            <h2 class="text-lg font-semibold text-white">Name and bio</h2>
+            {% include 'users/settings/field.html' with field=form.name %}
+            {% include 'users/settings/field.html' with field=form.tagline %}
+            <div class="space-y-1.5">
+                <span class="block text-sm font-medium text-white">{{ form.description.label }}</span>
+                {% url 'markdown_image' as upload_url %}
+                {% url 'markdown_preview' as preview_url %}
+                {% include "shared/widgets/markdown_editor.html" with field=form.description %}
+            </div>
+            <label class="flex items-center gap-3 text-sm text-gray-200 cursor-pointer">
+                {{ form.accepts_requests }} {{ form.accepts_requests.label }}
+            </label>
+            <p class="text-xs text-gray-400 -mt-2 pl-8">Invitations from the Members page always work.</p>
+        </section>
+
+        <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Pictures</h2>
+            <div class="grid gap-6 md:grid-cols-[12rem_minmax(0,1fr)]">
+                <div class="space-y-3" x-data="{ remove: false }">
+                    <p class="text-sm font-medium text-white">Profile picture</p>
+                    <div :class="remove && 'opacity-30'">{% include 'organizations/logo.html' with logo_class="w-32 h-32 text-4xl" %}</div>
+                    <label class="zb-action inline-flex items-center gap-1.5 text-sm cursor-pointer"><i class="bi bi-upload"></i> Choose<input type="file" name="logo_upload" accept=".jpg,.jpeg,.png,.webp" class="sr-only"></label>
+                    {% if org.logo %}<label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"><input type="checkbox" name="remove_logo" x-model="remove"> Remove</label>{% endif %}
+                    <p class="text-xs text-gray-400">Square, at least 128×128.</p>
+                    {% for error in form.logo_upload.errors %}<p class="text-sm text-red-300">{{ error }}</p>{% endfor %}
+                </div>
+                <div class="space-y-3 min-w-0" x-data="{ remove: false }">
+                    <p class="text-sm font-medium text-white">Banner <span class="text-gray-400 font-normal">(optional)</span></p>
+                    <div class="aspect-[4/1] rounded-xl overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800 border border-white/10" :class="remove && 'opacity-30'">
+                        {% if org.banner %}<img src="{{ org.banner.url }}" alt="" class="w-full h-full object-cover">{% else %}<span class="w-full h-full flex items-center justify-center text-white/30 text-sm">No banner</span>{% endif %}
+                    </div>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <label class="zb-action inline-flex items-center gap-1.5 text-sm cursor-pointer"><i class="bi bi-upload"></i> Choose<input type="file" name="banner_upload" accept=".jpg,.jpeg,.png,.webp" class="sr-only"></label>
+                        {% if org.banner %}<label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"><input type="checkbox" name="remove_banner" x-model="remove"> Remove</label>{% endif %}
+                    </div>
+                    <p class="text-xs text-gray-400">Shown across the top of the page. At least 1200 pixels wide; 4:1 works best.</p>
+                    {% for error in form.banner_upload.errors %}<p class="text-sm text-red-300">{{ error }}</p>{% endfor %}
+                </div>
+            </div>
+        </section>
+
+        <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+            <h2 class="text-lg font-semibold text-white mb-4">Links</h2>
+            {% include "shared/widgets/row_table.html" with field=form.links config=form.links_widget layout="link" sortable=True %}
+            {% for error in form.links.errors %}<p class="text-sm text-red-300">{{ error }}</p>{% endfor %}
+        </section>
+
+        <div class="flex justify-end">
+            <button type="submit" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold-500 to-gold-400 px-5 py-2.5 font-semibold text-pine-500 hover:brightness-110 transition cursor-pointer"><i class="bi bi-check2"></i> Save</button>
+        </div>
+    </form>
+
+    {% if my_row.role == 'owner' %}
+        <section class="rounded-2xl border border-red-400/30 bg-pine-600 p-5 sm:p-6" x-data="{ open: {% if delete_form.errors %}true{% else %}false{% endif %} }">
+            <h2 class="text-lg font-semibold text-white">Delete {{ org.name }}</h2>
+            <p class="text-sm text-gray-400 mt-1">Its page, members and messages go. Its mods stay up, credited to the people who uploaded them.</p>
+            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm mt-4" x-show="!open" @click="open = true"><i class="bi bi-trash"></i> Delete organization</button>
+            <form method="post" class="mt-4 flex flex-wrap items-start gap-3" x-show="open" x-cloak>
+                {% csrf_token %}
+                <input type="hidden" name="action" value="delete">
+                <div class="min-w-64 flex-1 max-w-sm">
+                    <label for="{{ delete_form.confirm.id_for_label }}" class="block text-sm text-gray-200 mb-1">Type <strong class="text-white">{{ org.name }}</strong> to confirm</label>
+                    {{ delete_form.confirm }}
+                    {% for error in delete_form.confirm.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}
+                </div>
+                <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm mt-6"><i class="bi bi-trash"></i> Delete</button>
+                <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm mt-6" @click="open = false">Keep it</button>
+            </form>
+        </section>
+    {% endif %}
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}
