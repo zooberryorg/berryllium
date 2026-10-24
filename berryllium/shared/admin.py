@@ -1,6 +1,15 @@
 from django.contrib import admin
 
-from berryllium.shared.models import ArchivedWebsite, ArchivedWebsiteLink, Language, License, Tag
+from berryllium.shared.models import (
+    ArchivedWebsite,
+    ArchivedWebsiteLink,
+    Category,
+    Expansion,
+    Game,
+    Language,
+    License,
+    Tag,
+)
 
 
 @admin.register(Tag)
@@ -34,3 +43,28 @@ class LicenseAdmin(admin.ModelAdmin):
 class LanguageAdmin(admin.ModelAdmin):
     list_display = ("name", "code")
     search_fields = ("name", "code")
+
+
+# --------------------------------------------------------------------------- options shown in forms and filters
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("key", "label", "scope", "icon", "order", "is_active")
+    list_editable = ("label", "icon", "order", "is_active")
+    list_filter = ("scope", "is_active")
+    search_fields = ("label", "key")
+    prepopulated_fields = {"key": ("label",)}
+
+
+@admin.register(Game)
+class GameAdmin(admin.ModelAdmin):
+    list_display = ("label", "key", "order", "is_active")
+    list_editable = ("order", "is_active")
+    prepopulated_fields = {"key": ("label",)}
+
+
+@admin.register(Expansion)
+class ExpansionAdmin(admin.ModelAdmin):
+    list_display = ("label", "key", "game", "order", "is_active")
+    list_editable = ("order", "is_active")
+    list_filter = ("game", "is_active")
+    prepopulated_fields = {"key": ("label",)}
