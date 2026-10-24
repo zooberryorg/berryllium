@@ -144,3 +144,102 @@ def _org_nav(request, org, row, active):
     nav.append({"url": org.get_absolute_url(), "label": "View page", "icon": "bi-box-arrow-up-right", "count": None, "active": False})
     nav.append({"url": reverse("settings_organizations"), "label": "All organizations", "icon": "bi-arrow-left", "count": None, "active": False})
     return nav
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def manage_page(request, slug):
+    org, row = _manage(request, slug, "edit_profile")
+    form = OrganizationPageForm(request.POST or None, request.FILES or None, instance=org)
+    delete_form = DeleteOrganizationForm(organization=org)
+    if request.method == "POST" and request.POST.get("action") == "delete":
+        if row.role != Role.OWNER:
+            raise PermissionDenied
+        delete_form = DeleteOrganizationForm(request.POST, organization=org)
+        if delete_form.is_valid():
+            name = org.name
+            org.delete()
+            messages.success(request, f"{name} was deleted. Its mods stay up, credited to their uploaders.")
+            return redirect("settings_organizations")
+        form = OrganizationPageForm(instance=org)
+    elif request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Saved.")
+        return redirect("organization_manage_page", slug=org.slug)
+    return render(request, "organizations/manage/page.html", {
+        "panel_nav": _org_nav(request, org, row, "organization_manage_page"),
+        "org": org, "my_row": row, "form": form, "delete_form": delete_form,
+    })
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def manage_members(request, slug):
+    org, row = _manage(request, slug, "manage")
+    invite_form = InviteForm(request.POST if request.POST.get("action") == "invite" else None)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        target = None
+        if request.POST.get("member", "").isdigit():
+            target = org.memberships.select_related("user").filter(pk=int(request.POST["member"])).first()
+        if action == "invite":
+            if invite_form.is_valid():
+                member = invite_form.cleaned_data["username"]
+                _, problem = services.invite(org, member, request.user)
+                if problem:
+                    messages.warning(request, problem)
+                elif services.membership(org, member):
+                    messages.success(request, f"{member.username} had asked to join, so they're in now.")
+                else:
+                    messages.success(request, f"Invited {member.username}.")
+                return redirect("organization_manage_members", slug=org.slug)
+        elif action in ("approve", "decline_request", "cancel_invite") and request.POST.get("request", "").isdigit():
+            pending = org.requests.select_related("member").filter(pk=int(request.POST["request"])).first()
+            if pending is not None:
+                if action == "approve" and pending.kind == OrganizationRequest.Kind.REQUEST:
+                    services.accept(pending, request.user)
+                    messages.success(request, f"{pending.member.username} is now a member.")
+                else:
+                    services.decline(pending)
+                    messages.success(request, "Done.")
+            return redirect("organization_manage_members", slug=org.slug)
+        elif target is not None and action == "update":
+            if not services.can_change(row, target):
+                raise PermissionDenied
+            form = MemberSettingsForm(request.POST)
+            if form.is_valid():
+                for field in ("title", "can_publish", "can_use_inbox", "can_edit_profile"):
+                    setattr(target, field, form.cleaned_data[field])
+                target.save(update_fields=["title", "can_publish", "can_use_inbox", "can_edit_profile"])
+                messages.success(request, f"Saved {target.user.username}'s settings.")
+            return redirect("organization_manage_members", slug=org.slug)
+        elif target is not None and action == "remove":
+            if not services.can_change(row, target):
+                raise PermissionDenied
+            name = target.user.username
+            target.delete()
+            messages.success(request, f"Removed {name}.")
+            return redirect("organization_manage_members", slug=org.slug)
+        elif target is not None and action in ("make_co_owner", "make_member"):
+            problem = services.set_role(row, target, Role.CO_OWNER if action == "make_co_owner" else Role.MEMBER)
+            if problem:
+                messages.warning(request, problem)
+            else:
+                messages.success(request, f"{target.user.username} is now a {target.get_role_display().lower()}.")
+            return redirect("organization_manage_members", slug=org.slug)
+        elif target is not None and action == "transfer":
+            problem = services.transfer_ownership(row, target)
+            if problem:
+                messages.warning(request, problem)
+            else:
+                messages.success(request, f"{target.user.username} is now the owner. You're a co-owner.")
+            return redirect("organization_manage_members", slug=org.slug)
+    rows = _member_rows(org)
+    for member_row in rows:
+        member_row.editable = services.can_change(row, member_row)
+    return render(request, "organizations/manage/members.html", {
+        "panel_nav": _org_nav(request, org, row, "organization_manage_members"),
+        "org": org, "my_row": row, "rows": rows,
+        "permissions": services.PERMISSIONS,
+        "invite_form": invite_form,
+        "join_requests": org.requests.filter(kind=OrganizationRequest.Kind.REQUEST).select_related("member"),
+        "invites": org.requests.filter(kind=OrganizationRequest.Kind.INVITE).select_related("member", "created_by"),
+    })
