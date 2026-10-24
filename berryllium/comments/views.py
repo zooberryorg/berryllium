@@ -42,6 +42,9 @@ def section_context(request, obj, page_number=1):
         "owner_ids": {member.pk for member in targets.owners(obj)},
         "login_url": f"{reverse('login')}?next={target_url}%23comments",
         "form": _new_form(),  # the top-level form; replaced by the submitted one when it has errors
+        "latest_id": services.latest_id(
+            obj
+        ),  # the "new comments" check counts from here
     }
 
 
@@ -53,16 +56,29 @@ def _section(request, obj, form=None, error=""):
     comments = section_context(request, obj)
     if form is not None:
         comments["form"] = form
-    return render(request, "comments/section.html", {"comments": comments, "form_error": error})
+    return render(
+        request, "comments/section.html", {"comments": comments, "form_error": error}
+    )
 
 
-def _thread(request, obj, thread_id, reply_form=None, reply_to=None, quote=None, error=""):
+def _thread(
+    request, obj, thread_id, reply_form=None, reply_to=None, quote=None, error=""
+):
     comments = section_context(request, obj)
     thread = services.get_thread(thread_id)
-    return render(request, "comments/thread.html", {
-        "comments": comments, "thread": thread, "oob_count": True,
-        "reply_form": reply_form, "reply_to": reply_to, "quote": quote, "form_error": error,
-    })
+    return render(
+        request,
+        "comments/thread.html",
+        {
+            "comments": comments,
+            "thread": thread,
+            "oob_count": True,
+            "reply_form": reply_form,
+            "reply_to": reply_to,
+            "quote": quote,
+            "form_error": error,
+        },
+    )
 
 
 def _posted(response, comment):
@@ -75,7 +91,12 @@ def _comment_on(obj, pk):
     """A comment on this target that can be answered or quoted."""
     if not pk or not str(pk).isdigit():
         return None
-    comment = services.comments_for(obj).select_related("author", "parent").filter(pk=int(pk), is_deleted=False).first()
+    comment = (
+        services.comments_for(obj)
+        .select_related("author", "parent")
+        .filter(pk=int(pk), is_deleted=False)
+        .first()
+    )
     if comment is None:
         raise Http404("That comment is gone.")
     return comment
@@ -87,6 +108,7 @@ def _editable(request, comment_id):
     if obj is None or not targets.can_view(obj, request.user):
         raise Http404("Comment not found.")
     return comment, obj
+
 
 # --------------------------------------------------------------------------- reading
 
@@ -100,6 +122,39 @@ def more(request, kind, pk):
     comments = section_context(request, obj, request.GET.get("page", 1))
     return render(request, "comments/list.html", {"comments": comments})
 
+
+@require_GET
+def section(request, kind, pk):
+    """The whole comment section again (the "Show new comments" button)."""
+    obj = targets.get_target(kind, pk)
+    if not targets.can_view(obj, request.user):
+        raise Http404("Not found.")
+    return _section(request, obj)
+
+
+@require_GET
+def updates(request, kind, pk):
+    """
+    Checked every 30 seconds while the page is visible: how many comments others posted since the
+    section was loaded (?after=<newest id then>). 204 (nothing to change) when there are none.
+    """
+    obj = targets.get_target(kind, pk)
+    after = request.GET.get("after", "")
+    if not targets.can_view(obj, request.user) or not after.isdigit():
+        return HttpResponse(status=286)  # stop polling
+    count = services.new_since(obj, int(after), request.user)
+    if not count:
+        return HttpResponse(status=204)
+    return render(
+        request,
+        "comments/updates.html",
+        {
+            "comments": {"kind": kind, "target": obj, "latest_id": int(after)},
+            "new_count": count,
+        },
+    )
+
+
 # --------------------------------------------------------------------------- posting
 
 
@@ -112,11 +167,23 @@ def create(request, kind, pk):
     reply_to = _comment_on(obj, request.POST.get("reply_to"))
     quote = _comment_on(obj, request.POST.get("quote"))
     # a reply form keeps its own ids, so it doesn't clash with the main form on the page
-    form = CommentForm(request.POST, auto_id=f"id_reply_{reply_to.thread_id}_%s" if reply_to else "id_comment_%s", rows=4 if reply_to else None)
+    form = CommentForm(
+        request.POST,
+        auto_id=f"id_reply_{reply_to.thread_id}_%s" if reply_to else "id_comment_%s",
+        rows=4 if reply_to else None,
+    )
 
     def failed(message=""):
         if reply_to is not None:
-            return _thread(request, obj, reply_to.thread_id, reply_form=form, reply_to=reply_to, quote=quote, error=message)
+            return _thread(
+                request,
+                obj,
+                reply_to.thread_id,
+                reply_form=form,
+                reply_to=reply_to,
+                quote=quote,
+                error=message,
+            )
         return _section(request, obj, form=form, error=message)
 
     if not services.can_comment(obj, request.user):
@@ -124,12 +191,17 @@ def create(request, kind, pk):
     if not form.is_valid():
         return failed()
     if services.too_soon(request.user):
-        return failed("You're commenting very quickly. Wait a few seconds and try again.")
+        return failed(
+            "You're commenting very quickly. Wait a few seconds and try again."
+        )
 
-    comment = services.create_comment(obj, request.user, form.cleaned_data["body"], reply_to=reply_to, quote=quote)
+    comment = services.create_comment(
+        obj, request.user, form.cleaned_data["body"], reply_to=reply_to, quote=quote
+    )
     if reply_to is not None:
         return _posted(_thread(request, obj, comment.thread_id), comment)
     return _posted(_section(request, obj), comment)
+
 
 @login_required
 @require_GET
@@ -139,11 +211,24 @@ def reply_form(request, comment_id):
     if comment.is_deleted or not services.can_comment(obj, request.user):
         return HttpResponse("")
     quote = comment if request.GET.get("quote") else None
-    form = CommentForm(auto_id=f"id_reply_{comment.thread_id}_%s", rows=4, placeholder=f"Reply to {comment.author.username if comment.author else 'this comment'}...")
-    return render(request, "comments/form.html", {
-        "comments": section_context(request, obj), "form": form, "mode": "reply",
-        "thread_id": comment.thread_id, "reply_to": comment, "quote": quote,
-    })
+    form = CommentForm(
+        auto_id=f"id_reply_{comment.thread_id}_%s",
+        rows=4,
+        placeholder=f"Reply to {comment.author.username if comment.author else 'this comment'}...",
+    )
+    return render(
+        request,
+        "comments/form.html",
+        {
+            "comments": section_context(request, obj),
+            "form": form,
+            "mode": "reply",
+            "thread_id": comment.thread_id,
+            "reply_to": comment,
+            "quote": quote,
+        },
+    )
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -151,16 +236,29 @@ def edit(request, comment_id):
     comment, obj = _editable(request, comment_id)
     comments = section_context(request, obj)
     if request.method == "GET" and request.GET.get("cancel"):
-        return render(request, "comments/comment.html", {"comments": comments, "comment": comment})
+        return render(
+            request, "comments/comment.html", {"comments": comments, "comment": comment}
+        )
     if not services.can_edit(comment, request.user):
         raise PermissionDenied
-    form = CommentForm(request.POST or None, initial={"body": comment.body}, auto_id=f"id_edit_{comment.pk}_%s")
+    form = CommentForm(
+        request.POST or None,
+        initial={"body": comment.body},
+        auto_id=f"id_edit_{comment.pk}_%s",
+    )
     if request.method == "POST" and form.is_valid():
         comment.body = form.cleaned_data["body"]
         comment.edited_at = timezone.now()
         comment.save(update_fields=["body", "edited_at"])
-        return render(request, "comments/comment.html", {"comments": comments, "comment": comment})
-    return render(request, "comments/form.html", {"comments": comments, "form": form, "mode": "edit", "comment": comment})
+        return render(
+            request, "comments/comment.html", {"comments": comments, "comment": comment}
+        )
+    return render(
+        request,
+        "comments/form.html",
+        {"comments": comments, "form": form, "mode": "edit", "comment": comment},
+    )
+
 
 @login_required
 @require_POST
@@ -174,6 +272,7 @@ def delete(request, comment_id):
     # the thread may be gone entirely then only the counter is sent
     return _thread(request, obj, thread_id)
 
+
 @login_required
 @require_POST
 def toggle(request, kind, pk):
@@ -185,6 +284,7 @@ def toggle(request, kind, pk):
     type(obj).objects.filter(pk=obj.pk).update(comments_enabled=obj.comments_enabled)
     return _section(request, obj)
 
+
 # --------------------------------------------------------------------------- editor helpers (comments and messages)
 
 
@@ -195,14 +295,27 @@ def preview(request):
     html = render_markdown(request.POST.get("description", ""))
     return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
 
+
 @login_required
 @require_POST
 def image(request):
     since = timezone.now() - timedelta(days=1)
-    if UploadedImage.objects.filter(uploader=request.user, created_at__gte=since).count() >= DAILY_IMAGE_LIMIT:
-        return JsonResponse({"error": f"You can add up to {DAILY_IMAGE_LIMIT} images a day. Try again tomorrow."}, status=400)
+    if (
+        UploadedImage.objects.filter(
+            uploader=request.user, created_at__gte=since
+        ).count()
+        >= DAILY_IMAGE_LIMIT
+    ):
+        return JsonResponse(
+            {
+                "error": f"You can add up to {DAILY_IMAGE_LIMIT} images a day. Try again tomorrow."
+            },
+            status=400,
+        )
     form = DescriptionImageForm(request.POST, request.FILES)
     if not form.is_valid():
         return JsonResponse({"error": form.errors["image"][0]}, status=400)
-    uploaded = UploadedImage.objects.create(uploader=request.user, image=form.cleaned_data["image"])
+    uploaded = UploadedImage.objects.create(
+        uploader=request.user, image=form.cleaned_data["image"]
+    )
     return JsonResponse({"url": uploaded.image.url})
