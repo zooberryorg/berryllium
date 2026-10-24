@@ -11,7 +11,7 @@
             {% csrf_token %}
             <label class="sr-only" for="new-moderator">Username</label>
             <input id="new-moderator" name="username" required placeholder="Username of the member to add" autocomplete="off" class="zb-input text-sm flex-1">
-            <button type="submit" name="action" value="add" class="inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors duration-150 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2 border-gold-400/50 text-gold-200 enabled:hover:bg-gold-400 enabled:hover:text-pine-500 justify-center"><i class="bi bi-person-plus"></i> Add moderator</button>
+            <button type="submit" name="action" value="add" class="zb-action inline-flex items-center justify-center gap-1.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-gold-400 focus-visible:outline-offset-2"><i class="bi bi-person-plus"></i> Add moderator</button>
         </form>
         {% if moderators %}
             <ul class="divide-y divide-white/5">
