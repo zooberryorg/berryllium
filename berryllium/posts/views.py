@@ -25,7 +25,13 @@ from berryllium.posts.forms import (
     clean_post_file,
 )
 from berryllium.posts.models import Post, PostFile, PostImage
-from berryllium.posts.services import can_view, is_public, publish_post, publish_problems, published_posts
+from berryllium.posts.services import (
+    can_view,
+    is_public,
+    publish_post,
+    publish_problems,
+    published_posts,
+)
 from berryllium.shared.fields import proper_case
 from berryllium.shared.markdown_render import render_markdown, render_markdown_with_toc
 from berryllium.users.permissions import can_edit_post, can_post_news
@@ -47,8 +53,9 @@ def _editable_post(request, post_id):
 
 
 def _noun(user):
-    """"Article" for the site team (they pick the kind) or "Tutorial" for regular members (they can only post tutorials)."""
+    """ "Article" for the site team (they pick the kind) or "Tutorial" for regular members (they can only post tutorials)."""
     return "Article" if can_post_news(user) else "Tutorial"
+
 
 # --------------------------------------------------------------------------- create (modal)
 
@@ -56,7 +63,11 @@ def _noun(user):
 @login_required
 @require_http_methods(["GET", "POST"])
 def create_draft(request):
-    form = PostGeneralForm(request.POST or None, uploader=request.user, can_post_news=can_post_news(request.user))
+    form = PostGeneralForm(
+        request.POST or None,
+        uploader=request.user,
+        can_post_news=can_post_news(request.user),
+    )
     if request.method == "POST" and form.is_valid():
         post = form.save(commit=False)
         post.uploaded_by = request.user
@@ -66,7 +77,10 @@ def create_draft(request):
         response = HttpResponse()
         response["HX-Redirect"] = reverse("post_edit", kwargs={"post_id": post.pk})
         return response
-    return render(request, "posts/create/draft.html", {"form": form, "noun": _noun(request.user)})
+    return render(
+        request, "posts/create/draft.html", {"form": form, "noun": _noun(request.user)}
+    )
+
 
 # --------------------------------------------------------------------------- editor
 
@@ -75,7 +89,12 @@ def create_draft(request):
 @require_http_methods(["GET", "POST"])
 def edit(request, post_id):
     post = _editable_post(request, post_id)
-    form_kwargs = {"instance": post, "uploader": post.uploaded_by, "can_post_news": can_post_news(request.user), "user": request.user}
+    form_kwargs = {
+        "instance": post,
+        "uploader": post.uploaded_by,
+        "can_post_news": can_post_news(request.user),
+        "user": request.user,
+    }
     if request.method == "POST":
         action = request.POST.get("action", "save")
         form = PostEditorForm(request.POST, **form_kwargs)
@@ -84,14 +103,20 @@ def edit(request, post_id):
             form.save()
             form.save_relations()
         if action == "autosave":
-            errors = [message for field_errors in form.errors.values() for message in field_errors]
+            errors = [
+                message
+                for field_errors in form.errors.values()
+                for message in field_errors
+            ]
             return JsonResponse({"saved": saved, "errors": errors[:3]})
         if saved and action == "publish":
             problems = publish_problems(post)
             if not problems:
                 was_live = post.first_published_at is not None
                 publish_post(post)
-                messages.success(request, "Changes saved." if was_live else "Published.")
+                messages.success(
+                    request, "Changes saved." if was_live else "Published."
+                )
                 return redirect("post_detail", post_id=post.pk)
             messages.error(request, "Fix the items under Before publishing first.")
         elif saved and action == "preview":
@@ -103,15 +128,19 @@ def edit(request, post_id):
             messages.error(request, "Some fields need fixing. They're marked below.")
     else:
         form = PostEditorForm(**form_kwargs)
-    return render(request, "posts/editor/base.html", {
-        "form": form,
-        "post": post,
-        "problems": publish_problems(post),
-        "files": post.files.all(),
-        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS),
-        "max_files": MAX_POST_FILES,
-        "noun": post.get_kind_display(),
-    })
+    return render(
+        request,
+        "posts/editor/base.html",
+        {
+            "form": form,
+            "post": post,
+            "problems": publish_problems(post),
+            "files": post.files.all(),
+            "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS),
+            "max_files": MAX_POST_FILES,
+            "noun": post.get_kind_display(),
+        },
+    )
 
 
 @login_required
@@ -134,7 +163,10 @@ def thumbnail(request, post_id):
             post.save(update_fields=["thumbnail", "last_updated"])
         else:
             error = form.errors["image"][0]
-    return render(request, "posts/editor/thumbnail.html", {"post": post, "thumbnail_error": error})
+    return render(
+        request, "posts/editor/thumbnail.html", {"post": post, "thumbnail_error": error}
+    )
+
 
 @login_required
 @require_POST
@@ -145,20 +177,32 @@ def files(request, post_id):
     uploads = request.FILES.getlist("files")
     room = MAX_POST_FILES - post.files.count()
     if len(uploads) > room:
-        errors.append(f"A post can have at most {MAX_POST_FILES} files. Remove some first.")
-        uploads = uploads[:max(room, 0)]
+        errors.append(
+            f"A post can have at most {MAX_POST_FILES} files. Remove some first."
+        )
+        uploads = uploads[: max(room, 0)]
     order = post.files.count()
     for upload in uploads:
         problem = clean_post_file(upload)
         if problem:
             errors.append(problem)
             continue
-        PostFile.objects.create(post=post, file=upload, filename=upload.name, size=upload.size, order=order)
+        PostFile.objects.create(
+            post=post, file=upload, filename=upload.name, size=upload.size, order=order
+        )
         order += 1
-    return render(request, "posts/editor/files.html", {
-        "post": post, "files": post.files.all(), "file_errors": errors,
-        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
-    })
+    return render(
+        request,
+        "posts/editor/files.html",
+        {
+            "post": post,
+            "files": post.files.all(),
+            "file_errors": errors,
+            "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS),
+            "max_files": MAX_POST_FILES,
+        },
+    )
+
 
 @login_required
 @require_POST
@@ -170,10 +214,18 @@ def file_change(request, post_id, file_id):
     else:
         attachment.title = request.POST.get("title", "").strip()[:255]
         attachment.save(update_fields=["title"])
-    return render(request, "posts/editor/files.html", {
-        "post": post, "files": post.files.all(), "file_errors": [],
-        "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS), "max_files": MAX_POST_FILES,
-    })
+    return render(
+        request,
+        "posts/editor/files.html",
+        {
+            "post": post,
+            "files": post.files.all(),
+            "file_errors": [],
+            "file_extensions": ", ".join("." + e for e in POST_FILE_EXTENSIONS),
+            "max_files": MAX_POST_FILES,
+        },
+    )
+
 
 @login_required
 @require_POST
@@ -195,6 +247,7 @@ def preview(request, post_id):
     html = render_markdown(request.POST.get("description", ""))
     return HttpResponse(html or '<p class="opacity-60">Nothing to preview yet.</p>')
 
+
 # --------------------------------------------------------------------------- reading
 
 
@@ -207,27 +260,52 @@ def detail(request, post_id):
     credits = list(post.credits.select_related("member", "author__member"))
     # related: same kind, most shared tags first, then newest
     tag_ids = list(post.tags.values_list("pk", flat=True))
-    related = published_posts(post.kind).exclude(pk=post.pk).select_related("uploaded_by")
+    related = (
+        published_posts(post.kind).exclude(pk=post.pk).select_related("uploaded_by")
+    )
     if tag_ids:
-        related = related.annotate(shared=Count("tags", filter=Q(tags__in=tag_ids))).order_by("-shared", "-publish_date")
+        related = related.annotate(
+            shared=Count("tags", filter=Q(tags__in=tag_ids))
+        ).order_by("-shared", "-publish_date")
     related = related[:3]
-    return render(request, "posts/detail/base.html", {
-        "post": post,
-        "body_html": body_html,
-        "toc": toc,
-        "files": list(post.files.all()),
-        "collaborators": [c for c in credits if c.role == ModCredit.Role.COLLABORATOR],
-        "original_authors": [c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR],
-        "tags": list(post.tags.all()),
-        "original_websites": list(post.original_websites.all()),
-        "related": related,
-        # "Updated" only when an edit came more than a day after publishing
-        "was_updated": bool(post.first_published_at) and (post.last_updated - post.publish_date).total_seconds() > 86400,
-        "is_public": is_public(post),
-        "can_edit": can_edit_post(request.user, post),
-        "explore_tab": "news" if post.kind == Post.Kind.NEWS else "tutorials",
-        "comments": comments_context(request, post),
-    })
+    return render(
+        request,
+        "posts/detail/base.html",
+        {
+            "post": post,
+            "body_html": body_html,
+            "toc": toc,
+            "files": list(post.files.all()),
+            "collaborators": [
+                c for c in credits if c.role == ModCredit.Role.COLLABORATOR
+            ],
+            "original_authors": [
+                c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR
+            ],
+            "tags": list(post.tags.all()),
+            "category_chips": options.category_chips(post.category, "article"),
+            "game_labels": [
+                label
+                for key, label in options.game_labels().items()
+                if key in options.keys(post.game) and key != options.NOT_APPLICABLE
+            ],
+            "expansion_labels": [
+                options.expansion_labels().get(key, key)
+                for key in options.keys(post.expansions)
+                if key != options.NO_EXPANSION
+            ],
+            "original_websites": list(post.original_websites.all()),
+            "related": related,
+            # "Updated" only when an edit came more than a day after publishing
+            "was_updated": bool(post.first_published_at)
+            and (post.last_updated - post.publish_date).total_seconds() > 86400,
+            "is_public": is_public(post),
+            "can_edit": can_edit_post(request.user, post),
+            "explore_tab": "news" if post.kind == Post.Kind.NEWS else "tutorials",
+            "comments": comments_context(request, post),
+        },
+    )
+
 
 @require_GET
 def download(request, file_id):
@@ -235,48 +313,191 @@ def download(request, file_id):
     if not can_view(attachment.post, request.user):
         raise Http404("File not found.")
     if is_public(attachment.post):
-        PostFile.objects.filter(pk=attachment.pk).update(download_count=F("download_count") + 1)
-    return FileResponse(attachment.file.open("rb"), as_attachment=True, filename=attachment.filename)
+        PostFile.objects.filter(pk=attachment.pk).update(
+            download_count=F("download_count") + 1
+        )
+    return FileResponse(
+        attachment.file.open("rb"), as_attachment=True, filename=attachment.filename
+    )
+
+
+MAX_TAGS = 10
+
+
+def _remove_url(params, key, value=None):
+    """The current query string without one filter (and without the page number)."""
+    query = params.copy()
+    query.pop("page", None)
+    if value is None:
+        query.pop(key, None)
+    else:
+        query.setlist(key, [v for v in query.getlist(key) if v != value])
+    encoded = query.urlencode()
+    return f"?{encoded}" if encoded else "?"
 
 
 def _listing(request, kind, explore_tab):
     params = request.GET
+    category_names, game_names = (
+        options.category_labels("article"),
+        options.game_labels(),
+    )
     q = params.get("q", "").strip()[:100]
-    tag = proper_case(params.get("tag", ""))[:50]
+    category = params.get("category", "")
+    category = category if category in category_names else ""
+    tags = list(
+        dict.fromkeys(proper_case(t) for t in params.getlist("tag") if t.strip())
+    )[:MAX_TAGS]
     sort = params.get("sort", "")
     sort = sort if sort in SORTS else "recent"
-    game_options = [option for option in GAME_OPTIONS if option[0] != "na"]
     game = params.get("game", "")
-    game = game if game in dict(game_options) else ""
+    game = game if game in game_names and game != options.NOT_APPLICABLE else ""
     period = params.get("period", "")
     period = period if period in PERIODS else ""
-    posts = published_posts(kind).select_related("uploaded_by").prefetch_related("tags")
+    base = published_posts(kind)
+    posts = base.select_related("uploaded_by", "organization").prefetch_related("tags")
     if q:
-        posts = posts.filter(Q(title__icontains=q) | Q(summary__icontains=q) | Q(tags__name__icontains=q)).distinct()
-    if tag:
+        posts = posts.filter(
+            Q(title__icontains=q) | Q(summary__icontains=q) | Q(tags__name__icontains=q)
+        ).distinct()
+    if category:
+        posts = posts.filter(_csv_has("category", category))
+    for tag in tags:
         posts = posts.filter(tags__name__iexact=tag)
     if game:
         posts = posts.filter(_csv_has("game", game))
     if period:
-        posts = posts.filter(publish_date__gte=timezone.now() - timedelta(days=PERIODS[period][1]))
-    page = Paginator(posts.order_by(*SORTS[sort][1]), PAGE_SIZE).get_page(params.get("page"))
+        posts = posts.filter(
+            publish_date__gte=timezone.now() - timedelta(days=PERIODS[period][1])
+        )
+    page = Paginator(posts.order_by(*SORTS[sort][1]), PAGE_SIZE).get_page(
+        params.get("page")
+    )
+    for post in page.object_list:
+        post.category_chips = options.category_chips(post.category, "article")
+    active = []
+    if q:
+        active.append(
+            {
+                "label": f'"{q}"',
+                "name": "q",
+                "value": "",
+                "url": _remove_url(params, "q"),
+            }
+        )
+    if category:
+        active.append(
+            {
+                "label": category_names[category],
+                "name": "category",
+                "value": "",
+                "url": _remove_url(params, "category"),
+            }
+        )
+    for tag in tags:
+        active.append(
+            {
+                "label": tag,
+                "name": "tag",
+                "value": tag,
+                "url": _remove_url(params, "tag", tag),
+            }
+        )
+    if game:
+        active.append(
+            {
+                "label": game_names[game],
+                "name": "game",
+                "value": "",
+                "url": _remove_url(params, "game"),
+            }
+        )
+    if period:
+        active.append(
+            {
+                "label": PERIODS[period][0],
+                "name": "period",
+                "value": "",
+                "url": _remove_url(params, "period"),
+            }
+        )
     page_query = params.copy()
     page_query.pop("page", None)
     context = {
         "page": page,
-        "page_range": list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)),
+        "page_range": list(
+            page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1)
+        ),
         "page_query": page_query.urlencode(),
-        "q": q, "tag": tag, "sort": sort, "game": game, "period": period,
-        "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
-        "game_options": game_options,
-        "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
+        "q": q,
+        "sort": sort,
+        "game": game,
+        "period": period,
+        "filters": {"q": q, "category": category, "tags": tags},
+        "active_filters": active,
         "kind": kind,
         "kind_label": dict(Post.Kind.choices)[kind],
         "explore_tab": explore_tab,
-        "has_any": published_posts(kind).exists(),
+        "has_any": base.exists(),
     }
-    is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
-    return render(request, "posts/explore/results.html" if is_htmx else "posts/explore/base.html", context)
+    is_htmx = request.headers.get("HX-Request") and not request.headers.get(
+        "HX-History-Restore-Request"
+    )
+    if is_htmx:
+        return render(request, "posts/explore/results.html", context)
+    icons = options.category_icons("article")
+    context.update(
+        {
+            "categories": [
+                {
+                    "key": key,
+                    "label": label,
+                    "icon": icons.get(key, "bi-folder"),
+                    "count": base.filter(_csv_has("category", key)).count(),
+                }
+                for key, label in options.article_categories()
+            ],
+            "total_published": base.count(),
+            "tag_picker": picker_config(
+                name="tag",
+                search_url=reverse("explore_search_article_tags") + f"?kind={kind}",
+                items=[{"value": t, "label": t} for t in tags],
+                title="Filter by tags",
+                placeholder="Search tags...",
+                empty_text="No tags match.",
+            ),
+            "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
+            "game_options": options.game_options(include_na=False),
+            "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
+        }
+    )
+    return render(request, "posts/explore/base.html", context)
+
+
+@require_GET
+def search_article_tags(request):
+    from berryllium.shared.models import Tag
+
+    kind = request.GET.get("kind", "")
+    q = request.GET.get("q", "").strip()[:100]
+    now = timezone.now()
+    used = Q(posts__draft=False, posts__publish_date__lte=now)
+    if kind in dict(Post.Kind.choices):
+        used &= Q(posts__kind=kind)
+    tags = Tag.objects.annotate(uses=Count("posts", filter=used, distinct=True)).filter(
+        uses__gt=0
+    )
+    if q:
+        tags = tags.filter(name__icontains=q)
+    results = [
+        {
+            "value": t.name,
+            "label": t.name,
+            "sublabel": f"{t.uses} article{'s' if t.uses != 1 else ''}",
+        }
+        for t in tags.order_by("-uses", "name")[:20]
+    ]
+    return JsonResponse({"results": results})
 
 
 @require_GET
@@ -288,7 +509,8 @@ def explore_tutorials(request):
 def explore_news(request):
     return _listing(request, Post.Kind.NEWS, "news")
 
-# --------------------------------------------------------------------------- Settings > My posts
+
+# --------------------------------------------------------------------------- Control Panel > My articles
 
 
 def _my_posts(user):
@@ -298,19 +520,25 @@ def _my_posts(user):
 @login_required
 def settings_posts(request):
     from berryllium.users.settings_views import _nav  # the Settings menu
+
     posts = _my_posts(request.user).order_by("-last_updated")
-    return render(request, "posts/settings/posts.html", {
-        "posts": posts,
-        "panel_nav": _nav(request, "settings_posts"),
-        "noun": _noun(request.user),
-    })
+    return render(
+        request,
+        "posts/settings/posts.html",
+        {
+            "posts": posts,
+            "panel_nav": _nav(request, "settings_posts"),
+            "noun": _noun(request.user),
+        },
+    )
+
 
 @login_required
 @require_POST
 def settings_posts_change(request, post_id):
     post = get_object_or_404(_my_posts(request.user), pk=post_id)
     action = request.POST.get("action")
-    name = f"\u201c{post.title or 'Untitled post'}\u201d"
+    name = f"\u201c{post.title or 'Untitled article'}\u201d"
     if action == "unpublish" and not post.draft:
         post.draft = True
         post.save(update_fields=["draft"])
@@ -318,7 +546,10 @@ def settings_posts_change(request, post_id):
     elif action == "publish" and post.draft:
         problems = publish_problems(post)
         if problems:
-            messages.warning(request, f"{name} wasn't published: " + " ".join(p["message"] for p in problems))
+            messages.warning(
+                request,
+                f"{name} wasn't published: " + " ".join(p["message"] for p in problems),
+            )
         else:
             publish_post(post)
             messages.success(request, f"Published {name}.")
