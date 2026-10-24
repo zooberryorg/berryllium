@@ -5,7 +5,8 @@ from django.urls import reverse
 
 from berryllium.mods.models import Mod
 from berryllium.mods.review import _labels
-from berryllium.mods.settings import GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES
+from berryllium.mods.settings import GALLERY_RATIO
+from berryllium.shared import options
 from berryllium.mods.views.explore import (
     DEFAULT_SORT,
     MAX_QUERY_LENGTH,
@@ -68,9 +69,9 @@ def profile_context(request, mods_queryset):
     page = Paginator(results, PAGE_SIZE).get_page(params.get("page"))
     for mod in page.object_list:
         mod.card_image_url = default_storage.url(mod.card_image_path) if mod.card_image_path else None
-        mod.category_labels = _labels(mod.category, MOD_CATEGORIES)
+        mod.category_labels = _labels(mod.category, options.category_labels("mod"))
         mod.category_chips = _category_chips(mod.category)
-        mod.game_labels = _labels(mod.game, GAME_OPTIONS)
+        mod.game_labels = _labels(mod.game, options.game_labels())
 
     page_query = params.copy()
     page_query.pop("page", None)

@@ -2,11 +2,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from berryllium.mods.models import ModCredit, ModFile, ModFileGroup, ModImage
-from berryllium.mods.settings import EXPANSION_REQUIREMENTS, GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES
+from berryllium.mods.settings import GALLERY_RATIO
+from berryllium.shared import options
 
 
 def _labels(stored, choices):
-    """ "animals, scripts" -> ["Animals", "Scripts"] using a settings choices list."""
+    """ "animals, scripts" -> ["Animals", "Scripts"] using a {key: label} map (or a choices list)."""
     lookup = dict(choices)
     return [lookup.get(key.strip(), key.strip()) for key in (stored or "").split(",") if key.strip()]
 
@@ -73,9 +74,9 @@ def review_context(mod):
         "original_authors": [c for c in credits if c.role == ModCredit.Role.ORIGINAL_AUTHOR],
         "original_websites": list(mod.original_websites.all()),
         # categorization
-        "category_labels": _labels(mod.category, MOD_CATEGORIES),
-        "game_labels": _labels(mod.game, GAME_OPTIONS),
-        "expansion_labels": _labels(mod.expansions, EXPANSION_REQUIREMENTS),
+        "category_labels": _labels(mod.category, options.category_labels("mod")),
+        "game_labels": _labels(mod.game, options.game_labels()),
+        "expansion_labels": _labels(mod.expansions, options.expansion_labels()),
         "tags": list(mod.tags.all()),
         "pending_tags": mod.pending_tags or [],
         # files

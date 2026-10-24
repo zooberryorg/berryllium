@@ -10,14 +10,8 @@ from berryllium.comments.views import section_context as comments_context
 from berryllium.mods.models import Mod, ModCredit, ModFile, ModFileGroup
 from berryllium.users.permissions import can_edit_mod, is_moderator
 from berryllium.mods.review import _labels
-from berryllium.mods.settings import (
-    EXPANSION_REQUIREMENTS,
-    GALLERY_RATIO,
-    GAME_OPTIONS,
-    MOD_CATEGORIES,
-    MOD_CATEGORY_ICONS,
-)
-
+from berryllium.mods.settings import GALLERY_RATIO
+from berryllium.shared import options
 TABS = ("description", "files", "credits", "comments")
 
 
@@ -89,11 +83,11 @@ def mod_detail(request, mod_id):
         "original_websites": list(mod.original_websites.all()),
         # categorization
         "categories": [
-            {"key": key, "label": dict(MOD_CATEGORIES).get(key, key), "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder")}
+            {"key": key, "label": options.category_labels("mod").get(key, key), "icon": options.category_icons("mod").get(key, "bi-folder")}
             for key in category_keys
         ],
-        "game_labels": _labels(mod.game, GAME_OPTIONS),
-        "expansion_labels": [label for label in _labels(mod.expansions, EXPANSION_REQUIREMENTS) if label != "None"],
+        "game_labels": _labels(mod.game, options.game_labels()),
+        "expansion_labels": [label for key, label in zip(options.keys(mod.expansions), _labels(mod.expansions, options.expansion_labels())) if key != options.NO_EXPANSION],
         "tags": list(mod.tags.all()),
         "tabs": TABS,
         "can_edit": can_edit_mod(request.user, mod),

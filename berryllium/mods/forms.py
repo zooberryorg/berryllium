@@ -53,11 +53,9 @@ from berryllium.mods.settings import (
     MAX_SUMMARY_LENGTH,
     COLLAPSIBLE_WIDGET_ATTRS,
     DISABLE_SUBMIT_BUTTON_ATTRS,
-    MOD_CATEGORIES,
-    GAME_OPTIONS,
-    EXPANSION_REQUIREMENTS,
     MAX_IMAGE_SIZE,
 )
+from berryllium.shared import options
 
 
 class ModGeneralInfoForm(forms.ModelForm):
@@ -273,6 +271,22 @@ class ModGeneralInfoForm(forms.ModelForm):
             empty_text="No matching websites. Ask staff to add it if it's missing.",
         )
 
+def keep_retired_choices(form, label_maps):
+    """
+    An option an admin turned off stays offered on mods (or articles) that already use it, so saving
+    them again doesn't fail.
+    """
+    instance = getattr(form, "instance", None)
+    for name, labels in label_maps.items():
+        if name not in form.fields:
+            continue
+        field = form.fields[name]
+        offered = list(field.choices)
+        current = options.keys(getattr(instance, name, "") if instance is not None and instance.pk else "")
+        extra = [(key, labels.get(key, key)) for key in current if key not in dict(offered)]
+        if extra:
+            field.choices = offered + extra
+
 class ModCategorizationForm(forms.ModelForm):
     """
     This is Step 1 of the file upload form and has simple meta data
@@ -289,11 +303,10 @@ class ModCategorizationForm(forms.ModelForm):
             ),
         )
 
-    category = multiple_choice_attributes(MOD_CATEGORIES, PillCheckboxSelectMultiple)
-    game = multiple_choice_attributes(GAME_OPTIONS, PillCheckboxSelectMultiple)
-    expansions = multiple_choice_attributes(
-        EXPANSION_REQUIREMENTS, PillCheckboxSelectMultiple
-    )
+    # the lists are edited in the admin (shared.options), so they're read when the form is built
+    category = multiple_choice_attributes(options.mod_categories, PillCheckboxSelectMultiple)
+    game = multiple_choice_attributes(options.game_options, PillCheckboxSelectMultiple)
+    expansions = multiple_choice_attributes(options.expansion_options, PillCheckboxSelectMultiple)
     tags = PickerField(required=False, allow_new=True, max_items=20, label="Tags")
 
     class Meta:
@@ -308,6 +321,12 @@ class ModCategorizationForm(forms.ModelForm):
             value = self.initial.get(name)
             if isinstance(value, str):
                 self.initial[name] = [key.strip() for key in value.split(",") if key.strip()]
+
+        keep_retired_choices(self, {
+            "category": options.category_labels("mod"),
+            "game": options.game_labels(),
+            "expansions": options.expansion_labels(),
+        })
 
     def clean_tags(self):
         return resolve_tags(self.cleaned_data.get("tags", []))
