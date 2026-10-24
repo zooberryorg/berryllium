@@ -1,0 +1,132 @@
+{% extends 'shared/panel/base.html' %}
+{% load bfilters %}
+{% block panel_nav_label %}Organization sections{% endblock %}
+{% block panel_kicker %}{{ org.name }}{% endblock %}
+{% block panel_title %}Members{% endblock %}
+{% block panel_content %}
+    <p class="text-sm text-gray-300">
+        The owner and co-owners can do everything. Other members only get what's ticked for them.
+        {% if my_row.role == 'owner' %}Only you can make co-owners or hand over ownership.{% else %}Only the owner changes co-owners.{% endif %}
+    </p>
+
+    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5" aria-labelledby="invite-title">
+        <h2 id="invite-title" class="text-sm font-semibold uppercase tracking-wider text-gray-400">Invite a member</h2>
+        <form method="post" class="mt-3 flex flex-col sm:flex-row sm:items-start gap-3">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="invite">
+            <div class="flex-1 max-w-sm">{{ invite_form.username }}{% for error in invite_form.username.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}</div>
+            <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm justify-center py-2"><i class="bi bi-person-plus"></i> Invite</button>
+        </form>
+        <p class="text-xs text-gray-400 mt-2">They get a notification and answer from their Control Panel.</p>
+    </section>
+
+    {% if join_requests or invites %}
+        <section class="rounded-2xl border border-gold-400/30 bg-gold-400/5 p-5 space-y-3" aria-labelledby="pending-title">
+            <h2 id="pending-title" class="text-sm font-semibold uppercase tracking-wider text-gold-300">Waiting</h2>
+            {% for pending in join_requests %}
+                <div class="flex flex-wrap items-center gap-3">
+                    {% include 'shared/navigation/avatar.html' with member=pending.member avatar_class="w-9 h-9 text-sm" %}
+                    <div class="min-w-0 flex-1 text-sm">
+                        <p class="text-gray-200"><a href="{% url 'member_profile' pending.member.username %}" class="font-semibold text-white hover:text-gold-200">{{ pending.member.username }}</a> asked to join · {{ pending.created_at|timeago }}</p>
+                        {% if pending.message %}<p class="text-gray-400">“{{ pending.message }}”</p>{% endif %}
+                    </div>
+                    <form method="post" class="flex items-center gap-2">
+                        {% csrf_token %}
+                        <input type="hidden" name="request" value="{{ pending.pk }}">
+                        <button type="submit" name="action" value="approve" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-check2"></i> Let in</button>
+                        <button type="submit" name="action" value="decline_request" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-x-lg"></i> Decline</button>
+                    </form>
+                </div>
+            {% endfor %}
+            {% for pending in invites %}
+                <div class="flex flex-wrap items-center gap-3">
+                    {% include 'shared/navigation/avatar.html' with member=pending.member avatar_class="w-9 h-9 text-sm" %}
+                    <p class="min-w-0 flex-1 text-sm text-gray-300"><span class="font-semibold text-white">{{ pending.member.username }}</span> is invited{% if pending.created_by %} by {{ pending.created_by.username }}{% endif %} · {{ pending.created_at|timeago }}</p>
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="request" value="{{ pending.pk }}">
+                        <button type="submit" name="action" value="cancel_invite" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-x-lg"></i> Cancel invitation</button>
+                    </form>
+                </div>
+            {% endfor %}
+        </section>
+    {% endif %}
+
+    <ul class="divide-y divide-white/5 rounded-2xl border border-pine-300 bg-pine-600 overflow-hidden">
+        {% for row in rows %}
+            <li class="px-4 py-4" x-data="{ editing: false, confirming: '' }">
+                <div class="flex flex-wrap items-center gap-3">
+                    {% include 'shared/navigation/avatar.html' with member=row.user avatar_class="w-10 h-10 text-base" %}
+                    <div class="min-w-0 flex-1">
+                        <p class="flex flex-wrap items-center gap-2">
+                            <a href="{% url 'member_profile' row.user.username %}" class="font-medium text-white hover:text-gold-200">{{ row.user.username }}</a>
+                            <span class="text-[11px] px-2 py-0.5 rounded-full {% if row.role == 'member' %}bg-white/10 text-white/80{% else %}bg-gold-400/15 text-gold-200{% endif %}">{{ row.get_role_display }}</span>
+                            {% if row.user_id == user.pk %}<span class="text-xs text-gray-400">(you)</span>{% endif %}
+                        </p>
+                        <p class="text-xs text-gray-400">
+                            {% if row.title %}{{ row.title }} · {% endif %}joined {{ row.joined_at|timeago }}
+                            {% if row.role == 'member' %}
+                                · {% for field, label, help in permissions %}{% if row|get_attr:field %}<span class="text-gray-200">{{ label }}</span>{% else %}<span class="line-through opacity-60">{{ label }}</span>{% endif %}{% if not forloop.last %}, {% endif %}{% endfor %}
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% if row.editable %}
+                        <div class="flex flex-wrap items-center gap-2" x-show="!confirming">
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="editing = !editing" :aria-expanded="editing.toString()"><i class="bi bi-pencil"></i> Edit</button>
+                            {% if my_row.role == 'owner' %}
+                                <form method="post" class="contents">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="member" value="{{ row.pk }}">
+                                    {% if row.role == 'member' %}
+                                        <button type="submit" name="action" value="make_co_owner" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-shield-plus"></i> Make co-owner</button>
+                                    {% else %}
+                                        <button type="submit" name="action" value="make_member" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-shield-minus"></i> Make member</button>
+                                    {% endif %}
+                                </form>
+                                <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = 'transfer'"><i class="bi bi-key"></i> Hand over ownership</button>
+                            {% endif %}
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = 'remove'"><i class="bi bi-person-dash"></i> Remove</button>
+                        </div>
+                        <form method="post" class="flex flex-wrap items-center gap-2" x-show="confirming" x-cloak role="alert">
+                            {% csrf_token %}
+                            <input type="hidden" name="member" value="{{ row.pk }}">
+                            <span class="text-sm text-gray-200" x-show="confirming === 'remove'">Remove {{ row.user.username }} from {{ org.name }}?</span>
+                            <span class="text-sm text-gray-200" x-show="confirming === 'transfer'">Make {{ row.user.username }} the owner? You'll become a co-owner.</span>
+                            <button type="submit" name="action" :value="confirming" class="zb-action inline-flex items-center gap-1.5 text-sm">Yes</button>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = ''">Cancel</button>
+                        </form>
+                    {% endif %}
+                </div>
+                {% if row.editable %}
+                    <form method="post" class="mt-4 ml-0 sm:ml-13 grid gap-3 rounded-xl border border-white/10 bg-pine-800/40 p-4" x-show="editing" x-cloak>
+                        {% csrf_token %}
+                        <input type="hidden" name="member" value="{{ row.pk }}">
+                        <input type="hidden" name="action" value="update">
+                        <label class="block max-w-sm">
+                            <span class="block text-sm font-medium text-white mb-1">What they do here</span>
+                            <input type="text" name="title" value="{{ row.title }}" maxlength="80" placeholder="e.g. Texture artist" class="zb-input text-sm w-full">
+                        </label>
+                        {% if row.role == 'member' %}
+                            <fieldset class="space-y-2">
+                                <legend class="text-sm font-medium text-white mb-1">Can</legend>
+                                {% for field, label, help in permissions %}
+                                    <label class="flex items-start gap-3 text-sm text-gray-200 cursor-pointer">
+                                        <input type="checkbox" name="{{ field }}" {% if row|get_attr:field %}checked{% endif %} class="mt-0.5">
+                                        <span><span class="text-white">{{ label }}</span> <span class="text-gray-400">· {{ help }}</span></span>
+                                    </label>
+                                {% endfor %}
+                            </fieldset>
+                        {% else %}
+                            <p class="text-xs text-gray-400">Co-owners can do everything, so there's nothing to tick.</p>
+                            {% for field, label, help in permissions %}{% if row|get_attr:field %}<input type="hidden" name="{{ field }}" value="on">{% endif %}{% endfor %}
+                        {% endif %}
+                        <div class="flex items-center gap-2">
+                            <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-check2"></i> Save</button>
+                            <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="editing = false">Cancel</button>
+                        </div>
+                    </form>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
