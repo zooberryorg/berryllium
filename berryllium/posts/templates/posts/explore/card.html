@@ -1,35 +1,67 @@
 {% load bfilters %}
-<article class="group/card relative flex flex-col overflow-hidden rounded-2xl border border-white/10 bg-pine-700 transition-all duration-200 hover:border-gold-400/40 hover:shadow-lg hover:shadow-black/20">
-    <div class="relative aspect-video overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800">
+<article class="group/card relative flex flex-col h-full rounded-2xl border border-white/10 bg-pine-700 overflow-hidden transition-all duration-200 hover:border-gold-400/40 hover:shadow-xl hover:shadow-black/20">
+    {# thumbnail #}
+    <div class="relative overflow-hidden bg-gradient-to-br from-pine-500 to-pine-800" style="aspect-ratio: {{ gallery_ratio|default:'3 / 2' }};">
         {% if post.thumbnail %}
-            <img src="{{ post.thumbnail.url }}" alt="" loading="lazy" class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-[1.03]">
+            <img src="{{ post.thumbnail.url }}" alt="" loading="lazy"
+                 class="w-full h-full object-cover transition-transform duration-300 ease-out group-hover/card:scale-[1.03]">
         {% else %}
-            <span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi {% if post.kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %} text-4xl"></i></span>
+            <span class="w-full h-full flex items-center justify-center text-white/20"><i class="bi bi-image text-4xl"></i></span>
         {% endif %}
-        <span class="absolute top-3 left-3 inline-flex items-center gap-1 rounded-full bg-pine-900/80 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-gold-200">
-            <i class="bi {% if post.kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %}"></i> {{ post.get_kind_display }}
+        <span class="absolute top-3 left-3 flex flex-wrap gap-1.5">
+            <span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-pine-900/75 text-white/80 backdrop-blur-sm">
+                <i class="bi {% if post.kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %}"></i> {{ post.get_kind_display }}
+            </span>
+            {% if post.is_archived_file %}
+                <span class="inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full bg-pine-900/75 text-white/80 backdrop-blur-sm">
+                    <i class="bi bi-archive"></i> Archived
+                </span>
+            {% endif %}
         </span>
     </div>
-    <div class="flex flex-1 flex-col p-4">
-        {% if post.category_chips %}
-            <p class="mb-1.5 flex flex-wrap gap-1.5">
-                {% for chip in post.category_chips|slice:":2" %}<span class="inline-flex items-center gap-1 text-[11px] text-gold-200/90"><i class="bi {{ chip.icon }} text-[10px]"></i>{{ chip.label }}</span>{% endfor %}
-            </p>
-        {% endif %}
-        <h3 class="font-semibold text-white leading-snug line-clamp-2 group-hover/card:text-gold-200 transition-colors">
-            <a href="{{ post.get_absolute_url }}" class="after:absolute after:inset-0 focus-visible:outline-none">{{ post.title }}</a>
+
+    <div class="px-4 pt-4 min-w-0">
+        <h3 class="text-white font-semibold leading-snug truncate" title="{{ post.title }}">
+            <a href="{{ post.get_absolute_url }}" class="hover:text-gold-200 focus-visible:outline-none after:absolute after:inset-0 after:rounded-2xl focus-visible:after:outline-2 focus-visible:after:outline-gold-400 focus-visible:after:outline-offset-2">{{ post.title }}</a>
         </h3>
-        <p class="mt-1.5 text-sm text-granite-200 line-clamp-2" style="overflow-wrap: anywhere;">{{ post.summary }}</p>
-        <div class="mt-auto pt-4 flex items-center gap-2 text-xs text-gray-400">
-            {% if post.uploaded_by %}
-                {% include 'shared/navigation/avatar.html' with member=post.uploaded_by avatar_class="w-6 h-6 text-[10px]" %}
-                <span class="truncate text-white/70">{{ post.uploaded_by.username }}</span>
-            {% endif %}
-            <span class="ml-auto whitespace-nowrap" title="{{ post.publish_date|date:date_prefs.datetime }}">{{ post.publish_date|timeago }}</span>
-            <span aria-hidden="true">·</span>
-            <span class="whitespace-nowrap">{{ post.reading_minutes }} min</span>
-            <span aria-hidden="true">·</span>
-            <span class="whitespace-nowrap" title="{{ post.comment_count }} comment{{ post.comment_count|pluralize }}"><i class="bi bi-chat-left-text"></i> {{ post.comment_count|compact }}</span>
+        {% if post.organization or post.uploaded_by %}
+            <p class="text-xs text-gray-400 truncate">{% include 'mods/explore/byline.html' with mod=post %}</p>
+        {% endif %}
+        <p class="text-sm text-granite-200 mt-1.5 line-clamp-2" style="overflow-wrap: anywhere;">{{ post.summary }}</p>
+    </div>
+
+    {# categorization #}
+    <div class="flex flex-wrap gap-1.5 px-4 mt-3">
+        {% for label in post.game_labels %}
+            <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 text-gold-200">{{ label }}</span>
+        {% endfor %}
+        {% for chip in post.category_chips|slice:":2" %}
+            <span class="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/70">
+                <i class="bi {{ chip.icon }} text-[10px] text-white/50"></i>{{ chip.label }}
+            </span>
+        {% endfor %}
+        {% if post.category_chips|length > 2 %}
+            <span class="text-xs px-2 py-0.5 rounded-full text-white/50" title="{{ post.category_labels|slice:'2:'|join:', ' }}">+{{ post.category_chips|length|add:"-2" }}</span>
+        {% endif %}
+    </div>
+
+    {# stats #}
+    <div class="mt-auto pt-4">
+        <div class="flex items-center gap-1.5 px-4 py-3 border-t border-white/5 text-xs text-gray-400">
+            <dl class="flex items-center gap-1.5">
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="About {{ post.reading_minutes }} minute{{ post.reading_minutes|pluralize }} to read">
+                    <dt><i class="bi bi-clock"></i><span class="sr-only">Reading time</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ post.reading_minutes }} min</dd>
+                </div>
+                <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-pine-800/70 text-gray-300" title="{{ post.comment_count }} comment{{ post.comment_count|pluralize }}">
+                    <dt><i class="bi bi-chat-left-text-fill"></i><span class="sr-only">Comments</span></dt>
+                    <dd class="font-semibold tabular-nums">{{ post.comment_count|compact }}</dd>
+                </div>
+            </dl>
+            <time class="ml-auto pl-2 truncate" datetime="{{ post.publish_date|date:'c' }}"
+                  title="Published {{ post.publish_date|date:date_prefs.datetime }}">
+                <i class="bi bi-calendar3 mr-0.5" aria-hidden="true"></i><span class="sr-only">Published</span> {{ post.publish_date|timeago }}
+            </time>
         </div>
     </div>
 </article>
