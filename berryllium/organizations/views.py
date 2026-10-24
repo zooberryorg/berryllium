@@ -120,3 +120,27 @@ def my_organizations(request):
         "requests": OrganizationRequest.objects.filter(member=request.user, kind=OrganizationRequest.Kind.REQUEST).select_related("organization"),
         "form": form,
     })
+
+# --------------------------------------------------------------------------- managing one organization
+
+def _manage(request, slug, permission):
+    """(org, my membership) when the signed-in member may do `permission` here, otherwise 403."""
+    org = _org(slug)
+    row = services.membership(org, request.user)
+    if not services.can(row, permission):
+        raise PermissionDenied
+    return org, row
+
+def _org_nav(request, org, row, active):
+    nav = [{"group": org.name}]
+    items = [
+        ("organization_manage_page", "Page", "bi-card-text", "edit_profile", None),
+        ("organization_manage_members", "Members", "bi-people", "manage", org.memberships.count()),
+        ("organization_inbox", "Inbox", "bi-envelope", "use_inbox", (inbox.org_unread_count(org) or None) if row.has("use_inbox") else None),
+    ]
+    for name, label, icon, permission, count in items:
+        if services.can(row, permission):
+            nav.append({"url": reverse(name, kwargs={"slug": org.slug}), "label": label, "icon": icon, "count": count, "active": name == active})
+    nav.append({"url": org.get_absolute_url(), "label": "View page", "icon": "bi-box-arrow-up-right", "count": None, "active": False})
+    nav.append({"url": reverse("settings_organizations"), "label": "All organizations", "icon": "bi-arrow-left", "count": None, "active": False})
+    return nav
