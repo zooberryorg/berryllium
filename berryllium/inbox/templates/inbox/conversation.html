@@ -1,10 +1,18 @@
 {% extends 'inbox/base.html' %}
-{% block list_class %}hidden lg:block{% endblock %}
+{% block list_class %}hidden xl:block{% endblock %}
 {% block inbox_main %}
-    <a href="{% url 'inbox' %}" class="lg:hidden mb-3 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gold-300"><i class="bi bi-chevron-left"></i> Inbox</a>
+    <a href="{% url 'inbox' %}" class="xl:hidden mb-3 inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-gold-300"><i class="bi bi-chevron-left"></i> Inbox</a>
     <section class="rounded-2xl border border-pine-300 bg-pine-600" aria-label="Conversation">
         <header class="flex flex-wrap items-center gap-3 border-b border-white/10 px-5 py-4" x-data="{ confirming: false }">
-            {% if other %}
+            {% if org %}
+                <a href="{{ org.get_absolute_url }}" class="flex items-center gap-3 min-w-0 group/person">
+                    {% include 'organizations/logo.html' with org=org logo_class="w-11 h-11 text-lg" %}
+                    <span class="min-w-0">
+                        <span class="block font-semibold text-white truncate group-hover/person:text-gold-200">{{ org.name }}</span>
+                        <span class="block text-xs text-gray-400">Organization · its members answer here</span>
+                    </span>
+                </a>
+            {% elif other %}
                 <a href="{% url 'member_profile' other.username %}" class="flex items-center gap-3 min-w-0 group/person">
                     {% include 'shared/navigation/avatar.html' with member=other avatar_class="w-11 h-11 text-lg" %}
                     <span class="min-w-0">
@@ -19,7 +27,7 @@
                 <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" x-show="!confirming" @click="confirming = true"><i class="bi bi-trash"></i> Delete conversation</button>
                 <form method="post" action="{% url 'inbox_delete' conversation.pk %}" class="contents" x-show="confirming" x-cloak>
                     {% csrf_token %}
-                    <span class="text-sm text-gray-200">Delete it for you? {% if other %}{{ other.username }} keeps their copy.{% endif %}</span>
+                    <span class="text-sm text-gray-200">Delete it for you? {% if org %}{{ org.name }} keeps its copy.{% elif other %}{{ other.username }} keeps their copy.{% endif %}</span>
                     <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-trash"></i> Delete</button>
                     <button type="button" class="zb-action inline-flex items-center gap-1.5 text-sm" @click="confirming = false">Keep it</button>
                 </form>
