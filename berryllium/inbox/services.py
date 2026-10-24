@@ -155,6 +155,14 @@ def visible_messages(membership, show_all=False):
     return list(reversed(newest[:SHOWN_MESSAGES])), has_earlier
 
 
+def messages_after(membership, after_id):
+    """Messages that arrived after after_id, oldest first. an open conversation checks for these."""
+    messages = membership.conversation.messages.select_related("sender", "sent_as").filter(pk__gt=after_id)
+    if membership.cleared_at:
+        messages = messages.filter(created_at__gt=membership.cleared_at)
+    return list(messages.order_by("created_at", "pk")[:SHOWN_MESSAGES])
+
+
 def mark_read(membership):
     membership.last_read_at = timezone.now()
     membership.save(update_fields=["last_read_at"])
@@ -189,6 +197,8 @@ def problem_sending(sender, recipient, as_org=None):
 
 def problem_sending_to_org(sender, org):
     """Organizations have no size limit; the sender's own inbox still has to have room."""
+    if org.is_archived:
+        return f"{org.name} is an archived organization, so it can't receive messages."
     if org.memberships.filter(user=sender).exists():
         return f"You're a member of {org.name}. Its messages are in its inbox, under Organizations in your Control Panel."
     mine = usage_summary(sender)

@@ -1,0 +1,5 @@
+{% for message in new_messages %}
+    {% include 'inbox/message.html' %}
+{% endfor %}
+{% include 'inbox/poller.html' %}
+<p id="thread-empty" hx-swap-oob="delete"></p>

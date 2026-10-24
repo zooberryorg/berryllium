@@ -1,0 +1,15 @@
+<div id="comment-updates"
+     hx-get="{% url 'comments_updates' comments.kind comments.target.pk %}?after={{ comments.latest_id }}"
+     hx-trigger="every 30s [document.visibilityState === 'visible'], visibilitychange[document.visibilityState === 'visible'] from:document"
+     hx-swap="outerHTML"
+     aria-live="polite">
+    {% if new_count %}
+        <button type="button"
+                class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-full border border-gold-400/40 bg-gold-400/10 px-4 py-2 text-sm font-medium text-gold-200 hover:bg-gold-400/20 transition-colors cursor-pointer"
+                hx-get="{% url 'comments_section' comments.kind comments.target.pk %}"
+                hx-target="#comments"
+                hx-swap="outerHTML">
+            <i class="bi bi-arrow-repeat"></i> {{ new_count }} new comment{{ new_count|pluralize }} · Show
+        </button>
+    {% endif %}
+</div>

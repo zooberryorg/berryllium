@@ -46,7 +46,9 @@
                 {% endif %}
                 {% include 'inbox/message.html' %}
             {% empty %}
-                <p class="py-6 text-center text-sm text-gray-400">No messages here. Write the first one below.</p>
+                <p id="thread-empty" class="py-6 text-center text-sm text-gray-400">No messages here. Write the first one below.</p>
+            {% endfor %}
+            {% include 'inbox/poller.html' %}
             {% endfor %}
         </div>
 

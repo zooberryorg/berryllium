@@ -2,10 +2,10 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_http_methods, require_POST
+from django.views.decorators.http import require_GET, require_http_methods, require_POST
 
 from berryllium.inbox import services
 from berryllium.inbox.forms import DefaultLimitForm, MessageForm, NewMessageForm, QuotaForm
@@ -120,11 +120,34 @@ def conversation(request, conversation_id):
         "form": form,
         "quote": quote,
         "org": org,
+        "last_id": shown[-1].pk if shown else 0,
+        "poll_url": reverse("inbox_conversation_updates", kwargs={"conversation_id": convo.pk}),
         "problem": problem or (
             (services.problem_sending_to_org(request.user, org) if org else services.problem_sending(request.user, other))
             if request.method == "GET" else ""
         ),
     })
+
+def updates_response(request, membership, poll_url):
+    """New messages since ?after=, for the poller in an open conversation. 204 (nothing to change) when there are none."""
+    after = request.GET.get("after", "")
+    if not after.isdigit():
+        return HttpResponse(status=204)
+    new = services.messages_after(membership, int(after))
+    if not new:
+        return HttpResponse(status=204)
+    services.mark_read(membership)
+    return render(request, "inbox/new_messages.html", {"new_messages": new, "last_id": new[-1].pk, "poll_url": poll_url})
+
+
+@require_GET
+def conversation_updates(request, conversation_id):
+    if not request.user.is_authenticated:
+        return HttpResponse(status=286)  # stop polling
+    membership = services.membership_for(conversation_id, request.user)
+    if membership is None:
+        return HttpResponse(status=286)
+    return updates_response(request, membership, reverse("inbox_conversation_updates", kwargs={"conversation_id": conversation_id}))
 
 @login_required
 @require_POST
