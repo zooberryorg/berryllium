@@ -49,15 +49,23 @@ class Post(models.Model):
         TUTORIAL = "tutorial", "Tutorial"
         NEWS = "news", "News"
 
-    kind = models.CharField(max_length=20, choices=Kind.choices, default=Kind.TUTORIAL, db_index=True)
+    kind = models.CharField(
+        max_length=20, choices=Kind.choices, default=Kind.TUTORIAL, db_index=True
+    )
     title = models.CharField(max_length=200, db_index=True)
     summary = models.CharField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     thumbnail = models.ImageField(upload_to=post_thumbnail_path, blank=True)
+    category = models.CharField(max_length=200, blank=True, db_index=True)
     game = models.CharField(max_length=100, blank=True, db_index=True)
+    expansions = models.CharField(max_length=200, blank=True)
 
     uploaded_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="posts",
     )
     tags = models.ManyToManyField("shared.Tag", blank=True, related_name="posts")
     pending_tags = models.JSONField(default=list, blank=True)
@@ -70,18 +78,25 @@ class Post(models.Model):
 
     is_archived_file = models.BooleanField(default=False)
     original_release_date = models.DateField(null=True, blank=True)
-    original_websites = models.ManyToManyField("shared.ArchivedWebsite", blank=True, related_name="archived_posts")
+    original_websites = models.ManyToManyField(
+        "shared.ArchivedWebsite", blank=True, related_name="archived_posts"
+    )
 
     # comments
     comments_enabled = models.BooleanField(default=True)
-    comment_count = models.PositiveIntegerField(default=0)  # kept up to date by comments.services.refresh_count
+    comment_count = models.PositiveIntegerField(
+        default=0
+    )  # kept up to date by comments.services.refresh_count
     comments = GenericRelation("comments.Comment")
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
+    )
 
     class Meta:
         ordering = ["-publish_date"]
 
     def __str__(self):
-        return self.title or f"Untitled post #{self.pk}"
+        return self.title or f"Untitled article #{self.pk}"
 
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"post_id": self.pk})
@@ -107,10 +122,18 @@ class PostCredit(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, related_name="credits")
     role = models.CharField(max_length=20, choices=ModCredit.Role.choices)
     member = models.ForeignKey(
-        settings.AUTH_USER_MODEL, null=True, blank=True, on_delete=models.CASCADE, related_name="post_credits"
+        settings.AUTH_USER_MODEL,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="post_credits",
     )
     author = models.ForeignKey(
-        "users.Author", null=True, blank=True, on_delete=models.CASCADE, related_name="post_credits"
+        "users.Author",
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="post_credits",
     )
     pending_name = models.CharField(max_length=150, blank=True)
     order = models.PositiveIntegerField(default=0)

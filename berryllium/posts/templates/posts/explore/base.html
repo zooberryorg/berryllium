@@ -8,25 +8,41 @@
           hx-swap="innerHTML"
           hx-push-url="true"
           hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
-          class="space-y-4">
-        {% if kind == 'news' %}
-            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search news by title, summary or tag..." label="Search news" %}
-        {% else %}
-            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search tutorials by title, summary or tag..." label="Search tutorials" %}
-        {% endif %}
+          x-data="{ showFilters: false }"
+          class="flex flex-col lg:flex-row lg:items-start gap-6">
 
-        {% if tag %}<input type="hidden" name="tag" value="{{ tag }}">{% endif %}
-        <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
-            <div class="sm:min-w-[200px]">
-                {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
-            </div>
-            <div class="sm:min-w-[180px]">
-                {% include 'shared/widgets/dropdown.html' with name="game" label="Game" options=game_options selected=game empty_label="Any game" icon="bi-controller" clearable="true" %}
-            </div>
-            <div class="sm:min-w-[160px]">
-                {% include 'shared/widgets/dropdown.html' with name="period" label="Published" options=period_options selected=period empty_label="All time" icon="bi-calendar3" clearable="true" %}
-            </div>
+        <div class="lg:w-72 flex-shrink-0">
+            <button type="button" class="lg:hidden w-full zb-action flex items-center justify-center gap-2 mb-3"
+                    @click="showFilters = !showFilters" :aria-expanded="showFilters">
+                <i class="bi bi-funnel"></i> <span x-text="showFilters ? 'Hide filters' : 'Filters'"></span>
+            </button>
+            <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
+                {% include 'mods/explore/categories.html' %}
+                {% include 'shared/widgets/filter_picker.html' with label="Tags" config=tag_picker add_label="Search tags" %}
+            </aside>
         </div>
-        <div id="post-results" aria-live="polite">{% include 'posts/explore/results.html' %}</div>
+
+        <div class="flex-1 min-w-0 space-y-4">
+            {% if kind == 'news' %}
+                {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search news by title, summary or tag..." label="Search news" %}
+            {% else %}
+                {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=q placeholder="Search tutorials by title, summary or tag..." label="Search tutorials" %}
+            {% endif %}
+
+            <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+                <div class="sm:min-w-[200px]">
+                    {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+                </div>
+                <div class="sm:min-w-[180px]">
+                    {% include 'shared/widgets/dropdown.html' with name="game" label="Game" options=game_options selected=game empty_label="Any game" icon="bi-controller" clearable="true" %}
+                </div>
+                <div class="sm:min-w-[160px]">
+                    {% include 'shared/widgets/dropdown.html' with name="period" label="Published" options=period_options selected=period empty_label="All time" icon="bi-calendar3" clearable="true" %}
+                </div>
+            </div>
+
+            <div id="post-results" aria-live="polite">{% include 'posts/explore/results.html' %}</div>
+        </div>
     </form>
+    {% include 'shared/explore/filter_styles.html' %}
 {% endblock %}

@@ -23,6 +23,8 @@ def publish_problems(post):
         problems.append({"message": "Add a title.", "section": "details"})
     if not post.summary.strip():
         problems.append({"message": "Add a summary.", "section": "details"})
+    if not (post.category or "").strip():
+        problems.append({"message": "Pick a category.", "section": "tags"})
     if not post.thumbnail:
         problems.append({"message": "Upload a thumbnail image.", "section": "thumbnail"})
     if not post.body.strip():
