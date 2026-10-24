@@ -12,7 +12,8 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 
 from berryllium.comments.views import section_context as comments_context
 from berryllium.mods.models import ModCredit
-from berryllium.mods.settings import GAME_OPTIONS
+from berryllium.mods.pickers import picker_config
+from berryllium.shared import options
 from berryllium.mods.views.explore import PERIODS, _csv_has
 from berryllium.posts.forms import (
     MAX_POST_FILES,
@@ -46,8 +47,8 @@ def _editable_post(request, post_id):
 
 
 def _noun(user):
-    """"Post" for the site team (they pick the kind) or "Tutorial" for regular members (they can only post tutorials)."""
-    return "Post" if can_post_news(user) else "Tutorial"
+    """"Article" for the site team (they pick the kind) or "Tutorial" for regular members (they can only post tutorials)."""
+    return "Article" if can_post_news(user) else "Tutorial"
 
 # --------------------------------------------------------------------------- create (modal)
 
