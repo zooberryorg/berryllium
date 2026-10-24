@@ -1,0 +1,60 @@
+{% load bfilters %}
+{% include 'shared/explore/active_filters.html' %}
+
+<p class="text-gray-400 text-sm mb-4">
+    <span class="text-white font-semibold">{{ page.paginator.count }}</span> organization{{ page.paginator.count|pluralize }} found
+</p>
+
+{% if page.object_list %}
+    <div class="overflow-x-auto rounded-2xl border border-pine-300">
+        <table class="w-full text-sm">
+            <thead class="bg-pine-800/80 text-left text-xs uppercase tracking-wider text-gray-400">
+                <tr>
+                    <th scope="col" class="px-4 py-3 font-semibold">Organization</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right">Members</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right">Mods</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right hidden sm:table-cell">Downloads</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden md:table-cell">Active</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden lg:table-cell">Latest mod</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in page.object_list %}
+                    <tr class="odd:bg-pine-600 even:bg-pine-700 hover:bg-pine-300 transition-colors duration-150">
+                        <td class="px-4 py-2.5">
+                            <a href="{{ row.org.get_absolute_url }}" class="group/org flex items-center gap-3 min-w-0">
+                                {% include 'organizations/logo.html' with org=row.org logo_class="w-9 h-9 text-sm" %}
+                                <span class="min-w-0">
+                                    <span class="flex items-center gap-2">
+                                        <span class="font-medium text-white truncate group-hover/org:text-gold-200">{{ row.org.name }}</span>
+                                        {% if row.org.is_archived %}<span class="shrink-0 text-[11px] px-2 py-0.5 rounded-full bg-white/10 text-white/70"><i class="bi bi-archive"></i> Archived</span>{% endif %}
+                                    </span>
+                                    {% if row.org.tagline %}<span class="block text-xs text-gray-400 truncate max-w-[22rem]">{{ row.org.tagline }}</span>{% endif %}
+                                </span>
+                            </a>
+                        </td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-gray-300">{{ row.members }}</td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-white">{{ row.mods }}</td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-gray-300 hidden sm:table-cell" title="{{ row.downloads }}">{{ row.downloads|compact }}</td>
+                        <td class="px-4 py-2.5 tabular-nums text-gray-300 whitespace-nowrap hidden md:table-cell">{% if row.first_year %}{{ row.first_year }}{% if row.last_year != row.first_year %}–{{ row.last_year }}{% endif %}{% else %}<span class="text-gray-500">—</span>{% endif %}</td>
+                        <td class="px-4 py-2.5 text-gray-400 whitespace-nowrap hidden lg:table-cell">
+                            {% if row.last_published %}<time datetime="{{ row.last_published|date:'c' }}" title="{{ row.last_published|date:date_prefs.date }}">{{ row.last_published|timeago }}</time>{% else %}<span class="text-gray-500">No mods yet</span>{% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'shared/explore/table_pages.html' with target="#organization-results" %}
+{% else %}
+    <div class="rounded-2xl border border-white/10 bg-pine-700/60 p-10 text-center">
+        <i class="bi bi-diagram-3 text-4xl text-white/30"></i>
+        {% if has_anyone %}
+            <p class="text-white font-semibold mt-4">No organizations match these filters.</p>
+            <button type="button" class="zb-action mt-4 cursor-pointer" onclick="exploreClearFilter()">Clear all filters</button>
+        {% else %}
+            <p class="text-white font-semibold mt-4">No organizations yet.</p>
+            {% if user.is_authenticated %}<p class="text-gray-400 text-sm mt-1">Start one from the New button at the top.</p>{% endif %}
+        {% endif %}
+    </div>
+{% endif %}
