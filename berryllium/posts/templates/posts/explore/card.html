@@ -11,6 +11,11 @@
         </span>
     </div>
     <div class="flex flex-1 flex-col p-4">
+        {% if post.category_chips %}
+            <p class="mb-1.5 flex flex-wrap gap-1.5">
+                {% for chip in post.category_chips|slice:":2" %}<span class="inline-flex items-center gap-1 text-[11px] text-gold-200/90"><i class="bi {{ chip.icon }} text-[10px]"></i>{{ chip.label }}</span>{% endfor %}
+            </p>
+        {% endif %}
         <h3 class="font-semibold text-white leading-snug line-clamp-2 group-hover/card:text-gold-200 transition-colors">
             <a href="{{ post.get_absolute_url }}" class="after:absolute after:inset-0 focus-visible:outline-none">{{ post.title }}</a>
         </h3>
