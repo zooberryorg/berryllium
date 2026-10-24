@@ -3,10 +3,12 @@
     <ul class="rounded-2xl border border-pine-300 bg-pine-600 p-1.5 space-y-0.5">
         {% for row in conversations.object_list %}
             <li>
-                <a href="{% url 'inbox_conversation' row.conversation_id %}"
+                <a href="{{ row.url }}"
                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors duration-150 {% if membership and membership.conversation_id == row.conversation_id %}bg-gradient-to-r from-gold-500/40 to-gold-300/30 border border-gold-300/30{% else %}hover:bg-white/5 border border-transparent{% endif %}"
                    {% if membership and membership.conversation_id == row.conversation_id %}aria-current="page"{% endif %}>
-                    {% if row.other %}
+                    {% if row.organization %}
+                        {% include 'organizations/logo.html' with org=row.organization logo_class="w-10 h-10 text-base" %}
+                    {% elif row.other %}
                         {% include 'shared/navigation/avatar.html' with member=row.other avatar_class="w-10 h-10 text-base" %}
                     {% else %}
                         <span class="w-10 h-10 shrink-0 rounded-full bg-pine-400/50 flex items-center justify-center text-gray-400"><i class="bi bi-person"></i></span>

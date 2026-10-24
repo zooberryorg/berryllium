@@ -102,6 +102,9 @@ def _rows(sides):
         .order_by("-conversation__last_message_at")
     )
 
+def _counts(messages):
+    return dict(messages.order_by().values("conversation_id").annotate(n=Count("pk")).values_list("conversation_id", "n"))
+
 def conversation_list(member):
     """
     This member's conversations, newest first. Each row has other (the other member) or organization
@@ -176,7 +179,7 @@ def problem_sending(sender, recipient, as_org=None):
         return "This account can't receive messages."
     if recipient.pk == sender.pk:
         return "You can't send a message to yourself."
-        if as_org is None:
+    if as_org is None:
         mine = usage_summary(sender)
         if mine["full"]:
             return f"Your inbox is full ({mine['used']} of {mine['limit']} messages). Delete some conversations to make room."
