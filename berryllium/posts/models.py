@@ -88,6 +88,9 @@ class Post(models.Model):
         default=0
     )  # kept up to date by comments.services.refresh_count
     comments = GenericRelation("comments.Comment")
+    organization = models.ForeignKey(
+        "organizations.Organization", on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
+    )
 
     class Meta:
         ordering = ["-publish_date"]
