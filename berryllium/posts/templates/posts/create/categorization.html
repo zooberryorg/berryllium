@@ -1,0 +1,22 @@
+<div class="space-y-4">
+    <div>
+        <span class="block text-sm font-medium mb-1 text-white">{{ form.category.label }}</span>
+        {{ form.category }}
+        <p class="text-xs text-white/50 mt-2">Pick at least one before publishing.</p>
+        {% include "mods/create/field_errors.html" with field=form.category %}
+    </div>
+    <div>
+        <span class="block text-sm font-medium mb-1 text-white">{{ form.game.label }}</span>
+        {{ form.game }}
+        <p class="text-xs text-white/50 mt-2">Leave empty if it isn't about a particular game.</p>
+        {% include "mods/create/field_errors.html" with field=form.game %}
+    </div>
+    <details class="group/exp" {% if form.expansions.value %}open{% endif %}>
+        <summary class="flex items-center gap-2 text-sm font-medium text-white cursor-pointer list-none [&::-webkit-details-marker]:hidden">
+            {{ form.expansions.label }} <span class="font-normal text-white/50">(optional)</span>
+            <i class="bi bi-chevron-down text-[10px] text-white/50 transition-transform group-open/exp:rotate-180"></i>
+        </summary>
+        <div class="mt-2">{{ form.expansions }}</div>
+        {% include "mods/create/field_errors.html" with field=form.expansions %}
+    </details>
+</div>
