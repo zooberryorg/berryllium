@@ -13,6 +13,7 @@ from django.views.decorators.http import require_GET, require_http_methods, requ
 from berryllium.comments.views import section_context as comments_context
 from berryllium.mods.models import ModCredit
 from berryllium.mods.pickers import picker_config
+from berryllium.mods.settings import GALLERY_RATIO
 from berryllium.shared import options
 from berryllium.mods.views.explore import PERIODS, _csv_has
 from berryllium.posts.forms import (
@@ -50,6 +51,20 @@ def _editable_post(request, post_id):
     if not can_edit_post(request.user, post):
         raise Http404("Post not found.")
     return post
+
+
+def card_details(posts):
+    """What the article card shows under the summary: games, then categories (same as mod cards)."""
+    game_names = options.game_labels()
+    for post in posts:
+        post.category_chips = options.category_chips(post.category, "article")
+        post.category_labels = [chip["label"] for chip in post.category_chips]
+        post.game_labels = [
+            game_names.get(key, key)
+            for key in options.keys(post.game)
+            if key != options.NOT_APPLICABLE
+        ]
+    return posts
 
 
 def _noun(user):
@@ -261,13 +276,15 @@ def detail(request, post_id):
     # related: same kind, most shared tags first, then newest
     tag_ids = list(post.tags.values_list("pk", flat=True))
     related = (
-        published_posts(post.kind).exclude(pk=post.pk).select_related("uploaded_by")
+        published_posts(post.kind)
+        .exclude(pk=post.pk)
+        .select_related("uploaded_by", "organization")
     )
     if tag_ids:
         related = related.annotate(
             shared=Count("tags", filter=Q(tags__in=tag_ids))
         ).order_by("-shared", "-publish_date")
-    related = related[:3]
+    related = card_details(list(related[:3]))
     return render(
         request,
         "posts/detail/base.html",
@@ -296,6 +313,7 @@ def detail(request, post_id):
             ],
             "original_websites": list(post.original_websites.all()),
             "related": related,
+            "gallery_ratio": GALLERY_RATIO,
             # "Updated" only when an edit came more than a day after publishing
             "was_updated": bool(post.first_published_at)
             and (post.last_updated - post.publish_date).total_seconds() > 86400,
@@ -337,6 +355,7 @@ def _remove_url(params, key, value=None):
 
 
 def _listing(request, kind, explore_tab):
+    """Explore > Tutorials / News: a sidebar with categories and tags, the search, and dropdown filters."""
     params = request.GET
     category_names, game_names = (
         options.category_labels("article"),
@@ -354,6 +373,7 @@ def _listing(request, kind, explore_tab):
     game = game if game in game_names and game != options.NOT_APPLICABLE else ""
     period = params.get("period", "")
     period = period if period in PERIODS else ""
+
     base = published_posts(kind)
     posts = base.select_related("uploaded_by", "organization").prefetch_related("tags")
     if q:
@@ -373,8 +393,8 @@ def _listing(request, kind, explore_tab):
     page = Paginator(posts.order_by(*SORTS[sort][1]), PAGE_SIZE).get_page(
         params.get("page")
     )
-    for post in page.object_list:
-        post.category_chips = options.category_chips(post.category, "article")
+    card_details(page.object_list)
+
     active = []
     if q:
         active.append(
@@ -421,6 +441,7 @@ def _listing(request, kind, explore_tab):
                 "url": _remove_url(params, "period"),
             }
         )
+
     page_query = params.copy()
     page_query.pop("page", None)
     context = {
@@ -439,12 +460,14 @@ def _listing(request, kind, explore_tab):
         "kind_label": dict(Post.Kind.choices)[kind],
         "explore_tab": explore_tab,
         "has_any": base.exists(),
+        "gallery_ratio": GALLERY_RATIO,  # cards use the same picture shape as mod cards
     }
     is_htmx = request.headers.get("HX-Request") and not request.headers.get(
         "HX-History-Restore-Request"
     )
     if is_htmx:
         return render(request, "posts/explore/results.html", context)
+
     icons = options.category_icons("article")
     context.update(
         {
@@ -476,6 +499,7 @@ def _listing(request, kind, explore_tab):
 
 @require_GET
 def search_article_tags(request):
+    """The Tags filter on Tutorials / News: tags on published articles of that kind, most used first."""
     from berryllium.shared.models import Tag
 
     kind = request.GET.get("kind", "")
