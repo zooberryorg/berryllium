@@ -14,7 +14,8 @@ from django.views.decorators.http import require_GET
 from berryllium.mods.models import Mod, ModDependency, ModImage, ModLicense
 from berryllium.mods.pickers import picker_config
 from berryllium.mods.review import _labels
-from berryllium.mods.settings import GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
+from berryllium.mods.settings import GALLERY_RATIO
+from berryllium.shared import options
 from berryllium.shared.fields import proper_case
 from berryllium.shared.models import License, Tag
 
@@ -62,7 +63,7 @@ def _remove_url(params, key, value=None):
     return f"?{encoded}" if encoded else "?"
 
 def _read_filters(params):
-    categories, games = dict(MOD_CATEGORIES), dict(GAME_OPTIONS)
+    categories, games = options.category_labels("mod"), options.game_labels()
     category = params.get("category", "")
     game = params.get("game", "")
     period = params.get("period", "")
@@ -117,10 +118,10 @@ def _active_filters(params, filters, depends_items, license_obj):
     if filters["q"]:
         active.append({"label": f'"{filters["q"]}"', "name": "q", "value": "", "url": _remove_url(params, "q")})
     if filters["category"]:
-        active.append({"label": dict(MOD_CATEGORIES)[filters["category"]], "name": "category", "value": "",
+        active.append({"label": options.category_labels("mod")[filters["category"]], "name": "category", "value": "",
                        "url": _remove_url(params, "category")})
     if filters["game"]:
-        active.append({"label": dict(GAME_OPTIONS)[filters["game"]], "name": "game", "value": "",
+        active.append({"label": options.game_labels()[filters["game"]], "name": "game", "value": "",
                        "url": _remove_url(params, "game")})
     if filters["period"]:
         active.append({"label": PERIODS[filters["period"]][0], "name": "period", "value": "",
@@ -136,10 +137,11 @@ def _active_filters(params, filters, depends_items, license_obj):
     return active
 
 def _category_counts(base):
+    icons = options.category_icons("mod")
     return [
-        {"key": key, "label": label, "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder"),
+        {"key": key, "label": label, "icon": icons.get(key, "bi-folder"),
          "count": base.filter(_csv_has("category", key)).count()}
-        for key, label in MOD_CATEGORIES
+        for key, label in options.mod_categories()
     ]
 
 def _license_counts():
@@ -243,9 +245,7 @@ def search_dependencies(request):
 
 def _category_chips(stored):
     """ Category chips for a mod's card, based on the stored CSV field. """
-    labels = dict(MOD_CATEGORIES)
-    keys = [key.strip() for key in (stored or "").split(",") if key.strip()]
-    return [{"label": labels.get(key, key), "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder")} for key in keys]
+    return options.category_chips(stored, "mod")
 
 def mods(request):
     """Explore > Mods."""
@@ -267,10 +267,11 @@ def mods(request):
         .annotate(card_image_path=_card_image_path())
     )
     page = Paginator(results, PAGE_SIZE).get_page(params.get("page"))
+    category_names, game_names = options.category_labels("mod"), options.game_labels()
     for mod in page.object_list:
-        mod.category_labels = _labels(mod.category, MOD_CATEGORIES)
+        mod.category_labels = _labels(mod.category, category_names)
         mod.category_chips = _category_chips(mod.category)
-        mod.game_labels = _labels(mod.game, GAME_OPTIONS)
+        mod.game_labels = _labels(mod.game, game_names)
         mod.card_image_url = default_storage.url(mod.card_image_path) if mod.card_image_path else None
 
     page_range = list(page.paginator.get_elided_page_range(page.number, on_each_side=1, on_ends=1))
@@ -288,7 +289,7 @@ def mods(request):
         "has_any_mods": base.exists(),
         "sort_options": [(key, label) for key, (label, _) in SORTS.items()],
         "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
-        "game_options": [option for option in GAME_OPTIONS if option[0] != "na"],
+        "game_options": options.game_options(include_na=False),
     }
     # "Zoos & Saves" in the Explore tabs is this page with that category picked
     explore_tab = "zoos" if filters["category"] == "zoos_and_saves" else "mods"
