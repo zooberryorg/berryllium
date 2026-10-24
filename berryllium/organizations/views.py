@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Count
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -21,6 +21,7 @@ from berryllium.organizations.forms import (
     OrganizationPageForm,
 )
 from berryllium.organizations.models import Organization, OrganizationMembership, OrganizationRequest
+from berryllium.users.permissions import is_moderator, is_site_admin
 from berryllium.users.profiles import profile_context
 Role = OrganizationMembership.Role
 def _org(slug):
@@ -41,13 +42,16 @@ def profile(request, slug):
     is_htmx = request.headers.get("HX-Request") and not request.headers.get("HX-History-Restore-Request")
     if is_htmx:
         return render(request, "users/profile/results.html", context)
-    row = services.membership(org, request.user)
+    row = services.acting_row(org, request.user)
     pending = OrganizationRequest.objects.filter(organization=org, member=request.user).first() if request.user.is_authenticated else None
     context.update({
         "org": org,
         "display_name": org.name,
-        "my_row": row,
-        "can_manage_page": bool(row and (row.has("edit_profile") or row.is_manager or row.has("use_inbox"))),
+        "my_row": row if not getattr(row, "as_moderator", False) else row.real_row,
+        "can_manage_page": bool(row and (services.can(row, "edit_profile") or services.can(row, "manage") or services.can(row, "use_inbox"))),
+        "manage_url": reverse(
+            "organization_manage_page" if services.can(row, "edit_profile") else "organization_inbox", kwargs={"slug": org.slug},
+        ) if row else "",
         "pending": pending,
         "member_rows": _member_rows(org),
         "links": list(org.links.all()),
@@ -80,6 +84,30 @@ def leave(request, slug):
     else:
         messages.success(request, f"You left {org.name}.")
     return redirect("settings_organizations")
+
+# --------------------------------------------------------------------------- New > Organization (modal)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def create_modal(request):
+    """
+    The modal from the New menu. Members become the owner. Moderators and admins can also make an
+    archived organization: a historical group with members but no owner.
+    """
+    form = CreateOrganizationForm(request.POST or None, can_archive=is_moderator(request.user))
+    if request.method == "POST" and form.is_valid():
+        archived = form.cleaned_data.get("archived", False)
+        org = services.create_organization(request.user, form.cleaned_data["name"], form.cleaned_data["tagline"], archived=archived)
+        if archived:
+            messages.success(request, f"{org.name} was added as an archived organization. List its former members under Members.")
+        else:
+            messages.success(request, f"{org.name} is ready. Add a picture and a bio, then invite your team.")
+        response = HttpResponse()
+        response["HX-Redirect"] = reverse("organization_manage_page", kwargs={"slug": org.slug})
+        return response
+    return render(request, "organizations/create_modal.html", {"form": form})
+
 
 # --------------------------------------------------------------------------- Control Panel Organizations
 
@@ -124,9 +152,12 @@ def my_organizations(request):
 # --------------------------------------------------------------------------- managing one organization
 
 def _manage(request, slug, permission):
-    """(org, my membership) when the signed-in member may do `permission` here, otherwise 403."""
+    """
+    (org, my membership) when the signed-in member may do permission here, otherwise 403.
+    Moderators and admins get a stand-in owner row, so they can look after any organization.
+    """
     org = _org(slug)
-    row = services.membership(org, request.user)
+    row = services.acting_row(org, request.user)
     if not services.can(row, permission):
         raise PermissionDenied
     return org, row
@@ -139,10 +170,13 @@ def _org_nav(request, org, row, active):
         ("organization_inbox", "Inbox", "bi-envelope", "use_inbox", (inbox.org_unread_count(org) or None) if row.has("use_inbox") else None),
     ]
     for name, label, icon, permission, count in items:
-        if services.can(row, permission):
+        if services.can(row, permission) and not (permission == "use_inbox" and org.is_archived):
             nav.append({"url": reverse(name, kwargs={"slug": org.slug}), "label": label, "icon": icon, "count": count, "active": name == active})
     nav.append({"url": org.get_absolute_url(), "label": "View page", "icon": "bi-box-arrow-up-right", "count": None, "active": False})
-    nav.append({"url": reverse("settings_organizations"), "label": "All organizations", "icon": "bi-arrow-left", "count": None, "active": False})
+    if getattr(row, "as_moderator", False):
+        nav.append({"url": reverse("explore_organizations"), "label": "All organizations", "icon": "bi-arrow-left", "count": None, "active": False})
+    else:
+        nav.append({"url": reverse("settings_organizations"), "label": "All organizations", "icon": "bi-arrow-left", "count": None, "active": False})
     return nav
 
 @login_required
@@ -152,7 +186,8 @@ def manage_page(request, slug):
     form = OrganizationPageForm(request.POST or None, request.FILES or None, instance=org)
     delete_form = DeleteOrganizationForm(organization=org)
     if request.method == "POST" and request.POST.get("action") == "delete":
-        if row.role != Role.OWNER:
+        # the owner, or an admin (moderators can't delete organizations)
+        if row.role != Role.OWNER or (getattr(row, "as_moderator", False) and not is_site_admin(request.user)):
             raise PermissionDenied
         delete_form = DeleteOrganizationForm(request.POST, organization=org)
         if delete_form.is_valid():
@@ -168,6 +203,7 @@ def manage_page(request, slug):
     return render(request, "organizations/manage/page.html", {
         "panel_nav": _org_nav(request, org, row, "organization_manage_page"),
         "org": org, "my_row": row, "form": form, "delete_form": delete_form,
+        "can_delete": row.role == Role.OWNER and (not getattr(row, "as_moderator", False) or is_site_admin(request.user)),
     })
 
 @login_required
@@ -183,6 +219,14 @@ def manage_members(request, slug):
         if action == "invite":
             if invite_form.is_valid():
                 member = invite_form.cleaned_data["username"]
+                if org.is_archived:
+                    # no invitation to accept: former members are listed directly
+                    _, problem = services.add_to_archived(org, member, request.user)
+                    if problem:
+                        messages.warning(request, problem)
+                    else:
+                        messages.success(request, f"Listed {member.username} as a member.")
+                    return redirect("organization_manage_members", slug=org.slug)
                 _, problem = services.invite(org, member, request.user)
                 if problem:
                     messages.warning(request, problem)
@@ -229,6 +273,8 @@ def manage_members(request, slug):
             problem = services.transfer_ownership(row, target)
             if problem:
                 messages.warning(request, problem)
+            elif getattr(row, "as_moderator", False):
+                messages.success(request, f"{target.user.username} is now the owner of {org.name}.")
             else:
                 messages.success(request, f"{target.user.username} is now the owner. You're a co-owner.")
             return redirect("organization_manage_members", slug=org.slug)
@@ -239,6 +285,9 @@ def manage_members(request, slug):
         "panel_nav": _org_nav(request, org, row, "organization_manage_members"),
         "org": org, "my_row": row, "rows": rows,
         "permissions": services.PERMISSIONS,
+        "as_moderator": getattr(row, "as_moderator", False),
+        # the owner hands over ownership; an admin can give any organization an owner (an archived one becomes managed)
+        "can_transfer": row.role == Role.OWNER and (not getattr(row, "as_moderator", False) or is_site_admin(request.user)),
         "invite_form": invite_form,
         "join_requests": org.requests.filter(kind=OrganizationRequest.Kind.REQUEST).select_related("member"),
         "invites": org.requests.filter(kind=OrganizationRequest.Kind.INVITE).select_related("member", "created_by"),
@@ -255,6 +304,19 @@ def org_inbox(request, slug):
         "panel_nav": _org_nav(request, org, row, "organization_inbox"),
         "org": org, "my_row": row, "conversations": page,
     })
+
+@require_GET
+def org_conversation_updates(request, slug, conversation_id):
+    """New messages for the poller in an open organization conversation."""
+    from berryllium.inbox.views import updates_response
+    if not request.user.is_authenticated:
+        return HttpResponse(status=286)  # stop polling
+    org = _org(slug)
+    side = inbox.org_side(conversation_id, org) if services.can(services.acting_row(org, request.user), "use_inbox") else None
+    if side is None:
+        return HttpResponse(status=286)
+    url = reverse("organization_conversation_updates", kwargs={"slug": org.slug, "conversation_id": conversation_id})
+    return updates_response(request, side, url)
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -294,5 +356,7 @@ def org_conversation(request, slug, conversation_id):
         "org": org, "my_row": row, "conversations": page, "membership": side,
         "conversation": convo, "other": other, "thread": shown, "has_earlier": has_earlier,
         "first_unread": first_unread, "form": form, "quote": quote,
+        "last_id": shown[-1].pk if shown else 0,
+        "poll_url": reverse("organization_conversation_updates", kwargs={"slug": org.slug, "conversation_id": convo.pk}),
         "problem": problem or (inbox.problem_sending(request.user, other, as_org=org) if request.method == "GET" else ""),
     })

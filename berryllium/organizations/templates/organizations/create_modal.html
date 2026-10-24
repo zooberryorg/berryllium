@@ -1,0 +1,38 @@
+<form hx-post="{% url 'organization_create' %}"
+      hx-target="#modal-content"
+      hx-swap="innerHTML"
+      x-data="{ archived: {{ form.archived.value|yesno:'true,false' }} }">
+    {% csrf_token %}
+    <div class="p-6 flex flex-col gap-4">
+        <p class="text-sm text-gray-400" x-show="!archived">You'll be its owner. You can add a picture, banner, bio and links next, then invite your team.</p>
+        {% if form.archived %}
+            <p class="text-sm text-gray-400" x-show="archived" x-cloak>An archived organization is a historical group kept for the record. It has no owner: moderators and admins look after it, and you list its former members yourself. An admin can give it an owner later.</p>
+        {% endif %}
+        <div>
+            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium mb-1 text-white">Name</label>
+            {{ form.name }}
+            {% for error in form.name.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}
+        </div>
+        <div>
+            <label for="{{ form.tagline.id_for_label }}" class="block text-sm font-medium mb-1 text-white">Tagline</label>
+            {{ form.tagline }}
+            {% for error in form.tagline.errors %}<p class="mt-1 text-sm text-red-300">{{ error }}</p>{% endfor %}
+        </div>
+        {% if form.archived %}
+            <div class="pt-4 border-t border-white/10">
+                <label class="inline-flex cursor-pointer pl-4 py-1 pr-4 max-w-max bg-pine-special-200 border border-pine-special-100 rounded-full shadow-xs mb-2 items-center hover:brightness-110 transition-all">
+                    {{ form.archived }}
+                    <div class="shrink-0 relative w-9 h-5 rounded-full bg-pine-400/30 after:bg-pine-info-200 peer-checked:bg-gold-400 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-buffer after:content-[''] after:scale-100 peer-hover:after:scale-110 peer-active:after:scale-140 after:absolute after:top-[2px] after:start-[2px] after:rounded-full after:h-4 after:w-4 after:transition-all"></div>
+                    <div class="ms-2.5 select-none text-white/80"><p class="text-xs text-heading flex">{{ form.archived.label }}</p></div>
+                </label>
+                <p class="text-white/50 text-xs">Moderators and admins only. Turn this on for a group from the past that no one runs anymore.</p>
+            </div>
+        {% endif %}
+    </div>
+    <div class="p-6 border-t border-[#4a5a4b]/50 flex gap-3 bg-pine-600/50">
+        <button type="button" class="zb-controls flex-1 items-center justify-center" @click="closeModal()">Cancel</button>
+        <button type="submit" class="zb-controls text-pine-500 flex-1 items-center justify-center bg-gold-400 hover:bg-gold-300 transition-colors">
+            <span x-text="archived ? 'Add archived organization' : 'Create organization'">Create organization</span>
+        </button>
+    </div>
+</form>
