@@ -7,7 +7,7 @@ from django.utils import timezone
 
 from berryllium.mods.models import ModCredit
 from berryllium.mods.pickers import picker_config
-from berryllium.mods.settings import GAME_OPTIONS, MOD_CATEGORIES, MOD_CATEGORY_ICONS
+from berryllium.shared import options
 from berryllium.mods.views.explore import PERIODS, published_mods
 from berryllium.shared.fields import proper_case
 from berryllium.shared.models import ArchivedWebsite
@@ -90,12 +90,12 @@ def read_filters(params):
     sort = params.get("sort", "")
     return {
         "q": params.get("q", "").strip()[:100],
-        "category": params.get("category", "") if params.get("category", "") in dict(MOD_CATEGORIES) else "",
+        "category": params.get("category", "") if params.get("category", "") in options.category_labels("mod") else "",
         "tags": list(dict.fromkeys(proper_case(t) for t in params.getlist("tag") if t.strip()))[:MAX_TAGS],
         "year_from": _int(params.get("from", "")),
         "year_to": _int(params.get("to", "")),
         "websites": [w for w in params.getlist("website") if w == ZOOBERRY or w.isdigit()],
-        "game": params.get("game", "") if params.get("game", "") in dict(GAME_OPTIONS) else "",
+                "game": params.get("game", "") if params.get("game", "") in options.game_labels() else "",
         "period": params.get("period", "") if params.get("period", "") in PERIODS else "",
         "sort": sort if sort in SORTS else DEFAULT_SORT,
     }
@@ -162,7 +162,7 @@ def modders(request):
     if filters["q"]:
         active.append({"label": f'"{filters["q"]}"', "name": "q", "value": "", "url": _remove_url(params, "q")})
     if filters["category"]:
-        active.append({"label": dict(MOD_CATEGORIES)[filters["category"]], "name": "category", "value": "", "url": _remove_url(params, "category")})
+        active.append({"label": options.category_labels("mod")[filters["category"]], "name": "category", "value": "", "url": _remove_url(params, "category")})
     for tag in filters["tags"]:
         active.append({"label": tag, "name": "tag", "value": tag, "url": _remove_url(params, "tag", tag)})
     if filters["year_from"]:
@@ -170,7 +170,7 @@ def modders(request):
     if filters["year_to"]:
         active.append({"label": f"Active until {filters['year_to']}", "name": "to", "value": "", "url": _remove_url(params, "to")})
     if filters["game"]:
-        active.append({"label": dict(GAME_OPTIONS)[filters["game"]], "name": "game", "value": "", "url": _remove_url(params, "game")})
+        active.append({"label": options.game_labels()[filters["game"]], "name": "game", "value": "", "url": _remove_url(params, "game")})
     if filters["period"]:
         active.append({"label": f"Last published {PERIODS[filters['period']][0].lower()}", "name": "period", "value": "", "url": _remove_url(params, "period")})
     for website in filters["websites"]:
@@ -197,9 +197,9 @@ def modders(request):
         "explore_tab": "modders",
         "total_published": len(everyone),
         "categories": [
-            {"key": key, "label": label, "icon": MOD_CATEGORY_ICONS.get(key, "bi-folder"),
+            {"key": key, "label": label, "icon": options.category_icons("mod").get(key, "bi-folder"),
              "count": sum(1 for p in everyone if key in p["categories"])}
-            for key, label in MOD_CATEGORIES
+            for key, label in options.mod_categories()
         ],
         "website_options": sorted(
             ({"key": key, "label": site_names.get(key, key), "count": sum(1 for p in everyone if key in p["websites"])}
@@ -210,7 +210,7 @@ def modders(request):
         "year_from": str(filters["year_from"] or ""),
         "year_to": str(filters["year_to"] or ""),
         "sort_options": list(SORTS.items()),
-        "game_options": [option for option in GAME_OPTIONS if option[0] != "na"],
+        "game_options": options.game_options(include_na=False),
         "period_options": [(key, label) for key, (label, _) in PERIODS.items()],
         "tag_picker": picker_config(
             name="tag",
