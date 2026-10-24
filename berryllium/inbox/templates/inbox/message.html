@@ -7,7 +7,10 @@
             <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400/50 flex items-center justify-center text-gray-400"><i class="bi bi-person"></i></span>
         {% endif %}
         <div class="min-w-0 flex-1">
-            <p class="text-sm font-semibold text-white">{% if message.sender_id == user.pk %}You{% elif message.sender %}{{ message.sender.username }}{% else %}Deleted member{% endif %}</p>
+            <p class="text-sm font-semibold text-white">
+                {% if message.sender_id == user.pk %}You{% elif message.sender %}{{ message.sender.username }}{% else %}Deleted member{% endif %}
+                {% if message.sent_as %}<span class="ml-1 text-[11px] font-medium px-1.5 py-0.5 rounded-md bg-gold-400/15 text-gold-200">{{ message.sent_as.name }}</span>{% endif %}
+            </p>
             <p class="text-xs text-gray-400"><a href="#message-{{ message.pk }}" class="hover:text-gold-200" title="{{ message.created_at|date:date_prefs.datetime }}"><time datetime="{{ message.created_at|date:'c' }}">{{ message.created_at|timeago }}</time></a></p>
         </div>
         <a href="?quote={{ message.pk }}#reply" class="zb-action inline-flex items-center gap-1.5 text-xs"><i class="bi bi-quote"></i> Quote</a>
