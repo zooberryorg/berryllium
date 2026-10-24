@@ -2,11 +2,12 @@ from django.urls import reverse
 from django.utils import timezone
 
 from berryllium.mods.models import ModCredit, ModFile, ModFileGroup, ModImage
-from berryllium.mods.settings import EXPANSION_REQUIREMENTS, GALLERY_RATIO, GAME_OPTIONS, MOD_CATEGORIES
+from berryllium.mods.settings import GALLERY_RATIO
+from berryllium.shared import options
 
 
 def _labels(stored, choices):
-    """ "animals, scripts" -> ["Animals", "Scripts"] using a settings choices list."""
+    """ "animals, scripts" -> ["Animals", "Scripts"] using a {key: label} map (or a choices list)."""
     lookup = dict(choices)
     return [lookup.get(key.strip(), key.strip()) for key in (stored or "").split(",") if key.strip()]
 
