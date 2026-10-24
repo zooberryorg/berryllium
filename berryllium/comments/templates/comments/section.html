@@ -31,6 +31,8 @@
         {% include 'comments/form.html' with mode="new" form=comments.form %}
     {% endif %}
 
+    {% if comments.is_public %}{% include 'comments/updates.html' %}{% endif %}
+    
     <div id="comment-list" class="mt-6 space-y-4">
         {% include 'comments/list.html' %}
     </div>
