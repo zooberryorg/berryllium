@@ -84,7 +84,8 @@ def conversation(request, conversation_id):
     if membership is None:
         raise Http404("Conversation not found.")
     convo = membership.conversation
-    other = services.other_member(convo, request.user)
+    org = convo.organization  # set when this conversation is with an organization
+    other = None if org else services.other_member(convo, request.user)
     show_all = bool(request.GET.get("all"))
 
     quote = None
@@ -96,7 +97,7 @@ def conversation(request, conversation_id):
     problem = ""
     if request.method == "POST":
         if form.is_valid():
-            problem = services.problem_sending(request.user, other)
+            problem = services.problem_sending_to_org(request.user, org) if org else services.problem_sending(request.user, other)
             if not problem and services.too_soon(request.user):
                 problem = "You're sending messages very quickly. Wait a moment and try again."
             if not problem:
@@ -118,7 +119,11 @@ def conversation(request, conversation_id):
         "first_unread": first_unread,
         "form": form,
         "quote": quote,
-        "problem": problem or (services.problem_sending(request.user, other) if request.method == "GET" else ""),
+        "org": org,
+        "problem": problem or (
+            (services.problem_sending_to_org(request.user, org) if org else services.problem_sending(request.user, other))
+            if request.method == "GET" else ""
+        ),
     })
 
 @login_required
