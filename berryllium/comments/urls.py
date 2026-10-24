@@ -5,6 +5,8 @@ from berryllium.comments import views
 urlpatterns = [
     path("comments/<str:kind>/<int:pk>/", views.more, name="comments_more"),
     path("comments/<str:kind>/<int:pk>/new/", views.create, name="comment_create"),
+    path("comments/<str:kind>/<int:pk>/section/", views.section, name="comments_section"),
+    path("comments/<str:kind>/<int:pk>/updates/", views.updates, name="comments_updates"),
     path("comments/<str:kind>/<int:pk>/toggle/", views.toggle, name="comments_toggle"),
     path("comments/<int:comment_id>/reply/", views.reply_form, name="comment_reply_form"),
     path("comments/<int:comment_id>/edit/", views.edit, name="comment_edit"),
