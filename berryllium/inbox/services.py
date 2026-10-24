@@ -56,7 +56,15 @@ def unread_count(member):
 
 
 def conversation_between(a, b):
-    return Conversation.objects.filter(memberships__member=a).filter(memberships__member=b).first()
+    """The private conversation between two members (not one with an organization)."""
+    return (
+        Conversation.objects.filter(organization__isnull=True)
+        .filter(memberships__member=a).filter(memberships__member=b).first()
+    )
+
+def org_conversation(member, org):
+    """The conversation between a member and an organization."""
+    return Conversation.objects.filter(organization=org, memberships__member=member).first()
 
 
 def other_member(conversation, me):
