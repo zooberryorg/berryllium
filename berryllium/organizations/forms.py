@@ -16,12 +16,16 @@ MIN_BANNER_WIDTH = 1200
 
 def _check_image(image, *, min_width=0, min_height=0):
     if image.size > MAX_IMAGE_SIZE:
-        raise forms.ValidationError(f"The image must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
+        raise forms.ValidationError(
+            f"The image must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+        )
     if image.image.format not in ("JPEG", "PNG", "WEBP"):
         raise forms.ValidationError("Use a JPG, PNG or WEBP image.")
     width, height = image.image.size
     if width < min_width or height < min_height:
-        raise forms.ValidationError(f"The image must be at least {min_width}×{min_height or 'any'} pixels (yours is {width}×{height}).")
+        raise forms.ValidationError(
+            f"The image must be at least {min_width}×{min_height or 'any'} pixels (yours is {width}×{height})."
+        )
     return image
 
 
@@ -40,8 +44,39 @@ def _clean_name(name, exclude_pk=None):
 
 
 class CreateOrganizationForm(forms.Form):
-    name = forms.CharField(max_length=100, widget=forms.TextInput(attrs={"class": INPUT, "placeholder": "e.g. Savannah Studio", "autocomplete": "off"}))
-    tagline = forms.CharField(max_length=160, required=False, widget=forms.TextInput(attrs={"class": INPUT, "placeholder": "One line about what you make (optional)"}))
+    name = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={
+                "class": INPUT,
+                "placeholder": "e.g. Savannah Studio",
+                "autocomplete": "off",
+            }
+        ),
+    )
+    tagline = forms.CharField(
+        max_length=160,
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": INPUT,
+                "placeholder": "One line about what you make (optional)",
+            }
+        ),
+    )
+    # moderators and admins only (the view removes it for everyone else)
+    archived = forms.BooleanField(
+        required=False,
+        label="Archived organization",
+        widget=forms.CheckboxInput(
+            attrs={"class": "sr-only peer", "x-model": "archived"}
+        ),
+    )
+
+    def __init__(self, *args, can_archive=False, **kwargs):
+        super().__init__(*args, **kwargs)
+        if not can_archive:
+            del self.fields["archived"]
 
     def clean_name(self):
         return _clean_name(self.cleaned_data["name"])
@@ -54,16 +89,29 @@ class OrganizationPageForm(forms.ModelForm):
     banner_upload = forms.ImageField(required=False, label="Banner")
     remove_logo = forms.BooleanField(required=False)
     remove_banner = forms.BooleanField(required=False)
-    links = JSONRowsField(row_cleaner=clean_link_row, required=False, max_rows=12, label="Links")
+    links = JSONRowsField(
+        row_cleaner=clean_link_row, required=False, max_rows=12, label="Links"
+    )
 
     class Meta:
         model = Organization
         fields = ["name", "tagline", "description", "accepts_requests"]
-        labels = {"description": "Biography", "accepts_requests": "Let members ask to join from the organization's page"}
+        labels = {
+            "description": "Biography",
+            "accepts_requests": "Let members ask to join from the organization's page",
+        }
         widgets = {
             "name": forms.TextInput(attrs={"class": INPUT, "autocomplete": "off"}),
-            "tagline": forms.TextInput(attrs={"class": INPUT, "placeholder": "One line about what you make"}),
-            "description": forms.Textarea(attrs={"class": "zb-textarea text-sm resize-y w-full", "rows": 10, "placeholder": "Who you are, what you make, how to get involved. Markdown works."}),
+            "tagline": forms.TextInput(
+                attrs={"class": INPUT, "placeholder": "One line about what you make"}
+            ),
+            "description": forms.Textarea(
+                attrs={
+                    "class": "zb-textarea text-sm resize-y w-full",
+                    "rows": 10,
+                    "placeholder": "Who you are, what you make, how to get involved. Markdown works.",
+                }
+            ),
         }
 
     def clean_name(self):
@@ -71,7 +119,11 @@ class OrganizationPageForm(forms.ModelForm):
 
     def clean_logo_upload(self):
         image = self.cleaned_data.get("logo_upload")
-        return _check_image(image, min_width=MIN_LOGO_SIZE, min_height=MIN_LOGO_SIZE) if image else None
+        return (
+            _check_image(image, min_width=MIN_LOGO_SIZE, min_height=MIN_LOGO_SIZE)
+            if image
+            else None
+        )
 
     def clean_banner_upload(self):
         image = self.cleaned_data.get("banner_upload")
@@ -81,7 +133,10 @@ class OrganizationPageForm(forms.ModelForm):
         if self.is_bound:
             rows = raw_rows(self.data, self.add_prefix("links"))
         else:
-            rows = [{"kind": link.kind, "url": link.url, "label": link.label} for link in self.instance.links.all()]
+            rows = [
+                {"kind": link.kind, "url": link.url, "label": link.label}
+                for link in self.instance.links.all()
+            ]
         return widget_config(
             name=self.add_prefix("links"),
             rows=rows,
@@ -95,7 +150,10 @@ class OrganizationPageForm(forms.ModelForm):
     @transaction.atomic
     def save(self, commit=True):
         org = super().save(commit=False)
-        for field, upload, remove in (("logo", "logo_upload", "remove_logo"), ("banner", "banner_upload", "remove_banner")):
+        for field, upload, remove in (
+            ("logo", "logo_upload", "remove_logo"),
+            ("banner", "banner_upload", "remove_banner"),
+        ):
             current = getattr(org, field)
             if self.cleaned_data.get(upload):
                 if current:
@@ -112,11 +170,20 @@ class OrganizationPageForm(forms.ModelForm):
 
 
 class InviteForm(forms.Form):
-    username = forms.CharField(max_length=150, widget=forms.TextInput(attrs={"class": INPUT, "placeholder": "Username", "autocomplete": "off"}))
+    username = forms.CharField(
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={"class": INPUT, "placeholder": "Username", "autocomplete": "off"}
+        ),
+    )
 
     def clean_username(self):
         name = self.cleaned_data["username"].strip().lstrip("@")
-        member = get_user_model().objects.filter(username__iexact=name, is_active=True).first()
+        member = (
+            get_user_model()
+            .objects.filter(username__iexact=name, is_active=True)
+            .first()
+        )
         if member is None:
             raise forms.ValidationError("There's no member with that username.")
         return member
@@ -125,14 +192,23 @@ class InviteForm(forms.Form):
 class MemberSettingsForm(forms.Form):
     """One member's title and permissions, set by the owner or a co-owner."""
 
-    title = forms.CharField(max_length=80, required=False, widget=forms.TextInput(attrs={"class": INPUT, "placeholder": "e.g. Texture artist"}))
+    title = forms.CharField(
+        max_length=80,
+        required=False,
+        widget=forms.TextInput(
+            attrs={"class": INPUT, "placeholder": "e.g. Texture artist"}
+        ),
+    )
     can_publish = forms.BooleanField(required=False)
     can_use_inbox = forms.BooleanField(required=False)
     can_edit_profile = forms.BooleanField(required=False)
 
 
 class DeleteOrganizationForm(forms.Form):
-    confirm = forms.CharField(max_length=100, widget=forms.TextInput(attrs={"class": INPUT, "autocomplete": "off"}))
+    confirm = forms.CharField(
+        max_length=100,
+        widget=forms.TextInput(attrs={"class": INPUT, "autocomplete": "off"}),
+    )
 
     def __init__(self, *args, organization=None, **kwargs):
         super().__init__(*args, **kwargs)
