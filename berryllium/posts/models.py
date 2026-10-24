@@ -54,7 +54,9 @@ class Post(models.Model):
     summary = models.CharField(max_length=500, blank=True)
     body = models.TextField(blank=True)
     thumbnail = models.ImageField(upload_to=post_thumbnail_path, blank=True)
+    category = models.CharField(max_length=200, blank=True, db_index=True)
     game = models.CharField(max_length=100, blank=True, db_index=True)
+    expansions = models.CharField(max_length=200, blank=True)
 
     uploaded_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="posts"
@@ -81,7 +83,7 @@ class Post(models.Model):
         ordering = ["-publish_date"]
 
     def __str__(self):
-        return self.title or f"Untitled post #{self.pk}"
+        return self.title or f"Untitled article #{self.pk}"
 
     def get_absolute_url(self):
         return reverse("post_detail", kwargs={"post_id": self.pk})
