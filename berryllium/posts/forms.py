@@ -3,10 +3,15 @@ import os
 from django import forms
 from django.urls import reverse
 
-from berryllium.mods.forms import DescriptionImageForm, ModGeneralInfoForm
+from berryllium.mods.forms import (
+    DescriptionImageForm,
+    ModGeneralInfoForm,
+    keep_retired_choices,
+)
 from berryllium.mods.pickers import PickerField, picker_config, resolve_tags, tag_items
-from berryllium.mods.settings import ALLOWED_EXTENSIONS, GAME_OPTIONS, MAX_FILE_SIZE, MAX_IMAGE_SIZE
+from berryllium.mods.settings import ALLOWED_EXTENSIONS, MAX_FILE_SIZE, MAX_IMAGE_SIZE
 from berryllium.posts.models import Post
+from berryllium.shared import options
 from berryllium.shared.widgets import PillCheckboxSelectMultiple
 
 PostImageForm = DescriptionImageForm
@@ -16,12 +21,45 @@ MAX_POST_FILES = 20
 MIN_THUMBNAIL_WIDTH = 640
 
 
+def _game_choices():
+    return options.game_options(include_na=False)
+
+
 class PostGeneralForm(ModGeneralInfoForm):
-    kind = forms.ChoiceField(choices=Post.Kind.choices, widget=forms.RadioSelect, initial=Post.Kind.TUTORIAL)
+    """The new-article modal: the mod modal's fields, the kind (for the site team), and categorization."""
+
+    kind = forms.ChoiceField(
+        choices=Post.Kind.choices, widget=forms.RadioSelect, initial=Post.Kind.TUTORIAL
+    )
+    # articles have their own category list and games and expansions are the same as for mods
+    category = forms.MultipleChoiceField(
+        required=False,
+        label="Categories",
+        choices=options.article_categories,
+        widget=PillCheckboxSelectMultiple,
+    )
+    game = forms.MultipleChoiceField(
+        required=False,
+        label="Games",
+        choices=_game_choices,
+        widget=PillCheckboxSelectMultiple,
+    )
+    expansions = forms.MultipleChoiceField(
+        required=False,
+        label="Expansions",
+        choices=options.expansion_options,
+        widget=PillCheckboxSelectMultiple,
+    )
 
     class Meta(ModGeneralInfoForm.Meta):
         model = Post
-        fields = ["kind", *ModGeneralInfoForm.Meta.fields]
+        fields = [
+            "kind",
+            *ModGeneralInfoForm.Meta.fields,
+            "category",
+            "game",
+            "expansions",
+        ]
 
     def __init__(self, *args, can_post_news=False, **kwargs):
         super().__init__(*args, **kwargs)
@@ -31,43 +69,62 @@ class PostGeneralForm(ModGeneralInfoForm):
             del self.fields["kind"]
         # wording for posts instead of mods
         self.fields["title"].widget.attrs["placeholder"] = "Enter a title..."
-        self.fields["summary"].widget.attrs["placeholder"] = "One or two sentences shown on cards and under the title..."
+        self.fields["summary"].widget.attrs["placeholder"] = (
+            "One or two sentences shown on cards and under the title..."
+        )
         self.fields["collaborators"].help_text = "People who wrote this with you."
         self.fields["original_authors"].help_text = "Who wrote it originally."
-        self.fields["is_archived_file"].label = "Was this first published somewhere else?"
+        self.fields[
+            "is_archived_file"
+        ].label = "Was this first published somewhere else?"
+        # stored as "a, b"; the checkboxes need lists
+        for name in ("category", "game", "expansions"):
+            if isinstance(self.initial.get(name), str):
+                self.initial[name] = options.keys(self.initial[name])
+        keep_retired_choices(
+            self,
+            {
+                "category": options.category_labels("article"),
+                "game": options.game_labels(),
+                "expansions": options.expansion_labels(),
+            },
+        )
+
+    def _joined(self, name):
+        return ", ".join(self.cleaned_data.get(name) or [])
+
+    def clean_category(self):
+        return self._joined("category")
+
+    def clean_game(self):
+        return self._joined("game")
+
+    def clean_expansions(self):
+        return self._joined("expansions")
 
 
 class PostEditorForm(PostGeneralForm):
     """The editor: everything from the modal, plus tags and the article body (markdown)."""
 
     tags = PickerField(required=False, allow_new=True, max_items=20, label="Tags")
-    game = forms.MultipleChoiceField(
-        required=False,
-        label="Game",
-        choices=[option for option in GAME_OPTIONS if option[0] != "na"],
-        widget=PillCheckboxSelectMultiple,
-    )
     body = forms.CharField(
         required=False,
         label="Article",
-        widget=forms.Textarea(attrs={
-            "placeholder": "Write your article in markdown. Headings (## Heading) become the table of contents.",
-            "class": "zb-textarea text-sm resize-y w-full font-mono",
-            "rows": 22,
-        }),
+        widget=forms.Textarea(
+            attrs={
+                "placeholder": "Write your article in markdown. Headings (## Heading) become the table of contents.",
+                "class": "zb-textarea text-sm resize-y w-full font-mono",
+                "rows": 22,
+            }
+        ),
     )
 
     class Meta(PostGeneralForm.Meta):
-        fields = [*PostGeneralForm.Meta.fields, "game", "body"]
+        fields = [*PostGeneralForm.Meta.fields, "body"]
 
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
-        if isinstance(self.initial.get("game"), str):
-            self.initial["game"] = [key.strip() for key in self.initial["game"].split(",") if key.strip()]
-            
-    def clean_game(self):
-        return ", ".join(self.cleaned_data.get("game") or [])
 
     def clean_tags(self):
         return resolve_tags(self.cleaned_data.get("tags", []))
@@ -83,7 +140,10 @@ class PostEditorForm(PostGeneralForm):
 
     def tags_picker(self):
         if self.is_bound:
-            existing, new_names = resolve_tags([v for v in self.data.getlist(self.add_prefix("tags")) if v], strict=False)
+            existing, new_names = resolve_tags(
+                [v for v in self.data.getlist(self.add_prefix("tags")) if v],
+                strict=False,
+            )
         else:
             existing = list(self.instance.tags.all()) if self.instance.pk else []
             new_names = list(self.instance.pending_tags or [])
@@ -103,12 +163,16 @@ class ThumbnailForm(forms.Form):
     def clean_image(self):
         image = self.cleaned_data["image"]
         if image.size > MAX_IMAGE_SIZE:
-            raise forms.ValidationError(f"The image must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB.")
+            raise forms.ValidationError(
+                f"The image must be under {MAX_IMAGE_SIZE // (1024 * 1024)} MB."
+            )
         if image.image.format not in ("JPEG", "PNG", "WEBP"):
             raise forms.ValidationError("Use a JPG, PNG or WEBP image.")
         width, _ = image.image.size
         if width < MIN_THUMBNAIL_WIDTH:
-            raise forms.ValidationError(f"The image must be at least {MIN_THUMBNAIL_WIDTH}px wide (yours is {width}px).")
+            raise forms.ValidationError(
+                f"The image must be at least {MIN_THUMBNAIL_WIDTH}px wide (yours is {width}px)."
+            )
         return image
 
 
@@ -117,5 +181,7 @@ def clean_post_file(upload):
     if extension not in POST_FILE_EXTENSIONS:
         return f"{upload.name}: only {', '.join('.' + e for e in POST_FILE_EXTENSIONS)} files can be attached."
     if upload.size > MAX_FILE_SIZE:
-        return f"{upload.name}: files must be under {MAX_FILE_SIZE // (1024 * 1024)} MB."
+        return (
+            f"{upload.name}: files must be under {MAX_FILE_SIZE // (1024 * 1024)} MB."
+        )
     return ""
