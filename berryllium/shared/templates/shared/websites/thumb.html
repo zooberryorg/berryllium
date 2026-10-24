@@ -1,0 +1,5 @@
+{% if website.thumbnail %}
+    <img src="{{ website.thumbnail.url }}" alt="" class="{{ thumb_class|default:'w-9 h-9' }} shrink-0 rounded-lg object-cover ring-2 ring-pine-300 bg-pine-800">
+{% else %}
+    <span class="{{ thumb_class|default:'w-9 h-9 text-sm' }} shrink-0 rounded-lg bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-gold-200 select-none" aria-hidden="true"><i class="bi bi-archive-fill"></i></span>
+{% endif %}

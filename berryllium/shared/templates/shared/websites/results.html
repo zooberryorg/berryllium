@@ -1,0 +1,63 @@
+{% include 'shared/explore/active_filters.html' %}
+
+<p class="text-gray-400 text-sm mb-4">
+    <span class="text-white font-semibold">{{ page.paginator.count }}</span> website{{ page.paginator.count|pluralize }} found
+</p>
+
+{% if page.object_list %}
+    <div class="overflow-x-auto rounded-2xl border border-pine-300">
+        <table class="w-full text-sm">
+            <thead class="bg-pine-800/80 text-left text-xs uppercase tracking-wider text-gray-400">
+                <tr>
+                    <th scope="col" class="px-4 py-3 font-semibold">Website</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right">Mods</th>
+                    <th scope="col" class="px-4 py-3 font-semibold">Years</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden sm:table-cell">Status</th>
+                    <th scope="col" class="px-4 py-3 font-semibold hidden md:table-cell">Games</th>
+                    <th scope="col" class="px-4 py-3 font-semibold text-right hidden lg:table-cell">Staff</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for website in page.object_list %}
+                    <tr class="odd:bg-pine-600 even:bg-pine-700 hover:bg-pine-300 transition-colors duration-150">
+                        <td class="px-4 py-2.5">
+                            <a href="{{ website.get_absolute_url }}" class="group/site flex items-center gap-3 min-w-0">
+                                {% include 'shared/websites/thumb.html' %}
+                                <span class="min-w-0">
+                                    <span class="block font-medium text-white truncate group-hover/site:text-gold-200">{{ website.name }}</span>
+                                    {% if website.alias_list %}<span class="block text-xs text-gray-400 truncate max-w-[22rem]">Also {{ website.alias_list|join:", " }}</span>{% endif %}
+                                </span>
+                            </a>
+                        </td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-white">{{ website.mod_count }}</td>
+                        <td class="px-4 py-2.5 tabular-nums text-gray-300 whitespace-nowrap">{{ website.years_active|default:"—" }}</td>
+                        <td class="px-4 py-2.5 hidden sm:table-cell">
+                            {% if website.is_offline %}
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-gray-300 whitespace-nowrap"><i class="bi bi-wifi-off"></i> Offline</span>
+                            {% else %}
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-gold-400/15 border border-gold-400/30 text-gold-200 whitespace-nowrap"><i class="bi bi-wifi"></i> Online</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-2.5 hidden md:table-cell">
+                            <span class="flex flex-wrap gap-1">
+                                {% for label in website.game_labels %}<span class="text-xs px-2 py-0.5 rounded-full bg-white/5 border border-white/10 text-white/80 whitespace-nowrap">{{ label }}</span>{% empty %}<span class="text-gray-500">—</span>{% endfor %}
+                            </span>
+                        </td>
+                        <td class="px-4 py-2.5 text-right tabular-nums text-gray-300 hidden lg:table-cell">{{ website.staff_count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% include 'shared/explore/table_pages.html' with target="#website-results" %}
+{% else %}
+    <div class="rounded-2xl border border-white/10 bg-pine-700/60 p-10 text-center">
+        <i class="bi bi-archive text-4xl text-white/30"></i>
+        {% if has_anyone %}
+            <p class="text-white font-semibold mt-4">No websites match these filters.</p>
+            <button type="button" class="zb-action mt-4 cursor-pointer" onclick="exploreClearFilter()">Clear all filters</button>
+        {% else %}
+            <p class="text-white font-semibold mt-4">No archived websites have been added yet.</p>
+        {% endif %}
+    </div>
+{% endif %}

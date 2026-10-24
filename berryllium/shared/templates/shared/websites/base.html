@@ -1,0 +1,61 @@
+{% extends 'shared/explore/base.html' %}
+{% block explore_content %}
+    <form id="explore-filters"
+          method="get"
+          action="{% url 'explore_websites' %}"
+          hx-get="{% url 'explore_websites' %}"
+          hx-target="#website-results"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-trigger="change delay:50ms, input changed delay:400ms from:#explore-search, submit"
+          x-data="{ showFilters: false }"
+          class="flex flex-col lg:flex-row lg:items-start gap-6">
+
+        <div class="lg:w-72 flex-shrink-0">
+            <button type="button" class="lg:hidden w-full zb-action flex items-center justify-center gap-2 mb-3"
+                    @click="showFilters = !showFilters" :aria-expanded="showFilters">
+                <i class="bi bi-funnel"></i> <span x-text="showFilters ? 'Hide filters' : 'Filters'"></span>
+            </button>
+            <aside class="space-y-6 lg:block" :class="showFilters ? 'block' : 'hidden'">
+                <fieldset class="rounded-2xl bg-pine-600 backdrop-blur-sm p-1.5 border border-pine-300">
+                    <legend class="sr-only">Status</legend>
+                    <h3 class="text-lg font-bold text-white px-4 pt-2 mb-1">Status</h3>
+                    <p class="text-xs text-gray-400 px-4 mb-3">Sites that used to host Zoo Tycoon mods, and whether they're still up.</p>
+                    <div class="space-y-1 text-sm">
+                        <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-transparent transition-[color,background-color] duration-150 cursor-pointer">
+                            <input type="radio" name="status" value="" class="sr-only" {% if not filters.status %}checked{% endif %}>
+                            <span class="w-8 h-8 rounded-lg flex items-center justify-center"><i class="explore-option-icon bi bi-grid text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i></span>
+                            <span class="flex-1">All websites</span>
+                            <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ total_websites }}</span>
+                        </label>
+                        {% for option in status_options %}
+                            <label class="explore-option group flex items-center gap-3 px-4 py-1 rounded-xl text-gray-400 hover:text-white hover:bg-white/5 border border-transparent transition-[color,background-color] duration-150 cursor-pointer">
+                                <input type="radio" name="status" value="{{ option.key }}" class="sr-only" {% if filters.status == option.key %}checked{% endif %}>
+                                <span class="w-8 h-8 rounded-lg flex items-center justify-center"><i class="explore-option-icon bi {{ option.icon }} text-gray-400 text-sm group-hover:text-gold-300 transition-colors duration-150"></i></span>
+                                <span class="flex-1">{{ option.label }}</span>
+                                <span class="text-xs bg-pine-700/50 px-2 py-1 rounded-full">{{ option.count }}</span>
+                            </label>
+                        {% endfor %}
+                    </div>
+                </fieldset>
+            </aside>
+        </div>
+
+        <div class="flex-1 min-w-0 space-y-4">
+            {% include 'shared/widgets/search_input.html' with input_id="explore-search" value=filters.q placeholder="Search websites by name or alias..." label="Search archived websites" %}
+            <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+                <div class="sm:min-w-[200px]">
+                    {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=filters.sort icon="bi-sort-down" %}
+                </div>
+                <div class="sm:min-w-[180px]">
+                    {% include 'shared/widgets/dropdown.html' with name="game" label="Game" options=game_options selected=filters.game empty_label="Any game" icon="bi-controller" clearable="true" %}
+                </div>
+            </div>
+
+            <div id="website-results" aria-live="polite">
+                {% include 'shared/websites/results.html' %}
+            </div>
+        </div>
+    </form>
+    {% include 'shared/explore/filter_styles.html' %}
+{% endblock %}

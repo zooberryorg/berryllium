@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load bfilters %}
+{% block content %}
+    <div class="max-w-screen-xl mx-auto px-2 sm:px-4 py-6 lg:py-8 space-y-6">
+        {% include 'shared/messages.html' %}
+
+        <header class="overflow-hidden rounded-2xl border border-pine-300 bg-pine-600">
+            {% if website.banner %}
+                <div class="aspect-[3/1] sm:aspect-[4/1] bg-pine-800">
+                    <img src="{{ website.banner.url }}" alt="" class="w-full h-full object-cover">
+                </div>
+            {% endif %}
+            <div class="flex flex-col sm:flex-row sm:items-center gap-5 sm:gap-6 p-5 sm:p-6">
+                <div class="{% if website.banner %}-mt-16 sm:-mt-20{% endif %}">
+                    {% include 'shared/websites/thumb.html' with thumb_class="w-24 h-24 sm:w-32 sm:h-32 text-4xl ring-4 ring-pine-600" %}
+                </div>
+                <div class="min-w-0 flex-1 space-y-1.5">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <h1 class="text-3xl sm:text-4xl font-bold text-white leading-tight" style="overflow-wrap: anywhere;">{{ website.name }}</h1>
+                        <span class="text-xs px-2.5 py-1 rounded-full bg-gold-400/15 text-gold-200"><i class="bi bi-archive-fill mr-1"></i>Archived website</span>
+                        {% if website.is_offline %}
+                            <span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80"><i class="bi bi-wifi-off mr-1"></i>Offline</span>
+                        {% else %}
+                            <span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80"><i class="bi bi-wifi mr-1"></i>Still online</span>
+                        {% endif %}
+                    </div>
+                    {% if website.alias_list %}<p class="text-granite-200">Also known as {{ website.alias_list|join:", " }}</p>{% endif %}
+                    <p class="flex flex-wrap items-center gap-x-2 gap-y-1 text-gray-300">
+                        <span><strong class="text-white tabular-nums">{{ stats.mods }}</strong> archived mod{{ stats.mods|pluralize }}</span>
+                        <span class="text-gray-500" aria-hidden="true">•</span>
+                        <span title="{{ downloads }} downloads"><strong class="text-white tabular-nums">{{ downloads|compact }}</strong> download{{ downloads|pluralize }} here</span>
+                        {% for label in website.game_labels %}
+                            <span class="text-gray-500" aria-hidden="true">•</span><span>{{ label }}</span>
+                        {% endfor %}
+                    </p>
+                    {% if website.years_active %}<p class="text-sm text-gray-400 italic">Active {{ website.years_active }}{% if website.est_date and website.closure_date %} ({{ website.est_date|date:"M Y" }} to {{ website.closure_date|date:"M Y" }}){% endif %}</p>{% endif %}
+                </div>
+                {% if website.url and not website.is_offline %}
+                    <div class="flex flex-wrap items-center gap-2 sm:self-start">
+                        <a href="{{ website.url }}" target="_blank" rel="noopener noreferrer nofollow" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-box-arrow-up-right"></i> Visit</a>
+                    </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="grid gap-6 items-start lg:grid-cols-[minmax(0,1fr)_20rem]">
+            <div class="min-w-0 space-y-4">
+                <form id="profile-filters"
+                      method="get"
+                      action="{{ request.path }}"
+                      hx-get="{{ request.path }}"
+                      hx-target="#profile-results"
+                      hx-swap="innerHTML"
+                      hx-push-url="true"
+                      hx-trigger="change delay:50ms, input changed delay:400ms from:#profile-search, submit"
+                      class="space-y-4">
+                    {% with placeholder="Search mods archived from "|add:website.name|add:"..." label="Search mods archived from "|add:website.name %}
+                        {% include 'shared/widgets/search_input.html' with input_id="profile-search" value=q %}
+                    {% endwith %}
+                    <div class="grid grid-cols-1 sm:flex sm:flex-wrap gap-3 text-sm">
+                        <div class="sm:min-w-[200px]">
+                            {% include 'shared/widgets/dropdown.html' with name="sort" label="Sort by" options=sort_options selected=sort icon="bi-sort-down" %}
+                        </div>
+                    </div>
+                </form>
+                <div id="profile-results" aria-live="polite">
+                    {% include 'users/profile/results.html' %}
+                </div>
+            </div>
+
+            <aside class="min-w-0 space-y-4 order-first lg:order-none" aria-label="About {{ website.name }}">
+                <section class="rounded-2xl border border-pine-300 bg-pine-600 p-5 sm:p-6">
+                    <h2 class="text-lg font-semibold text-white mb-3">About</h2>
+                    {% if website.description %}
+                        <div class="md-preview text-sm text-granite-200" style="overflow-wrap: anywhere;">{{ website.description|markdown }}</div>
+                    {% else %}
+                        <p class="text-sm text-gray-400">No history has been written for {{ website.name }} yet.</p>
+                    {% endif %}
+                </section>
+
+                {% if links or website.url %}
+                    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Links</h2>
+                        <ul class="flex flex-wrap gap-2">
+                            {% if website.url %}
+                                <li><a href="{{ website.url }}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/90 hover:border-gold-400/50 hover:text-gold-300 transition-colors"><i class="bi bi-house"></i> Main address</a></li>
+                            {% endif %}
+                            {% for link in links %}
+                                <li><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer nofollow" class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-white/90 hover:border-gold-400/50 hover:text-gold-300 transition-colors"><i class="bi {{ link.icon }}"></i> {{ link.label }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                {% if staff %}
+                    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Former staff</h2>
+                        <ul class="space-y-1">
+                            {% for person in staff %}
+                                <li>
+                                    <a href="{{ person.url }}" class="group/person flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-white/5 transition-colors">
+                                        {% if person.member %}
+                                            {% include 'shared/navigation/avatar.html' with member=person.member avatar_class="w-9 h-9 text-sm" %}
+                                        {% else %}
+                                            <span class="w-9 h-9 shrink-0 rounded-full bg-pine-400 ring-2 ring-pine-300 flex items-center justify-center text-sm font-semibold text-gold-200 uppercase select-none">{{ person.name|slice:":1" }}</span>
+                                        {% endif %}
+                                        <span class="min-w-0 flex-1 truncate text-sm font-medium text-white group-hover/person:text-gold-200">{{ person.name }}</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+
+                {% if articles %}
+                    <section class="rounded-2xl border border-pine-300 bg-pine-600 p-4">
+                        <h2 class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">Archived articles</h2>
+                        <ul class="space-y-1">
+                            {% for article in articles %}
+                                <li><a href="{{ article.get_absolute_url }}" class="flex items-start gap-2 rounded-xl px-2 py-1.5 text-sm text-white/90 hover:bg-white/5 hover:text-gold-200 transition-colors"><i class="bi {% if article.kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %} text-gray-400 mt-0.5"></i><span class="min-w-0">{{ article.title|default:"Untitled article" }}</span></a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                {% endif %}
+            </aside>
+        </div>
+    </div>
+    <style>
+        [x-cloak] { display: none !important; }
+        #profile-search::-webkit-search-cancel-button { -webkit-appearance: none; appearance: none; }
+    </style>
+    {% include 'shared/markdown_styles.html' %}
+{% endblock %}
