@@ -1,13 +1,6 @@
-{% if tag %}
-    <div class="mb-4 flex items-center gap-2 text-sm">
-        <span class="text-gray-400">Tagged</span>
-        <a href="{{ request.path }}{% if q %}?q={{ q|urlencode }}{% endif %}" class="inline-flex items-center gap-1.5 rounded-full bg-gold-400/15 px-3 py-1 text-gold-200 hover:bg-gold-400/25" title="Remove this filter">
-            #{{ tag }} <i class="bi bi-x"></i>
-        </a>
-    </div>
-{% endif %}
+{% include 'shared/explore/active_filters.html' %}
 {% if page.object_list %}
-    <p class="mb-4 text-sm text-gray-400">{{ page.paginator.count }} {% if kind == 'news' %}post{{ page.paginator.count|pluralize }}{% else %}tutorial{{ page.paginator.count|pluralize }}{% endif %}</p>
+    <p class="mb-4 text-sm text-gray-400">{{ page.paginator.count }} {% if kind == 'news' %}news post{{ page.paginator.count|pluralize }}{% else %}tutorial{{ page.paginator.count|pluralize }}{% endif %}</p>
     <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {% for post in page.object_list %}{% include 'posts/explore/card.html' %}{% endfor %}
     </div>
@@ -29,7 +22,7 @@
         <i class="bi {% if kind == 'news' %}bi-newspaper{% else %}bi-tools{% endif %} text-4xl text-white/20"></i>
         {% if has_any %}
             <p class="mt-3 text-white">Nothing matches these filters.</p>
-            <a href="{{ request.path }}" class="mt-2 inline-block text-sm text-gold-300 hover:text-gold-200">Clear all filters</a>
+            <button type="button" class="mt-2 inline-block text-sm text-gold-300 hover:text-gold-200 cursor-pointer" onclick="exploreClearFilter()">Clear all filters</button>
         {% elif kind == 'news' %}
             <p class="mt-3 text-white">No news yet.</p>
             <p class="mt-1 text-sm text-gray-400">Site announcements will show up here.</p>
