@@ -1,4 +1,7 @@
+import json
+
 from django.contrib.auth.decorators import login_required
+from django.http import HttpResponse
 from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET, require_POST
@@ -26,11 +29,19 @@ def menu(request):
     """The bell in the top bar. Loads last few notifications."""
     return _menu(request)
 
-@login_required
 @require_GET
 def badge(request):
-    """Unread count for the top bar bell. Every minute updated via AJAX."""
-    return render(request, "notifications/badge.html", {"unread_notifications": unread_count(request.user)})
+    """
+    Unread count for the top bar bell, checked every 30 seconds while the tab is visible.
+    It also tells the page the count (notificationsCount), so an open bell menu can reload.
+    """
+    if not request.user.is_authenticated:
+        # signed out in another tab: 286 tells htmx to stop polling (instead of swapping in the login page)
+        return HttpResponse(status=286)
+    count = unread_count(request.user)
+    response = render(request, "notifications/badge.html", {"unread_notifications": count})
+    response["HX-Trigger"] = json.dumps({"notificationsCount": count})
+    return response
 
 @login_required
 @require_GET
