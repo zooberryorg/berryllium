@@ -30,7 +30,7 @@
             {# bulk bar #}
             <div class="flex flex-wrap items-center gap-3 rounded-2xl border border-pine-300 bg-pine-600 px-4 py-3">
                 <label class="flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
-                    <input type="checkbox" class="w-4 h-4 accent-gold-400 cursor-pointer"
+                    <input type="checkbox" class="zb-checkbox"
                            :checked="selected.length && selected.length === allIds.length"
                            x-effect="$el.indeterminate = selected.length > 0 && selected.length < allIds.length"
                            @change="selected = $event.target.checked ? [...allIds] : []; confirming = false">
@@ -63,7 +63,7 @@
                     <li class="flex items-center gap-3 sm:gap-4 px-4 py-3 transition-colors duration-150"
                         :class="selected.includes('{{ mod.pk }}') ? 'bg-gold-400/5' : 'hover:bg-white/[0.03]'">
                         <input type="checkbox" name="ids" value="{{ mod.pk }}" x-model="selected" @change="confirming = false"
-                               class="w-4 h-4 shrink-0 accent-gold-400 cursor-pointer" aria-label="Select {{ mod.title|default:'Untitled mod' }}">
+                               class="zb-checkbox shrink-0" aria-label="Select {{ mod.title|default:'Untitled mod' }}">
                         <span class="hidden sm:block w-24 shrink-0 overflow-hidden rounded-lg bg-pine-800" style="aspect-ratio: 16 / 9;">
                             {% if mod.card_image_url %}<img src="{{ mod.card_image_url }}" alt="" loading="lazy" class="w-full h-full object-cover">{% endif %}
                         </span>
