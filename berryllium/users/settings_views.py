@@ -15,12 +15,14 @@ def _my_mods(user):
 
 
 def _nav(request, active):
+    from berryllium.organizations.models import OrganizationMembership # note: imported here to avoid circular import
     sections = [
         ("settings_profile", "Profile", "bi-person-circle", None),
         ("settings_preferences", "Preferences", "bi-sliders", None),
         ("settings_account", "Account", "bi-shield-lock", None),
         ("settings_mods", "My mods", "bi-puzzle", _my_mods(request.user).count()),
-        ("settings_posts", "My posts", "bi-journal-text", request.user.posts.count()),
+        ("settings_posts", "My articles", "bi-journal-text", request.user.posts.count()),
+        ("settings_organizations", "Organizations", "bi-people", OrganizationMembership.objects.filter(user=request.user).count()),
     ]
     return [
         {"url": reverse(name), "label": label, "icon": icon, "count": count, "active": name == active}
