@@ -18,6 +18,7 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <h1 class="text-3xl sm:text-4xl font-bold text-white leading-tight" style="overflow-wrap: anywhere;">{{ org.name }}</h1>
                         <span class="text-xs px-2.5 py-1 rounded-full bg-gold-400/15 text-gold-200"><i class="bi bi-people-fill mr-1"></i>Organization</span>
+                        {% if org.is_archived %}<span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80" title="A historical group kept for the record"><i class="bi bi-archive mr-1"></i>Archived</span>{% endif %}
                         {% if my_row %}<span class="text-xs px-2.5 py-1 rounded-full bg-white/10 text-white/80">You're {% if my_row.role == 'member' %}a member{% else %}the {{ my_row.get_role_display|lower }}{% endif %}</span>{% endif %}
                     </div>
                     {% if org.tagline %}<p class="text-granite-200">{{ org.tagline }}</p>{% endif %}
@@ -32,7 +33,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-2 sm:self-start">
                     {% if user.is_authenticated %}
-                        {% if not my_row %}
+                        {% if not my_row and not org.is_archived %}
                             <a href="{% url 'inbox_new' %}?org={{ org.slug|urlencode }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-envelope"></i> Message</a>
                             {% if pending %}
                                 <span class="zb-action inline-flex items-center gap-1.5 text-sm opacity-70 cursor-default"><i class="bi bi-hourglass-split"></i> {% if pending.kind == 'invite' %}You're invited{% else %}Asked to join{% endif %}</span>
@@ -43,10 +44,12 @@
                                     <button type="submit" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-person-plus"></i> Ask to join</button>
                                 </form>
                             {% endif %}
-                        {% elif can_manage_page %}
-                            <a href="{% if my_row.can_edit_profile or my_row.is_manager %}{% url 'organization_manage_page' org.slug %}{% else %}{% url 'organization_inbox' org.slug %}{% endif %}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-sliders2"></i> Manage</a>
                         {% endif %}
-                    {% else %}
+                        {% if can_manage_page %}
+                            {# members with a permission, plus moderators and admins #}
+                            <a href="{{ manage_url }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-sliders2"></i> Manage</a>
+                        {% endif %}
+                    {% elif not org.is_archived %}
                         <a href="{% url 'login' %}?next={{ request.path|urlencode }}" class="zb-action inline-flex items-center gap-1.5 text-sm"><i class="bi bi-envelope"></i> Log in to message</a>
                     {% endif %}
                 </div>
